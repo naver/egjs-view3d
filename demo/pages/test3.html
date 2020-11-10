@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme-color" content="#2D3142">
+  <link rel="shortcut icon" type="image/png" href="../favicon.png"/>
+  <link rel="stylesheet" href="../css/common.css">
+  <script type="module" src="../lib/model-viewer.js"></script>
+  <title>View3D viewer</title>
+</head>
+<body>
+  <model-viewer
+    src="../asset/lofoten/model_original.glb"
+    camera-controls
+    style="width: 100%;"
+    ar ar-modes="webxr scene-viewer quick-look"
+  ></model-viewer>
+  <h1>Test3</h1>
+  <div id="result"></div>
+  <script type="text/javascript" src="../js/test3.js"></script>
+</body>

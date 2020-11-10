@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
+    <script type="text/javascript" src="./js/dat.gui.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/screenfull@5.0.1/dist/screenfull.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script type="text/javascript" src="./dist/view3d.pkgd.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Oswald&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/spinkit.min.css">
+    <link rel="stylesheet" href="./css/index.css">
+    <link rel="stylesheet" href="./css/drop.css">
+    <title>View3D viewer</title>
+    <script>
+      if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
+        alert("Browser doesn't support File API");
+      }
+    </script>
+</head>
+<body>
+  <div id="view3d-wrapper">
+    <div class="view3d-canvas-wrapper">
+      <canvas id="view3d-canvas"></canvas>
+      <div id="view3d-controls" class="invisible">
+        <div class="buttons-wrapper">
+          <img id="pause" width="24" height="24" src="image/pause.svg" />
+          <img id="reset" width="24" height="24" src="image/reset.svg" />
+          <img id="fullscreen" width="24" height="24" src="image/fullscreen.svg" />
+          <img id="info" width="24" height="24" src="image/info.svg" />
+        </div>
+      </div>
+      <div class="loading-indicator invisible">
+        <div class="sk-wave">
+          <div class="sk-wave-rect"></div>
+          <div class="sk-wave-rect"></div>
+          <div class="sk-wave-rect"></div>
+          <div class="sk-wave-rect"></div>
+          <div class="sk-wave-rect"></div>
+        </div>
+        <div class="loading-details"></div>
+      </div>
+    </div>
+    <div id="drop-indicator">
+      <span>Drag glTF 2.0 files or folder here</span>
+      <input type="file" id="file-fallback" multiple>
+    </div>
+  </div>
+  <script type="text/javascript" src="./js/ie11.js"></script>
+</body>
