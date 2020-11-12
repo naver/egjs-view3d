@@ -1,12 +1,22 @@
 <img src="./demo/image/view3d.png" />
 
-[![Version](https://img.shields.io/npm/v/@egjs/view3d?color=A8C256&label=&style=flat-square&logo=npm)](https://www.npmjs.com/package/@egjs/view3d) ![typescript](https://img.shields.io/static/v1.svg?label=&message=TypeScript&color=294E80&style=flat-square&logo=typescript) ![supports](https://img.shields.io/static/v1.svg?label=&message=%F0%9F%93%B1%F0%9F%92%BB%F0%9F%96%A5%EF%B8%8F&color=EEEEEE&style=flat-square)
+[![Version](https://img.shields.io/npm/v/@egjs/view3d?color=A8C256&label=&style=flat-square&logo=npm)](https://www.npmjs.com/package/@egjs/view3d) ![typescript](https://img.shields.io/static/v1.svg?label=&message=TypeScript&color=294E80&style=flat-square&logo=typescript) ![supports](https://img.shields.io/static/v1.svg?label=&message=%F0%9F%93%B1%F0%9F%92%BB%F0%9F%96%A5%EF%B8%8F&color=DDD&style=flat-square)
 
 Fast & customizable 3D model viewer for everyone
 
-[Demo](https://naver.github.io/egjs-view3d/demo) / [API Document](https://naver.github.io/egjs-view3d) / [Tutorial](https://naver.github.io/egjs-view3d/tutorial-Adding%20Controls.html)
+👉 **[Demo](https://naver.github.io/egjs-view3d/demo)** / **[API Document](https://naver.github.io/egjs-view3d)** / **[Tutorial](https://naver.github.io/egjs-view3d/tutorial-Adding%20Controls.html)**
 
-## Install
+## 🔸 Features
+- Fully customizable 3D model viewer based on the [three.js](https://github.com/mrdoob/three.js/)
+- Supports LOD, which can greatly decrease time before 3D model displays.
+  - [Demo](https://naver.github.io/egjs-view3d/demo#features-lod)
+- Supports WebXR & SceneViewer AR for Android & AR Quick Look for iOS
+- Supports multiple AR types
+  - [Demo](https://naver.github.io/egjs-view3d/demo#features-ar)
+- Fully documented API
+- Typescript-based
+
+## 🔸 Install
 
 ```sh
 npm i @egjs/view3d
@@ -14,7 +24,7 @@ npm i @egjs/view3d
 yarn add @egjs/view3d
 ```
 
-## Getting Started
+## 🔸 Getting Started
 @egjs/view3d requires one canvas element to be initialized.
 
 ```html
@@ -53,7 +63,7 @@ const view3d = new View3D("#my-canvas");
 
 See more examples on our [Demo](https://naver.github.io/egjs-view3d/demo) / [Tutorial](https://naver.github.io/egjs-view3d/tutorial-Adding%20Controls.html)
 
-## Browser Coverage
+## 🔸 Browser Coverage
 View3D is available for browsers support webgl.
 
 |<img width="20" src="https://simpleicons.org/icons/internetexplorer.svg" alt="IE" />|<img width="20" src="https://simpleicons.org/icons/googlechrome.svg" alt="Chrome" />|<img width="20" src="https://simpleicons.org/icons/firefoxbrowser.svg" alt="Firefox" />|<img width="20" src="https://simpleicons.org/icons/safari.svg" alt="Safari" />|<img width="20" src="https://simpleicons.org/icons/apple.svg" alt="iOS" />|<img width="20" src="https://simpleicons.org/icons/android.svg" alt="Android">|
@@ -62,15 +72,15 @@ View3D is available for browsers support webgl.
 
 See more details at https://caniuse.com/webgl
 
-## Argumented Reality Coverage
+## 🔸 Augmented Reality(AR) Coverage
 <img width="20" src="https://simpleicons.org/icons/android.svg" alt="Android"><br/>(WebXR)|<img width="20" src="https://simpleicons.org/icons/android.svg" alt="Android"><br/>(Google SceneViewer)|<img width="20" src="https://simpleicons.org/icons/apple.svg" alt="iOS" /><br/>(AR QuickLook)|
 |:---:|:---:|:---:|
 |<img width="15" src="https://simpleicons.org/icons/googlechrome.svg" alt="Chrome" />|All browsers|<img width="15" src="https://simpleicons.org/icons/safari.svg" alt="Safari" /> <img width="15" src="https://simpleicons.org/icons/googlechrome.svg" alt="Chrome" />|
 |Android 7.0+, Chromium 81+|Android 7.0+|iOS 11+|
-- We also support AR session based on Google's [SceneViewer](https://developers.google.com/ar/develop/java/scene-viewer)
+- We also support AR session based on Google's [SceneViewer](https://developers.google.com/ar/develop/java/scene-viewer) and Apple's [AR Quick Look](https://developer.apple.com/augmented-reality/quick-look/)
 - For Android device coverage, see https://developers.google.com/ar/discover/supported-devices
 
-## License
+## 🔸 License
 ```
 Copyright (c) 2020-present NAVER Corp.
 

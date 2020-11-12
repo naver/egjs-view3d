@@ -126,7 +126,7 @@
     <div class="features container">
       <h1 class="features-header">FEATURES</h1>
       <div class="features-list">
-        <div class="features-item">
+        <div id="features-lod" class="features-item">
           <div class="features-title">LOD (Level of Detail)</div>
           <div class="features-subtitle">- Made with <a href="https://github.com/CesiumGS/gltf-pipeline">gltf-pipeline</a> & view3d-editor</div>
           <div class="features-desc">Load a simplified model with a smaller size first, significantly increasing load speed.</div>
@@ -151,7 +151,7 @@
           <div class="features-footer">&gt; <a href="https://sketchfab.com/3d-models/lofoten-diorama-a77e8eb2a76b43db85f85c8c00db2814">Lofoten Diorama</a> by <a href="https://sketchfab.com/Erik_Br">Erik_Br</a>, Licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></div>
         </div>
         <div class="features-separator"></div>
-        <div class="features-item">
+        <div id="features-ar" class="features-item">
           <div class="features-title">AR-ready</div>
           <div class="features-subtitle">- Place your 3D model anywhere: Floor / Wall / Hover</div>
           <div class="features-desc">You can put your models on a detected floor/wall, or you can make your model hover on the air.</div>
@@ -160,7 +160,9 @@
               <div class="ar-thumbnail-wrapper">
                 <div class="size-1by1">
                   <div class="ar-thumbnail-placeholder">
-                    <video class="ar-thumbnail" src="./image/FloorARSession.mp4" muted autoplay loop></video>
+                    <a href="./pages/ar-floor.html">
+                      <video class="ar-thumbnail" src="./image/FloorARSession.mp4" muted autoplay loop></video>
+                    </a>
                   </div>
                 </div>
               </div>
@@ -170,7 +172,9 @@
               <div class="ar-thumbnail-wrapper">
                 <div class="size-1by1">
                   <div class="ar-thumbnail-placeholder">
-                    <video class="ar-thumbnail" src="./image/WallARSession.mp4" muted autoplay loop></video>
+                    <a href="./pages/ar-wall.html">
+                      <video class="ar-thumbnail" src="./image/WallARSession.mp4" muted autoplay loop></video>
+                    </a>
                   </div>
                 </div>
               </div>
@@ -180,7 +184,9 @@
               <div class="ar-thumbnail-wrapper">
                 <div class="size-1by1">
                   <div class="ar-thumbnail-placeholder">
-                    <video class="ar-thumbnail" src="./image/HoverARSession.mp4" muted autoplay loop></video>
+                    <a href="./pages/ar-hover.html">
+                      <video class="ar-thumbnail" src="./image/HoverARSession.mp4" muted autoplay loop></video>
+                    </a>
                   </div>
                 </div>
               </div>
