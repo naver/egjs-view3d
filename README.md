@@ -4,7 +4,7 @@
 
 Fast & customizable 3D model viewer for everyone
 
-👉 **[Demo](https://naver.github.io/egjs-view3d)** / **[API Document](https://naver.github.io/egjs-view3d/docs)** / **[Tutorial](https://naver.github.io/egjs-view3d/docs/tutorial-Adding%20Controls.html)**
+👉 **[Demo](https://naver.github.io/egjs-view3d)** / **[API Document](https://naver.github.io/egjs-view3d/release/latest/docs/)** / **[Tutorial](https://naver.github.io/egjs-view3d/release/latest/docs//tutorial-Adding%20Controls.html)**
 
 ## Features
 - A customizable 3D model viewer based on the [three.js](https://github.com/mrdoob/three.js/)
