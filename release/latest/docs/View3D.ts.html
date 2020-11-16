@@ -1,0 +1,329 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>JSDoc: View3D.ts</title>
+
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="./build/entry.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link href="https://fonts.googleapis.com/css?family=Muli:100,400,700|Oswald:300|Inconsolata,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+</head>
+
+<body>
+    <div id="stickyNavbarOverlay"></div>
+    <div class="top-navbar">
+        <div class="container">
+            <nav class="navbar" role="navigation" aria-label="main navigation">
+                <div class="navbar-brand">
+                    
+                     
+                        <h1 class="navbar-item">@egjs/view3d Documentation</h1>
+                    
+                    <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                    </a>
+                </div>
+                 
+                <div class="navbar-menu">
+                    <div class="navbar-end">
+                    
+                        <div class="navbar-item">
+                            <a href="https://github.com/naver/egjs-view3d" target="_blank">
+                                Github
+                            </a>
+                        </div>
+                    
+                        <div class="navbar-item">
+                            <a href="./demo/index.html" target="_blank">
+                                Demo
+                            </a>
+                        </div>
+                    
+                    </div>
+                </div>
+                
+            </nav>
+        </div>
+    </div>
+    <div class="container">
+        <div class="columns">
+            <div class="column is-3" id="sidebarNav">
+                <div class="sidebar">
+                    <nav>
+                        <h2><a href="index.html">Home</a></h2><div class="category"><h3>Tutorials</h3><ul><li><a href="tutorial-Adding Controls.html">Adding Controls</a></li><li><a href="tutorial-Adding Lights.html">Adding Lights</a></li><li><a href="tutorial-Adding Skybox and Envmap.html">Adding Skybox and Envmap</a></li><li><a href="tutorial-Displaying Shadows.html">Displaying Shadows</a></li><li><a href="tutorial-Handling Errors.html">Handling Errors</a></li><li><a href="tutorial-Loading a Model.html">Loading a Model</a></li><li><a href="tutorial-Playing Animations.html">Playing Animations</a></li></ul><h3>Namespaces</h3><ul><li><a href="EASING.html">EASING</a></li><li><a href="Constants.html">Constants</a></li></ul><h3>Classes</h3><ul><li><a href="Pose.html">Pose</a></li><li><a href="View3D.html">View3D</a></li></ul><h3>Interfaces</h3><ul><li><a href="FloorARSessionOption.html">FloorARSessionOption</a></li></ul><h3>Events</h3><ul><li><a href="Animation.html#event:progress">progress</a></li><li><a href="Animation.html#event:finish">finish</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AnyFunction">AnyFunction</a></li><li><a href="global.html#AnyObject">AnyObject</a></li></ul></div><div class="category"><h2>Controls</h2><h3>Classes</h3><ul><li><a href="AnimationControl.html">AnimationControl</a></li><li><a href="AutoControl.html">AutoControl</a></li><li><a href="DistanceControl.html">DistanceControl</a></li><li><a href="OrbitControl.html">OrbitControl</a></li><li><a href="RotateControl.html">RotateControl</a></li><li><a href="TranslateControl.html">TranslateControl</a></li></ul><h3>Interfaces</h3><ul><li><a href="CameraControl.html">CameraControl</a></li></ul></div><div class="category"><h2>Controls-AR</h2><h3>Classes</h3><ul><li><a href="ARFloorControl.html">ARFloorControl</a></li><li><a href="ARFloorTranslateControl.html">ARFloorTranslateControl</a></li><li><a href="ARHoverControl.html">ARHoverControl</a></li><li><a href="ARHoverRotateControl.html">ARHoverRotateControl</a></li><li><a href="ARHoverTranslateControl.html">ARHoverTranslateControl</a></li><li><a href="ArrowIndicator.html">ArrowIndicator</a></li><li><a href="ARScaleControl.html">ARScaleControl</a></li><li><a href="ARSwipeControl.html">ARSwipeControl</a></li><li><a href="ARSwirlControl.html">ARSwirlControl</a></li><li><a href="ARWallControl.html">ARWallControl</a></li><li><a href="ARWallTranslateControl.html">ARWallTranslateControl</a></li><li><a href="DeadzoneChecker.html">DeadzoneChecker</a></li><li><a href="FloorIndicator.html">FloorIndicator</a></li><li><a href="RotationIndicator.html">RotationIndicator</a></li><li><a href="ScaleUI.html">ScaleUI</a></li></ul><h3>Interfaces</h3><ul><li><a href="ScaleUIOption.html">ScaleUIOption</a></li><li><a href="RotationIndicatorOption.html">RotationIndicatorOption</a></li><li><a href="FloorIndicatorOption.html">FloorIndicatorOption</a></li><li><a href="DeadzoneCheckerOption.html">DeadzoneCheckerOption</a></li><li><a href="ARWallTranslateControlOption.html">ARWallTranslateControlOption</a></li><li><a href="ARWallControlOption.html">ARWallControlOption</a></li><li><a href="ARSwirlControlOption.html">ARSwirlControlOption</a></li><li><a href="ARSwipeControlOption.html">ARSwipeControlOption</a></li><li><a href="ARScaleControlOption.html">ARScaleControlOption</a></li><li><a href="ArrowIndicatorOption.html">ArrowIndicatorOption</a></li><li><a href="ARHoverTranslateControlOption.html">ARHoverTranslateControlOption</a></li><li><a href="ARHoverRotateControlOption.html">ARHoverRotateControlOption</a></li><li><a href="ARHoverControlOption.html">ARHoverControlOption</a></li><li><a href="ARFloorTranslateControlOption.html">ARFloorTranslateControlOption</a></li><li><a href="ARFloorControlOption.html">ARFloorControlOption</a></li><li><a href="ARControl.html">ARControl</a></li></ul></div><div class="category"><h2>Core</h2><h3>Classes</h3><ul><li><a href="Animation.html">Animation</a></li><li><a href="Camera.html">Camera</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Model.html">Model</a></li><li><a href="ModelAnimator.html">ModelAnimator</a></li><li><a href="Renderer.html">Renderer</a></li><li><a href="Scene.html">Scene</a></li><li><a href="XRManager.html">XRManager</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:afterRender">afterRender</a></li></ul></div><div class="category"><h2>Environment</h2><h3>Classes</h3><ul><li><a href="AutoDirectionalLight.html">AutoDirectionalLight</a></li><li><a href="ShadowPlane.html">ShadowPlane</a></li></ul><h3>Interfaces</h3><ul><li><a href="Environment.html">Environment</a></li></ul></div><div class="category"><h2>Extra</h2><h3>Classes</h3><ul><li><a href="TextureModel.html">TextureModel</a></li></ul></div><div class="category"><h2>Loaders</h2><h3>Classes</h3><ul><li><a href="GLTFLoader.html">GLTFLoader</a></li><li><a href="TextureLoader.html">TextureLoader</a></li></ul><h3>Interfaces</h3><ul><li><a href="ModelLoadOption.html">ModelLoadOption</a></li></ul></div><div class="category"><h2>XR</h2><h3>Classes</h3><ul><li><a href="DOMOverlay.html">DOMOverlay</a></li><li><a href="FloorARSession.html">FloorARSession</a></li><li><a href="HitTest.html">HitTest</a></li><li><a href="HoverARSession.html">HoverARSession</a></li><li><a href="QuickLookSession.html">QuickLookSession</a></li><li><a href="SceneViewerSession.html">SceneViewerSession</a></li><li><a href="WallARSession.html">WallARSession</a></li><li><a href="WebARSession.html">WebARSession</a></li></ul><h3>Interfaces</h3><ul><li><a href="XRSession.html">XRSession</a></li><li><a href="WebARSessionOption.html">WebARSessionOption</a></li><li><a href="WallARSessionOption.html">WallARSessionOption</a></li><li><a href="HoverARSessionOption.html">HoverARSessionOption</a></li></ul><h3>Events</h3><ul><li><a href="WebARSession.html#.event:start">start</a></li><li><a href="WebARSession.html#.event:modelPlaced">modelPlaced</a></li><li><a href="WebARSession.html#.event:end">end</a></li><li><a href="WebARSession.html#.event:canPlace">canPlace</a></li></ul></div>
+                    </nav>
+                </div>
+            </div>
+            <div class="column is-9-desktop">
+                <div class="content" id="main-content-wrapper">
+                    <header class="page-title">
+                        <p>Source</p>
+                        <h1>View3D.ts</h1>
+                    </header>
+                    
+                    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
+ * Copyright (c) 2020 NAVER Corp.
+ * egjs projects are licensed under the MIT license
+ */
+
+import EventEmitter from "./core/EventEmitter";
+import Renderer from "./core/Renderer";
+import Scene from "./core/Scene";
+import Camera from "./core/camera/Camera";
+import Model from "./core/Model";
+import ModelAnimator from "./core/ModelAnimator";
+import XRManager from "./core/XRManager";
+import { EVENTS } from "./consts/event";
+import * as DEFAULT from "./consts/default";
+import { getCanvas } from "./utils";
+
+/**
+ * Yet another 3d model viewer
+ * @category Core
+ * @mermaid
+ * classDiagram
+ *   class View3D
+ *     View3D *-- Camera
+ *     View3D *-- Renderer
+ *     View3D *-- Scene
+ *     View3D *-- ModelAnimator
+ *     Camera *-- Controller
+ * @event resize
+ * @event beforeRender
+ * @event afterRender
+ */
+class View3D extends EventEmitter&lt;{
+  resize: {
+    width: number;
+    height: number;
+    target: View3D;
+  };
+  beforeRender: View3D;
+  afterRender: View3D;
+}> {
+  /**
+   * Current version of the View3D
+   */
+  public static VERSION: string = "#__VERSION__#";
+
+  private _model: Model | null;
+  private _renderer: Renderer;
+  private _scene: Scene;
+  private _camera: Camera;
+  private _animator: ModelAnimator;
+  private _xr: XRManager;
+
+  /**
+   * {@link Renderer} instance of the View3D
+   * @type {Renderer}
+   */
+  public get renderer() { return this._renderer; }
+  /**
+   * {@link Scene} instance of the View3D
+   * @type {Scene}
+   */
+  public get scene() { return this._scene; }
+  /**
+   * {@link Camera} instance of the View3D
+   * @type {Camera}
+   */
+  public get camera() { return this._camera; }
+  /**
+   * {@link Controller} instance of the Camera
+   * @type {Controller}
+   */
+  public get controller() { return this._camera.controller; }
+  /**
+   * {@link ModelAnimator} instance of the View3D
+   * @type {ModelAnimator}
+   */
+  public get animator() { return this._animator; }
+  /**
+   * {@link XRManager} instance of the View3D
+   * @type {XRManager}
+   */
+  public get xr() { return this._xr; }
+  /**
+   * {@link Model} that View3D is currently showing
+   * @type {Model|null}
+   */
+  public get model() { return this._model; }
+
+  /**
+   * Creates new View3D instance
+   * @example
+   * import View3D, { ERROR_CODES } from "@egjs/view3d";
+   *
+   * try {
+   *   const view3d = new View3D("#wrapper")
+   * } catch (e) {
+   *   if (e.code === ERROR_CODES.ELEMENT_NOT_FOUND) {
+   *     console.error("Element not found")
+   *   }
+   * }
+   * @throws {View3DError} `CODES.WRONG_TYPE`&lt;br/>When parameter does not either string or the canvas element.
+   * @throws {View3DError} `CODES.ELEMENT_NOT_FOUND`&lt;br/>When the element with given query does not exist.
+   * @throws {View3DError} `CODES.ELEMENT_NOT_CANVAS`&lt;br/>When the element given is not a \&lt;canvas\> element.
+   * @throws {View3DError} `CODES.WEBGL_NOT_SUPPORTED`&lt;br/>When browser does not support WebGL.
+   * @see Model
+   * @see Camera
+   * @see Renderer
+   * @see Scene
+   * @see Controller
+   * @see XRManager
+   */
+  constructor(el: string | HTMLCanvasElement) {
+    super();
+    const canvas = getCanvas(el);
+
+    this._renderer = new Renderer(canvas);
+    this._camera = new Camera(canvas);
+    this._scene = new Scene();
+    this._animator = new ModelAnimator(this._scene.root);
+    this._xr = new XRManager(this);
+    this._model = null;
+
+    this.resize();
+
+    window.addEventListener(EVENTS.RESIZE, this.resize);
+  }
+
+  /**
+   * Destroy the denam instance and remove all events attached to it
+   * @returns {void} Nothing
+   */
+  public destroy(): void {
+    this._scene.reset();
+    this.controller.clear();
+    this._model = null;
+
+    window.removeEventListener(EVENTS.RESIZE, this.resize);
+  }
+
+  /**
+   * Resize the denam instance to fit current canvas size
+   * @method
+   * @returns {void} Nothing
+   */
+  public resize = (): void => {
+    this._renderer.resize();
+
+    const newSize = this._renderer.size;
+    this._camera.resize(newSize);
+  }
+
+  /**
+   * Display the given model.
+   * This method will remove the current displaying model, and reset the camera &amp; control to default position.
+   * View3D can only show one model at a time
+   * @param model {@link Model} instance to show
+   * @param {object} [options={}] Display options
+   * @param {number} [options.applySize=true] Whether to change model size to given "size" option.
+   * @param {number} [options.size=80] Size of the model to show as.
+   * @param {boolean} [options.resetView=true] Whether to reset the view to the camera's default pose.
+   * @returns {void} Nothing
+   */
+  public display(model: Model, {
+    applySize = true,
+    size = DEFAULT.MODEL_SIZE,
+    resetView = true,
+  } = {}): void {
+    const renderer = this._renderer;
+    const scene = this._scene;
+    const camera = this._camera;
+    const animator = this._animator;
+
+    if (applySize) {
+      model.size = size;
+    }
+    // model.moveToOrigin();
+
+    scene.resetModel();
+
+    if (resetView) {
+      camera.reset();
+    }
+
+    animator.reset();
+
+    this._model = model;
+
+    scene.add(model.scene);
+    animator.setClips(model.animations);
+
+    scene.update(model);
+
+    renderer.stopAnimationLoop();
+    renderer.setAnimationLoop(this.renderLoop);
+  }
+
+  /**
+   * View3D's basic render loop function
+   * @param delta Number of seconds passed since last frame
+   */
+  public renderLoop = (delta: number) => {
+    const renderer = this._renderer;
+    const scene = this._scene;
+    const camera = this._camera;
+    const controller = this.controller;
+    const animator = this._animator;
+
+    animator.update(delta);
+    controller.update(delta);
+
+    this.emit("beforeRender", this);
+    renderer.render(scene, camera);
+    this.emit("afterRender", this);
+  }
+}
+
+export default View3D;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<footer class="footer">
+    <div class="content has-text-centered">
+        <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 0.3.7</a> on Mon Nov 16 2020 17:11:52 GMT+0900 (Korean Standard Time)</p>
+        <p class="sidebar-created-by">
+            <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by 
+            <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+        </p>
+    </div>
+</footer>
+
+
+<script src="scripts/app.min.js"></script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
