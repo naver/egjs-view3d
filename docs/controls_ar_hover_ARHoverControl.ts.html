@@ -1,0 +1,354 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>JSDoc: controls/ar/hover/ARHoverControl.ts</title>
+
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="./build/entry.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link href="https://fonts.googleapis.com/css?family=Muli:100,400,700|Oswald:300|Inconsolata,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+</head>
+
+<body>
+    <div id="stickyNavbarOverlay"></div>
+    <div class="top-navbar">
+        <div class="container">
+            <nav class="navbar" role="navigation" aria-label="main navigation">
+                <div class="navbar-brand">
+                    
+                     
+                        <h1 class="navbar-item">@egjs/view3d Documentation</h1>
+                    
+                    <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                    </a>
+                </div>
+                 
+                <div class="navbar-menu">
+                    <div class="navbar-end">
+                    
+                        <div class="navbar-item">
+                            <a href="https://github.com/naver/egjs-view3d" target="_blank">
+                                Github
+                            </a>
+                        </div>
+                    
+                        <div class="navbar-item">
+                            <a href="./demo/index.html" target="_blank">
+                                Demo
+                            </a>
+                        </div>
+                    
+                    </div>
+                </div>
+                
+            </nav>
+        </div>
+    </div>
+    <div class="container">
+        <div class="columns">
+            <div class="column is-3" id="sidebarNav">
+                <div class="sidebar">
+                    <nav>
+                        <h2><a href="index.html">Home</a></h2><div class="category"><h3>Tutorials</h3><ul><li><a href="tutorial-Adding Controls.html">Adding Controls</a></li><li><a href="tutorial-Adding Lights.html">Adding Lights</a></li><li><a href="tutorial-Adding Skybox and Envmap.html">Adding Skybox and Envmap</a></li><li><a href="tutorial-Displaying Shadows.html">Displaying Shadows</a></li><li><a href="tutorial-Handling Errors.html">Handling Errors</a></li><li><a href="tutorial-Loading a Model.html">Loading a Model</a></li><li><a href="tutorial-Playing Animations.html">Playing Animations</a></li></ul><h3>Namespaces</h3><ul><li><a href="EASING.html">EASING</a></li><li><a href="Constants.html">Constants</a></li></ul><h3>Classes</h3><ul><li><a href="Pose.html">Pose</a></li><li><a href="View3D.html">View3D</a></li></ul><h3>Interfaces</h3><ul><li><a href="FloorARSessionOption.html">FloorARSessionOption</a></li></ul><h3>Events</h3><ul><li><a href="Animation.html#event:progress">progress</a></li><li><a href="Animation.html#event:finish">finish</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AnyFunction">AnyFunction</a></li><li><a href="global.html#AnyObject">AnyObject</a></li></ul></div><div class="category"><h2>Controls</h2><h3>Classes</h3><ul><li><a href="AnimationControl.html">AnimationControl</a></li><li><a href="AutoControl.html">AutoControl</a></li><li><a href="DistanceControl.html">DistanceControl</a></li><li><a href="OrbitControl.html">OrbitControl</a></li><li><a href="RotateControl.html">RotateControl</a></li><li><a href="TranslateControl.html">TranslateControl</a></li></ul><h3>Interfaces</h3><ul><li><a href="CameraControl.html">CameraControl</a></li></ul></div><div class="category"><h2>Controls-AR</h2><h3>Classes</h3><ul><li><a href="ARFloorControl.html">ARFloorControl</a></li><li><a href="ARFloorTranslateControl.html">ARFloorTranslateControl</a></li><li><a href="ARHoverControl.html">ARHoverControl</a></li><li><a href="ARHoverRotateControl.html">ARHoverRotateControl</a></li><li><a href="ARHoverTranslateControl.html">ARHoverTranslateControl</a></li><li><a href="ArrowIndicator.html">ArrowIndicator</a></li><li><a href="ARScaleControl.html">ARScaleControl</a></li><li><a href="ARSwipeControl.html">ARSwipeControl</a></li><li><a href="ARSwirlControl.html">ARSwirlControl</a></li><li><a href="ARWallControl.html">ARWallControl</a></li><li><a href="ARWallTranslateControl.html">ARWallTranslateControl</a></li><li><a href="DeadzoneChecker.html">DeadzoneChecker</a></li><li><a href="FloorIndicator.html">FloorIndicator</a></li><li><a href="RotationIndicator.html">RotationIndicator</a></li><li><a href="ScaleUI.html">ScaleUI</a></li></ul><h3>Interfaces</h3><ul><li><a href="ScaleUIOption.html">ScaleUIOption</a></li><li><a href="RotationIndicatorOption.html">RotationIndicatorOption</a></li><li><a href="FloorIndicatorOption.html">FloorIndicatorOption</a></li><li><a href="DeadzoneCheckerOption.html">DeadzoneCheckerOption</a></li><li><a href="ARWallTranslateControlOption.html">ARWallTranslateControlOption</a></li><li><a href="ARWallControlOption.html">ARWallControlOption</a></li><li><a href="ARSwirlControlOption.html">ARSwirlControlOption</a></li><li><a href="ARSwipeControlOption.html">ARSwipeControlOption</a></li><li><a href="ARScaleControlOption.html">ARScaleControlOption</a></li><li><a href="ArrowIndicatorOption.html">ArrowIndicatorOption</a></li><li><a href="ARHoverTranslateControlOption.html">ARHoverTranslateControlOption</a></li><li><a href="ARHoverRotateControlOption.html">ARHoverRotateControlOption</a></li><li><a href="ARHoverControlOption.html">ARHoverControlOption</a></li><li><a href="ARFloorTranslateControlOption.html">ARFloorTranslateControlOption</a></li><li><a href="ARFloorControlOption.html">ARFloorControlOption</a></li><li><a href="ARControl.html">ARControl</a></li></ul></div><div class="category"><h2>Core</h2><h3>Classes</h3><ul><li><a href="Animation.html">Animation</a></li><li><a href="Camera.html">Camera</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Model.html">Model</a></li><li><a href="ModelAnimator.html">ModelAnimator</a></li><li><a href="Renderer.html">Renderer</a></li><li><a href="Scene.html">Scene</a></li><li><a href="XRManager.html">XRManager</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:afterRender">afterRender</a></li></ul></div><div class="category"><h2>Environment</h2><h3>Classes</h3><ul><li><a href="AutoDirectionalLight.html">AutoDirectionalLight</a></li><li><a href="ShadowPlane.html">ShadowPlane</a></li></ul><h3>Interfaces</h3><ul><li><a href="Environment.html">Environment</a></li></ul></div><div class="category"><h2>Extra</h2><h3>Classes</h3><ul><li><a href="TextureModel.html">TextureModel</a></li></ul></div><div class="category"><h2>Loaders</h2><h3>Classes</h3><ul><li><a href="GLTFLoader.html">GLTFLoader</a></li><li><a href="TextureLoader.html">TextureLoader</a></li></ul><h3>Interfaces</h3><ul><li><a href="ModelLoadOption.html">ModelLoadOption</a></li></ul></div><div class="category"><h2>XR</h2><h3>Classes</h3><ul><li><a href="DOMOverlay.html">DOMOverlay</a></li><li><a href="FloorARSession.html">FloorARSession</a></li><li><a href="HitTest.html">HitTest</a></li><li><a href="HoverARSession.html">HoverARSession</a></li><li><a href="QuickLookSession.html">QuickLookSession</a></li><li><a href="SceneViewerSession.html">SceneViewerSession</a></li><li><a href="WallARSession.html">WallARSession</a></li><li><a href="WebARSession.html">WebARSession</a></li></ul><h3>Interfaces</h3><ul><li><a href="XRSession.html">XRSession</a></li><li><a href="WebARSessionOption.html">WebARSessionOption</a></li><li><a href="WallARSessionOption.html">WallARSessionOption</a></li><li><a href="HoverARSessionOption.html">HoverARSessionOption</a></li></ul><h3>Events</h3><ul><li><a href="WebARSession.html#.event:start">start</a></li><li><a href="WebARSession.html#.event:modelPlaced">modelPlaced</a></li><li><a href="WebARSession.html#.event:end">end</a></li><li><a href="WebARSession.html#.event:canPlace">canPlace</a></li></ul></div>
+                    </nav>
+                </div>
+            </div>
+            <div class="column is-9-desktop">
+                <div class="content" id="main-content-wrapper">
+                    <header class="page-title">
+                        <p>Source</p>
+                        <h1>controls/ar/hover/ARHoverControl.ts</h1>
+                    </header>
+                    
+                    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
+ * Copyright (c) 2020 NAVER Corp.
+ * egjs projects are licensed under the MIT license
+ */
+
+import * as THREE from "three";
+import ARHoverRotateControl, { ARHoverRotateControlOption } from "./ARHoverRotateControl";
+import ARHoverTranslateControl, { ARHoverTranslateControlOption } from "./ARHoverTranslateControl";
+import ARScaleControl, { ARScaleControlOption } from "../common/ARScaleControl";
+import DeadzoneChecker from "../common/DeadzoneChecker";
+import * as TOUCH from "~/consts/touch";
+import { XRRenderContext, XRContext } from "~/types/internal";
+
+/**
+ * Options for the {@link ARHoverControl}
+ * @category Controls-AR
+ * @interface
+ * @property {ARHoverRotateControlOption} rotate Options for {@link ARHoverRotateControl}
+ * @property {ARHoverTranslateControlOption} translate Options for {@link ARHoverTranslateControl}
+ * @property {ARScaleControlOption} scale Options for {@link ARScaleControl}
+ * @property {DeadzoneCheckerOption} deadzone Options for {@link DeadzoneChecker}
+ */
+export interface ARHoverControlOption {
+  rotate: ARHoverRotateControlOption;
+  translate: ARHoverTranslateControlOption;
+  scale: ARScaleControlOption;
+}
+
+/**
+ * AR control for {@link HoverARSession}
+ * @category Controls-AR
+ */
+class ARHoverControl {
+  private _enabled = true;
+  private _initialized = false;
+  private _modelHit = false;
+  private _deadzoneChecker: DeadzoneChecker;
+  private _rotateControl: ARHoverRotateControl;
+  private _translateControl: ARHoverTranslateControl;
+  private _scaleControl: ARScaleControl;
+
+  /**
+   * Return whether this control is enabled or not
+   */
+  public get enabled() { return this._enabled; }
+  /**
+   * {@link ARRotateControl} in this control
+   */
+  public get rotate() { return this._rotateControl; }
+  /**
+   * {@link ARTranslateControl} in this control
+   */
+  public get translate() { return this._translateControl; }
+  /**
+   * {@link ARScaleControl} in this control
+   */
+  public get scale() { return this._scaleControl; }
+  public get controls() {
+    return [this._rotateControl, this._translateControl, this._scaleControl];
+  }
+
+  /**
+   * Create new instance of ARHoverControl
+   * @param {ARHoverControlOption} options Options
+   */
+  constructor(options: Partial&lt;ARHoverControlOption> = {}) {
+    this._rotateControl = new ARHoverRotateControl(options.rotate);
+    this._translateControl = new ARHoverTranslateControl(options.translate);
+    this._scaleControl = new ARScaleControl(options.scale);
+    this._deadzoneChecker = new DeadzoneChecker();
+  }
+
+  public init(ctx: XRRenderContext) {
+    const { size } = ctx;
+
+    this.controls.forEach(control => control.init(ctx));
+    this._deadzoneChecker.setAspect(size.height / size.width);
+
+    this._initialized = true;
+  }
+
+  /**
+   * Destroy this control and deactivate it
+   * @param view3d Instance of the {@link View3D}
+   */
+  public destroy(ctx: XRContext) {
+    if (!this._initialized) return;
+
+    this.deactivate();
+    this.controls.forEach(control => control.destroy(ctx));
+
+    this._initialized = false;
+  }
+
+  public deactivate() {
+    this._modelHit = false;
+    this._deadzoneChecker.cleanup();
+    this.controls.forEach(control => control.deactivate());
+  }
+
+  /**
+   * Enable this control
+   */
+  public enable() {
+    this._enabled = true;
+  }
+
+  /**
+   * Disable this control
+   */
+  public disable() {
+    this._enabled = false;
+    this.deactivate();
+  }
+
+  public update(ctx: XRRenderContext) {
+    const { session } = ctx;
+
+    if (!this._initialized) return;
+
+    const deadzoneChecker = this._deadzoneChecker;
+    const inputSources = session.inputSources;
+
+    if (deadzoneChecker.inDeadzone) {
+      this._checkDeadzone(ctx, inputSources);
+    } else {
+      this._processInput(ctx, inputSources);
+    }
+    this._updateControls(ctx);
+  }
+
+  public onSelectStart = (ctx: XRRenderContext) => {
+    const { view3d, session, frame, referenceSpace, xrCam } = ctx;
+    if (!this._enabled) return;
+
+    const deadzoneChecker = this._deadzoneChecker;
+    const rotateControl = this._rotateControl;
+    const translateControl = this._translateControl;
+    const scaleControl = this._scaleControl;
+
+    // Update rotation axis
+    if (rotateControl.enabled) {
+      rotateControl.updateRotateAxis(ctx);
+    }
+
+    // Update deadzone testing gestures
+    if (rotateControl.swirl.enabled) {
+      deadzoneChecker.addTestingGestures(TOUCH.GESTURE.ONE_FINGER);
+    }
+    if (rotateControl.swipe.enabled) {
+      deadzoneChecker.addTestingGestures(TOUCH.GESTURE.TWO_FINGER);
+    }
+    if (translateControl.enabled) {
+      deadzoneChecker.addTestingGestures(TOUCH.GESTURE.ONE_FINGER);
+    }
+    if (scaleControl.enabled) {
+      deadzoneChecker.addTestingGestures(TOUCH.GESTURE.PINCH);
+    }
+
+    const coords = this._inputSourceToVector(session.inputSources);
+    deadzoneChecker.applyScreenAspect(coords);
+    deadzoneChecker.setFirstInput(coords);
+
+    if (coords.length === 1) {
+      // Check finger is on the model
+      const modelBbox = view3d.model!.bbox;
+
+      const targetRayPose = frame.getPose(session.inputSources[0].targetRaySpace, referenceSpace);
+      const camPos = new THREE.Vector3().setFromMatrixPosition(xrCam.matrixWorld);
+
+      const fingerDir = new THREE.Vector3().copy(targetRayPose.transform.position).sub(camPos).normalize();
+      const fingerRay = new THREE.Ray(camPos, fingerDir);
+      const intersection = fingerRay.intersectBox(modelBbox, new THREE.Vector3());
+
+      if (intersection) {
+        // Touch point intersected with model
+        this._modelHit = true;
+      }
+    }
+  }
+
+  public onSelectEnd = () => {
+    this.deactivate();
+  }
+
+  private _checkDeadzone(ctx: XRRenderContext, inputSources: any[]) {
+    const coords = this._inputSourceToVector(inputSources);
+    const gesture = this._deadzoneChecker.check(coords.map(coord => coord.clone()));
+    const rotateControl = this._rotateControl;
+    const translateControl = this._translateControl;
+    const scaleControl = this._scaleControl;
+
+    if (gesture === TOUCH.GESTURE.NONE) return;
+
+    switch (gesture) {
+      case TOUCH.GESTURE.ONE_FINGER_HORIZONTAL:
+      case TOUCH.GESTURE.ONE_FINGER_VERTICAL:
+        if (this._modelHit) {
+          translateControl.activate(ctx, gesture);
+          translateControl.setInitialPos(coords);
+        } else {
+          rotateControl.activate(ctx, gesture);
+          rotateControl.setInitialPos(coords);
+        }
+        break;
+      case TOUCH.GESTURE.TWO_FINGER_HORIZONTAL:
+      case TOUCH.GESTURE.TWO_FINGER_VERTICAL:
+        rotateControl.activate(ctx, gesture);
+        rotateControl.setInitialPos(coords);
+        break;
+      case TOUCH.GESTURE.PINCH:
+        scaleControl.activate(ctx, gesture);
+        scaleControl.setInitialPos(coords);
+        break;
+    }
+  }
+
+  private _processInput(ctx: XRRenderContext, inputSources: any[]) {
+    const coords = this._inputSourceToVector(inputSources);
+
+    this.controls.forEach(control => control.process(ctx, { coords, inputSources }));
+  }
+
+  private _updateControls(ctx: XRRenderContext) {
+    const { view3d, model, delta } = ctx;
+    const deltaMilisec = delta * 1000;
+
+    this.controls.forEach(control => control.update(ctx, deltaMilisec));
+
+    model.scene.updateMatrix();
+    view3d.scene.update(model);
+  }
+
+  private _inputSourceToVector(inputSources: any[]) {
+    return Array.from(inputSources).map(inputSource => {
+      const axes = inputSource.gamepad.axes;
+      return new THREE.Vector2(axes[0], -axes[1]);
+    });
+  }
+}
+
+export default ARHoverControl;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<footer class="footer">
+    <div class="content has-text-centered">
+        <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 0.3.7</a> on Mon Nov 16 2020 16:49:29 GMT+0900 (Korean Standard Time)</p>
+        <p class="sidebar-created-by">
+            <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by 
+            <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+        </p>
+    </div>
+</footer>
+
+
+<script src="scripts/app.min.js"></script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

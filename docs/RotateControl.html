@@ -1,0 +1,2047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>JSDoc: RotateControl</title>
+
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="./build/entry.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link href="https://fonts.googleapis.com/css?family=Muli:100,400,700|Oswald:300|Inconsolata,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+</head>
+
+<body>
+    <div id="stickyNavbarOverlay"></div>
+    <div class="top-navbar">
+        <div class="container">
+            <nav class="navbar" role="navigation" aria-label="main navigation">
+                <div class="navbar-brand">
+                    
+                     
+                        <h1 class="navbar-item">@egjs/view3d Documentation</h1>
+                    
+                    <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                    </a>
+                </div>
+                 
+                <div class="navbar-menu">
+                    <div class="navbar-end">
+                    
+                        <div class="navbar-item">
+                            <a href="https://github.com/naver/egjs-view3d" target="_blank">
+                                Github
+                            </a>
+                        </div>
+                    
+                        <div class="navbar-item">
+                            <a href="./demo/index.html" target="_blank">
+                                Demo
+                            </a>
+                        </div>
+                    
+                    </div>
+                </div>
+                
+            </nav>
+        </div>
+    </div>
+    <div class="container">
+        <div class="columns">
+            <div class="column is-3" id="sidebarNav">
+                <div class="sidebar">
+                    <nav>
+                        <h2><a href="index.html">Home</a></h2><div class="category"><h3>Tutorials</h3><ul><li><a href="tutorial-Adding Controls.html">Adding Controls</a></li><li><a href="tutorial-Adding Lights.html">Adding Lights</a></li><li><a href="tutorial-Adding Skybox and Envmap.html">Adding Skybox and Envmap</a></li><li><a href="tutorial-Displaying Shadows.html">Displaying Shadows</a></li><li><a href="tutorial-Handling Errors.html">Handling Errors</a></li><li><a href="tutorial-Loading a Model.html">Loading a Model</a></li><li><a href="tutorial-Playing Animations.html">Playing Animations</a></li></ul><h3>Namespaces</h3><ul><li><a href="EASING.html">EASING</a></li><li><a href="Constants.html">Constants</a></li></ul><h3>Classes</h3><ul><li><a href="Pose.html">Pose</a></li><li><a href="View3D.html">View3D</a></li></ul><h3>Interfaces</h3><ul><li><a href="FloorARSessionOption.html">FloorARSessionOption</a></li></ul><h3>Events</h3><ul><li><a href="Animation.html#event:progress">progress</a></li><li><a href="Animation.html#event:finish">finish</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AnyFunction">AnyFunction</a></li><li><a href="global.html#AnyObject">AnyObject</a></li></ul></div><div class="category"><h2>Controls</h2><h3>Classes</h3><ul><li><a href="AnimationControl.html">AnimationControl</a></li><li><a href="AutoControl.html">AutoControl</a></li><li><a href="DistanceControl.html">DistanceControl</a></li><li><a href="OrbitControl.html">OrbitControl</a></li><li><a href="RotateControl.html">RotateControl</a></li><li><a href="TranslateControl.html">TranslateControl</a></li></ul><h3>Interfaces</h3><ul><li><a href="CameraControl.html">CameraControl</a></li></ul></div><div class="category"><h2>Controls-AR</h2><h3>Classes</h3><ul><li><a href="ARFloorControl.html">ARFloorControl</a></li><li><a href="ARFloorTranslateControl.html">ARFloorTranslateControl</a></li><li><a href="ARHoverControl.html">ARHoverControl</a></li><li><a href="ARHoverRotateControl.html">ARHoverRotateControl</a></li><li><a href="ARHoverTranslateControl.html">ARHoverTranslateControl</a></li><li><a href="ArrowIndicator.html">ArrowIndicator</a></li><li><a href="ARScaleControl.html">ARScaleControl</a></li><li><a href="ARSwipeControl.html">ARSwipeControl</a></li><li><a href="ARSwirlControl.html">ARSwirlControl</a></li><li><a href="ARWallControl.html">ARWallControl</a></li><li><a href="ARWallTranslateControl.html">ARWallTranslateControl</a></li><li><a href="DeadzoneChecker.html">DeadzoneChecker</a></li><li><a href="FloorIndicator.html">FloorIndicator</a></li><li><a href="RotationIndicator.html">RotationIndicator</a></li><li><a href="ScaleUI.html">ScaleUI</a></li></ul><h3>Interfaces</h3><ul><li><a href="ScaleUIOption.html">ScaleUIOption</a></li><li><a href="RotationIndicatorOption.html">RotationIndicatorOption</a></li><li><a href="FloorIndicatorOption.html">FloorIndicatorOption</a></li><li><a href="DeadzoneCheckerOption.html">DeadzoneCheckerOption</a></li><li><a href="ARWallTranslateControlOption.html">ARWallTranslateControlOption</a></li><li><a href="ARWallControlOption.html">ARWallControlOption</a></li><li><a href="ARSwirlControlOption.html">ARSwirlControlOption</a></li><li><a href="ARSwipeControlOption.html">ARSwipeControlOption</a></li><li><a href="ARScaleControlOption.html">ARScaleControlOption</a></li><li><a href="ArrowIndicatorOption.html">ArrowIndicatorOption</a></li><li><a href="ARHoverTranslateControlOption.html">ARHoverTranslateControlOption</a></li><li><a href="ARHoverRotateControlOption.html">ARHoverRotateControlOption</a></li><li><a href="ARHoverControlOption.html">ARHoverControlOption</a></li><li><a href="ARFloorTranslateControlOption.html">ARFloorTranslateControlOption</a></li><li><a href="ARFloorControlOption.html">ARFloorControlOption</a></li><li><a href="ARControl.html">ARControl</a></li></ul></div><div class="category"><h2>Core</h2><h3>Classes</h3><ul><li><a href="Animation.html">Animation</a></li><li><a href="Camera.html">Camera</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Model.html">Model</a></li><li><a href="ModelAnimator.html">ModelAnimator</a></li><li><a href="Renderer.html">Renderer</a></li><li><a href="Scene.html">Scene</a></li><li><a href="XRManager.html">XRManager</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:afterRender">afterRender</a></li></ul></div><div class="category"><h2>Environment</h2><h3>Classes</h3><ul><li><a href="AutoDirectionalLight.html">AutoDirectionalLight</a></li><li><a href="ShadowPlane.html">ShadowPlane</a></li></ul><h3>Interfaces</h3><ul><li><a href="Environment.html">Environment</a></li></ul></div><div class="category"><h2>Extra</h2><h3>Classes</h3><ul><li><a href="TextureModel.html">TextureModel</a></li></ul></div><div class="category"><h2>Loaders</h2><h3>Classes</h3><ul><li><a href="GLTFLoader.html">GLTFLoader</a></li><li><a href="TextureLoader.html">TextureLoader</a></li></ul><h3>Interfaces</h3><ul><li><a href="ModelLoadOption.html">ModelLoadOption</a></li></ul></div><div class="category"><h2>XR</h2><h3>Classes</h3><ul><li><a href="DOMOverlay.html">DOMOverlay</a></li><li><a href="FloorARSession.html">FloorARSession</a></li><li><a href="HitTest.html">HitTest</a></li><li><a href="HoverARSession.html">HoverARSession</a></li><li><a href="QuickLookSession.html">QuickLookSession</a></li><li><a href="SceneViewerSession.html">SceneViewerSession</a></li><li><a href="WallARSession.html">WallARSession</a></li><li><a href="WebARSession.html">WebARSession</a></li></ul><h3>Interfaces</h3><ul><li><a href="XRSession.html">XRSession</a></li><li><a href="WebARSessionOption.html">WebARSessionOption</a></li><li><a href="WallARSessionOption.html">WallARSessionOption</a></li><li><a href="HoverARSessionOption.html">HoverARSessionOption</a></li></ul><h3>Events</h3><ul><li><a href="WebARSession.html#.event:start">start</a></li><li><a href="WebARSession.html#.event:modelPlaced">modelPlaced</a></li><li><a href="WebARSession.html#.event:end">end</a></li><li><a href="WebARSession.html#.event:canPlace">canPlace</a></li></ul></div>
+                    </nav>
+                </div>
+            </div>
+            <div class="column is-9-desktop">
+                <div class="content" id="main-content-wrapper">
+                    <header class="page-title">
+                        <p>Class</p>
+                        <h1>RotateControl</h1>
+                    </header>
+                    
+                    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2><span class="attribs"><span class="type-signature"></span></span>RotateControl<span class="signature">(options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h2>
+        
+            <div class="class-description"><p>Model's rotation control that supports both mouse &amp; touch</p></div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class='vertical-section'>
+                <h3 class="title"><span>Constructor</span></h3>
+                <div class="members">
+                    <div class="member">
+
+
+    
+    <h4 class="name" id="RotateControl">
+        <a class="href-link" href="#RotateControl">#</a>
+        
+        <span class="code-name">
+            
+                new RotateControl<span class="signature">(options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        
+<tr class="deep-level-0">
+  
+      <td class="name"><code>options</code></td>
+  
+
+  <td class="type">
+  
+      
+<span class="param-type">object</span>
+
+
+  
+  </td>
+
+  
+      <td class="attributes">
+      
+          &lt;optional><br>
+      
+
+      
+
+      
+      </td>
+  
+
+  
+      <td class="default">
+      
+          {}
+      
+      </td>
+  
+
+  <td class="description last"><p>Options</p></td>
+</tr>
+
+  
+  
+    
+<tr class="deep-level-1">
+  
+      <td class="name"><code>element</code></td>
+  
+
+  <td class="type">
+  
+      
+<span class="param-type">HTMLElement</span>
+|
+
+<span class="param-type">null</span>
+
+
+  
+  </td>
+
+  
+      <td class="attributes">
+      
+          &lt;optional><br>
+      
+
+      
+
+      
+      </td>
+  
+
+  
+      <td class="default">
+      
+      </td>
+  
+
+  <td class="description last"><p>Target element.</p></td>
+</tr>
+
+  
+    
+<tr class="deep-level-1">
+  
+      <td class="name"><code>duration</code></td>
+  
+
+  <td class="type">
+  
+      
+<span class="param-type">number</span>
+
+
+  
+  </td>
+
+  
+      <td class="attributes">
+      
+          &lt;optional><br>
+      
+
+      
+
+      
+      </td>
+  
+
+  
+      <td class="default">
+      
+          500
+      
+      </td>
+  
+
+  <td class="description last"><p>Motion's duration.</p></td>
+</tr>
+
+  
+    
+<tr class="deep-level-1">
+  
+      <td class="name"><code>easing</code></td>
+  
+
+  <td class="type">
+  
+      
+<span class="param-type">function</span>
+
+
+  
+  </td>
+
+  
+      <td class="attributes">
+      
+          &lt;optional><br>
+      
+
+      
+
+      
+      </td>
+  
+
+  
+      <td class="default">
+      
+          (x: number) => 1 - Math.pow(1 - x, 3)
+      
+      </td>
+  
+
+  <td class="description last"><p>Motion's easing function.</p></td>
+</tr>
+
+  
+    
+<tr class="deep-level-1">
+  
+      <td class="name"><code>scale</code></td>
+  
+
+  <td class="type">
+  
+      
+<span class="param-type">THREE.Vector2</span>
+
+
+  
+  </td>
+
+  
+      <td class="attributes">
+      
+          &lt;optional><br>
+      
+
+      
+
+      
+      </td>
+  
+
+  
+      <td class="default">
+      
+          new THREE.Vector2(1, 1)
+      
+      </td>
+  
+
+  <td class="description last"><p>Scale factor for panning, x is for horizontal and y is for vertical panning.</p></td>
+</tr>
+
+  
+    
+<tr class="deep-level-1">
+  
+      <td class="name"><code>useGrabCursor</code></td>
+  
+
+  <td class="type">
+  
+      
+<span class="param-type">boolean</span>
+
+
+  
+  </td>
+
+  
+      <td class="attributes">
+      
+          &lt;optional><br>
+      
+
+      
+
+      
+      </td>
+  
+
+  
+      <td class="default">
+      
+          true
+      
+      </td>
+  
+
+  <td class="description last"><p>Whether to apply CSS style <code>cursor: grab</code> on the target element or not.</p></td>
+</tr>
+
+  
+    
+<tr class="deep-level-1">
+  
+      <td class="name"><code>scaleToElement</code></td>
+  
+
+  <td class="type">
+  
+      
+<span class="param-type">boolean</span>
+
+
+  
+  </td>
+
+  
+      <td class="attributes">
+      
+          &lt;optional><br>
+      
+
+      
+
+      
+      </td>
+  
+
+  
+      <td class="default">
+      
+          true
+      
+      </td>
+  
+
+  <td class="description last"><p>Whether to scale control to fit element size.</p></td>
+</tr>
+
+  
+
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="implements">Implements:</dt>
+    <dd class="implements"><ul>
+        
+            <li><a href="CameraControl.html">CameraControl</a></li>
+        
+    </ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+    <dt class="tag-tutorial">Tutorials:</dt>
+    <dd class="tag-tutorial">
+        <ul>
+            <li><a href="tutorial-Adding Controls.html">Adding Controls</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="controls_RotateControl.ts.html" class="button">View Source</a>
+            <span>
+                <a href="controls_RotateControl.ts.html">controls/RotateControl.ts</a>, <a href="controls_RotateControl.ts.html#line22">line 22</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+                </div>
+            </div>
+        
+    
+    </div>
+    
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <div class='vertical-section'>
+            <h3 class="title"><span>Members</span></h3>
+            <div class="members">
+            
+                <div class="member">
+
+<h4 class="name" id="element">
+    <a class="href-link" href="#element">#</a>
+    
+        
+            <span class='tag'>readonly</span>
+        
+    
+    <span class="code-name">
+        element
+    </span>
+    
+</h4>
+
+
+
+
+<div class="description">
+    <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p>Control's current target element to attach event listeners</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="controls_RotateControl.ts.html" class="button">View Source</a>
+            <span>
+                <a href="controls_RotateControl.ts.html">controls/RotateControl.ts</a>, <a href="controls_RotateControl.ts.html#line40">line 40</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+</div>
+            
+                <div class="member">
+
+<h4 class="name" id="enabled">
+    <a class="href-link" href="#enabled">#</a>
+    
+        
+            <span class='tag'>readonly</span>
+        
+    
+    <span class="code-name">
+        enabled
+    </span>
+    
+</h4>
+
+
+
+
+<div class="description">
+    <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p>Whether this control is enabled or not</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="controls_RotateControl.ts.html" class="button">View Source</a>
+            <span>
+                <a href="controls_RotateControl.ts.html">controls/RotateControl.ts</a>, <a href="controls_RotateControl.ts.html#line76">line 76</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+</div>
+            
+                <div class="member">
+
+    <span class="method-parameter is-pulled-right">
+        <label>Type:</label>
+        
+<span class="param-type">THREE.Vector2</span>
+
+
+    </span>
+
+<h4 class="name" id="scale">
+    <a class="href-link" href="#scale">#</a>
+    
+    <span class="code-name">
+        scale
+    </span>
+    
+</h4>
+
+
+
+
+<div class="description">
+    <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p>Scale factor for panning, x is for horizontal and y is for vertical panning.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="https://threejs.org/docs/#api/en/math/Vector2">https://threejs.org/docs/#api/en/math/Vector2</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="controls_RotateControl.ts.html" class="button">View Source</a>
+            <span>
+                <a href="controls_RotateControl.ts.html">controls/RotateControl.ts</a>, <a href="controls_RotateControl.ts.html#line49">line 49</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    
+        <pre class="prettyprint"><code>const rotateControl = new View3D.RotateControl();
+rotateControl.scale.setX(2);</code></pre>
+    
+
+
+</div>
+            
+                <div class="member">
+
+<h4 class="name" id="scaleToElement">
+    <a class="href-link" href="#scaleToElement">#</a>
+    
+    <span class="code-name">
+        scaleToElement
+    </span>
+    
+</h4>
+
+
+
+
+<div class="description">
+    <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p>Whether to scale control to fit element size.<br>
+When this is true and <a href="RotateControl.html#scale">scale.x</a> is 1, panning through element's width will make 3d model's yaw rotate 360°.<br>
+When this is true and <a href="RotateControl.html#scale">scale.y</a> is 1, panning through element's height will make 3d model's pitch rotate 180°.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>true</li>
+        </ul></dd>
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="controls_RotateControl.ts.html" class="button">View Source</a>
+            <span>
+                <a href="controls_RotateControl.ts.html">controls/RotateControl.ts</a>, <a href="controls_RotateControl.ts.html#line71">line 71</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    
+        <pre class="prettyprint"><code>import View3D, { RotateControl } from "@egjs/view3d";
+const view3d = new View3D("#view3d-canvas");
+const rotateControl = new RotateControl();
+rotateControl.scaleToElement = true;
+view3d.controller.add(rotateControl);
+view3d.resize();</code></pre>
+    
+
+
+</div>
+            
+                <div class="member">
+
+<h4 class="name" id="useGrabCursor">
+    <a class="href-link" href="#useGrabCursor">#</a>
+    
+    <span class="code-name">
+        useGrabCursor
+    </span>
+    
+</h4>
+
+
+
+
+<div class="description">
+    <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p>Whether to apply CSS style <code>cursor: grab</code> on the target element or not</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>true</li>
+        </ul></dd>
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="controls_RotateControl.ts.html" class="button">View Source</a>
+            <span>
+                <a href="controls_RotateControl.ts.html">controls/RotateControl.ts</a>, <a href="controls_RotateControl.ts.html#line57">line 57</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    
+        <pre class="prettyprint"><code>const rotateControl = new View3D.RotateControl();
+rotateControl.useGrabCursor = true;</code></pre>
+    
+
+
+</div>
+            
+            </div>
+        </div>
+    
+
+    
+        <div class='vertical-section'>
+            <h3 class="title"><span>Methods</span></h3>
+            <div class="members">
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id="destroy">
+        <a class="href-link" href="#destroy">#</a>
+        
+        <span class="code-name">
+            
+                destroy<span class="signature">()</span><span class="type-signature"> &rarr; {void}</span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p>Destroy the instance and remove all event listeners attached<br>
+This also will reset CSS cursor to intial</p>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="controls_RotateControl.ts.html" class="button">View Source</a>
+            <span>
+                <a href="controls_RotateControl.ts.html">controls/RotateControl.ts</a>, <a href="controls_RotateControl.ts.html#line129">line 129</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class='columns method-parameter'>
+        <div class="column is-2"><label>Returns:</label></div>
+        <div class="column is-10">
+            
+                    
+
+<div class="columns">
+    
+    <div class='param-desc column is-7'><p>Nothing</p></div>
+    
+    
+    <div class='column is-5 has-text-left'>
+        <label>Type: </label>
+        
+<span class="param-type">void</span>
+
+
+    </div>
+    
+</div>
+
+                
+        </div>
+    </div>
+
+
+
+
+</div>
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id="disable">
+        <a class="href-link" href="#disable">#</a>
+        
+        <span class="code-name">
+            
+                disable<span class="signature">()</span><span class="type-signature"> &rarr; {void}</span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p>Disable this input and remove all event handlers</p>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="controls_RotateControl.ts.html" class="button">View Source</a>
+            <span>
+                <a href="controls_RotateControl.ts.html">controls/RotateControl.ts</a>, <a href="controls_RotateControl.ts.html#line187">line 187</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class='columns method-parameter'>
+        <div class="column is-2"><label>Returns:</label></div>
+        <div class="column is-10">
+            
+                    
+
+<div class="columns">
+    
+    <div class='param-desc column is-7'><p>Nothing</p></div>
+    
+    
+    <div class='column is-5 has-text-left'>
+        <label>Type: </label>
+        
+<span class="param-type">void</span>
+
+
+    </div>
+    
+</div>
+
+                
+        </div>
+    </div>
+
+
+
+
+</div>
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id="enable">
+        <a class="href-link" href="#enable">#</a>
+        
+        <span class="code-name">
+            
+                enable<span class="signature">()</span><span class="type-signature"> &rarr; {void}</span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p>Enable this input and add event listeners</p>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="controls_RotateControl.ts.html" class="button">View Source</a>
+            <span>
+                <a href="controls_RotateControl.ts.html">controls/RotateControl.ts</a>, <a href="controls_RotateControl.ts.html#line165">line 165</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class='columns method-parameter'>
+        <div class="column is-2"><label>Returns:</label></div>
+        <div class="column is-10">
+            
+                    
+
+<div class="columns">
+    
+    <div class='param-desc column is-7'><p>Nothing</p></div>
+    
+    
+    <div class='column is-5 has-text-left'>
+        <label>Type: </label>
+        
+<span class="param-type">void</span>
+
+
+    </div>
+    
+</div>
+
+                
+        </div>
+    </div>
+
+
+
+
+</div>
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id="resize">
+        <a class="href-link" href="#resize">#</a>
+        
+        <span class="code-name">
+            
+                resize<span class="signature">(size)</span><span class="type-signature"></span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p>Resize control to match target size<br>
+This method is only meaningful when <a href="RotateControl.html#scaleToElement">scaleToElement</a> is enabled</p>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        
+<tr class="deep-level-0">
+  
+      <td class="name"><code>size</code></td>
+  
+
+  <td class="type">
+  
+      
+<span class="param-type">THREE.Vector2</span>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last"><p><a href="https://threejs.org/docs/#api/en/math/Vector2">THREE.Vector2</a> instance of width(x), height(y)</p></td>
+</tr>
+
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="controls_RotateControl.ts.html" class="button">View Source</a>
+            <span>
+                <a href="controls_RotateControl.ts.html">controls/RotateControl.ts</a>, <a href="controls_RotateControl.ts.html#line157">line 157</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id="setElement">
+        <a class="href-link" href="#setElement">#</a>
+        
+        <span class="code-name">
+            
+                setElement<span class="signature">(element)</span><span class="type-signature"> &rarr; {void}</span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p>Set target element to attach event listener</p>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        
+<tr class="deep-level-0">
+  
+      <td class="name"><code>element</code></td>
+  
+
+  <td class="type">
+  
+      
+<span class="param-type">HTMLElement</span>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last"><p>target element</p></td>
+</tr>
+
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="controls_RotateControl.ts.html" class="button">View Source</a>
+            <span>
+                <a href="controls_RotateControl.ts.html">controls/RotateControl.ts</a>, <a href="controls_RotateControl.ts.html#line219">line 219</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class='columns method-parameter'>
+        <div class="column is-2"><label>Returns:</label></div>
+        <div class="column is-10">
+            
+                    
+
+<div class="columns">
+    
+    <div class='param-desc column is-7'><p>Nothing</p></div>
+    
+    
+    <div class='column is-5 has-text-left'>
+        <label>Type: </label>
+        
+<span class="param-type">void</span>
+
+
+    </div>
+    
+</div>
+
+                
+        </div>
+    </div>
+
+
+
+
+</div>
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id="sync">
+        <a class="href-link" href="#sync">#</a>
+        
+        <span class="code-name">
+            
+                sync<span class="signature">(camera)</span><span class="type-signature"> &rarr; {void}</span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p>Synchronize this control's state to given camera position</p>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        
+<tr class="deep-level-0">
+  
+      <td class="name"><code>camera</code></td>
+  
+
+  <td class="type">
+  
+      
+<span class="param-type"><a href="Camera.html">Camera</a></span>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last"><p>Camera to match state</p></td>
+</tr>
+
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="controls_RotateControl.ts.html" class="button">View Source</a>
+            <span>
+                <a href="controls_RotateControl.ts.html">controls/RotateControl.ts</a>, <a href="controls_RotateControl.ts.html#line209">line 209</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class='columns method-parameter'>
+        <div class="column is-2"><label>Returns:</label></div>
+        <div class="column is-10">
+            
+                    
+
+<div class="columns">
+    
+    <div class='param-desc column is-7'><p>Nothing</p></div>
+    
+    
+    <div class='column is-5 has-text-left'>
+        <label>Type: </label>
+        
+<span class="param-type">void</span>
+
+
+    </div>
+    
+</div>
+
+                
+        </div>
+    </div>
+
+
+
+
+</div>
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id="update">
+        <a class="href-link" href="#update">#</a>
+        
+        <span class="code-name">
+            
+                update<span class="signature">(camera, deltaTime)</span><span class="type-signature"> &rarr; {void}</span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p>Update control by given deltaTime</p>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        
+<tr class="deep-level-0">
+  
+      <td class="name"><code>camera</code></td>
+  
+
+  <td class="type">
+  
+      
+<span class="param-type"><a href="Camera.html">Camera</a></span>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last"><p>Camera to update position</p></td>
+</tr>
+
+
+    
+
+        
+<tr class="deep-level-0">
+  
+      <td class="name"><code>deltaTime</code></td>
+  
+
+  <td class="type">
+  
+      
+<span class="param-type">number</span>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last"><p>Number of milisec to update</p></td>
+</tr>
+
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="controls_RotateControl.ts.html" class="button">View Source</a>
+            <span>
+                <a href="controls_RotateControl.ts.html">controls/RotateControl.ts</a>, <a href="controls_RotateControl.ts.html#line139">line 139</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class='columns method-parameter'>
+        <div class="column is-2"><label>Returns:</label></div>
+        <div class="column is-10">
+            
+                    
+
+<div class="columns">
+    
+    <div class='param-desc column is-7'><p>Nothing</p></div>
+    
+    
+    <div class='column is-5 has-text-left'>
+        <label>Type: </label>
+        
+<span class="param-type">void</span>
+
+
+    </div>
+    
+</div>
+
+                
+        </div>
+    </div>
+
+
+
+
+</div>
+            
+            </div>
+        </div>
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<footer class="footer">
+    <div class="content has-text-centered">
+        <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 0.3.7</a> on Mon Nov 16 2020 16:49:30 GMT+0900 (Korean Standard Time)</p>
+        <p class="sidebar-created-by">
+            <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by 
+            <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+        </p>
+    </div>
+</footer>
+
+
+<script src="scripts/app.min.js"></script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
