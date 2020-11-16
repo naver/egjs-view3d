@@ -5,14 +5,14 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
-    <script type="text/javascript" src="./js/dat.gui.min.js"></script>
+    <script type="text/javascript" src="../js/dat.gui.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/screenfull@5.0.1/dist/screenfull.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
-    <script type="text/javascript" src="./dist/view3d.pkgd.js"></script>
+    <script type="text/javascript" src="../release/latest/dist/view3d.pkgd.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Oswald&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./css/spinkit.min.css">
-    <link rel="stylesheet" href="./css/index.css">
-    <link rel="stylesheet" href="./css/drop.css">
+    <link rel="stylesheet" href="../css/spinkit.min.css">
+    <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../css/drop.css">
     <title>View3D viewer</title>
     <script>
       if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
@@ -26,10 +26,10 @@
       <canvas id="view3d-canvas"></canvas>
       <div id="view3d-controls" class="invisible">
         <div class="buttons-wrapper">
-          <img id="pause" width="24" height="24" src="image/pause.svg" />
-          <img id="reset" width="24" height="24" src="image/reset.svg" />
-          <img id="fullscreen" width="24" height="24" src="image/fullscreen.svg" />
-          <img id="info" width="24" height="24" src="image/info.svg" />
+          <img id="pause" width="24" height="24" src="../image/pause.svg" />
+          <img id="reset" width="24" height="24" src="../image/reset.svg" />
+          <img id="fullscreen" width="24" height="24" src="../image/fullscreen.svg" />
+          <img id="info" width="24" height="24" src="../image/info.svg" />
         </div>
       </div>
       <div class="loading-indicator invisible">
@@ -48,5 +48,5 @@
       <input type="file" id="file-fallback" multiple>
     </div>
   </div>
-  <script type="text/javascript" src="./js/ie11.js"></script>
+  <script type="text/javascript" src="../js/ie11.js"></script>
 </body>

@@ -17,7 +17,7 @@ export default buildHelper([
   {
     name,
     input: "./src/index.umd.ts",
-    output: `./demo/dist/${fileName}.pkgd.js`,
+    output: `./demo/release/latest/dist/${fileName}.pkgd.js`,
     format: "umd",
     resolve: true,
     plugins: [

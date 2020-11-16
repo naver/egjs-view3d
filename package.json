@@ -1,6 +1,6 @@
 {
   "name": "@egjs/view3d",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Fast & customizable 3D model viewer for everyone based on three.js & typescript",
   "main": "dist/view3d.js",
   "module": "dist/view3d.esm.js",
@@ -12,9 +12,13 @@
     "declaration": "rm -rf declaration && ttsc -p tsconfig.declaration.json",
     "printsizes": "print-sizes ./dist --exclude=\\.map",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
-    "demo:build": "npm run build && cpx 'dist/**/*' demo/dist --clean",
-    "demo:deploy": "npm run demo:build && npm run doc && cpx 'demo/**/*' docs/demo --clean && gh-pages -d docs/",
-    "doc": "rm -rf ./docs && jsdoc -c jsdoc.json",
+    "demo:build": "npm run build && cpx 'dist/**/*' demo/release/latest/dist --clean",
+    "demo:prebuild-version": "cpx 'dist/**/*' demo/release/$npm_package_version/dist --clean && cpx 'docs/**/*' demo/release/$npm_package_version/docs --clean",
+    "demo:prebuild-latest": "cpx 'dist/**/*' demo/release/latest/dist --clean && cpx 'docs/**/*' demo/release/latest/docs --clean",
+    "demo:deploy-origin": "npm run build && npm run jsdoc && npm run demo:prebuild-version && npm run demo:prebuild-latest && gh-pages -d demo/",
+    "demo:deploy": "npm run build && npm run jsdoc && npm run demo:prebuild-version && npm run demo:prebuild-latest && gh-pages -d demo/ --add --remote upstream",
+    "release": "release-helper upstream",
+    "jsdoc": "rm -rf ./docs && jsdoc -c jsdoc.json",
     "test": "jest --coverage"
   },
   "repository": {
