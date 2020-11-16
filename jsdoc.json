@@ -33,7 +33,7 @@
         },
         {
           "label": "Demo",
-          "href": "./demo/index.html"
+          "href": "../"
         }
       ]
     }
