@@ -1,0 +1,168 @@
+{
+  "accessors": [
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 874,
+      "max": [
+        29.076671600341797,
+        104.04806518554688,
+        114.1339111328125
+      ],
+      "min": [
+        -137.59109497070312,
+        -50.916759490966797,
+        -89.356597900390625
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 10488,
+      "componentType": 5126,
+      "count": 874,
+      "max": [
+        0.99843817949295044,
+        0.99154585599899292,
+        0.97950476408004761
+      ],
+      "min": [
+        -0.99996030330657959,
+        -0.99999821186065674,
+        -0.99740797281265259
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 0,
+      "componentType": 5125,
+      "count": 894,
+      "max": [
+        873
+      ],
+      "min": [
+        0
+      ],
+      "type": "SCALAR"
+    }
+  ],
+  "asset": {
+    "extras": {
+      "author": "gooseman (https://sketchfab.com/gooseman)",
+      "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+      "source": "https://sketchfab.com/3d-models/low-poly-bull-head-c8ef67d323404fd8af8dacf9744fe709",
+      "title": "Low Poly Bull Head"
+    },
+    "generator": "Sketchfab-6.24.0",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 3576,
+      "byteOffset": 0,
+      "name": "floatBufferViews",
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 20976,
+      "byteOffset": 3576,
+      "byteStride": 12,
+      "name": "floatBufferViews",
+      "target": 34962
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 24552,
+      "uri": "scene.bin"
+    }
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "name": "None",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "metallicFactor": 0.85999999999999999,
+        "roughnessFactor": 0.51000000000000001
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 1,
+            "POSITION": 0
+          },
+          "indices": 2,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "children": [
+        1
+      ],
+      "name": "RootNode (gltf orientation matrix)",
+      "rotation": [
+        -0.6283783, 0.2376471, 0.2102524, 0.7102524
+      ]
+    },
+    {
+      "children": [
+        2
+      ],
+      "matrix": [
+        0.80744808912277222,
+        -0.58973801136016846,
+        -0.01538392249494791,
+        0,
+        -0.58638215065002441,
+        -0.80516654253005981,
+        0.088672570884227753,
+        0,
+        -0.064680203795433044,
+        -0.062577642500400543,
+        -0.99594199657440186,
+        0,
+        5.9315967559814453,
+        16.733146667480469,
+        21.536626815795898,
+        1
+      ],
+      "name": "RootNode (model correction matrix)"
+    },
+    {
+      "children": [
+        3
+      ],
+      "name": "fixed nose back and horn.obj.cleaner.gles"
+    },
+    {
+      "mesh": 0,
+      "name": ""
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "OSG_Scene",
+      "nodes": [
+        0
+      ]
+    }
+  ]
+}
+

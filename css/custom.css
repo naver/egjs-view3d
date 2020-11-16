@@ -1,0 +1,12 @@
+.title-wrapper {
+  position: relative;
+  padding: 1em;
+  color: white;
+  margin: .5em 0;
+}
+#view3d-inline-canvas {
+  position: absolute;
+  height: 33%;
+  bottom: 0;
+  right: 0;
+}
