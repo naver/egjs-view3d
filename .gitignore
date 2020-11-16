@@ -103,7 +103,8 @@ typings/
 
 ## Custom ###
 .DS_Store
-
+demo/release/
+dist/
 outjs/
 declaration/
 docs/

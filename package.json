@@ -1,6 +1,6 @@
 {
 	"name": "@egjs/view3d",
-	"version": "1.0.1",
+	"version": "1.0.1-snapshot",
 	"description": "Fast & customizable 3D model viewer for everyone based on three.js & typescript",
 	"main": "dist/view3d.js",
 	"module": "dist/view3d.esm.js",
