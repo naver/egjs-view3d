@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>JSDoc: View3D</title>
+
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="./build/entry.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link href="https://fonts.googleapis.com/css?family=Muli:100,400,700|Oswald:300|Inconsolata,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+</head>
+
+<body>
+    <div id="stickyNavbarOverlay"></div>
+    <div class="top-navbar">
+        <div class="container">
+            <nav class="navbar" role="navigation" aria-label="main navigation">
+                <div class="navbar-brand">
+                    
+                     
+                        <h1 class="navbar-item">@egjs/view3d Documentation</h1>
+                    
+                    <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                    </a>
+                </div>
+                 
+                <div class="navbar-menu">
+                    <div class="navbar-end">
+                    
+                        <div class="navbar-item">
+                            <a href="https://github.com/naver/egjs-view3d" target="_blank">
+                                Github
+                            </a>
+                        </div>
+                    
+                        <div class="navbar-item">
+                            <a href="../" target="_blank">
+                                Demo
+                            </a>
+                        </div>
+                    
+                    </div>
+                </div>
+                
+            </nav>
+        </div>
+    </div>
+    <div class="container">
+        <div class="columns">
+            <div class="column is-3" id="sidebarNav">
+                <div class="sidebar">
+                    <nav>
+                        <h2><a href="index.html">Home</a></h2><div class="category"><h3>Tutorials</h3><ul><li><a href="tutorial-Adding Controls.html">Adding Controls</a></li><li><a href="tutorial-Adding Lights.html">Adding Lights</a></li><li><a href="tutorial-Adding Skybox and Envmap.html">Adding Skybox and Envmap</a></li><li><a href="tutorial-Displaying Shadows.html">Displaying Shadows</a></li><li><a href="tutorial-Handling Errors.html">Handling Errors</a></li><li><a href="tutorial-Loading a Model.html">Loading a Model</a></li><li><a href="tutorial-Playing Animations.html">Playing Animations</a></li></ul><h3>Namespaces</h3><ul><li><a href="EASING.html">EASING</a></li><li><a href="Constants.html">Constants</a></li></ul><h3>Classes</h3><ul><li><a href="Pose.html">Pose</a></li><li><a href="View3D.html">View3D</a></li></ul><h3>Interfaces</h3><ul><li><a href="FloorARSessionOption.html">FloorARSessionOption</a></li></ul><h3>Events</h3><ul><li><a href="Animation.html#event:progress">progress</a></li><li><a href="Animation.html#event:finish">finish</a></li></ul><h3>Global</h3><ul><li><a href="global.html#AnyFunction">AnyFunction</a></li><li><a href="global.html#AnyObject">AnyObject</a></li></ul></div><div class="category"><h2>Controls</h2><h3>Classes</h3><ul><li><a href="AnimationControl.html">AnimationControl</a></li><li><a href="AutoControl.html">AutoControl</a></li><li><a href="DistanceControl.html">DistanceControl</a></li><li><a href="OrbitControl.html">OrbitControl</a></li><li><a href="RotateControl.html">RotateControl</a></li><li><a href="TranslateControl.html">TranslateControl</a></li></ul><h3>Interfaces</h3><ul><li><a href="CameraControl.html">CameraControl</a></li></ul></div><div class="category"><h2>Controls-AR</h2><h3>Classes</h3><ul><li><a href="ARFloorControl.html">ARFloorControl</a></li><li><a href="ARFloorTranslateControl.html">ARFloorTranslateControl</a></li><li><a href="ARHoverControl.html">ARHoverControl</a></li><li><a href="ARHoverRotateControl.html">ARHoverRotateControl</a></li><li><a href="ARHoverTranslateControl.html">ARHoverTranslateControl</a></li><li><a href="ArrowIndicator.html">ArrowIndicator</a></li><li><a href="ARScaleControl.html">ARScaleControl</a></li><li><a href="ARSwipeControl.html">ARSwipeControl</a></li><li><a href="ARSwirlControl.html">ARSwirlControl</a></li><li><a href="ARWallControl.html">ARWallControl</a></li><li><a href="ARWallTranslateControl.html">ARWallTranslateControl</a></li><li><a href="DeadzoneChecker.html">DeadzoneChecker</a></li><li><a href="FloorIndicator.html">FloorIndicator</a></li><li><a href="RotationIndicator.html">RotationIndicator</a></li><li><a href="ScaleUI.html">ScaleUI</a></li></ul><h3>Interfaces</h3><ul><li><a href="ScaleUIOption.html">ScaleUIOption</a></li><li><a href="RotationIndicatorOption.html">RotationIndicatorOption</a></li><li><a href="FloorIndicatorOption.html">FloorIndicatorOption</a></li><li><a href="DeadzoneCheckerOption.html">DeadzoneCheckerOption</a></li><li><a href="ARWallTranslateControlOption.html">ARWallTranslateControlOption</a></li><li><a href="ARWallControlOption.html">ARWallControlOption</a></li><li><a href="ARSwirlControlOption.html">ARSwirlControlOption</a></li><li><a href="ARSwipeControlOption.html">ARSwipeControlOption</a></li><li><a href="ARScaleControlOption.html">ARScaleControlOption</a></li><li><a href="ArrowIndicatorOption.html">ArrowIndicatorOption</a></li><li><a href="ARHoverTranslateControlOption.html">ARHoverTranslateControlOption</a></li><li><a href="ARHoverRotateControlOption.html">ARHoverRotateControlOption</a></li><li><a href="ARHoverControlOption.html">ARHoverControlOption</a></li><li><a href="ARFloorTranslateControlOption.html">ARFloorTranslateControlOption</a></li><li><a href="ARFloorControlOption.html">ARFloorControlOption</a></li><li><a href="ARControl.html">ARControl</a></li></ul></div><div class="category"><h2>Core</h2><h3>Classes</h3><ul><li><a href="Animation.html">Animation</a></li><li><a href="Camera.html">Camera</a></li><li><a href="Controller.html">Controller</a></li><li><a href="Model.html">Model</a></li><li><a href="ModelAnimator.html">ModelAnimator</a></li><li><a href="Renderer.html">Renderer</a></li><li><a href="Scene.html">Scene</a></li><li><a href="XRManager.html">XRManager</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:afterRender">afterRender</a></li></ul></div><div class="category"><h2>Environment</h2><h3>Classes</h3><ul><li><a href="AutoDirectionalLight.html">AutoDirectionalLight</a></li><li><a href="ShadowPlane.html">ShadowPlane</a></li></ul><h3>Interfaces</h3><ul><li><a href="Environment.html">Environment</a></li></ul></div><div class="category"><h2>Extra</h2><h3>Classes</h3><ul><li><a href="TextureModel.html">TextureModel</a></li></ul></div><div class="category"><h2>Loaders</h2><h3>Classes</h3><ul><li><a href="GLTFLoader.html">GLTFLoader</a></li><li><a href="TextureLoader.html">TextureLoader</a></li></ul><h3>Interfaces</h3><ul><li><a href="ModelLoadOption.html">ModelLoadOption</a></li></ul></div><div class="category"><h2>XR</h2><h3>Classes</h3><ul><li><a href="DOMOverlay.html">DOMOverlay</a></li><li><a href="FloorARSession.html">FloorARSession</a></li><li><a href="HitTest.html">HitTest</a></li><li><a href="HoverARSession.html">HoverARSession</a></li><li><a href="QuickLookSession.html">QuickLookSession</a></li><li><a href="SceneViewerSession.html">SceneViewerSession</a></li><li><a href="WallARSession.html">WallARSession</a></li><li><a href="WebARSession.html">WebARSession</a></li></ul><h3>Interfaces</h3><ul><li><a href="XRSession.html">XRSession</a></li><li><a href="WebARSessionOption.html">WebARSessionOption</a></li><li><a href="WallARSessionOption.html">WallARSessionOption</a></li><li><a href="HoverARSessionOption.html">HoverARSessionOption</a></li></ul><h3>Events</h3><ul><li><a href="WebARSession.html#.event:start">start</a></li><li><a href="WebARSession.html#.event:modelPlaced">modelPlaced</a></li><li><a href="WebARSession.html#.event:end">end</a></li><li><a href="WebARSession.html#.event:canPlace">canPlace</a></li></ul></div>
+                    </nav>
+                </div>
+            </div>
+            <div class="column is-9-desktop">
+                <div class="content" id="main-content-wrapper">
+                    <header class="page-title">
+                        <p>Class</p>
+                        <h1>View3D</h1>
+                    </header>
+                    
+                    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2><span class="attribs"><span class="type-signature"></span></span>View3D<span class="signature">(el)</span><span class="type-signature"></span></h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class='vertical-section'>
+                <h3 class="title"><span>Constructor</span></h3>
+                <div class="members">
+                    <div class="member">
+
+
+    
+    <h4 class="name" id="View3D">
+        <a class="href-link" href="#View3D">#</a>
+        
+        <span class="code-name">
+            
+                new View3D<span class="signature">(el)</span><span class="type-signature"></span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p>Creates new View3D instance</p>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        
+<tr class="deep-level-0">
+  
+      <td class="name"><code>el</code></td>
+  
+
+  <td class="type">
+  
+      
+<span class="param-type">string | HTMLCanvasElement</span>
+
+
+  
+  </td>
+
+  
+
+  
+
+  <td class="description last"></td>
+</tr>
+
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="Model.html">Model</a></li>
+        
+            <li><a href="Camera.html">Camera</a></li>
+        
+            <li><a href="Renderer.html">Renderer</a></li>
+        
+            <li><a href="Scene.html">Scene</a></li>
+        
+            <li><a href="Controller.html">Controller</a></li>
+        
+            <li><a href="XRManager.html">XRManager</a></li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="View3D.ts.html" class="button">View Source</a>
+            <span>
+                <a href="View3D.ts.html">View3D.ts</a>, <a href="View3D.ts.html#line112">line 112</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class='columns method-parameter'>
+        <div class="column is-2"><label>Throws:</label></div>
+        <div class="column is-10">
+            
+                    
+<div class="columns">
+    
+    <div class='param-desc column is-7'><p><code>CODES.WRONG_TYPE</code><br/>When parameter does not either string or the canvas element.</p></div>
+    <div class='column is-5 has-text-left'>
+        <label>Type: </label>
+<span class="param-type">View3DError</span>
+
+
+    </div>
+    
+</div>
+
+                
+                    
+<div class="columns">
+    
+    <div class='param-desc column is-7'><p><code>CODES.ELEMENT_NOT_FOUND</code><br/>When the element with given query does not exist.</p></div>
+    <div class='column is-5 has-text-left'>
+        <label>Type: </label>
+<span class="param-type">View3DError</span>
+
+
+    </div>
+    
+</div>
+
+                
+                    
+<div class="columns">
+    
+    <div class='param-desc column is-7'><p><code>CODES.ELEMENT_NOT_CANVAS</code><br/>When the element given is not a &lt;canvas&gt; element.</p></div>
+    <div class='column is-5 has-text-left'>
+        <label>Type: </label>
+<span class="param-type">View3DError</span>
+
+
+    </div>
+    
+</div>
+
+                
+                    
+<div class="columns">
+    
+    <div class='param-desc column is-7'><p><code>CODES.WEBGL_NOT_SUPPORTED</code><br/>When browser does not support WebGL.</p></div>
+    <div class='column is-5 has-text-left'>
+        <label>Type: </label>
+<span class="param-type">View3DError</span>
+
+
+    </div>
+    
+</div>
+
+                
+        </div>
+    </div>
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    
+        <pre class="prettyprint"><code>import View3D, { ERROR_CODES } from "@egjs/view3d";
+
+try {
+  const view3d = new View3D("#wrapper")
+} catch (e) {
+  if (e.code === ERROR_CODES.ELEMENT_NOT_FOUND) {
+    console.error("Element not found")
+  }
+}</code></pre>
+    
+
+
+</div>
+                </div>
+            </div>
+        
+    
+    </div>
+    
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <div class='vertical-section'>
+            <h3 class="title"><span>Members</span></h3>
+            <div class="members">
+            
+                <div class="member">
+
+    <span class="method-parameter is-pulled-right">
+        <label>Type:</label>
+        
+<span class="param-type">string</span>
+
+
+    </span>
+
+<h4 class="name" id=".VERSION">
+    <a class="href-link" href="#.VERSION">#</a>
+    
+        
+            <span class='tag'>static</span>
+        
+    
+    <span class="code-name">
+        VERSION
+    </span>
+    
+</h4>
+
+
+
+
+<div class="description">
+    <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p>Current version of the View3D</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="View3D.ts.html" class="button">View Source</a>
+            <span>
+                <a href="View3D.ts.html">View3D.ts</a>, <a href="View3D.ts.html#line44">line 44</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+</div>
+            
+                <div class="member">
+
+    <span class="method-parameter is-pulled-right">
+        <label>Type:</label>
+        
+<span class="param-type"><a href="ModelAnimator.html">ModelAnimator</a></span>
+
+
+    </span>
+
+<h4 class="name" id="animator">
+    <a class="href-link" href="#animator">#</a>
+    
+    <span class="code-name">
+        animator
+    </span>
+    
+</h4>
+
+
+
+
+<div class="description">
+    <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p><a href="ModelAnimator.html">ModelAnimator</a> instance of the View3D</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="View3D.ts.html" class="button">View Source</a>
+            <span>
+                <a href="View3D.ts.html">View3D.ts</a>, <a href="View3D.ts.html#line77">line 77</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+</div>
+            
+                <div class="member">
+
+    <span class="method-parameter is-pulled-right">
+        <label>Type:</label>
+        
+<span class="param-type"><a href="Camera.html">Camera</a></span>
+
+
+    </span>
+
+<h4 class="name" id="camera">
+    <a class="href-link" href="#camera">#</a>
+    
+    <span class="code-name">
+        camera
+    </span>
+    
+</h4>
+
+
+
+
+<div class="description">
+    <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p><a href="Camera.html">Camera</a> instance of the View3D</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="View3D.ts.html" class="button">View Source</a>
+            <span>
+                <a href="View3D.ts.html">View3D.ts</a>, <a href="View3D.ts.html#line67">line 67</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+</div>
+            
+                <div class="member">
+
+    <span class="method-parameter is-pulled-right">
+        <label>Type:</label>
+        
+<span class="param-type"><a href="Controller.html">Controller</a></span>
+
+
+    </span>
+
+<h4 class="name" id="controller">
+    <a class="href-link" href="#controller">#</a>
+    
+    <span class="code-name">
+        controller
+    </span>
+    
+</h4>
+
+
+
+
+<div class="description">
+    <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p><a href="Controller.html">Controller</a> instance of the Camera</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="View3D.ts.html" class="button">View Source</a>
+            <span>
+                <a href="View3D.ts.html">View3D.ts</a>, <a href="View3D.ts.html#line72">line 72</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+</div>
+            
+                <div class="member">
+
+    <span class="method-parameter is-pulled-right">
+        <label>Type:</label>
+        
+<span class="param-type"><a href="Model.html">Model</a></span>
+|
+
+<span class="param-type">null</span>
+
+
+    </span>
+
+<h4 class="name" id="model">
+    <a class="href-link" href="#model">#</a>
+    
+    <span class="code-name">
+        model
+    </span>
+    
+</h4>
+
+
+
+
+<div class="description">
+    <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p><a href="Model.html">Model</a> that View3D is currently showing</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="View3D.ts.html" class="button">View Source</a>
+            <span>
+                <a href="View3D.ts.html">View3D.ts</a>, <a href="View3D.ts.html#line87">line 87</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+</div>
+            
+                <div class="member">
+
+    <span class="method-parameter is-pulled-right">
+        <label>Type:</label>
+        
+<span class="param-type"><a href="Renderer.html">Renderer</a></span>
+
+
+    </span>
+
+<h4 class="name" id="renderer">
+    <a class="href-link" href="#renderer">#</a>
+    
+    <span class="code-name">
+        renderer
+    </span>
+    
+</h4>
+
+
+
+
+<div class="description">
+    <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p><a href="Renderer.html">Renderer</a> instance of the View3D</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="View3D.ts.html" class="button">View Source</a>
+            <span>
+                <a href="View3D.ts.html">View3D.ts</a>, <a href="View3D.ts.html#line57">line 57</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+</div>
+            
+                <div class="member">
+
+<h4 class="name" id="renderLoop">
+    <a class="href-link" href="#renderLoop">#</a>
+    
+    <span class="code-name">
+        renderLoop
+    </span>
+    
+</h4>
+
+
+
+
+<div class="description">
+    <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p>View3D's basic render loop function</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="View3D.ts.html" class="button">View Source</a>
+            <span>
+                <a href="View3D.ts.html">View3D.ts</a>, <a href="View3D.ts.html#line201">line 201</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+</div>
+            
+                <div class="member">
+
+    <span class="method-parameter is-pulled-right">
+        <label>Type:</label>
+        
+<span class="param-type"><a href="Scene.html">Scene</a></span>
+
+
+    </span>
+
+<h4 class="name" id="scene">
+    <a class="href-link" href="#scene">#</a>
+    
+    <span class="code-name">
+        scene
+    </span>
+    
+</h4>
+
+
+
+
+<div class="description">
+    <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p><a href="Scene.html">Scene</a> instance of the View3D</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="View3D.ts.html" class="button">View Source</a>
+            <span>
+                <a href="View3D.ts.html">View3D.ts</a>, <a href="View3D.ts.html#line62">line 62</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+</div>
+            
+                <div class="member">
+
+    <span class="method-parameter is-pulled-right">
+        <label>Type:</label>
+        
+<span class="param-type"><a href="XRManager.html">XRManager</a></span>
+
+
+    </span>
+
+<h4 class="name" id="xr">
+    <a class="href-link" href="#xr">#</a>
+    
+    <span class="code-name">
+        xr
+    </span>
+    
+</h4>
+
+
+
+
+<div class="description">
+    <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p><a href="XRManager.html">XRManager</a> instance of the View3D</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="View3D.ts.html" class="button">View Source</a>
+            <span>
+                <a href="View3D.ts.html">View3D.ts</a>, <a href="View3D.ts.html#line82">line 82</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+</div>
+            
+            </div>
+        </div>
+    
+
+    
+        <div class='vertical-section'>
+            <h3 class="title"><span>Methods</span></h3>
+            <div class="members">
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id="destroy">
+        <a class="href-link" href="#destroy">#</a>
+        
+        <span class="code-name">
+            
+                destroy<span class="signature">()</span><span class="type-signature"> &rarr; {void}</span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p>Destroy the denam instance and remove all events attached to it</p>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="View3D.ts.html" class="button">View Source</a>
+            <span>
+                <a href="View3D.ts.html">View3D.ts</a>, <a href="View3D.ts.html#line132">line 132</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class='columns method-parameter'>
+        <div class="column is-2"><label>Returns:</label></div>
+        <div class="column is-10">
+            
+                    
+
+<div class="columns">
+    
+    <div class='param-desc column is-7'><p>Nothing</p></div>
+    
+    
+    <div class='column is-5 has-text-left'>
+        <label>Type: </label>
+        
+<span class="param-type">void</span>
+
+
+    </div>
+    
+</div>
+
+                
+        </div>
+    </div>
+
+
+
+
+</div>
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id="display">
+        <a class="href-link" href="#display">#</a>
+        
+        <span class="code-name">
+            
+                display<span class="signature">(model, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {void}</span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p>Display the given model.<br>
+This method will remove the current displaying model, and reset the camera &amp; control to default position.<br>
+View3D can only show one model at a time</p>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        
+<tr class="deep-level-0">
+  
+      <td class="name"><code>model</code></td>
+  
+
+  <td class="type">
+  
+      
+<span class="param-type"><a href="ModelAnimator.html">Model</a></span>
+
+
+  
+  </td>
+
+  
+      <td class="attributes">
+      
+
+      
+
+      
+      </td>
+  
+
+  
+      <td class="default">
+      
+      </td>
+  
+
+  <td class="description last"><p><a href="Model.html">Model</a> instance to show</p></td>
+</tr>
+
+
+    
+
+        
+<tr class="deep-level-0">
+  
+      <td class="name"><code>options</code></td>
+  
+
+  <td class="type">
+  
+      
+<span class="param-type">object</span>
+
+
+  
+  </td>
+
+  
+      <td class="attributes">
+      
+          &lt;optional><br>
+      
+
+      
+
+      
+      </td>
+  
+
+  
+      <td class="default">
+      
+          {}
+      
+      </td>
+  
+
+  <td class="description last"><p>Display options</p></td>
+</tr>
+
+  
+  
+    
+<tr class="deep-level-1">
+  
+      <td class="name"><code>applySize</code></td>
+  
+
+  <td class="type">
+  
+      
+<span class="param-type">number</span>
+
+
+  
+  </td>
+
+  
+      <td class="attributes">
+      
+          &lt;optional><br>
+      
+
+      
+
+      
+      </td>
+  
+
+  
+      <td class="default">
+      
+          true
+      
+      </td>
+  
+
+  <td class="description last"><p>Whether to change model size to given &quot;size&quot; option.</p></td>
+</tr>
+
+  
+    
+<tr class="deep-level-1">
+  
+      <td class="name"><code>size</code></td>
+  
+
+  <td class="type">
+  
+      
+<span class="param-type">number</span>
+
+
+  
+  </td>
+
+  
+      <td class="attributes">
+      
+          &lt;optional><br>
+      
+
+      
+
+      
+      </td>
+  
+
+  
+      <td class="default">
+      
+          80
+      
+      </td>
+  
+
+  <td class="description last"><p>Size of the model to show as.</p></td>
+</tr>
+
+  
+    
+<tr class="deep-level-1">
+  
+      <td class="name"><code>resetView</code></td>
+  
+
+  <td class="type">
+  
+      
+<span class="param-type">boolean</span>
+
+
+  
+  </td>
+
+  
+      <td class="attributes">
+      
+          &lt;optional><br>
+      
+
+      
+
+      
+      </td>
+  
+
+  
+      <td class="default">
+      
+          true
+      
+      </td>
+  
+
+  <td class="description last"><p>Whether to reset the view to the camera's default pose.</p></td>
+</tr>
+
+  
+
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="View3D.ts.html" class="button">View Source</a>
+            <span>
+                <a href="View3D.ts.html">View3D.ts</a>, <a href="View3D.ts.html#line163">line 163</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class='columns method-parameter'>
+        <div class="column is-2"><label>Returns:</label></div>
+        <div class="column is-10">
+            
+                    
+
+<div class="columns">
+    
+    <div class='param-desc column is-7'><p>Nothing</p></div>
+    
+    
+    <div class='column is-5 has-text-left'>
+        <label>Type: </label>
+        
+<span class="param-type">void</span>
+
+
+    </div>
+    
+</div>
+
+                
+        </div>
+    </div>
+
+
+
+
+</div>
+            
+                <div class="member">
+
+
+    
+    <h4 class="name" id="resize">
+        <a class="href-link" href="#resize">#</a>
+        
+        <span class="code-name">
+            
+                resize<span class="signature">()</span><span class="type-signature"> &rarr; {void}</span>
+            
+        </span>
+    </h4>
+    
+
+    
+    
+    <div class="description">
+        <script type="text/javascript" src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script><p>Resize the denam instance to fit current canvas size</p>
+    </div>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="View3D.ts.html" class="button">View Source</a>
+            <span>
+                <a href="View3D.ts.html">View3D.ts</a>, <a href="View3D.ts.html#line145">line 145</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class='columns method-parameter'>
+        <div class="column is-2"><label>Returns:</label></div>
+        <div class="column is-10">
+            
+                    
+
+<div class="columns">
+    
+    <div class='param-desc column is-7'><p>Nothing</p></div>
+    
+    
+    <div class='column is-5 has-text-left'>
+        <label>Type: </label>
+        
+<span class="param-type">void</span>
+
+
+    </div>
+    
+</div>
+
+                
+        </div>
+    </div>
+
+
+
+
+</div>
+            
+            </div>
+        </div>
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<footer class="footer">
+    <div class="content has-text-centered">
+        <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 0.3.7</a> on Mon Nov 16 2020 19:40:06 GMT+0900 (Korean Standard Time)</p>
+        <p class="sidebar-created-by">
+            <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by 
+            <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+        </p>
+    </div>
+</footer>
+
+
+<script src="scripts/app.min.js"></script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
