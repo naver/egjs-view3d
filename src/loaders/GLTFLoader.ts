@@ -43,7 +43,7 @@ class GLTFLoader {
    * @param options Options for a loaded model
    * @returns Promise that resolves {@link Model}
    */
-  public load(url: string, options: Partial<ModelLoadOption>): Promise<Model> {
+  public load(url: string, options: Partial<ModelLoadOption> = {}): Promise<Model> {
     const loader = this._loader;
     loader.manager = new THREE.LoadingManager();
 
@@ -154,7 +154,7 @@ class GLTFLoader {
    * @param options Options for a loaded model
    * @returns Promise that resolves {@link Model}
    */
-  public loadFromFiles(files: File[], options: Partial<ModelLoadOption>): Promise<Model> {
+  public loadFromFiles(files: File[], options: Partial<ModelLoadOption> = {}): Promise<Model> {
     const objectURLs: string[] = [];
     const revokeURLs = () => {
       objectURLs.forEach(url => {
