@@ -4,7 +4,7 @@
 
 Fast & customizable 3D model viewer for everyone
 
-👉 **[Demo](https://naver.github.io/egjs-view3d)** / **[API Document](https://naver.github.io/egjs-view3d/release/latest/docs/)** / **[Tutorial](https://naver.github.io/egjs-view3d/release/latest/docs//tutorial-Adding%20Controls.html)**
+👉 **[Demo](https://naver.github.io/egjs-view3d)** / **[API Document](https://naver.github.io/egjs-view3d/release/latest/docs/)** / **[Tutorial](https://naver.github.io/egjs-view3d/release/latest/docs//tutorial-Adding%20Controls.html)** / Related Article [1](https://medium.com/naver-fe-platform/webar-with-webxr-api-part-1-e191a2dc7177),[2](https://medium.com/naver-fe-platform/webar-with-webxr-api-part-2-dc76b20767fb)
 
 ## Features
 - A customizable 3D model viewer based on the [three.js](https://github.com/mrdoob/three.js/)
