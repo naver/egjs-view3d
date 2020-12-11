@@ -188,9 +188,8 @@ class TranslateControl implements CameraControl {
 
     targetEl.addEventListener(EVENTS.CONTEXT_MENU, this._onContextMenu, false);
 
-    this._setCursor(CURSOR.GRAB);
-
     this._enabled = true;
+    this._setCursor(CURSOR.GRAB);
   }
 
   /**
@@ -213,7 +212,6 @@ class TranslateControl implements CameraControl {
     targetEl.removeEventListener(EVENTS.CONTEXT_MENU, this._onContextMenu, false);
 
     this._setCursor("");
-
     this._enabled = false;
   }
 
@@ -239,7 +237,7 @@ class TranslateControl implements CameraControl {
 
   private _setCursor(val: ValueOf<typeof CURSOR> | "") {
     const targetEl = this._targetEl;
-    if (!this._useGrabCursor || !targetEl) return;
+    if (!this._useGrabCursor || !targetEl || !this._enabled) return;
 
     targetEl.style.cursor = val;
   }
