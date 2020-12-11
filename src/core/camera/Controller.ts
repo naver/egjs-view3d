@@ -18,6 +18,11 @@ class Controller {
   private _controls: CameraControl[] = [];
 
   /**
+   * {@link CameraControl CameraControl} instances that is added on this controller.
+   */
+  public get controls() { return this._controls; }
+
+  /**
    * Create new Controller instance
    */
   constructor(canvas: HTMLCanvasElement, camera: Camera) {
@@ -36,7 +41,7 @@ class Controller {
 
   /**
    * Add a new control
-   * @param control {@link Control Control} instance to add
+   * @param control {@link CameraControl CameraControl} instance to add
    * @see Adding Controls
    * @returns {void} Nothing
    */
@@ -53,7 +58,7 @@ class Controller {
 
   /**
    * Remove control and disable it
-   * @param control {@link Control Control} instance to remove
+   * @param control {@link CameraControl CameraControl} instance to remove
    * @returns removed control or null if it doesn't exists
    */
   public remove(control: CameraControl): CameraControl | null {

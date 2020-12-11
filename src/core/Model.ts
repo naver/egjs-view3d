@@ -19,7 +19,7 @@ class Model {
   private _fixSkinnedBbox: boolean;
 
   /**
-   * {@link https://threejs.org/docs/#api/en/scenes/Scene THREE.Scene} of the model
+   * Scene of the model, see {@link https://threejs.org/docs/#api/en/objects/Group THREE.Group}
    * @readonly
    */
   public get scene() { return this._scene; }

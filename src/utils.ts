@@ -39,6 +39,10 @@ export function getCanvas(el: HTMLElement | string): HTMLCanvasElement {
 }
 
 export function range(end: number): number[] {
+  if (!end || end <= 0) {
+    return [];
+  }
+
   return Array.apply(0, Array(end)).map((undef, idx) => idx);
 }
 
@@ -50,13 +54,24 @@ export function clamp(x: number, min: number, max: number) {
   return Math.max(Math.min(x, max), min);
 }
 
+export function findIndex<T>(target: T, list: T[]) {
+  let index = -1;
+  for (const itemIndex of range(list.length)) {
+    if (list[itemIndex] === target) {
+      index = itemIndex;
+      break;
+    }
+  }
+  return index;
+}
+
 // Linear interpolation between a and b
 export function mix(a: number, b: number, t: number) {
   return a * (1 - t) + b * t;
 }
 
 export function circulate(val: number, min: number, max: number) {
-  const size = max - min;
+  const size = Math.abs(max - min);
 
   if (val < min) {
     const offset = (min - val) % size;
@@ -84,21 +99,10 @@ export function merge(target: object, ...srcs: object[]): object {
   return target;
 }
 
-export function findIndex<T>(target: T, list: T[]) {
-  let index = -1;
-  for (const itemIndex of range(list.length)) {
-    if (list[itemIndex] === target) {
-      index = itemIndex;
-      break;
-    }
-  }
-  return index;
-}
-
 export function getBoxPoints(box: THREE.Box3) {
   return [
     box.min.clone(),
-    new THREE.Vector3(box.min.x, box.min.y, box.min.z),
+    new THREE.Vector3(box.min.x, box.min.y, box.max.z),
     new THREE.Vector3(box.min.x, box.max.y, box.min.z),
     new THREE.Vector3(box.min.x, box.max.y, box.max.z),
     new THREE.Vector3(box.max.x, box.min.y, box.min.z),
