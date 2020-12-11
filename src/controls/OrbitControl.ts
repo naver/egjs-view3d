@@ -80,7 +80,9 @@ class OrbitControl implements CameraControl {
    * @returns {void} Nothing
    */
   public destroy(): void {
-    this.disable();
+    this._rotateControl.destroy();
+    this._translateControl.destroy();
+    this._distanceControl.destroy();
   }
 
   /**

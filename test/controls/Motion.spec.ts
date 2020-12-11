@@ -13,9 +13,9 @@ describe("Motion", () => {
       const motion = new Motion({ duration, range, easing });
 
       // Then
-      expect(motion.range).toEqual(range);
-      expect(motion.duration).toEqual(duration);
-      expect(motion.val).toEqual(0);
+      expect(motion.range).to.equal(range);
+      expect(motion.duration).to.equal(duration);
+      expect(motion.val).to.equal(0);
     });
 
     it("has initial progress 0", () => {
@@ -23,7 +23,7 @@ describe("Motion", () => {
       const motion = new Motion({ duration: 100, range: { min: 0, max: 1 }, easing: (x: number) => x });
 
       // Then
-      expect(motion.progress).toEqual(0);
+      expect(motion.progress).to.equal(0);
     });
   });
 
@@ -40,8 +40,8 @@ describe("Motion", () => {
       const progressAfterCall = motion.progress;
 
       // Then
-      expect(progressBeforeCall).not.toEqual(0);
-      expect(progressAfterCall).toEqual(0);
+      expect(progressBeforeCall).not.to.equal(0);
+      expect(progressAfterCall).to.equal(0);
     });
 
     it("should clamp new end to range maximum", () => {
@@ -58,9 +58,9 @@ describe("Motion", () => {
       const progressAfterUpdate = motion.progress;
 
       // Then
-      expect(progressBeforeUpdate).toEqual(0);
-      expect(progressAfterUpdate).toEqual(1);
-      expect(newEndPoint).toEqual(range.max);
+      expect(progressBeforeUpdate).to.equal(0);
+      expect(progressAfterUpdate).to.equal(1);
+      expect(newEndPoint).to.equal(range.max);
     });
 
     it("should clamp new end to range minimum", () => {
@@ -79,9 +79,9 @@ describe("Motion", () => {
       const progressAfterUpdate = motion.progress;
 
       // Then
-      expect(progressBeforeUpdate).toEqual(0);
-      expect(progressAfterUpdate).toEqual(1);
-      expect(newEndPoint).toEqual(range.min);
+      expect(progressBeforeUpdate).to.equal(0);
+      expect(progressAfterUpdate).to.equal(1);
+      expect(newEndPoint).to.equal(range.min);
     });
   });
 
@@ -96,9 +96,9 @@ describe("Motion", () => {
       const progressAfterUpdate = motion.progress;
 
       // Then
-      expect(progressBeforeUpdate).toEqual(0);
-      expect(progressAfterUpdate).toEqual(0);
-      expect(delta).toEqual(0);
+      expect(progressBeforeUpdate).to.equal(0);
+      expect(progressAfterUpdate).to.equal(0);
+      expect(delta).to.equal(0);
     });
 
     it("should update progress by time, and value by easing", () => {
@@ -118,10 +118,10 @@ describe("Motion", () => {
       // Then
       const expectedProgress = 0.5;
       const expectedValue = motion.start + (motion.end - motion.start) * easing(expectedProgress);
-      expect(progressBeforeUpdate).toEqual(0);
-      expect(progressAfterUpdate).toEqual(expectedProgress);
-      expect(valueBeforeUpdate).toEqual(motion.start);
-      expect(valueAfterUpdate).toEqual(expectedValue);
+      expect(progressBeforeUpdate).to.equal(0);
+      expect(progressAfterUpdate).to.equal(expectedProgress);
+      expect(valueBeforeUpdate).to.equal(motion.start);
+      expect(valueAfterUpdate).to.equal(expectedValue);
     });
   });
 
@@ -135,9 +135,9 @@ describe("Motion", () => {
       motion.reset(resetVal);
 
       // Then
-      expect(motion.start).toEqual(resetVal);
-      expect(motion.end).toEqual(resetVal);
-      expect(motion.val).toEqual(resetVal);
+      expect(motion.start).to.equal(resetVal);
+      expect(motion.end).to.equal(resetVal);
+      expect(motion.val).to.equal(resetVal);
     });
 
     it("should clamp given parameter to its range", () => {
@@ -150,9 +150,9 @@ describe("Motion", () => {
       motion.reset(resetVal);
 
       // Then
-      expect(motion.start).toEqual(range.min);
-      expect(motion.end).toEqual(range.min);
-      expect(motion.val).toEqual(range.min);
+      expect(motion.start).to.equal(range.min);
+      expect(motion.end).to.equal(range.min);
+      expect(motion.val).to.equal(range.min);
     });
   });
 });
