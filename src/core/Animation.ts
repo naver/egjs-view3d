@@ -4,13 +4,12 @@
  */
 
 import EventEmitter from "./EventEmitter";
-import { Time } from "~/consts/browser";
 import * as DEFAULT from "~/consts/default";
 import * as EASING from "~/consts/easing";
 import { circulate } from "~/utils";
 
 /**
- * Fires for every frame when animation is active.
+ * Fires for every animation frame when animation is active.
  * @type object
  * @property {object} event Event object.
  * @property {number} [event.progress] Current animation progress value.
@@ -19,13 +18,17 @@ import { circulate } from "~/utils";
  * @event Animation#progress
  */
 
- /**
-  * @type object
-  * @property {object} event Event object.
-  * @property {number} [event.progress] Current animation progress value.
-  * Value is ranged from 0(start) to 1(end).
-  * @property {number} [event.easedProgress] Eased progress value.
-  */
+/**
+ * Fires for every animation loop except for the last loop
+ * This will be triggered only when repeat > 0
+ * @type object
+ * @property {object} event Event object.
+ * @property {number} [event.progress] Current animation progress value.
+ * Value is ranged from 0(start) to 1(end).
+ * @property {number} [event.easedProgress] Eased progress value.
+ * @property {number} [event.loopIndex] Index of the current loop.
+ * @event Animation#loop
+ */
 
 /**
  * Fires when animation ends.
@@ -95,6 +98,7 @@ class Animation extends EventEmitter<{
   public stop() {
     if (this._rafId < 0) return;
 
+    this._time = 0;
     this._loopCount = 0;
     this._stopLoop();
   }
@@ -149,7 +153,7 @@ class Animation extends EventEmitter<{
   }
 
   private _updateClock() {
-    this._clock = Time.now();
+    this._clock = Date.now();
   }
 }
 

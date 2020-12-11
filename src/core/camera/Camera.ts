@@ -163,7 +163,7 @@ class Camera {
 
       controller.syncToCamera();
 
-      return new Promise(resolve => resolve);
+      return Promise.resolve();
     } else {
       // Add reset animation control to controller
       const resetControl = new AnimationControl(currentPose, defaultPose);

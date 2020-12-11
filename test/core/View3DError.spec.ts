@@ -4,25 +4,25 @@ describe("View3DError", () => {
   it("should include code in it", () => {
     // Given
     const testMessage = "I AM ERROR";
-    const testCode = 426;
+    const testCode = 123456789;
 
     // When
     const error = new View3DError(testMessage, testCode);
 
     // Then
-    expect(error.code).toBe(testCode);
+    expect(error.code).to.equal(testCode);
   });
 
   it("should include inherited properties(message, stack) in it", () => {
     // Given
     const testMessage = "I AM ERROR";
-    const testCode = 426;
+    const testCode = 987654321;
 
     // When
     const error = new View3DError(testMessage, testCode);
 
     // Then
-    expect(error.message).toBe(testMessage);
-    expect(error.stack).not.toBeUndefined();
+    expect(error.message).to.equal(testMessage);
+    expect(error.stack).not.to.be.undefined;
   });
 });
