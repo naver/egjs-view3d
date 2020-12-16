@@ -24,11 +24,11 @@ import { XRRenderContext, XRContext, XRInputs } from "~/types/internal";
  * @property {DeadzoneCheckerOption} deadzone Options for {@link DeadzoneChecker}
  */
 export interface ARWallControlOption {
-  rotate: ARSwirlControlOption;
-  translate: ARWallTranslateControlOption;
-  scale: ARScaleControlOption;
-  floorIndicator: FloorIndicatorOption;
-  deadzone: DeadzoneCheckerOption;
+  rotate: Partial<ARSwirlControlOption>;
+  translate: Partial<ARWallTranslateControlOption>;
+  scale: Partial<ARScaleControlOption>;
+  floorIndicator: Partial<FloorIndicatorOption>;
+  deadzone: Partial<DeadzoneCheckerOption>;
 }
 
 /**
@@ -51,7 +51,7 @@ class ARWallControl {
    */
   public get enabled() { return this._enabled; }
   /**
-   * {@link ARRotateControl} in this control
+   * {@link ARSwirlControlOptions} in this control
    */
   public get rotate() { return this._rotateControl; }
   /**
@@ -68,17 +68,18 @@ class ARWallControl {
 
   /**
    * Create new instance of ARControl
-   * @param {ARFloorControlOption} options Options
+   * @param {ARWallControlOption} options Options
    */
-  constructor(options = {}) {
+  constructor(options: Partial<ARWallControlOption> = {}) {
     // TODO: bind options
     this._rotateControl = new ARSwirlControl({
+      ...options.rotate,
       showIndicator: false,
     });
-    this._translateControl = new ARWallTranslateControl();
-    this._scaleControl = new ARScaleControl();
-    this._floorIndicator = new FloorIndicator();
-    this._deadzoneChecker = new DeadzoneChecker();
+    this._translateControl = new ARWallTranslateControl(options.translate);
+    this._scaleControl = new ARScaleControl(options.scale);
+    this._floorIndicator = new FloorIndicator(options.floorIndicator);
+    this._deadzoneChecker = new DeadzoneChecker(options.deadzone);
   }
 
   public init(ctx: XRRenderContext, initialTransform: {

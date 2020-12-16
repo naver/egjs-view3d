@@ -28,11 +28,12 @@ class GLTFLoader {
    */
   constructor() {
     this._loader = new ThreeGLTFLoader();
+    this._dracoLoader = new DRACOLoader();
 
     const loader = this._loader;
     loader.setCrossOrigin("anonymous");
 
-    const dracoLoader = new DRACOLoader();
+    const dracoLoader = this._dracoLoader;
     dracoLoader.setDecoderPath(DEFAULT.DRACO_DECODER_URL);
     loader.setDRACOLoader(dracoLoader);
   }
@@ -64,87 +65,92 @@ class GLTFLoader {
    * @param {object} options Options
    * @param {string} [options.path] Base path for additional files.
    * @param {function} [options.onLoad] Callback which called after each model LOD is loaded.
+   * @returns {Model} Model instance with highest LOD
    */
   public loadPreset(viewer: View3D, url: string, options: Partial<{
     path: string;
     onLoad: (model: Model, lodIndex: number) => any;
-  }> = {}): Promise<void> {
+  }> = {}): Promise<Model> {
     const loader = this._loader;
     const fileLoader = new THREE.FileLoader();
 
     return fileLoader.loadAsync(url)
       .then(jsonRaw => {
-        const json = JSON.parse(jsonRaw);
-        const baseURL = THREE.LoaderUtils.extractUrlBase(url);
+        return new Promise((resolve, reject) => {
+          const json = JSON.parse(jsonRaw);
+          const baseURL = THREE.LoaderUtils.extractUrlBase(url);
 
-        // Reset
-        viewer.scene.reset();
-        viewer.camera.reset();
-        viewer.animator.reset();
+          // Reset
+          viewer.scene.reset();
+          viewer.camera.reset();
+          viewer.animator.reset();
 
-        const modelOptions = json.model;
-        const cameraOptions = json.camera;
-        const environmentOptions = json.env;
+          const modelOptions = json.model;
+          const cameraOptions = json.camera;
+          const environmentOptions = json.env;
 
-        viewer.camera.setDefaultPose({
-          yaw: cameraOptions.yaw,
-          pitch: cameraOptions.pitch,
-        });
-        viewer.camera.minDistance = cameraOptions.distanceRange[0];
-        viewer.camera.maxDistance = cameraOptions.distanceRange[1];
-
-        if (environmentOptions.background) {
-          viewer.scene.setBackground(new THREE.Color(environmentOptions.background));
-        }
-
-        const shadowPlane = new ShadowPlane();
-        shadowPlane.opacity = environmentOptions.shadow.opacity;
-        viewer.scene.addEnv(shadowPlane);
-
-        const ambientOptions = environmentOptions.ambient;
-        const ambient = new THREE.AmbientLight(new THREE.Color(ambientOptions.color), ambientOptions.intensity);
-        viewer.scene.addEnv(ambient);
-
-        const lightOptions = [environmentOptions.light1, environmentOptions.light2, environmentOptions.light3];
-        lightOptions.forEach(lightOption => {
-          const lightDirection = new THREE.Vector3(lightOption.x, lightOption.y, lightOption.z).negate();
-          const directional = new AutoDirectionalLight(new THREE.Color(lightOption.color), lightOption.intensity, {
-            direction: lightDirection,
+          viewer.camera.setDefaultPose({
+            yaw: cameraOptions.yaw,
+            pitch: cameraOptions.pitch,
           });
-          directional.light.castShadow = lightOption.castShadow;
-          directional.light.updateMatrixWorld();
-          viewer.scene.addEnv(directional);
-        });
+          viewer.camera.minDistance = cameraOptions.distanceRange[0];
+          viewer.camera.maxDistance = cameraOptions.distanceRange[1];
 
-        let isFirstLoad = true;
-        const loadFlags = json.LOD.map(() => false) as boolean[];
-        json.LOD.forEach((fileName: string, lodIndex: number) => {
-          const glbURL = this._resolveURL(`${baseURL}${fileName}`, options.path || "");
+          if (environmentOptions.background) {
+            viewer.scene.setBackground(new THREE.Color(environmentOptions.background));
+          }
 
-          loader.load(glbURL, gltf => {
-            loadFlags[lodIndex] = true;
-            const higherLODLoaded = loadFlags.slice(lodIndex + 1).some(loaded => loaded);
-            if (higherLODLoaded) return;
+          const shadowPlane = new ShadowPlane();
+          shadowPlane.opacity = environmentOptions.shadow.opacity;
+          viewer.scene.addEnv(shadowPlane);
 
-            const model = this._parseToModel(gltf);
+          const ambientOptions = environmentOptions.ambient;
+          const ambient = new THREE.AmbientLight(new THREE.Color(ambientOptions.color), ambientOptions.intensity);
+          viewer.scene.addEnv(ambient);
 
-            viewer.display(model, {
-              size: modelOptions.size,
-              resetView: isFirstLoad,
+          const lightOptions = [environmentOptions.light1, environmentOptions.light2, environmentOptions.light3];
+          lightOptions.forEach(lightOption => {
+            const lightDirection = new THREE.Vector3(lightOption.x, lightOption.y, lightOption.z).negate();
+            const directional = new AutoDirectionalLight(new THREE.Color(lightOption.color), lightOption.intensity, {
+              direction: lightDirection,
             });
-            isFirstLoad = false;
-
-            model.castShadow = modelOptions.castShadow;
-            model.receiveShadow = modelOptions.receiveShadow;
-
-            if (options.onLoad) {
-              options.onLoad(model, lodIndex);
-            }
-          }, undefined, err => {
-            throw err;
+            directional.light.castShadow = lightOption.castShadow;
+            directional.light.updateMatrixWorld();
+            viewer.scene.addEnv(directional);
           });
-        });
-        return;
+
+          let isFirstLoad = true;
+          const loadFlags = json.LOD.map(() => false) as boolean[];
+          json.LOD.forEach((fileName: string, lodIndex: number) => {
+            const glbURL = this._resolveURL(`${baseURL}${fileName}`, options.path || "");
+
+            loader.load(glbURL, gltf => {
+              loadFlags[lodIndex] = true;
+              const higherLODLoaded = loadFlags.slice(lodIndex + 1).some(loaded => loaded);
+              if (higherLODLoaded) return;
+
+              const model = this._parseToModel(gltf);
+
+              viewer.display(model, {
+                size: modelOptions.size,
+                resetView: isFirstLoad,
+              });
+              isFirstLoad = false;
+
+              model.castShadow = modelOptions.castShadow;
+              model.receiveShadow = modelOptions.receiveShadow;
+
+              if (options.onLoad) {
+                options.onLoad(model, lodIndex);
+              }
+              if (lodIndex === json.LOD.length - 1) {
+                resolve(model);
+              }
+            }, undefined, err => {
+              reject(err);
+            });
+          });
+        })
       });
   }
 

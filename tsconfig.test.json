@@ -8,6 +8,7 @@
     "experimentalDecorators": true,
     "types": [
       "karma-chai",
+      "chai-as-promised",
       "mocha",
     ]
   },

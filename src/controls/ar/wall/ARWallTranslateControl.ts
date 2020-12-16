@@ -15,7 +15,7 @@ import { XRRenderContext, XRContext, XRInputs } from "~/types/internal";
  * @property {ArrowIndicatorOption} arrow Options for {@link ArrowIndicator}
  */
 export interface ARWallTranslateControlOption {
-  arrow: ArrowIndicatorOption;
+  arrow: Partial<ArrowIndicatorOption>;
 }
 
 /**

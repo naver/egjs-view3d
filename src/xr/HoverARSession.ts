@@ -9,7 +9,7 @@ import ARHoverControl, { ARHoverControlOption } from "~/controls/ar/hover/ARHove
 import Animation from "~/core/Animation";
 import * as XR from "~/consts/xr";
 import { XRRenderContext, XRContext } from "~/types/internal";
-import { getPrimaryAxisIndex, clamp } from "~/utils";
+import { clamp } from "~/utils";
 
 /**
  * Options for {@link HoverARSession}.
@@ -39,12 +39,12 @@ class HoverARSession extends WebARSession {
 
   /**
    * {@link ARControl} instance of this session
-   * @type ARFloorControl | null
+   * @type ARHoverControl | null
    */
   public get control() { return this._control; }
 
   /**
-   * Create new instance of FloorARSession
+   * Create new instance of HoverARSession
    * @param {HoverARSessionOption} options Options
    */
   constructor(options: Partial<HoverARSessionOption> = {}) {

@@ -147,6 +147,8 @@ class View3D extends EventEmitter<{
 
     const newSize = this._renderer.size;
     this._camera.resize(newSize);
+
+    this.emit("resize", { ...newSize, target: this });
   }
 
   /**
