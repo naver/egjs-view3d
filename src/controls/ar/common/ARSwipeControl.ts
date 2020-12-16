@@ -130,13 +130,13 @@ class ARSwipeControl implements ARControl {
     rotationIndicator.updateScale(model.size / 2);
 
     if (gesture === TOUCH.GESTURE.TWO_FINGER_HORIZONTAL) {
-      rotationIndicator.updateRoation(
+      rotationIndicator.updateRotation(
         model.scene.quaternion.clone()
           .multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI / 2, 0, 0))),
       );
       this._state = STATE.ROTATE_HORIZONTAL;
     } else if (gesture === TOUCH.GESTURE.TWO_FINGER_VERTICAL) {
-      rotationIndicator.updateRoation(
+      rotationIndicator.updateRotation(
         model.scene.quaternion.clone()
           .multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(0, Math.PI / 2, 0))),
       );
@@ -164,6 +164,7 @@ class ARSwipeControl implements ARControl {
     const state = this._state;
     const prevPos = this._prevPos;
     const motion = this._motion;
+    const scale = this._userScale;
 
     const middlePos = new THREE.Vector2(
       (coords[0].x + coords[1].x) / 2,
@@ -175,8 +176,8 @@ class ARSwipeControl implements ARControl {
       ? this._horizontalAxis
       : this._verticalAxis;
     const rotationAngle = state === STATE.ROTATE_HORIZONTAL
-      ? posDiff.x
-      : -posDiff.y;
+      ? posDiff.x * scale
+      : -posDiff.y * scale;
 
     const rotation = new THREE.Quaternion().setFromAxisAngle(rotationAxis, rotationAngle);
     const interpolated = this._getInterpolatedQuaternion();

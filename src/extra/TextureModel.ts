@@ -46,7 +46,7 @@ class TextureModel extends Model {
     image: THREE.Texture | HTMLImageElement | HTMLCanvasElement | HTMLVideoElement;
     width?: number;
     height?: number;
-    billboard: boolean;
+    billboard?: boolean;
   }) {
     const texture = (image as THREE.Texture).isTexture
       ? image as THREE.Texture

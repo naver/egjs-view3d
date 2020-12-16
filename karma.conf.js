@@ -1,6 +1,6 @@
 module.exports = function(config) {
   const karmaConfig = {
-    frameworks: ["mocha", "chai", "sinon", "karma-typescript"],
+    frameworks: ["mocha", "chai", "chai-as-promised", "sinon", "karma-typescript"],
     mime: {
       'text/x-typescript': ['ts','tsx']
     },
@@ -12,8 +12,12 @@ module.exports = function(config) {
     files: [
       "./src/**/*.ts",
       "./test/**/*.ts",
-      "./test/setup.js"
+      "./test/setup.js",
+      {pattern: "./test/assets/**/*.*", watched: false, included: false, served: true},
     ],
+    proxies: {
+      "/assets/": "/base/test/assets/"
+    },
     preprocessors: {
       "src/**/*.ts": ["karma-typescript"],
       "test/**/*.ts": ["karma-typescript"],

@@ -94,7 +94,7 @@ class RotationIndicator {
    * Update indicator's rotation
    * @param rotation Quaternion value set as new rotation.
    */
-  public updateRoation(rotation: THREE.Quaternion) {
+  public updateRotation(rotation: THREE.Quaternion) {
     this._obj.quaternion.copy(rotation);
   }
 }

@@ -124,7 +124,7 @@ class ARSwirlControl implements ARControl {
       rotationIndicator.show();
       rotationIndicator.updatePosition(model.bbox.getCenter(new THREE.Vector3()));
       rotationIndicator.updateScale(model.size / 2);
-      rotationIndicator.updateRoation(model.scene.quaternion);
+      rotationIndicator.updateRotation(model.scene.quaternion);
     }
   }
 
@@ -157,7 +157,7 @@ class ARSwirlControl implements ARControl {
     const ndcModelPos = new THREE.Vector2().fromArray(modelPos.project(xrCam).toArray());
 
     // Get the rotation angle with the model's NDC coordinates as the center.
-    const rotationAngle = getRotationAngle(ndcModelPos, prevPos, coord);
+    const rotationAngle = getRotationAngle(ndcModelPos, prevPos, coord) * this._userScale;
     const rotation = new THREE.Quaternion().setFromAxisAngle(this._axis, rotationAngle);
     const interpolated = this._getInterpolatedQuaternion();
 

@@ -21,9 +21,9 @@ import { XRRenderContext, XRContext } from "~/types/internal";
  * @property {DeadzoneCheckerOption} deadzone Options for {@link DeadzoneChecker}
  */
 export interface ARHoverControlOption {
-  rotate: ARHoverRotateControlOption;
-  translate: ARHoverTranslateControlOption;
-  scale: ARScaleControlOption;
+  rotate: Partial<ARHoverRotateControlOption>;
+  translate: Partial<ARHoverTranslateControlOption>;
+  scale: Partial<ARScaleControlOption>;
 }
 
 /**
@@ -44,11 +44,11 @@ class ARHoverControl {
    */
   public get enabled() { return this._enabled; }
   /**
-   * {@link ARRotateControl} in this control
+   * {@link ARHoverRotateControlOption} in this control
    */
   public get rotate() { return this._rotateControl; }
   /**
-   * {@link ARTranslateControl} in this control
+   * {@link ARHoverTranslateControlOption} in this control
    */
   public get translate() { return this._translateControl; }
   /**

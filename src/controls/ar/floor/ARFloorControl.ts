@@ -24,11 +24,11 @@ import DeadzoneChecker, { DeadzoneCheckerOption } from "../common/DeadzoneChecke
  * @property {DeadzoneCheckerOption} deadzone Options for {@link DeadzoneChecker}
  */
 export interface ARFloorControlOption {
-  rotate: ARSwirlControlOption;
-  translate: ARFloorTranslateControlOption;
-  scale: ARScaleControlOption;
-  floorIndicator: FloorIndicatorOption;
-  deadzone: DeadzoneCheckerOption;
+  rotate: Partial<ARSwirlControlOption>;
+  translate: Partial<ARFloorTranslateControlOption>;
+  scale: Partial<ARScaleControlOption>;
+  floorIndicator: Partial<FloorIndicatorOption>;
+  deadzone: Partial<DeadzoneCheckerOption>;
 }
 
 /**
@@ -51,11 +51,11 @@ class ARFloorControl {
    */
   public get enabled() { return this._enabled; }
   /**
-   * {@link ARRotateControl} in this control
+   * {@link ARSwirlControl} in this control
    */
   public get rotate() { return this._rotateControl; }
   /**
-   * {@link ARTranslateControl} in this control
+   * {@link ARFloorTranslateControl} in this control
    */
   public get translate() { return this._translateControl; }
   /**

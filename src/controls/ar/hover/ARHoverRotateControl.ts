@@ -18,8 +18,8 @@ import ARControl from "../common/ARControl";
  * @property {ARSwipeControlOption} swipe Options for {@link ARSwipeControl}
  */
 export interface ARHoverRotateControlOption {
-  swirl: ARSwirlControlOption;
-  swipe: ARSwipeControlOption;
+  swirl: Partial<ARSwirlControlOption>;
+  swipe: Partial<ARSwipeControlOption>;
 }
 
 /**
