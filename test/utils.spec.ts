@@ -38,7 +38,6 @@ describe("Utils", () => {
 
       // Then
       try {
-        expect(() => getElement("#target")).not.to.throw();
         expect(getElement("#target")).to.equal(findingEl);
       } catch (e) {
         expect(true).to.be.false; // Shouldn't reach here
