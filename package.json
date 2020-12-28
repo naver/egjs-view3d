@@ -41,7 +41,6 @@
   },
   "homepage": "https://github.com/naver/egjs-view3d#readme",
   "dependencies": {
-    "chai-as-promised": "^7.1.1",
     "three": "^0.116.1"
   },
   "devDependencies": {
@@ -61,6 +60,7 @@
     "babel-plugin-no-side-effect-class-properties": "0.0.7",
     "better-docs": "^1.4.7",
     "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
     "concurrently": "^5.1.0",
     "cpx": "^1.5.0",
     "gh-pages": "2.0.1",
