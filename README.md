@@ -1,10 +1,12 @@
 <img src="https://naver.github.io/egjs-view3d/image/view3d.png" />
 
-[![Version](https://img.shields.io/npm/v/@egjs/view3d?color=A8C256&label=&style=flat-square&logo=npm)](https://www.npmjs.com/package/@egjs/view3d) ![typescript](https://img.shields.io/static/v1.svg?label=&message=TypeScript&color=294E80&style=flat-square&logo=typescript) ![supports](https://img.shields.io/static/v1.svg?label=&message=%F0%9F%93%B1%F0%9F%92%BB%F0%9F%96%A5%EF%B8%8F&color=DDD&style=flat-square)
+[![Version](https://img.shields.io/npm/v/@egjs/view3d?color=A8C256&label=&style=flat-square&logo=npm)](https://www.npmjs.com/package/@egjs/view3d) [![size](https://img.shields.io/bundlephobia/minzip/@egjs/view3d.svg?style=flat-square&label=%F0%9F%92%BE%20gzipped)](https://bundlephobia.com/result?p=@egjs/view3d@1.0.1) [![build](https://img.shields.io/travis/naver/egjs-view3d.svg?style=flat-square&label=build&logo=travis%20ci)](https://travis-ci.org/naver/egjs-view3d) [![coverage](https://img.shields.io/coveralls/github/naver/egjs-view3d.svg?style=flat-square&label=%E2%9C%85%20coverage)](https://coveralls.io/github/naver/egjs-view3d?branch=main) ![typescript](https://img.shields.io/static/v1.svg?label=&message=TypeScript&color=294E80&style=flat-square&logo=typescript) ![supports](https://img.shields.io/static/v1.svg?label=&message=%F0%9F%93%B1%F0%9F%92%BB%F0%9F%96%A5%EF%B8%8F&color=DDD&style=flat-square)
 
 Fast & customizable 3D model viewer for everyone
 
-👉 **[Demo](https://naver.github.io/egjs-view3d)** / **[API Document](https://naver.github.io/egjs-view3d/release/latest/docs/)** / **[Tutorial](https://naver.github.io/egjs-view3d/release/latest/docs//tutorial-Adding%20Controls.html)** / Related Article [1](https://medium.com/naver-fe-platform/webar-with-webxr-api-part-1-e191a2dc7177),[2](https://medium.com/naver-fe-platform/webar-with-webxr-api-part-2-dc76b20767fb)
+👉 **[Demo](https://naver.github.io/egjs-view3d)** / **[API Document](https://naver.github.io/egjs-view3d/release/latest/docs/)** / **[Tutorial](https://naver.github.io/egjs-view3d/release/latest/docs//tutorial-Adding%20Controls.html)**
+
+👉 Related Articles: [1](https://medium.com/naver-fe-platform/webar-with-webxr-api-part-1-e191a2dc7177), [2](https://medium.com/naver-fe-platform/webar-with-webxr-api-part-2-dc76b20767fb)
 
 ## Features
 - A customizable 3D model viewer based on the [three.js](https://github.com/mrdoob/three.js/)

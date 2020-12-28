@@ -108,7 +108,7 @@ class Scene {
    * @param envs {@link Environment} | {@link https://threejs.org/docs/#api/en/core/Object3D THREE.Object3D}s to add
    * @returns {void} Nothing
    */
-  public addEnv(...envs: Array<Environment | THREE.Object3D>): void {
+  public addEnv(...envs: (Environment | THREE.Object3D)[]): void {
     envs.forEach(env => {
       if ((env as THREE.Object3D).isObject3D) {
         this._envObjects.add(env as THREE.Object3D);
@@ -133,7 +133,7 @@ class Scene {
    * @param envs {@link Environment} | {@link https://threejs.org/docs/#api/en/core/Object3D THREE.Object3D}s to add
    * @returns {void} Nothing
    */
-  public removeEnv(...envs: Array<Environment | THREE.Object3D>): void {
+  public removeEnv(...envs: (Environment | THREE.Object3D)[]): void {
     envs.forEach(env => {
       if ((env as THREE.Object3D).isObject3D) {
         this._envObjects.remove(env as THREE.Object3D);

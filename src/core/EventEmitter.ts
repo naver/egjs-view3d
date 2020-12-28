@@ -17,7 +17,7 @@ type EventCallback<T extends EventMap, K extends EventKey<T>>
 
 class EventEmitter<T extends EventMap> {
   private _listenerMap: {
-    [keys: string]: Array<EventCallback<T, EventKey<T>>>,
+    [keys: string]: EventCallback<T, EventKey<T>>[],
   };
 
   constructor() {

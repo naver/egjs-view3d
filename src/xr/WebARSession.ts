@@ -121,7 +121,7 @@ abstract class WebARSession extends EventEmitter<{
     super();
     const overlayEl = getElement(overlayRoot);
 
-    const features: Array<typeof XR.EMPTY_FEATURES> = [];
+    const features: (typeof XR.EMPTY_FEATURES)[] = [];
     if (overlayEl) {
       this._domOverlay = new DOMOverlay({
         root: overlayEl,

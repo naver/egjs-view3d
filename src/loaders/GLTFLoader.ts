@@ -150,7 +150,7 @@ class GLTFLoader {
               reject(err);
             });
           });
-        })
+        });
       });
   }
 
