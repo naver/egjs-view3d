@@ -3,10 +3,12 @@
  * egjs projects are licensed under the MIT license
  */
 
+import DracoLoader from "./DracoLoader";
 import GLTFLoader from "./GLTFLoader";
 import TextureLoader from "./TextureLoader";
 
 export {
   GLTFLoader,
-  TextureLoader,
+  DracoLoader,
+  TextureLoader
 };

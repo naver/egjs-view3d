@@ -98,7 +98,7 @@ class View3D extends EventEmitter<{
    *     console.error("Element not found")
    *   }
    * }
-   * @throws {View3DError} `CODES.WRONG_TYPE`<br/>When parameter does not either string or the canvas element.
+   * @throws {View3DError} `CODES.WRONG_TYPE`<br/>When the parameter is not either string or the canvas element.
    * @throws {View3DError} `CODES.ELEMENT_NOT_FOUND`<br/>When the element with given query does not exist.
    * @throws {View3DError} `CODES.ELEMENT_NOT_CANVAS`<br/>When the element given is not a \<canvas\> element.
    * @throws {View3DError} `CODES.WEBGL_NOT_SUPPORTED`<br/>When browser does not support WebGL.
@@ -126,7 +126,7 @@ class View3D extends EventEmitter<{
   }
 
   /**
-   * Destroy the denam instance and remove all events attached to it
+   * Destroy View3D instance and remove all events attached to it
    * @returns {void} Nothing
    */
   public destroy(): void {
@@ -138,7 +138,7 @@ class View3D extends EventEmitter<{
   }
 
   /**
-   * Resize the denam instance to fit current canvas size
+   * Resize View3D instance to fit current canvas size
    * @method
    * @returns {void} Nothing
    */
