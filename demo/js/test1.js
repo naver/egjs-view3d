@@ -10,7 +10,7 @@ view3d.camera.setDefaultPose(new View3D.Pose(30, 15, 30));
 
 const start = Date.now();
 console.time("load");
-loader.load("../asset/lofoten/model_original.glb")
+loader.load("../asset/android.glb")
   .then(model => {
     view3d.display(model);
     requestAnimationFrame(() => {

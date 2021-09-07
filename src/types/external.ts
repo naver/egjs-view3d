@@ -27,3 +27,17 @@ export interface AnyObject {
 export interface ModelLoadOption {
   fixSkinnedBbox: boolean;
 }
+
+/**
+ * Loading option for the .drc model
+ * @interface
+ * @category Loaders
+ * @extends ModelLoadOption
+ * @property {boolean} point Whether to use Three.js's PointsMaterial & Points
+ * @property {object} pointOptions An options object for {@link https://threejs.org/docs/#api/en/materials/PointsMaterial THREE.PointsMaterialParameters}
+ */
+export interface DracoLoadOption extends ModelLoadOption {
+  color: string | number;
+  point: boolean;
+  pointOptions: THREE.PointsMaterialParameters;
+}
