@@ -15,7 +15,7 @@
     "ignores": [],
     "expendsItemMembers": true,
     "recurse": true,
-    "readme": "./readme.md",
+    "readme": "./README.md",
     "tutorials": "./docs-src/tutorials"
   },
   "plugins": [
