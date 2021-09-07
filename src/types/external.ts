@@ -33,6 +33,7 @@ export interface ModelLoadOption {
  * @interface
  * @category Loaders
  * @extends ModelLoadOption
+ * @property {string|number} color Color of the loaded model's mesh / points
  * @property {boolean} point Whether to use Three.js's PointsMaterial & Points
  * @property {object} pointOptions An options object for {@link https://threejs.org/docs/#api/en/materials/PointsMaterial THREE.PointsMaterialParameters}
  */
