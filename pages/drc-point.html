@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme-color" content="#2D3142">
+  <link rel="shortcut icon" type="image/png" href="../favicon.png"/>
+  <link rel="stylesheet" href="../lib/prism.css" />
+  <link rel="stylesheet" href="../css/common.css">
+  <script type="text/javascript" src="../release/latest/dist/view3d.pkgd.js"></script>
+  <script type="text/javascript" src="../lib/prism.js" data-manual></script>
+  <title>View3D viewer</title>
+</head>
+<body>
+  <div id="view3d-wrapper">
+    <div class="demo-wrapper">
+      <a id="back-anchor" href="../index.html">
+        <svg id="back-arrow" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg">
+          <line x1="0" y1="50" x2="50" y2="90" fill="transparent" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"></line>
+          <line x1="0" y1="50" x2="50" y2="10" fill="transparent" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"></line>
+          <line x1="10" y1="50" x2="100" y2="50" fill="transparent" stroke-width="10"></line>
+        </svg>
+        <span>Back to Main</span>
+      </a>
+      <div class="demo-desc-placeholder">
+        <div class="demo-desc-wrapper">
+          <h1 class="demo-title">Draco(.drc) file format as Point Cloud</h1>
+          <h2 class="demo-subtitle"><a href="https://github.com/google/draco">Draco Github</a></h2>
+          <p class="demo-desc">Use <span style="font-weight: bold;">"point: true"</span> and it'll render model as a point cloud</p>
+          <pre class="code"><code id="page-src" class="language-js">import View3D, {
+  DracoLoader, OrbitControl, THREE
+} from "@egjs/view3d";
+
+const view3d = new View3D("#view3d-canvas");
+const loader = new DracoLoader();
+
+view3d.scene.setBackground(new THREE.Color(0x2288aa));
+
+view3d.controller.add(new OrbitControl());
+
+loader.load("../asset/bunny.drc", { color: 0x999999, point: true, pointOptions: { size: 0.3 } })
+  .then(model => {
+    view3d.display(model);
+  });</code></pre>
+        </div>
+      </div>
+    </div>
+    <div class="view3d-canvas-wrapper">
+      <canvas id="view3d-canvas"></canvas>
+    </div>
+  </div>
+  <script type="text/javascript" src="../js/drc-point.js"></script>
+</body>
