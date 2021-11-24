@@ -1,16 +1,16 @@
-import serve from "rollup-plugin-serve";
-import livereload from "rollup-plugin-livereload";
-import { name, fileName } from "./rollup.config";
-
-const fs = require("fs");
-const buildHelper = require("./config/build-helper");
+const fs = require("fs-extra");
 const babel = require("rollup-plugin-babel");
+const serve = require("rollup-plugin-serve");
+const livereload = require("rollup-plugin-livereload")
+
+const { name, fileName } = require("./rollup.config");
+const buildHelper = require("./config/build-helper");
 
 const httpsAvailable = fs.existsSync("./localhost-key.pem") && fs.existsSync("./localhost.pem");
 const httpsOption = httpsAvailable
   ? {
     key: fs.readFileSync("./localhost-key.pem"),
-    cert: fs.readFileSync('./localhost.pem')
+    cert: fs.readFileSync("./localhost.pem")
   } : undefined;
 
 export default buildHelper([
@@ -29,12 +29,12 @@ export default buildHelper([
         open: true,
         host: "0.0.0.0",
         contentBase: "demo",
-        https: httpsOption,
+        https: httpsOption
       }),
       livereload({
         watch: ".",
-        https: httpsOption,
-      }),
+        https: httpsOption
+      })
     ]
   }
 ]);
