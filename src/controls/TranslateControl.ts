@@ -13,7 +13,7 @@ import { EVENTS, MOUSE_BUTTON } from "~/consts/event";
 import { CURSOR } from "~/consts/css";
 import * as DEFAULT from "~/consts/default";
 import * as ERROR from "~/consts/error";
-import { ValueOf } from "~/types/internal";
+import { ValueOf } from "~/type/internal";
 
 /**
  * Model's translation control that supports both mouse & touch

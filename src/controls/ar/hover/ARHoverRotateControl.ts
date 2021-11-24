@@ -6,7 +6,7 @@
 import * as THREE from "three";
 import ARSwirlControl, { ARSwirlControlOption } from "../common/ARSwirlControl";
 import ARSwipeControl, { ARSwipeControlOption } from "../common/ARSwipeControl";
-import { XRRenderContext, XRContext, XRInputs } from "~/types/internal";
+import { XRRenderContext, XRContext, XRInputs } from "~/type/internal";
 import * as TOUCH from "~/consts/touch";
 import ARControl from "../common/ARControl";
 

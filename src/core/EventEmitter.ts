@@ -3,7 +3,7 @@
  * egjs projects are licensed under the MIT license
  */
 
-import { AnyFunction } from "~/types/external";
+import { AnyFunction } from "~/type/external";
 
 type NoArguments = undefined | null | void | never;
 type EventMap = Record<string, any>;

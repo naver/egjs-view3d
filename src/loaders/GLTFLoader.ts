@@ -10,7 +10,7 @@ import Model from "~/core/Model";
 import * as DEFAULT from "~/consts/default";
 import View3D from "~/View3D";
 import { ShadowPlane, AutoDirectionalLight } from "~/environments";
-import { ModelLoadOption } from "~/types/external";
+import { ModelLoadOption } from "~/type/external";
 
 /**
  * GLTFLoader

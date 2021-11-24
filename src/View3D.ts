@@ -2,8 +2,8 @@
  * Copyright (c) 2020 NAVER Corp.
  * egjs projects are licensed under the MIT license
  */
+import Component from "@egjs/component";
 
-import EventEmitter from "./core/EventEmitter";
 import Renderer from "./core/Renderer";
 import Scene from "./core/Scene";
 import Camera from "./core/camera/Camera";
@@ -29,7 +29,7 @@ import { getCanvas } from "./utils";
  * @event beforeRender
  * @event afterRender
  */
-class View3D extends EventEmitter<{
+class View3D extends Component<{
   resize: {
     width: number;
     height: number;

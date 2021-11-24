@@ -9,7 +9,7 @@ import ARHoverTranslateControl, { ARHoverTranslateControlOption } from "./ARHove
 import ARScaleControl, { ARScaleControlOption } from "../common/ARScaleControl";
 import DeadzoneChecker from "../common/DeadzoneChecker";
 import * as TOUCH from "~/consts/touch";
-import { XRRenderContext, XRContext } from "~/types/internal";
+import { XRRenderContext, XRContext } from "~/type/internal";
 
 /**
  * Options for the {@link ARHoverControl}

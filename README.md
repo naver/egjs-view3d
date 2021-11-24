@@ -66,7 +66,7 @@ const view3d = new View3D("#my-canvas");
 See more examples on our [Demo](https://naver.github.io/egjs-view3d) / [Tutorial](https://naver.github.io/egjs-view3d/docs/tutorial-Adding%20Controls.html)
 
 ## Browser Coverage
-View3D is available for browsers support webgl.
+View3D is available for browsers support WebGL.
 
 |<img width="20" src="https://simpleicons.org/icons/internetexplorer.svg" alt="IE" />|<img width="20" src="https://simpleicons.org/icons/googlechrome.svg" alt="Chrome" />|<img width="20" src="https://simpleicons.org/icons/firefoxbrowser.svg" alt="Firefox" />|<img width="20" src="https://simpleicons.org/icons/safari.svg" alt="Safari" />|<img width="20" src="https://simpleicons.org/icons/apple.svg" alt="iOS" />|<img width="20" src="https://simpleicons.org/icons/android.svg" alt="Android">|
 |:---:|:---:|:---:|:---:|:---:|:---:|

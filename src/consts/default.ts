@@ -3,14 +3,14 @@
  * egjs projects are licensed under the MIT license
  */
 
-import * as THREE from "three";
+import { Vector3 } from "three";
 import Pose from "~/core/camera/Pose";
 import { EASE_OUT_CUBIC } from "./easing";
-import { Range } from "~/types/internal";
+import { Range } from "~/type/internal";
 
 export const MODEL_SIZE = 80;
 
-// Animation related
+// Animation
 export const EASING = EASE_OUT_CUBIC;
 export const ANIMATION_DURATION = 500;
 export const ANIMATION_LOOP = false;
@@ -18,8 +18,8 @@ export const ANIMATION_RANGE: Readonly<Range> = {
   min: 0, max: 1,
 };
 
-// Camera related
-export const CAMERA_POSE: Readonly<Pose> = new Pose(0, 0, 100, new THREE.Vector3(0, 0, 0));
+// Camera
+export const CAMERA_POSE: Readonly<Pose> = new Pose(0, 0, 100, new Vector3(0, 0, 0));
 export const INFINITE_RANGE: Readonly<Range> = {
   min: -Infinity, max: Infinity,
 };

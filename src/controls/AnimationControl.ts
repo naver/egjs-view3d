@@ -9,7 +9,7 @@ import Motion from "./Motion";
 import Camera from "~/core/camera/Camera";
 import Pose from "~/core/camera/Pose";
 import * as DEFAULT from "~/consts/default";
-import { AnyFunction } from "~/types/external";
+import { AnyFunction } from "~/type/external";
 import { mix, circulate } from "~/utils";
 
 /**

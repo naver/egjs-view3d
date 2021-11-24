@@ -8,7 +8,7 @@ import ARControl from "./ARControl";
 import Motion from "~/controls/Motion";
 import RotationIndicator from "../ui/RotationIndicator";
 import * as DEFAULT from "~/consts/default";
-import { XRRenderContext, XRContext, XRInputs } from "~/types/internal";
+import { XRRenderContext, XRContext, XRInputs } from "~/type/internal";
 import * as TOUCH from "~/consts/touch";
 
 enum STATE {

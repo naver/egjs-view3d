@@ -8,7 +8,7 @@ import View3DError from "./View3DError";
 import { CODES } from "./consts/error";
 
 export * as EASING from "./consts/easing";
-export * from "./types/external";
+export * from "./type/external";
 export * from "./core";
 export * from "./controls";
 export * from "./loaders";

@@ -8,7 +8,7 @@ import ARControl from "./ARControl";
 import Motion from "~/controls/Motion";
 import ScaleUI from "../ui/ScaleUI";
 import * as TOUCH from "~/consts/touch";
-import { XRRenderContext, XRContext, XRInputs } from "~/types/internal";
+import { XRRenderContext, XRContext, XRInputs } from "~/type/internal";
 
 /**
  * Options for {@link ARScaleControl}

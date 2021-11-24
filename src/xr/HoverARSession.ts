@@ -8,7 +8,7 @@ import WebARSession, { WebARSessionOption } from "./WebARSession";
 import ARHoverControl, { ARHoverControlOption } from "~/controls/ar/hover/ARHoverControl";
 import Animation from "~/core/Animation";
 import * as XR from "~/consts/xr";
-import { XRRenderContext, XRContext } from "~/types/internal";
+import { XRRenderContext, XRContext } from "~/type/internal";
 import { clamp } from "~/utils";
 
 /**

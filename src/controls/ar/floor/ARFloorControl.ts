@@ -10,7 +10,7 @@ import ARScaleControl, { ARScaleControlOption } from "../common/ARScaleControl";
 import FloorIndicator, { FloorIndicatorOption } from "../ui/FloorIndicator";
 import * as XR from "~/consts/xr";
 import * as TOUCH from "~/consts/touch";
-import { XRRenderContext, XRContext, XRInputs } from "~/types/internal";
+import { XRRenderContext, XRContext, XRInputs } from "~/type/internal";
 import DeadzoneChecker, { DeadzoneCheckerOption } from "../common/DeadzoneChecker";
 
 /**

@@ -4,7 +4,7 @@
  */
 
 import { clamp, mix, circulate } from "~/utils";
-import { Range } from "~/types/internal";
+import { Range } from "~/type/internal";
 import * as DEFAULT from "~/consts/default";
 
 class Motion {

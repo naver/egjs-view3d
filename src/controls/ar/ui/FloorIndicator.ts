@@ -5,7 +5,7 @@
 
 import * as THREE from "three";
 import Motion from "../../Motion";
-import { Range } from "~/types/internal";
+import { Range } from "~/type/internal";
 
 /**
  * Options for {@link FloorIndicator}

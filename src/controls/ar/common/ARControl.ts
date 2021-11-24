@@ -4,7 +4,7 @@
  */
 
 import * as TOUCH from "~/consts/touch";
-import { XRRenderContext, XRContext, XRInputs } from "~/types/internal";
+import { XRRenderContext, XRContext, XRInputs } from "~/type/internal";
 
 /**
  * @category Controls-AR

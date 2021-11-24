@@ -11,7 +11,7 @@ import ARSwirlControl, { ARSwirlControlOption } from "../common/ARSwirlControl";
 import FloorIndicator, { FloorIndicatorOption } from "../ui/FloorIndicator";
 import * as XR from "~/consts/xr";
 import * as TOUCH from "~/consts/touch";
-import { XRRenderContext, XRContext, XRInputs } from "~/types/internal";
+import { XRRenderContext, XRContext, XRInputs } from "~/type/internal";
 
 /**
  * Options for the {@link ARWallControl}

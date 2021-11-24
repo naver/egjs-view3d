@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import View3D from "~/View3D";
 import Model from "~/core/Model";
-import { XRRenderContext } from "~/types/internal";
+import { XRRenderContext } from "~/type/internal";
 import XRSessionMock from "./xr/XRSessionMock";
 
 export const createSandbox = (id: string = ""): HTMLElement => {

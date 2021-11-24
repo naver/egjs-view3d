@@ -8,7 +8,7 @@ import Motion from "../../Motion";
 import * as DEFAULT from "~/consts/default";
 import * as EASING from "~/consts/easing";
 import * as TOUCH from "~/consts/touch";
-import { XRRenderContext, XRContext, XRInputs } from "~/types/internal";
+import { XRRenderContext, XRContext, XRInputs } from "~/type/internal";
 import ARControl from "../common/ARControl";
 
 enum STATE {

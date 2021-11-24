@@ -10,7 +10,7 @@ import Animation from "~/core/Animation";
 import ARFloorControl, { ARFloorControlOption } from "~/controls/ar/floor/ARFloorControl";
 import { merge } from "~/utils";
 import * as XR from "~/consts/xr";
-import { XRRenderContext, XRContext } from "~/types/internal";
+import { XRRenderContext, XRContext } from "~/type/internal";
 
 /**
  * Options for {@link FloorARSession}.

@@ -10,7 +10,7 @@ import ARWallControl, { ARWallControlOption } from "~/controls/ar/wall/ARWallCon
 import Animation from "~/core/Animation";
 import { merge } from "~/utils";
 import * as XR from "~/consts/xr";
-import { XRRenderContext, XRContext } from "~/types/internal";
+import { XRRenderContext, XRContext } from "~/type/internal";
 
 /**
  * Options for {@link WallARSession}.

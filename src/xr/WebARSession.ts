@@ -11,7 +11,7 @@ import EventEmitter from "~/core/EventEmitter";
 import { getElement, merge } from "~/utils";
 import * as DEFAULT from "~/consts/default";
 import * as XR from "~/consts/xr";
-import { XRContext, XRRenderContext } from "~/types/internal";
+import { XRContext, XRRenderContext } from "~/type/internal";
 
 declare global {
   interface Navigator { xr: any; }
