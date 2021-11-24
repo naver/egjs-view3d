@@ -5,11 +5,11 @@
 
 import * as THREE from "three";
 
-import ARWallControl, { ARWallControlOption } from "../controls/ar/wall/ARWallControl";
-import Animation from "../core/Animation";
-import { merge } from "../utils";
-import * as XR from "../consts/xr";
-import { XRRenderContext, XRContext } from "../type/internal";
+import ARWallControl, { ARWallControlOption } from "../../src/controls/ar/wall/ARWallControl";
+import Animation from "../../src/core/Animation";
+import { merge } from "../../src/utils";
+import * as XR from "../../src/consts/xr";
+import { XRRenderContext, XRContext } from "../../src/type/internal";
 
 import WebARSession, { WebARSessionOption } from "./WebARSession";
 import HitTest from "./features/HitTest";

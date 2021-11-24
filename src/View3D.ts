@@ -9,7 +9,6 @@ import Scene from "./core/Scene";
 import Camera from "./core/camera/Camera";
 import Model from "./core/Model";
 import ModelAnimator from "./core/ModelAnimator";
-import XRManager from "./core/XRManager";
 import { EVENTS } from "./consts/external";
 import * as BROWSER from "./consts/browser";
 import * as DEFAULT from "./consts/default";
@@ -40,7 +39,6 @@ class View3D extends Component<View3DEvents> {
   private _scene: Scene;
   private _camera: Camera;
   private _animator: ModelAnimator;
-  private _xr: XRManager;
 
   /**
    * {@link Renderer} instance of the View3D
@@ -67,11 +65,6 @@ class View3D extends Component<View3DEvents> {
    * @type {ModelAnimator}
    */
   public get animator() { return this._animator; }
-  /**
-   * {@link XRManager} instance of the View3D
-   * @type {XRManager}
-   */
-  public get xr() { return this._xr; }
   /**
    * {@link Model} that View3D is currently showing
    * @type {Model|null}
@@ -105,7 +98,6 @@ class View3D extends Component<View3DEvents> {
     this._camera = new Camera(canvas);
     this._scene = new Scene();
     this._animator = new ModelAnimator(this._scene.root);
-    this._xr = new XRManager(this);
     this._model = null;
 
     this.resize();

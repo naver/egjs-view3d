@@ -7,7 +7,6 @@ import ModelAnimator from "./ModelAnimator";
 import Model from "./Model";
 import Renderer from "./Renderer";
 import Scene from "./Scene";
-import XRManager from "./XRManager";
 import Camera from "./camera/Camera";
 import Controller from "./camera/Controller";
 import Pose from "./camera/Pose";
@@ -17,7 +16,6 @@ export {
   Model,
   Renderer,
   Scene,
-  XRManager,
   Camera,
   Controller,
   Pose

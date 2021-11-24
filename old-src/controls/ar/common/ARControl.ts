@@ -3,8 +3,8 @@
  * egjs projects are licensed under the MIT license
  */
 
-import * as TOUCH from "../../../consts/touch";
-import { XRRenderContext, XRContext, XRInputs } from "../../../type/internal";
+import * as TOUCH from "../../../../src/consts/touch";
+import { XRRenderContext, XRContext, XRInputs } from "../../../../src/type/internal";
 
 /**
  * @category Controls-AR

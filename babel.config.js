@@ -1,3 +1,5 @@
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+
 module.exports = function(api) {
   api.cache(true);
   const presets = [

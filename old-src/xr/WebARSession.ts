@@ -6,11 +6,11 @@
 import * as THREE from "three";
 import Component from "@egjs/component";
 
-import View3D from "../View3D";
-import { getElement, merge } from "../utils";
-import * as DEFAULT from "../consts/default";
-import * as XR from "../consts/xr";
-import { XRContext, XRRenderContext } from "../type/internal";
+import View3D from "../../src/View3D";
+import { getElement, merge } from "../../src/utils";
+import * as DEFAULT from "../../src/consts/default";
+import * as XR from "../../src/consts/xr";
+import { XRContext, XRRenderContext } from "../../src/type/internal";
 
 import XRSession from "./XRSession";
 import DOMOverlay from "./features/DOMOverlay";

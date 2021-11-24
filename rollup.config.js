@@ -1,5 +1,6 @@
-const buildHelper = require("./config/build-helper");
 const babel = require("rollup-plugin-babel");
+
+const buildHelper = require("./config/build-helper");
 
 export const name = "View3D";
 export const fileName = "view3d";
@@ -9,10 +10,6 @@ const external = {
 const tsconfig = "tsconfig.build.json";
 
 const plugins = [
-  babel({
-    include: ["src/**", "node_modules/three/**"],
-    configFile: "./babel.config.js"
-  }),
 ];
 
 export default buildHelper([
@@ -23,7 +20,7 @@ export default buildHelper([
     format: "umd",
     tsconfig,
     external,
-    plugins,
+    plugins
   },
   {
     name,
@@ -33,7 +30,7 @@ export default buildHelper([
     tsconfig,
     external,
     uglify: true,
-    plugins,
+    plugins
   },
   {
     name,
@@ -42,7 +39,7 @@ export default buildHelper([
     format: "umd",
     tsconfig,
     resolve: true,
-    plugins,
+    plugins
   },
   {
     name,
@@ -52,7 +49,7 @@ export default buildHelper([
     tsconfig,
     resolve: true,
     uglify: true,
-    plugins,
+    plugins
   },
   {
     input: "./src/index.ts",
@@ -61,6 +58,6 @@ export default buildHelper([
     tsconfig,
     external,
     exports: "named",
-    plugins,
-  },
+    plugins
+  }
 ]);

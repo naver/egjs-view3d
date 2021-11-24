@@ -12,7 +12,6 @@ export * from "./core";
 export * from "./controls";
 export * from "./loaders";
 export * from "./environments";
-export * from "./xr";
 export * from "./extra";
 export * from "./consts/external";
 export {

@@ -5,11 +5,11 @@
 
 import * as THREE from "three";
 
-import Motion from "../../Motion";
+import Motion from "../../../../src/controls/Motion";
 import ARControl from "../common/ARControl";
-import * as DEFAULT from "../../../consts/default";
-import * as EASING from "../../../consts/easing";
-import { XRRenderContext, XRContext, XRInputs } from "../../../type/internal";
+import * as DEFAULT from "../../../../src/consts/default";
+import * as EASING from "../../../../src/consts/easing";
+import { XRRenderContext, XRContext, XRInputs } from "../../../../src/type/internal";
 
 enum STATE {
   WAITING,

@@ -5,11 +5,11 @@
 
 import * as THREE from "three";
 
-import ARHoverControl, { ARHoverControlOption } from "../controls/ar/hover/ARHoverControl";
-import Animation from "../core/Animation";
-import { clamp } from "../utils";
-import * as XR from "../consts/xr";
-import { XRRenderContext, XRContext } from "../type/internal";
+import ARHoverControl, { ARHoverControlOption } from "../../src/controls/ar/hover/ARHoverControl";
+import Animation from "../../src/core/Animation";
+import { clamp } from "../../src/utils";
+import * as XR from "../../src/consts/xr";
+import { XRRenderContext, XRContext } from "../../src/type/internal";
 
 import WebARSession, { WebARSessionOption } from "./WebARSession";
 

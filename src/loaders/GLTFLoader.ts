@@ -78,7 +78,7 @@ class GLTFLoader {
     return fileLoader.loadAsync(url)
       .then(jsonRaw => {
         return new Promise((resolve, reject) => {
-          const json = JSON.parse(jsonRaw);
+          const json = JSON.parse(jsonRaw as string);
           const baseURL = THREE.LoaderUtils.extractUrlBase(url);
 
           // Reset

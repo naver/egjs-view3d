@@ -3,8 +3,8 @@
  * egjs projects are licensed under the MIT license
  */
 
-import { IS_ANDROID } from "../consts/browser";
-import * as XR from "../consts/xr";
+import { IS_ANDROID } from "../../src/consts/browser";
+import * as XR from "../../src/consts/xr";
 
 import XRSession from "./XRSession";
 

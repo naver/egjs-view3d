@@ -3,8 +3,8 @@
  * egjs projects are licensed under the MIT license
  */
 
-import { IS_IOS, IS_SAFARI } from "../consts/browser";
-import { QUICKLOOK_SUPPORTED } from "../consts/xr";
+import { IS_IOS, IS_SAFARI } from "../../src/consts/browser";
+import { QUICKLOOK_SUPPORTED } from "../../src/consts/xr";
 
 import XRSession from "./XRSession";
 
@@ -48,7 +48,7 @@ class QuickLookSession implements XRSession {
    */
   public isAvailable() {
     // This can handle all WebKit based browsers including iOS Safari & iOS Chrome
-    return Promise.resolve(QUICKLOOK_SUPPORTED && IS_IOS && IS_SAFARI);
+    return Promise.resolve(QUICKLOOK_SUPPORTED() && IS_IOS && IS_SAFARI);
   }
 
   /**
