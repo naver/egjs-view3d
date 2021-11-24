@@ -8,8 +8,8 @@ import * as THREE from "three";
 import View3DError from "../View3DError";
 import Camera from "../core/camera/Camera";
 import { getElement } from "../utils";
-import { EVENTS, MOUSE_BUTTON } from "../consts/event";
 import { CURSOR } from "../consts/css";
+import * as BROWSER from "../consts/browser";
 import * as DEFAULT from "../consts/default";
 import * as ERROR from "../consts/error";
 import { ValueOf } from "../type/internal";
@@ -174,11 +174,11 @@ class RotateControl implements CameraControl {
 
     const targetEl = this._targetEl;
 
-    targetEl.addEventListener(EVENTS.MOUSE_DOWN, this._onMouseDown, false);
+    targetEl.addEventListener(BROWSER.EVENTS.MOUSE_DOWN, this._onMouseDown, false);
 
-    targetEl.addEventListener(EVENTS.TOUCH_START, this._onTouchStart, false);
-    targetEl.addEventListener(EVENTS.TOUCH_MOVE, this._onTouchMove, false);
-    targetEl.addEventListener(EVENTS.TOUCH_END, this._onTouchEnd, false);
+    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_START, this._onTouchStart, false);
+    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove, false);
+    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, false);
 
     this._enabled = true;
     this._setCursor(CURSOR.GRAB);
@@ -193,13 +193,13 @@ class RotateControl implements CameraControl {
 
     const targetEl = this._targetEl;
 
-    targetEl.removeEventListener(EVENTS.MOUSE_DOWN, this._onMouseDown, false);
-    window.removeEventListener(EVENTS.MOUSE_MOVE, this._onMouseMove, false);
-    window.removeEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
+    targetEl.removeEventListener(BROWSER.EVENTS.MOUSE_DOWN, this._onMouseDown, false);
+    window.removeEventListener(BROWSER.EVENTS.MOUSE_MOVE, this._onMouseMove, false);
+    window.removeEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
 
-    targetEl.removeEventListener(EVENTS.TOUCH_START, this._onTouchStart, false);
-    targetEl.removeEventListener(EVENTS.TOUCH_MOVE, this._onTouchMove, false);
-    targetEl.removeEventListener(EVENTS.TOUCH_END, this._onTouchEnd, false);
+    targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_START, this._onTouchStart, false);
+    targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove, false);
+    targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, false);
 
     this._setCursor("");
     this._enabled = false;
@@ -233,7 +233,7 @@ class RotateControl implements CameraControl {
   }
 
   private _onMouseDown = (evt: MouseEvent) => {
-    if (evt.button !== MOUSE_BUTTON.LEFT) return;
+    if (evt.button !== BROWSER.MOUSE_BUTTON.LEFT) return;
 
     const targetEl = this._targetEl!;
     evt.preventDefault();
@@ -245,8 +245,8 @@ class RotateControl implements CameraControl {
     }
 
     this._prevPos.set(evt.clientX, evt.clientY);
-    window.addEventListener(EVENTS.MOUSE_MOVE, this._onMouseMove, false);
-    window.addEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
+    window.addEventListener(BROWSER.EVENTS.MOUSE_MOVE, this._onMouseMove, false);
+    window.addEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
 
     this._setCursor(CURSOR.GRABBING);
   };
@@ -271,8 +271,8 @@ class RotateControl implements CameraControl {
 
   private _onMouseUp = () => {
     this._prevPos.set(0, 0);
-    window.removeEventListener(EVENTS.MOUSE_MOVE, this._onMouseMove, false);
-    window.removeEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
+    window.removeEventListener(BROWSER.EVENTS.MOUSE_MOVE, this._onMouseMove, false);
+    window.removeEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
 
     this._setCursor(CURSOR.GRAB);
   };

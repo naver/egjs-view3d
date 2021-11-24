@@ -5,7 +5,6 @@
 
 import View3D from "./View3D";
 import View3DError from "./View3DError";
-import { CODES } from "./consts/error";
 
 export * as EASING from "./consts/easing";
 export * from "./type/external";
@@ -18,6 +17,5 @@ export * from "./extra";
 export * from "./consts/external";
 export {
   View3DError,
-  CODES as ERROR_CODES,
   View3D as default
 };

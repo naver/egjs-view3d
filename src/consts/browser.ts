@@ -12,7 +12,7 @@ export const IS_ANDROID = /android/i.test(navigator.userAgent);
 
 export const IS_SAFARI = /safari/i.test(navigator.userAgent);
 
-export const EVENT = {
+export const EVENTS = {
   MOUSE_DOWN: "mousedown",
   MOUSE_MOVE: "mousemove",
   MOUSE_UP: "mouseup",
@@ -25,3 +25,10 @@ export const EVENT = {
   MOUSE_ENTER: "mouseenter",
   MOUSE_LEAVE: "mouseleave"
 };
+
+// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
+export enum MOUSE_BUTTON {
+  LEFT,
+  MIDDLE,
+  RIGHT,
+}

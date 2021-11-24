@@ -10,34 +10,26 @@ import Camera from "./core/camera/Camera";
 import Model from "./core/Model";
 import ModelAnimator from "./core/ModelAnimator";
 import XRManager from "./core/XRManager";
-import { EVENTS } from "./consts/event";
+import { EVENTS } from "./consts/external";
+import * as BROWSER from "./consts/browser";
 import * as DEFAULT from "./consts/default";
+import * as EVENT_TYPES from "./type/event";
 import { getCanvas } from "./utils";
+
+/**
+ * @interface
+ */
+export interface View3DEvents {
+  resize: EVENT_TYPES.ResizeEvent;
+  beforeRender: EVENT_TYPES.BeforeRenderEvent;
+  afterRender: EVENT_TYPES.AfterRenderEvent;
+}
 
 /**
  * Yet another 3d model viewer
  * @category Core
- * @mermaid
- * classDiagram
- *   class View3D
- *     View3D *-- Camera
- *     View3D *-- Renderer
- *     View3D *-- Scene
- *     View3D *-- ModelAnimator
- *     Camera *-- Controller
- * @event resize
- * @event beforeRender
- * @event afterRender
  */
-class View3D extends Component<{
-  resize: {
-    width: number;
-    height: number;
-    target: View3D;
-  };
-  beforeRender: View3D;
-  afterRender: View3D;
-}> {
+class View3D extends Component<View3DEvents> {
   /**
    * Current version of the View3D
    */
@@ -89,6 +81,7 @@ class View3D extends Component<{
   /**
    * Creates new View3D instance
    * @example
+   * ```ts
    * import View3D, { ERROR_CODES } from "@egjs/view3d";
    *
    * try {
@@ -98,16 +91,11 @@ class View3D extends Component<{
    *     console.error("Element not found")
    *   }
    * }
+   * ```
    * @throws {View3DError} `CODES.WRONG_TYPE`<br/>When the parameter is not either string or the canvas element.
    * @throws {View3DError} `CODES.ELEMENT_NOT_FOUND`<br/>When the element with given query does not exist.
    * @throws {View3DError} `CODES.ELEMENT_NOT_CANVAS`<br/>When the element given is not a \<canvas\> element.
    * @throws {View3DError} `CODES.WEBGL_NOT_SUPPORTED`<br/>When browser does not support WebGL.
-   * @see Model
-   * @see Camera
-   * @see Renderer
-   * @see Scene
-   * @see Controller
-   * @see XRManager
    */
   public constructor(el: string | HTMLCanvasElement) {
     super();
@@ -122,25 +110,25 @@ class View3D extends Component<{
 
     this.resize();
 
-    window.addEventListener(EVENTS.RESIZE, this.resize);
+    window.addEventListener(BROWSER.EVENTS.RESIZE, this.resize);
   }
 
   /**
    * Destroy View3D instance and remove all events attached to it
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public destroy(): void {
     this._scene.reset();
     this.controller.clear();
     this._model = null;
 
-    window.removeEventListener(EVENTS.RESIZE, this.resize);
+    window.removeEventListener(BROWSER.EVENTS.RESIZE, this.resize);
   }
 
   /**
    * Resize View3D instance to fit current canvas size
    * @method
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public resize = (): void => {
     this._renderer.resize();
@@ -148,7 +136,7 @@ class View3D extends Component<{
     const newSize = this._renderer.size;
     this._camera.resize(newSize);
 
-    this.emit("resize", { ...newSize, target: this });
+    this.trigger(EVENTS.RESIZE, { ...newSize, target: this });
   };
 
   /**
@@ -160,7 +148,7 @@ class View3D extends Component<{
    * @param {number} [options.applySize=true] Whether to change model size to given "size" option.
    * @param {number} [options.size=80] Size of the model to show as.
    * @param {boolean} [options.resetView=true] Whether to reset the view to the camera's default pose.
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public display(model: Model, {
     applySize = true,
@@ -180,7 +168,7 @@ class View3D extends Component<{
     scene.resetModel();
 
     if (resetView) {
-      camera.reset();
+      void camera.reset();
     }
 
     animator.reset();
@@ -210,9 +198,9 @@ class View3D extends Component<{
     animator.update(delta);
     controller.update(delta);
 
-    this.emit("beforeRender", this);
+    this.trigger(EVENTS.BEFORE_RENDER, this);
     renderer.render(scene, camera);
-    this.emit("afterRender", this);
+    this.trigger(EVENTS.AFTER_RENDER, this);
   };
 }
 

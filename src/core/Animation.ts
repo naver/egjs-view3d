@@ -3,11 +3,11 @@
  * egjs projects are licensed under the MIT license
  */
 
+import Component from "@egjs/component";
+
 import * as DEFAULT from "../consts/default";
 import * as EASING from "../consts/easing";
 import { circulate } from "../utils";
-
-import EventEmitter from "./EventEmitter";
 
 /**
  * Fires for every animation frame when animation is active.
@@ -41,7 +41,7 @@ import EventEmitter from "./EventEmitter";
  * Self-running animation
  * @category Core
  */
-class Animation extends EventEmitter<{
+class Animation extends Component<{
   progress: (event: { progress: number; easedProgress: number }) => any;
   loop: (event: { progress: number; easedProgress: number; loopIndex: number }) => any;
   finish: void;
@@ -123,16 +123,16 @@ class Animation extends EventEmitter<{
       progress,
       easedProgress: this._easing(progress)
     };
-    this.emit("progress", progressEvent);
+    this.trigger("progress", progressEvent);
 
     for (let loopIdx = 0; loopIdx < loopIncrease; loopIdx++) {
       this._loopCount++;
       if (this._loopCount > this._repeat) {
-        this.emit("finish");
+        this.trigger("finish");
         this.stop();
         return;
       } else {
-        this.emit("loop", {
+        this.trigger("loop", {
           ...progressEvent,
           loopIndex: this._loopCount
         });

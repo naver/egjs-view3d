@@ -3,7 +3,7 @@ import * as sinon from "sinon";
 import TranslateControl from "~/controls/TranslateControl";
 import View3DError from "~/View3DError";
 import * as ERROR from "~/consts/error";
-import { EVENTS } from "~/consts/event";
+import * as BROWSER from "~/consts/browser";
 
 describe("TranslateControl", () => {
   describe("Initial state", () => {
@@ -93,7 +93,7 @@ describe("TranslateControl", () => {
       translateControl.enable();
 
       // Then
-      const listenersShouldBeAdded = new Set([EVENTS.MOUSE_DOWN, EVENTS.TOUCH_START, EVENTS.TOUCH_MOVE, EVENTS.TOUCH_END, EVENTS.CONTEXT_MENU]);
+      const listenersShouldBeAdded = new Set([BROWSER.EVENTS.MOUSE_DOWN, BROWSER.EVENTS.TOUCH_START, BROWSER.EVENTS.TOUCH_MOVE, BROWSER.EVENTS.TOUCH_END, BROWSER.EVENTS.CONTEXT_MENU]);
       const listenersAdded = addEventSpy.args.map(args => args[0]); // Take the first argument(event name) only
 
       expect(listenersAdded.length).to.greaterThan(0);
@@ -146,9 +146,9 @@ describe("TranslateControl", () => {
 
       // Then
       const listenersShouldBeRemoved = new Set([
-        EVENTS.MOUSE_DOWN, EVENTS.MOUSE_MOVE, EVENTS.MOUSE_UP,
-        EVENTS.TOUCH_START, EVENTS.TOUCH_MOVE, EVENTS.TOUCH_END,
-        EVENTS.CONTEXT_MENU
+        BROWSER.EVENTS.MOUSE_DOWN, BROWSER.EVENTS.MOUSE_MOVE, BROWSER.EVENTS.MOUSE_UP,
+        BROWSER.EVENTS.TOUCH_START, BROWSER.EVENTS.TOUCH_MOVE, BROWSER.EVENTS.TOUCH_END,
+        BROWSER.EVENTS.CONTEXT_MENU
       ]);
       const listenersRemoved = removeEventSpy.args.map(args => args[0]); // Take the first argument(event name) only
       expect(listenersRemoved.length).to.greaterThan(0);

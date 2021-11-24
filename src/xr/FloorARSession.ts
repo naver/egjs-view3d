@@ -132,7 +132,7 @@ class FloorARSession extends WebARSession {
 
     view3d.scene.update(model);
     view3d.scene.show();
-    this.emit("canPlace");
+    this.trigger("canPlace");
 
     // Don't need it
     hitTest.destroy();
@@ -142,7 +142,7 @@ class FloorARSession extends WebARSession {
 
     this._domOverlay?.hideLoading();
     this._modelPlaced = true;
-    this.emit("modelPlaced");
+    this.trigger("modelPlaced");
 
     // Show scale up animation
     const originalModelScale = modelRoot.scale.clone();

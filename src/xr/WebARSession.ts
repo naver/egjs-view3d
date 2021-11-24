@@ -4,9 +4,9 @@
  */
 
 import * as THREE from "three";
+import Component from "@egjs/component";
 
 import View3D from "../View3D";
-import EventEmitter from "../core/EventEmitter";
 import { getElement, merge } from "../utils";
 import * as DEFAULT from "../consts/default";
 import * as XR from "../consts/xr";
@@ -45,7 +45,7 @@ export interface WebARSessionOption {
  * @fires WebARSession#canPlace
  * @fires WebARSession#modelPlaced
  */
-abstract class WebARSession extends EventEmitter<{
+abstract class WebARSession extends Component<{
   start: void;
   end: void;
   canPlace: void;
@@ -249,14 +249,14 @@ abstract class WebARSession extends EventEmitter<{
   public onStart(ctx: XRContext) {
     this._session = ctx.session;
     this._domOverlay?.showLoading();
-    this.emit("start");
+    this.trigger("start");
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onEnd(ctx: XRContext) {
     this._session = null;
     this._domOverlay?.hideLoading();
-    this.emit("end");
+    this.trigger("end");
   }
 }
 

@@ -7,10 +7,9 @@ import * as THREE from "three";
 
 import ARControl from "../common/ARControl";
 import ArrowIndicator, { ArrowIndicatorOption } from "../ui/ArrowIndicator";
-
-import { getPrimaryAxisIndex } from "~/utils";
-import * as TOUCH from "~/consts/touch";
-import { XRRenderContext, XRContext, XRInputs } from "~/type/internal";
+import { getPrimaryAxisIndex } from "../../../utils";
+import * as TOUCH from "../../../consts/touch";
+import { XRRenderContext, XRContext, XRInputs } from "../../../type/internal";
 
 /**
  * Options for {@link ARHoverTranslateControl}
@@ -42,7 +41,7 @@ class ARHoverTranslateControl implements ARControl {
    * Create new instance of ARTranslateControl
    * @param {ARHoverTranslateControlOption} [options={}] Options
    */
-  constructor(options: Partial<ARHoverTranslateControlOption> = {}) {
+  public constructor(options: Partial<ARHoverTranslateControlOption> = {}) {
     this._arrowIndicator = new ArrowIndicator(options.arrow);
   }
 

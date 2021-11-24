@@ -8,7 +8,7 @@ import * as THREE from "three";
 import View3DError from "../View3DError";
 import Camera from "../core/camera/Camera";
 import { getElement } from "../utils";
-import { EVENTS } from "../consts/event";
+import * as BROWSER from "../consts/browser";
 import * as DEFAULT from "../consts/default";
 import * as ERROR from "../consts/error";
 
@@ -111,9 +111,9 @@ class DistanceControl implements CameraControl {
 
     const targetEl = this._targetEl;
 
-    targetEl.addEventListener(EVENTS.WHEEL, this._onWheel, false);
-    targetEl.addEventListener(EVENTS.TOUCH_MOVE, this._onTouchMove, false);
-    targetEl.addEventListener(EVENTS.TOUCH_END, this._onTouchEnd, false);
+    targetEl.addEventListener(BROWSER.EVENTS.WHEEL, this._onWheel, false);
+    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove, false);
+    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, false);
 
     this._enabled = true;
   }
@@ -127,9 +127,9 @@ class DistanceControl implements CameraControl {
 
     const targetEl = this._targetEl;
 
-    targetEl.removeEventListener(EVENTS.WHEEL, this._onWheel, false);
-    targetEl.removeEventListener(EVENTS.TOUCH_MOVE, this._onTouchMove, false);
-    targetEl.removeEventListener(EVENTS.TOUCH_END, this._onTouchEnd, false);
+    targetEl.removeEventListener(BROWSER.EVENTS.WHEEL, this._onWheel, false);
+    targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove, false);
+    targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, false);
 
     this._enabled = false;
   }

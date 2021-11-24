@@ -75,7 +75,7 @@ class HoverARSession extends WebARSession {
     session.addEventListener(XR.EVENTS.SELECT_END, this._onSelectEnd);
 
     this._modelPlaced = true;
-    this.emit("modelPlaced");
+    this.trigger("modelPlaced");
 
     // Show scale up animation
     const originalModelScale = modelRoot.scale.clone();
@@ -155,7 +155,7 @@ class HoverARSession extends WebARSession {
 
     if (!view3d.scene.visible) {
       view3d.scene.show();
-      this.emit("canPlace");
+      this.trigger("canPlace");
     }
   }
 

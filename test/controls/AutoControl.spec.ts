@@ -3,7 +3,7 @@ import Sinon, * as sinon from "sinon";
 import AutoControl from "~/controls/AutoControl";
 import View3DError from "~/View3DError";
 import * as ERROR from "~/consts/error";
-import { EVENTS } from "~/consts/event";
+import * as BROWSER from "~/consts/browser";
 
 describe("AutoControl", () => {
   let clock: Sinon.SinonFakeTimers;
@@ -97,7 +97,7 @@ describe("AutoControl", () => {
       autoControl.enable();
 
       // Then
-      const listenersShouldBeAdded = new Set([EVENTS.MOUSE_DOWN, EVENTS.TOUCH_START, EVENTS.TOUCH_END, EVENTS.MOUSE_ENTER, EVENTS.MOUSE_LEAVE, EVENTS.WHEEL]);
+      const listenersShouldBeAdded = new Set([BROWSER.EVENTS.MOUSE_DOWN, BROWSER.EVENTS.TOUCH_START, BROWSER.EVENTS.TOUCH_END, BROWSER.EVENTS.MOUSE_ENTER, BROWSER.EVENTS.MOUSE_LEAVE, BROWSER.EVENTS.WHEEL]);
       const listenersAdded = addEventSpy.args.map(args => args[0]); // Take the first argument(event name) only
 
       expect(listenersAdded.length).to.greaterThan(0);
@@ -133,10 +133,10 @@ describe("AutoControl", () => {
 
       // Then
       const listenersShouldBeRemoved = new Set([
-        EVENTS.MOUSE_DOWN, EVENTS.MOUSE_UP,
-        EVENTS.TOUCH_START, EVENTS.TOUCH_END,
-        EVENTS.MOUSE_ENTER, EVENTS.MOUSE_LEAVE,
-        EVENTS.WHEEL
+        BROWSER.EVENTS.MOUSE_DOWN, BROWSER.EVENTS.MOUSE_UP,
+        BROWSER.EVENTS.TOUCH_START, BROWSER.EVENTS.TOUCH_END,
+        BROWSER.EVENTS.MOUSE_ENTER, BROWSER.EVENTS.MOUSE_LEAVE,
+        BROWSER.EVENTS.WHEEL
       ]);
       const listenersRemoved = removeEventSpy.args.map(args => args[0]); // Take the first argument(event name) only
       expect(listenersRemoved.length).to.greaterThan(0);

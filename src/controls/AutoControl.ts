@@ -8,7 +8,7 @@ import * as THREE from "three";
 import View3DError from "../View3DError";
 import Camera from "../core/camera/Camera";
 import { getElement } from "../utils";
-import { EVENTS, MOUSE_BUTTON } from "../consts/event";
+import * as BROWSER from "../consts/browser";
 import * as ERROR from "../consts/error";
 import * as DEFAULT from "../consts/default";
 
@@ -159,15 +159,15 @@ class AutoControl implements CameraControl {
 
     const targetEl = this._targetEl;
 
-    targetEl.addEventListener(EVENTS.MOUSE_DOWN, this._onMouseDown, false);
+    targetEl.addEventListener(BROWSER.EVENTS.MOUSE_DOWN, this._onMouseDown, false);
 
-    targetEl.addEventListener(EVENTS.TOUCH_START, this._onTouchStart, false);
-    targetEl.addEventListener(EVENTS.TOUCH_END, this._onTouchEnd, false);
+    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_START, this._onTouchStart, false);
+    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, false);
 
-    targetEl.addEventListener(EVENTS.MOUSE_ENTER, this._onMouseEnter, false);
-    targetEl.addEventListener(EVENTS.MOUSE_LEAVE, this._onMouseLeave, false);
+    targetEl.addEventListener(BROWSER.EVENTS.MOUSE_ENTER, this._onMouseEnter, false);
+    targetEl.addEventListener(BROWSER.EVENTS.MOUSE_LEAVE, this._onMouseLeave, false);
 
-    targetEl.addEventListener(EVENTS.WHEEL, this._onWheel, false);
+    targetEl.addEventListener(BROWSER.EVENTS.WHEEL, this._onWheel, false);
 
     this._enabled = true;
   }
@@ -181,16 +181,16 @@ class AutoControl implements CameraControl {
 
     const targetEl = this._targetEl;
 
-    targetEl.removeEventListener(EVENTS.MOUSE_DOWN, this._onMouseDown, false);
-    window.removeEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
+    targetEl.removeEventListener(BROWSER.EVENTS.MOUSE_DOWN, this._onMouseDown, false);
+    window.removeEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
 
-    targetEl.removeEventListener(EVENTS.TOUCH_START, this._onTouchStart, false);
-    targetEl.removeEventListener(EVENTS.TOUCH_END, this._onTouchEnd, false);
+    targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_START, this._onTouchStart, false);
+    targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, false);
 
-    targetEl.removeEventListener(EVENTS.MOUSE_ENTER, this._onMouseEnter, false);
-    targetEl.removeEventListener(EVENTS.MOUSE_LEAVE, this._onMouseLeave, false);
+    targetEl.removeEventListener(BROWSER.EVENTS.MOUSE_ENTER, this._onMouseEnter, false);
+    targetEl.removeEventListener(BROWSER.EVENTS.MOUSE_LEAVE, this._onMouseLeave, false);
 
-    targetEl.removeEventListener(EVENTS.WHEEL, this._onWheel, false);
+    targetEl.removeEventListener(BROWSER.EVENTS.WHEEL, this._onWheel, false);
 
     this._enabled = false;
     this._interrupted = false;
@@ -215,15 +215,15 @@ class AutoControl implements CameraControl {
 
   private _onMouseDown = (evt: MouseEvent) => {
     if (!this._canInterrupt) return;
-    if (evt.button !== MOUSE_BUTTON.LEFT && evt.button !== MOUSE_BUTTON.RIGHT) return;
+    if (evt.button !== BROWSER.MOUSE_BUTTON.LEFT && evt.button !== BROWSER.MOUSE_BUTTON.RIGHT) return;
 
     this._interrupted = true;
     this._clearTimeout();
-    window.addEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
+    window.addEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
   };
 
   private _onMouseUp = () => {
-    window.removeEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
+    window.removeEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
     this._setUninterruptedAfterDelay(this._delay);
   };
 

@@ -3,7 +3,7 @@ import * as sinon from "sinon";
 import DistanceControl from "~/controls/DistanceControl";
 import View3DError from "~/View3DError";
 import * as ERROR from "~/consts/error";
-import { EVENTS } from "~/consts/event";
+import * as BROWSER from "~/consts/browser";
 
 describe("DistanceControl", () => {
   describe("Initial state", () => {
@@ -80,7 +80,7 @@ describe("DistanceControl", () => {
       distanceControl.enable();
 
       // Then
-      const listenersShouldBeAdded = new Set([EVENTS.TOUCH_MOVE, EVENTS.TOUCH_END, EVENTS.WHEEL]);
+      const listenersShouldBeAdded = new Set([BROWSER.EVENTS.TOUCH_MOVE, BROWSER.EVENTS.TOUCH_END, BROWSER.EVENTS.WHEEL]);
       const listenersAdded = addEventSpy.args.map(args => args[0]); // Take the first argument(event name) only
 
       expect(listenersAdded.length).to.greaterThan(0);
@@ -116,7 +116,7 @@ describe("DistanceControl", () => {
 
       // Then
       const listenersShouldBeRemoved = new Set([
-        EVENTS.TOUCH_START, EVENTS.TOUCH_MOVE, EVENTS.TOUCH_END, EVENTS.WHEEL
+        BROWSER.EVENTS.TOUCH_START, BROWSER.EVENTS.TOUCH_MOVE, BROWSER.EVENTS.TOUCH_END, BROWSER.EVENTS.WHEEL
       ]);
       const listenersRemoved = removeEventSpy.args.map(args => args[0]); // Take the first argument(event name) only
       expect(listenersRemoved.length).to.greaterThan(0);
