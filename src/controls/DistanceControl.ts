@@ -39,9 +39,11 @@ class DistanceControl implements CameraControl {
    * Scale factor of the distance
    * @type number
    * @example
+   * ```ts
    * import { DistanceControl } from "@egjs/view3d";
    * const distanceControl = new DistanceControl();
    * distanceControl.scale = 2;
+   * ```
    */
   public get scale() { return this._scale; }
   /**

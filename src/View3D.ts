@@ -25,21 +25,41 @@ export interface View3DEvents {
 }
 
 /**
+ * @interface
+ */
+export interface View3DOptions {
+  url: string | null;
+  autoInit: boolean;
+  autoResize: boolean;
+}
+
+/**
  * Yet another 3d model viewer
  * @category Core
  */
 class View3D extends Component<View3DEvents> {
   /**
    * Current version of the View3D
+   * @type {string}
+   * @readonly
    */
-  public static VERSION: string = "#__VERSION__#";
+  public static readonly VERSION: string = "#__VERSION__#";
 
-  private _model: Model | null;
+  // Internal Components
   private _renderer: Renderer;
   private _scene: Scene;
   private _camera: Camera;
   private _animator: ModelAnimator;
 
+  // Options
+  private _url: View3DOptions["url"];
+  private _autoInit: View3DOptions["autoInit"];
+  private _autoResize: View3DOptions["autoResize"];
+
+  // Internal States
+  private _initialized: boolean;
+
+  // Internal Components Getter
   /**
    * {@link Renderer} instance of the View3D
    * @type {Renderer}
@@ -65,14 +85,16 @@ class View3D extends Component<View3DEvents> {
    * @type {ModelAnimator}
    */
   public get animator() { return this._animator; }
-  /**
-   * {@link Model} that View3D is currently showing
-   * @type {Model|null}
-   */
-  public get model() { return this._model; }
+
+  // Options Getter
+  public get url() { return this._url; }
+  public get autoInit() { return this._autoInit; }
+  public get autoResize() { return this._autoResize; }
 
   /**
    * Creates new View3D instance
+   * @param canvasEl A canvas element or selector of it to initialize View3D<ko>View3D를 초기화할 캔버스 엘리먼트 혹은 선택자</ko>
+   * @param {object} [options={}] An options object for View3D<ko>View3D에 적용할 옵션 오브젝트</ko>
    * @example
    * ```ts
    * import View3D, { ERROR_CODES } from "@egjs/view3d";
@@ -90,19 +112,28 @@ class View3D extends Component<View3DEvents> {
    * @throws {View3DError} `CODES.ELEMENT_NOT_CANVAS`<br/>When the element given is not a \<canvas\> element.
    * @throws {View3DError} `CODES.WEBGL_NOT_SUPPORTED`<br/>When browser does not support WebGL.
    */
-  public constructor(el: string | HTMLCanvasElement) {
+  public constructor(canvasEl: string | HTMLElement, {
+    url = null,
+    autoInit = true,
+    autoResize = true
+  }: Partial<View3DOptions>) {
     super();
-    const canvas = getCanvas(el);
+    const canvas = getCanvas(canvasEl);
 
+    // Create internal components
     this._renderer = new Renderer(canvas);
     this._camera = new Camera(canvas);
     this._scene = new Scene();
     this._animator = new ModelAnimator(this._scene.root);
-    this._model = null;
 
-    this.resize();
+    // Bind options
+    this._url = url;
+    this._autoInit = autoInit;
+    this._autoResize = autoResize;
 
-    window.addEventListener(BROWSER.EVENTS.RESIZE, this.resize);
+    if (url && autoInit) {
+      this.init();
+    }
   }
 
   /**
@@ -112,9 +143,12 @@ class View3D extends Component<View3DEvents> {
   public destroy(): void {
     this._scene.reset();
     this.controller.clear();
-    this._model = null;
 
     window.removeEventListener(BROWSER.EVENTS.RESIZE, this.resize);
+  }
+
+  public init() {
+
   }
 
   /**

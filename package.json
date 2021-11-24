@@ -13,13 +13,13 @@
 		"printsizes": "print-sizes ./dist --exclude=\\.map",
 		"lint": "eslint 'src/**/*.ts'",
 		"lint:test": "eslint 'test/unit/**/*.ts'",
+    "docs:build": "jsdoc-to-mdx -c ./jsdoc-to-mdx.json",
 		"demo:build": "npm run build && cpx 'dist/**/*' demo/release/latest/dist --clean",
 		"demo:prebuild-version": "cpx 'dist/**/*' demo/release/$npm_package_version/dist --clean && cpx 'docs/**/*' demo/release/$npm_package_version/docs --clean",
 		"demo:prebuild-latest": "cpx 'dist/**/*' demo/release/latest/dist --clean && cpx 'docs/**/*' demo/release/latest/docs --clean",
 		"demo:deploy-origin": "npm run build && npm run jsdoc && npm run demo:prebuild-version && npm run demo:prebuild-latest && gh-pages -d demo/",
 		"demo:deploy": "npm run build && npm run jsdoc && npm run demo:prebuild-version && npm run demo:prebuild-latest && gh-pages -d demo/ --add --remote upstream",
-		"release": "release-helper upstream",
-		"jsdoc": "rm -rf ./docs && jsdoc -c jsdoc.json"
+		"release": "release-helper upstream"
 	},
 	"repository": {
 		"type": "git",
@@ -66,6 +66,7 @@
 		"fs-extra": "^10.0.0",
 		"gh-pages": "2.0.1",
 		"husky": "^4.2.1",
+		"jsdoc-to-mdx": "^1.1.0",
 		"print-sizes": "^0.1.0",
 		"rollup": "^1.10.1",
 		"rollup-plugin-babel": "^4.4.0",

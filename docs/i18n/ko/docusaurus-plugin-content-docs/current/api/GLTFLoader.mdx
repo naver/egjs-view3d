@@ -1,0 +1,89 @@
+---
+custom_edit_url: null
+---
+
+```ts
+class GLTFLoader
+```
+GLTFLoader
+
+<div className="container">
+  <div className="row mb-2"><div className="col col--12"><strong>Methods</strong></div></div>
+  <div className="row"><div className="col col--12"><a href="#load">load</a><br/><a href="#loadPreset">loadPreset</a><br/><a href="#loadFromFiles">loadFromFiles</a><br/><a href="#parse">parse</a></div></div>
+</div>
+
+## Constructor
+```ts
+new GLTFLoader()
+```
+
+## Methods
+
+### load {#load}
+
+<div className="bulma-tags">
+
+</div>
+
+Load new GLTF model from the given url
+
+**Returns**: Promise&lt;[Model](Model)&gt;
+- Promise that resolves [Model](Model)
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|url|string|||URL to fetch glTF/glb file|
+|options|Partial&lt;[ModelLoadOption](ModelLoadOption)&gt;|✔️|{}|Options for a loaded model|
+
+### loadPreset {#loadPreset}
+
+<div className="bulma-tags">
+
+</div>
+
+Load preset generated from View3D editor.
+
+**Returns**: [Model](Model)
+- Model instance with highest LOD
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|viewer|[View3D](View3D)|||Instance of the [View3D](View3D).|
+|url|string|||Preset url|
+|options|object|✔️|{}|Options|
+|options.path|string|✔️||Base path for additional files.|
+|options.onLoad|function|✔️||Callback which called after each model LOD is loaded.|
+
+### loadFromFiles {#loadFromFiles}
+
+<div className="bulma-tags">
+
+</div>
+
+Load new GLTF model from the given files
+
+**Returns**: Promise&lt;[Model](Model)&gt;
+- Promise that resolves [Model](Model)
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|files|File[]|||Files that has glTF/glb and all its associated resources like textures and .bin data files|
+|options|Partial&lt;[ModelLoadOption](ModelLoadOption)&gt;|✔️|{}|Options for a loaded model|
+
+### parse {#parse}
+
+<div className="bulma-tags">
+
+</div>
+
+Parse from array buffer
+
+**Returns**: Promise&lt;[Model](Model)&gt;
+- Promise that resolves [Model](Model)
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|data|ArrayBuffer|||glTF asset to parse, as an ArrayBuffer or JSON string.|
+|path|string|||The base path from which to find subsequent glTF resources such as textures and .bin data files.|
+|options|Partial&lt;[ModelLoadOption](ModelLoadOption)&gt;|✔️|{}|Options for a loaded model|
+

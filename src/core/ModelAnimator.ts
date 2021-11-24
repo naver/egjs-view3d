@@ -43,8 +43,10 @@ class ModelAnimator {
    * @param clips Three.js {@link https://threejs.org/docs/#api/en/animation/AnimationClip AnimationClip}s of the model
    * @returns {void} Nothing
    * @example
+   * ```ts
    * // After loading model
    * view3d.animator.setClips(model.animations);
+   * ```
    */
   public setClips(clips: THREE.AnimationClip[]): void {
     const mixer = this._mixer;

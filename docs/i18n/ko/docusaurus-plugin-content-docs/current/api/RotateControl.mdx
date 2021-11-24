@@ -1,0 +1,190 @@
+---
+custom_edit_url: null
+---
+
+```ts
+class RotateControl implements CameraControl
+```
+Model's rotation control that supports both mouse & touch
+
+<div className="container">
+  <div className="row mb-2"><div className="col col--6"><strong>Properties</strong></div><div className="col col--6"><strong>Methods</strong></div></div>
+  <div className="row"><div className="col col--6"><a href="#element">element</a><br/><a href="#scale">scale</a><br/><a href="#useGrabCursor">useGrabCursor</a><br/><a href="#scaleToElement">scaleToElement</a><br/><a href="#enabled">enabled</a></div><div className="col col--6"><a href="#destroy">destroy</a><br/><a href="#update">update</a><br/><a href="#resize">resize</a><br/><a href="#enable">enable</a><br/><a href="#disable">disable</a><br/><a href="#sync">sync</a><br/><a href="#setElement">setElement</a></div></div>
+</div>
+
+## Constructor
+```ts
+new RotateControl(options, options.element, options.duration, options.easing, options.scale, options.useGrabCursor, options.scaleToElement)
+```
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|options|object|✔️|{}|Options|
+|options.element|HTMLElement \| null|✔️||Target element.|
+|options.duration|number|✔️|500|Motion's duration.|
+|options.easing|function|✔️|(x: number) => 1 - Math.pow(1 - x, 3)|Motion's easing function.|
+|options.scale|THREE.Vector2|✔️|new THREE.Vector2(1, 1)|Scale factor for panning, x is for horizontal and y is for vertical panning.|
+|options.useGrabCursor|boolean|✔️|true|Whether to apply CSS style `cursor: grab` on the target element or not.|
+|options.scaleToElement|boolean|✔️|true|Whether to scale control to fit element size.|
+
+## Properties
+
+### element {#element}
+
+<div className="bulma-tags">
+  <span className="bulma-tag is-warning">readonly</span>
+</div>
+
+Control's current target element to attach event listeners
+
+### scale {#scale}
+
+<div className="bulma-tags">
+
+</div>
+
+Scale factor for panning, x is for horizontal and y is for vertical panning.
+
+**Type**: THREE.Vector2
+
+**See**:
+- https://threejs.org/docs/#api/en/math/Vector2
+```ts
+const rotateControl = new View3D.RotateControl();
+rotateControl.scale.setX(2);
+```
+
+### useGrabCursor {#useGrabCursor}
+
+<div className="bulma-tags">
+
+</div>
+
+Whether to apply CSS style `cursor: grab` on the target element or not
+
+**Default**: true
+
+```ts
+const rotateControl = new View3D.RotateControl();
+rotateControl.useGrabCursor = true;
+```
+
+### scaleToElement {#scaleToElement}
+
+<div className="bulma-tags">
+
+</div>
+
+Whether to scale control to fit element size.<br />When this is true and [scale.x](RotateControl#scale) is 1, panning through element's width will make 3d model's yaw rotate 360°.<br />When this is true and [scale.y](RotateControl#scale) is 1, panning through element's height will make 3d model's pitch rotate 180°.
+
+**Default**: true
+
+```ts
+import View3D, { RotateControl } from "@egjs/view3d";
+const view3d = new View3D("#view3d-canvas");
+const rotateControl = new RotateControl();
+rotateControl.scaleToElement = true;
+view3d.controller.add(rotateControl);
+view3d.resize();
+```
+
+### enabled {#enabled}
+
+<div className="bulma-tags">
+  <span className="bulma-tag is-warning">readonly</span>
+</div>
+
+Whether this control is enabled or not
+
+## Methods
+
+### destroy {#destroy}
+
+<div className="bulma-tags">
+
+</div>
+
+Destroy the instance and remove all event listeners attached<br />This also will reset CSS cursor to intial
+
+**Returns**: void
+- Nothing
+
+### update {#update}
+
+<div className="bulma-tags">
+
+</div>
+
+Update control by given deltaTime
+
+**Returns**: void
+- Nothing
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|camera|[Camera](Camera)|||Camera to update position|
+|deltaTime|number|||Number of milisec to update|
+
+### resize {#resize}
+
+<div className="bulma-tags">
+
+</div>
+
+Resize control to match target size<br />This method is only meaningful when [scaleToElement](RotateControl#scaleToElement) is enabled
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|size|THREE.Vector2|||[THREE.Vector2](https://threejs#org/docs/#api/en/math/Vector2) instance of width(x), height(y)|
+
+### enable {#enable}
+
+<div className="bulma-tags">
+
+</div>
+
+Enable this input and add event listeners
+
+**Returns**: void
+- Nothing
+
+### disable {#disable}
+
+<div className="bulma-tags">
+
+</div>
+
+Disable this input and remove all event handlers
+
+**Returns**: void
+- Nothing
+
+### sync {#sync}
+
+<div className="bulma-tags">
+
+</div>
+
+Synchronize this control's state to given camera position
+
+**Returns**: void
+- Nothing
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|camera|[Camera](Camera)|||Camera to match state|
+
+### setElement {#setElement}
+
+<div className="bulma-tags">
+
+</div>
+
+Set target element to attach event listener
+
+**Returns**: void
+- Nothing
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|element|HTMLElement|||target element|
+

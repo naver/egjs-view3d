@@ -45,16 +45,20 @@ class RotateControl implements CameraControl {
    * @type THREE.Vector2
    * @see https://threejs.org/docs/#api/en/math/Vector2
    * @example
+   * ```ts
    * const rotateControl = new View3D.RotateControl();
    * rotateControl.scale.setX(2);
+   * ```
    */
   public get scale() { return this._userScale; }
   /**
    * Whether to apply CSS style `cursor: grab` on the target element or not
    * @default true
    * @example
+   * ```ts
    * const rotateControl = new View3D.RotateControl();
    * rotateControl.useGrabCursor = true;
+   * ```
    */
   public get useGrabCursor() { return this._useGrabCursor; }
   /**
@@ -63,12 +67,14 @@ class RotateControl implements CameraControl {
    * When this is true and {@link RotateControl#scale scale.y} is 1, panning through element's height will make 3d model's pitch rotate 180°.
    * @default true
    * @example
+   * ```ts
    * import View3D, { RotateControl } from "@egjs/view3d";
    * const view3d = new View3D("#view3d-canvas");
    * const rotateControl = new RotateControl();
    * rotateControl.scaleToElement = true;
    * view3d.controller.add(rotateControl);
    * view3d.resize();
+   * ```
    */
   public get scaleToElement() { return this._scaleToElement; }
   /**

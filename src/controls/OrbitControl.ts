@@ -57,7 +57,6 @@ class OrbitControl implements CameraControl {
    * @param {object} [options.rotate={}] Constructor options of {@link RotateControl}
    * @param {object} [options.translate={}] Constructor options of {@link TranslateControl}
    * @param {object} [options.distance={}] Constructor options of {@link DistanceControl}
-   * @tutorial Adding Controls
    */
   public constructor({
     element = DEFAULT.NULL_ELEMENT,

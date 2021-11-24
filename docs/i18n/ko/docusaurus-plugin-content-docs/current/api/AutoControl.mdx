@@ -1,0 +1,169 @@
+---
+custom_edit_url: null
+---
+
+```ts
+class AutoControl implements CameraControl
+```
+Control that animates model without user input
+
+<div className="container">
+  <div className="row mb-2"><div className="col col--6"><strong>Properties</strong></div><div className="col col--6"><strong>Methods</strong></div></div>
+  <div className="row"><div className="col col--6"><a href="#element">element</a><br/><a href="#enabled">enabled</a><br/><a href="#delay">delay</a><br/><a href="#delayOnMouseLeave">delayOnMouseLeave</a><br/><a href="#speed">speed</a><br/><a href="#pauseOnHover">pauseOnHover</a><br/><a href="#canInterrupt">canInterrupt</a><br/><a href="#disableOnInterrupt">disableOnInterrupt</a></div><div className="col col--6"><a href="#destroy">destroy</a><br/><a href="#update">update</a><br/><a href="#enable">enable</a><br/><a href="#disable">disable</a><br/><a href="#setElement">setElement</a></div></div>
+</div>
+
+## Constructor
+```ts
+new AutoControl(options, options.element, options.delay, options.delayOnMouseLeave, options.speed, options.pauseOnHover, options.canInterrupt, options.disableOnInterrupt)
+```
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|options|object|✔️|{}|Options|
+|options.element|HTMLElement \| string \| null|✔️||Attaching element / selector of the element|
+|options.delay|number|✔️|2000|Reactivation delay after mouse input in milisecond|
+|options.delayOnMouseLeave|number|✔️|0|Reactivation delay after mouse leave|
+|options.speed|number|✔️|1|Y-axis(yaw) rotation speed|
+|options.pauseOnHover|boolean|✔️|false|Whether to pause rotation on mouse hover|
+|options.canInterrupt|boolean|✔️|true|Whether user can interrupt the rotation with click/wheel input|
+|options.disableOnInterrupt|boolean|✔️|false|Whether to disable control on user interrupt|
+
+## Properties
+
+### element {#element}
+
+<div className="bulma-tags">
+  <span className="bulma-tag is-warning">readonly</span>
+</div>
+
+Control's current target element to attach event listeners
+
+### enabled {#enabled}
+
+<div className="bulma-tags">
+  <span className="bulma-tag is-warning">readonly</span>
+</div>
+
+Whether this control is enabled or not
+
+### delay {#delay}
+
+<div className="bulma-tags">
+
+</div>
+
+Reactivation delay after mouse input in milisecond
+
+### delayOnMouseLeave {#delayOnMouseLeave}
+
+<div className="bulma-tags">
+
+</div>
+
+Reactivation delay after mouse leave<br />This option only works when [pauseOnHover](AutoControl#pauseOnHover) is activated
+
+### speed {#speed}
+
+<div className="bulma-tags">
+
+</div>
+
+Y-axis(yaw) rotation speed
+
+**Default**: 1
+
+### pauseOnHover {#pauseOnHover}
+
+<div className="bulma-tags">
+
+</div>
+
+Whether to pause rotation on mouse hover
+
+**Default**: false
+
+### canInterrupt {#canInterrupt}
+
+<div className="bulma-tags">
+
+</div>
+
+Whether user can interrupt the rotation with click/wheel input
+
+**Default**: true
+
+### disableOnInterrupt {#disableOnInterrupt}
+
+<div className="bulma-tags">
+
+</div>
+
+Whether to disable control on user interrupt
+
+**Default**: false
+
+## Methods
+
+### destroy {#destroy}
+
+<div className="bulma-tags">
+
+</div>
+
+Destroy the instance and remove all event listeners attached<br />This also will reset CSS cursor to intial
+
+**Returns**: void
+- Nothing
+
+### update {#update}
+
+<div className="bulma-tags">
+
+</div>
+
+Update control by given deltaTime
+
+**Returns**: void
+- Nothing
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|camera|[Camera](Camera)|||Camera to update position|
+|deltaTime|number|||Number of milisec to update|
+
+### enable {#enable}
+
+<div className="bulma-tags">
+
+</div>
+
+Enable this input and add event listeners
+
+**Returns**: void
+- Nothing
+
+### disable {#disable}
+
+<div className="bulma-tags">
+
+</div>
+
+Disable this input and remove all event handlers
+
+**Returns**: void
+- Nothing
+
+### setElement {#setElement}
+
+<div className="bulma-tags">
+
+</div>
+
+Set target element to attach event listener
+
+**Returns**: void
+- Nothing
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|element|HTMLElement|||target element|
+

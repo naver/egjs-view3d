@@ -1,0 +1,204 @@
+---
+custom_edit_url: null
+---
+
+```ts
+class TextureModel extends Model
+```
+Texture(image) model
+
+<div className="container">
+  <div className="row mb-2"><div className="col col--6"><strong>Properties</strong></div><div className="col col--6"><strong>Methods</strong></div></div>
+  <div className="row"><div className="col col--6"><a href="#texture">texture</a><br/><a href="#mesh">mesh</a><br/><a href="#scene">scene</a><br/><a href="#animations">animations</a><br/><a href="#lights">lights</a><br/><a href="#meshes">meshes</a><br/><a href="#bbox">bbox</a><br/><a href="#initialBbox">initialBbox</a><br/><a href="#size">size</a><br/><a href="#fixSkinnedBbox">fixSkinnedBbox</a><br/><a href="#originalSize">originalSize</a><br/><a href="#castShadow">castShadow</a><br/><a href="#receiveShadow">receiveShadow</a></div><div className="col col--6"><a href="#moveToOrigin">moveToOrigin</a><br/><a href="#_getAllMeshes">_getAllMeshes</a></div></div>
+</div>
+
+## Constructor
+```ts
+new TextureModel(options, options.width, options.height, options.billboard)
+```
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|options|object|||Options|
+|options.width|number|✔️||Width of the model.|
+|options.height|number|✔️||Height of the model.|
+|options.billboard|boolean|✔️|false|When set to true, model will keep rotate to show its front face to camera. Only Y-axis rotation is considered.|
+
+## Properties
+
+### texture {#texture}
+
+<div className="bulma-tags">
+
+</div>
+
+Texture that used for this model
+
+**Type**: THREE.Texture
+
+**See**:
+- https://threejs.org/docs/index.html#api/en/textures/Texture
+
+### mesh {#mesh}
+
+<div className="bulma-tags">
+
+</div>
+
+Model's mesh object
+
+**Type**: THREE.Mesh
+
+**See**:
+- https://threejs.org/docs/index.html#api/en/objects/Mesh
+
+### scene {#scene}
+
+<div className="bulma-tags">
+  <span className="bulma-tag is-warning">readonly</span>
+  <span className="bulma-tag is-danger">inherited</span>
+</div>
+
+Scene of the model, see [THREE.Group](https://threejs#org/docs/#api/en/objects/Group)
+
+### animations {#animations}
+
+<div className="bulma-tags">
+  <span className="bulma-tag is-danger">inherited</span>
+</div>
+
+[THREE.AnimationClip](https://threejs#org/docs/#api/en/animation/AnimationClip)s inside model
+
+### lights {#lights}
+
+<div className="bulma-tags">
+  <span className="bulma-tag is-warning">readonly</span>
+  <span className="bulma-tag is-danger">inherited</span>
+</div>
+
+[THREE.Light](https://threejs#org/docs/#api/en/lights/Light)s inside model if there's any.
+
+### meshes {#meshes}
+
+<div className="bulma-tags">
+  <span className="bulma-tag is-warning">readonly</span>
+  <span className="bulma-tag is-danger">inherited</span>
+</div>
+
+[THREE.Mesh](https://threejs#org/docs/#api/en/objects/Mesh)es inside model if there's any.
+
+### bbox {#bbox}
+
+<div className="bulma-tags">
+  <span className="bulma-tag is-danger">inherited</span>
+</div>
+
+Get a copy of model's current bounding box
+
+**Type**: THREE#Box3
+
+**See**:
+- https://threejs.org/docs/#api/en/math/Box3
+
+### initialBbox {#initialBbox}
+
+<div className="bulma-tags">
+  <span className="bulma-tag is-danger">inherited</span>
+</div>
+
+Get a copy of model's initial bounding box without transform
+
+### size {#size}
+
+<div className="bulma-tags">
+  <span className="bulma-tag is-danger">inherited</span>
+</div>
+
+Model's bounding box size<br />Changing this will scale the model.
+
+**Type**: number
+
+```ts
+import { GLTFLoader } from "@egjs/view3d";
+new GLTFLoader().load(URL_TO_GLTF)
+ .then(model => {
+   model.size = 100;
+ })
+```
+
+### fixSkinnedBbox {#fixSkinnedBbox}
+
+<div className="bulma-tags">
+  <span className="bulma-tag is-danger">inherited</span>
+</div>
+
+Whether to apply inference from skeleton when calculating bounding box<br />This can fix some models with skinned mesh when it has wrong bounding box
+
+**Type**: boolean
+
+### originalSize {#originalSize}
+
+<div className="bulma-tags">
+  <span className="bulma-tag is-danger">inherited</span>
+</div>
+
+Return the model's original bbox size before applying any transform
+
+**Type**: number
+
+### castShadow {#castShadow}
+
+<div className="bulma-tags">
+  <span className="bulma-tag is-danger">inherited</span>
+</div>
+
+Whether the model's meshes gets rendered into shadow map
+
+**Type**: boolean
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|val|boolean||||
+
+```ts
+model.castShadow = true;
+```
+
+### receiveShadow {#receiveShadow}
+
+<div className="bulma-tags">
+  <span className="bulma-tag is-danger">inherited</span>
+</div>
+
+Whether the model's mesh materials receive shadows
+
+**Type**: boolean
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|val|boolean||||
+
+```ts
+model.receiveShadow = true;
+```
+
+## Methods
+
+### moveToOrigin {#moveToOrigin}
+
+<div className="bulma-tags">
+  <span className="bulma-tag is-danger">inherited</span>
+</div>
+
+Translate the model to center the model's bounding box to world origin (0, 0, 0).
+
+### _getAllMeshes {#_getAllMeshes}
+
+<div className="bulma-tags">
+  <span className="bulma-tag is-danger">inherited</span>
+</div>
+
+Get all [THREE.Mesh](https://threejs#org/docs/#api/en/objects/Mesh)es inside model if there's any.
+
+**Returns**: THREE.Mesh[]
+- Meshes found at model's scene
+

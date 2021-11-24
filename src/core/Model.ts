@@ -64,11 +64,13 @@ class Model {
    * Changing this will scale the model.
    * @type number
    * @example
+   * ```ts
    * import { GLTFLoader } from "@egjs/view3d";
    * new GLTFLoader().load(URL_TO_GLTF)
    *  .then(model => {
    *    model.size = 100;
    *  })
+   * ```
    */
   public get size() {
     return this._getTransformedBbox().getSize(new THREE.Vector3()).length();
@@ -91,7 +93,9 @@ class Model {
    * Whether the model's meshes gets rendered into shadow map
    * @type boolean
    * @example
+   * ```ts
    * model.castShadow = true;
+   * ```
    */
   public set castShadow(val: boolean) {
     const meshes = this.meshes;
@@ -102,7 +106,9 @@ class Model {
    * Whether the model's mesh materials receive shadows
    * @type boolean
    * @example
+   * ```ts
    * model.receiveShadow = true;
+   * ```
    */
   public set receiveShadow(val: boolean) {
     const meshes = this.meshes;
@@ -197,7 +203,7 @@ class Model {
         return;
       }
 
-      const geometry = mesh.geometry as THREE.BufferGeometry;
+      const geometry = mesh.geometry;
       const positions = geometry.attributes.position;
       const skinIndicies = geometry.attributes.skinIndex;
       const skinWeights = geometry.attributes.skinWeight;

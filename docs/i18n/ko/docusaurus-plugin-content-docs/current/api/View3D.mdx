@@ -1,0 +1,174 @@
+---
+custom_edit_url: null
+---
+
+```ts
+class View3D extends Component
+```
+Yet another 3d model viewer
+
+<div className="container">
+  <div className="row mb-2"><div className="col col--4"><strong>Properties</strong></div><div className="col col--4"><strong>Methods</strong></div><div className="col col--4"><strong>Events</strong></div></div>
+  <div className="row"><div className="col col--4"><a href="#VERSION">VERSION</a><span className="bulma-tag is-info ml-2">static</span><br/><a href="#renderer">renderer</a><br/><a href="#scene">scene</a><br/><a href="#camera">camera</a><br/><a href="#controller">controller</a><br/><a href="#animator">animator</a><br/><a href="#renderLoop">renderLoop</a></div><div className="col col--4"><a href="#destroy">destroy</a><br/><a href="#resize">resize</a><br/><a href="#display">display</a></div><div className="col col--4"><a href="#event-resize">resize</a><br/><a href="#event-beforeRender">beforeRender</a><br/><a href="#event-afterRender">afterRender</a></div></div>
+</div>
+
+## Constructor
+```ts
+new View3D(canvasEl, options)
+```
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|canvasEl|string \| HTMLElement|||View3D를 초기화할 캔버스 엘리먼트 혹은 선택자|
+|options|object|✔️|{}|View3D에 적용할 옵션 오브젝트|
+
+## Properties
+### VERSION {#VERSION}
+
+<div className="bulma-tags">
+  <span className="bulma-tag is-info">static</span>
+  <span className="bulma-tag is-warning">readonly</span>
+</div>
+
+Current version of the View3D
+
+**Type**: string
+
+### renderer {#renderer}
+
+<div className="bulma-tags">
+
+</div>
+
+[Renderer](Renderer) instance of the View3D
+
+**Type**: [Renderer](Renderer)
+
+### scene {#scene}
+
+<div className="bulma-tags">
+
+</div>
+
+[Scene](Scene) instance of the View3D
+
+**Type**: [Scene](Scene)
+
+### camera {#camera}
+
+<div className="bulma-tags">
+
+</div>
+
+[Camera](Camera) instance of the View3D
+
+**Type**: [Camera](Camera)
+
+### controller {#controller}
+
+<div className="bulma-tags">
+
+</div>
+
+[Controller](Controller) instance of the Camera
+
+**Type**: [Controller](Controller)
+
+### animator {#animator}
+
+<div className="bulma-tags">
+
+</div>
+
+[ModelAnimator](ModelAnimator) instance of the View3D
+
+**Type**: [ModelAnimator](ModelAnimator)
+
+### renderLoop {#renderLoop}
+
+<div className="bulma-tags">
+
+</div>
+
+View3D's basic render loop function
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|delta||||Number of seconds passed since last frame|
+
+## Methods
+
+### destroy {#destroy}
+
+<div className="bulma-tags">
+
+</div>
+
+Destroy View3D instance and remove all events attached to it
+
+**Returns**: void
+
+### resize {#resize}
+
+<div className="bulma-tags">
+
+</div>
+
+Resize View3D instance to fit current canvas size
+
+**Returns**: void
+
+### display {#display}
+
+<div className="bulma-tags">
+
+</div>
+
+Display the given model.<br />This method will remove the current displaying model, and reset the camera & control to default position.<br />View3D can only show one model at a time
+
+**Returns**: void
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|model|[Model](Model)|||[Model](Model) instance to show|
+|options|object|✔️|{}|Display options|
+|options.applySize|number|✔️|true|Whether to change model size to given "size" option.|
+|options.size|number|✔️|80|Size of the model to show as.|
+|options.resetView|boolean|✔️|true|Whether to reset the view to the camera's default pose.|
+
+## Events
+### resize {#event-resize}
+
+<div className="bulma-tags">
+
+</div>
+
+Event that fires when View3D's [resize()](View3D#resize) is called
+
+**Type**: object
+
+|PROPERTY|TYPE|DESCRIPTION|
+|:---:|:---:|:---:|
+|target|[View3D](View3D)|이 이벤트를 트리거한 View3D의 인스턴스|
+|width|number|업데이트된 캔버스 너비|
+|height|number|업데이트된 캔버스 높이|
+
+### beforeRender {#event-beforeRender}
+
+<div className="bulma-tags">
+
+</div>
+
+Event that fires before rendering a frame
+
+**Type**: [View3D](View3D)
+
+### afterRender {#event-afterRender}
+
+<div className="bulma-tags">
+
+</div>
+
+Event that fires after rendering a frame
+
+**Type**: [View3D](View3D)
+

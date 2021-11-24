@@ -86,10 +86,12 @@ class Camera {
    * Minimum distance from lookAtPosition
    * @type number
    * @example
+   * ```ts
    * import View3D from "@egjs/view3d";
    *
    * const view3d = new View3D("#view3d-canvas");
    * view3d.camera.minDistance = 100;
+   * ```
    */
   public get minDistance() { return this._minDistance; }
 
@@ -97,10 +99,12 @@ class Camera {
    * Maximum distance from lookAtPosition
    * @type number
    * @example
+   * ```ts
    * import View3D from "@egjs/view3d";
    *
    * const view3d = new View3D("#view3d-canvas");
    * view3d.camera.maxDistance = 400;
+   * ```
    */
   public get maxDistance() { return this._maxDistance; }
 

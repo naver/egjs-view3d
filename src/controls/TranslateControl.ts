@@ -48,18 +48,22 @@ class TranslateControl implements CameraControl {
    * @type THREE.Vector2
    * @see https://threejs.org/docs/#api/en/math/Vector2
    * @example
+   * ```ts
    * import { TranslateControl } from "@egjs/view3d";
    * const translateControl = new TranslateControl();
    * translateControl.scale.set(2, 2);
+   * ```
    */
   public get scale() { return this._userScale; }
   /**
    * Whether to apply CSS style `cursor: grab` on the target element or not
    * @default true
    * @example
+   * ```ts
    * import { TranslateControl } from "@egjs/view3d";
    * const translateControl = new TranslateControl();
    * translateControl.useGrabCursor = true;
+   * ```
    */
   public get useGrabCursor() { return this._useGrabCursor; }
   /**
@@ -67,12 +71,14 @@ class TranslateControl implements CameraControl {
    * When this is true, camera's pivot change will correspond same amount you've dragged.
    * @default true
    * @example
+   * ```ts
    * import View3D, { TranslateControl } from "@egjs/view3d";
    * const view3d = new View3D("#view3d-canvas");
    * const translateControl = new TranslateControl();
    * translateControl.scaleToElement = true;
    * view3d.controller.add(translateControl);
    * view3d.resize();
+   * ```
    */
   public get scaleToElement() { return this._scaleToElement; }
   /**
@@ -107,7 +113,6 @@ class TranslateControl implements CameraControl {
    * @param {THREE.Vector2} [options.scale=new THREE.Vector2(1, 1)] Scale factor for translation.
    * @param {boolean} [options.useGrabCursor=true] Whether to apply CSS style `cursor: grab` on the target element or not.
    * @param {boolean} [options.scaleToElement=true] Whether to scale control to fit element size.
-   * @tutorial Adding Controls
    */
   public constructor({
     element = DEFAULT.NULL_ELEMENT,

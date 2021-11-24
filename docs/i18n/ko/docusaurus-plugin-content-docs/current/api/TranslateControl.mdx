@@ -1,0 +1,191 @@
+---
+custom_edit_url: null
+---
+
+```ts
+class TranslateControl implements CameraControl
+```
+Model's translation control that supports both mouse & touch
+
+<div className="container">
+  <div className="row mb-2"><div className="col col--6"><strong>Properties</strong></div><div className="col col--6"><strong>Methods</strong></div></div>
+  <div className="row"><div className="col col--6"><a href="#element">element</a><br/><a href="#scale">scale</a><br/><a href="#useGrabCursor">useGrabCursor</a><br/><a href="#scaleToElement">scaleToElement</a><br/><a href="#enabled">enabled</a></div><div className="col col--6"><a href="#destroy">destroy</a><br/><a href="#update">update</a><br/><a href="#resize">resize</a><br/><a href="#enable">enable</a><br/><a href="#disable">disable</a><br/><a href="#sync">sync</a><br/><a href="#setElement">setElement</a></div></div>
+</div>
+
+## Constructor
+```ts
+new TranslateControl(options, options.element, options.easing, options.scale, options.useGrabCursor, options.scaleToElement)
+```
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|options|object|✔️|{}|Options|
+|options.element|HTMLElement \| null|✔️||Target element.|
+|options.easing|function|✔️|(x: number) => 1 - Math.pow(1 - x, 3)|Motion's easing function.|
+|options.scale|THREE.Vector2|✔️|new THREE.Vector2(1, 1)|Scale factor for translation.|
+|options.useGrabCursor|boolean|✔️|true|Whether to apply CSS style `cursor: grab` on the target element or not.|
+|options.scaleToElement|boolean|✔️|true|Whether to scale control to fit element size.|
+
+## Properties
+
+### element {#element}
+
+<div className="bulma-tags">
+  <span className="bulma-tag is-warning">readonly</span>
+</div>
+
+Control's current target element to attach event listeners
+
+### scale {#scale}
+
+<div className="bulma-tags">
+
+</div>
+
+Scale factor for translation
+
+**Type**: THREE.Vector2
+
+**See**:
+- https://threejs.org/docs/#api/en/math/Vector2
+```ts
+import { TranslateControl } from "@egjs/view3d";
+const translateControl = new TranslateControl();
+translateControl.scale.set(2, 2);
+```
+
+### useGrabCursor {#useGrabCursor}
+
+<div className="bulma-tags">
+
+</div>
+
+Whether to apply CSS style `cursor: grab` on the target element or not
+
+**Default**: true
+
+```ts
+import { TranslateControl } from "@egjs/view3d";
+const translateControl = new TranslateControl();
+translateControl.useGrabCursor = true;
+```
+
+### scaleToElement {#scaleToElement}
+
+<div className="bulma-tags">
+
+</div>
+
+Scale control to fit element size.<br />When this is true, camera's pivot change will correspond same amount you've dragged.
+
+**Default**: true
+
+```ts
+import View3D, { TranslateControl } from "@egjs/view3d";
+const view3d = new View3D("#view3d-canvas");
+const translateControl = new TranslateControl();
+translateControl.scaleToElement = true;
+view3d.controller.add(translateControl);
+view3d.resize();
+```
+
+### enabled {#enabled}
+
+<div className="bulma-tags">
+  <span className="bulma-tag is-warning">readonly</span>
+</div>
+
+Whether this control is enabled or not
+
+## Methods
+
+### destroy {#destroy}
+
+<div className="bulma-tags">
+
+</div>
+
+Destroy the instance and remove all event listeners attached<br />This also will reset CSS cursor to intial
+
+**Returns**: void
+- Nothing
+
+### update {#update}
+
+<div className="bulma-tags">
+
+</div>
+
+Update control by given deltaTime
+
+**Returns**: void
+- Nothing
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|deltaTime|[Camera](Camera)|||Number of milisec to update|
+|deltaTime|number||||
+
+### resize {#resize}
+
+<div className="bulma-tags">
+
+</div>
+
+Resize control to match target size<br />This method is only meaningful when [scaleToElementSize](RotateControl#scaleToElementSize) is enabled
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|size|THREE.Vector2|||[THREE.Vector2](https://threejs#org/docs/#api/en/math/Vector2) instance of width(x), height(y)|
+
+### enable {#enable}
+
+<div className="bulma-tags">
+
+</div>
+
+Enable this input and add event listeners
+
+**Returns**: void
+- Nothing
+
+### disable {#disable}
+
+<div className="bulma-tags">
+
+</div>
+
+Disable this input and remove all event handlers
+
+**Returns**: void
+- Nothing
+
+### sync {#sync}
+
+<div className="bulma-tags">
+
+</div>
+
+Synchronize this control's state to given camera position
+
+**Returns**: void
+- Nothing
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|camera|[Camera](Camera)|||Camera to match state|
+
+### setElement {#setElement}
+
+<div className="bulma-tags">
+
+</div>
+
+Set target element to attach event listener
+
+**Returns**: void
+- Nothing
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|element|HTMLElement|||target element|
+

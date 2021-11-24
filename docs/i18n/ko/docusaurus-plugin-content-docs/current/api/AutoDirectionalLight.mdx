@@ -1,0 +1,97 @@
+---
+custom_edit_url: null
+---
+
+```ts
+class AutoDirectionalLight implements Environment
+```
+THREE.DirectionalLight wrapper that will automatically update its shadow size to model<br />Shadow is enabled by default, use [disableShadow](AutoDirectionalLight#disableShadow) to disable it
+
+<div className="container">
+  <div className="row mb-2"><div className="col col--6"><strong>Properties</strong></div><div className="col col--6"><strong>Methods</strong></div></div>
+  <div className="row"><div className="col col--6"><a href="#objects">objects</a><br/><a href="#light">light</a><br/><a href="#position">position</a></div><div className="col col--6"><a href="#enableShadow">enableShadow</a><br/><a href="#disableShadow">disableShadow</a><br/><a href="#fit">fit</a></div></div>
+</div>
+
+## Constructor
+```ts
+new AutoDirectionalLight(color, intensity, options, options.direction)
+```
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|color|string \| number \| THREE.Color|✔️|"#ffffff"|Color of the light|
+|intensity|number|✔️|1|Intensity of the light|
+|options|object|✔️|{}|Additional options|
+|options.direction|THREE.Vector3|✔️|new THREE.Vector3(-1, -1, -1)|Direction of the light|
+
+## Properties
+
+### objects {#objects}
+
+<div className="bulma-tags">
+
+</div>
+
+Array of lights that used in this preset
+
+**Returns**: THREE.Object3D[]
+
+**See**:
+- https://threejs.org/docs/#api/en/lights/Light
+
+### light {#light}
+
+<div className="bulma-tags">
+
+</div>
+
+The actual THREE.DirectionalLight
+
+**Type**: THREE#DirectionalLight
+
+**See**:
+- https://threejs.org/docs/#api/en/lights/DirectionalLight
+
+### position {#position}
+
+<div className="bulma-tags">
+
+</div>
+
+Position of the light
+
+**Type**: THREE#Vector3
+
+**See**:
+- https://threejs.org/docs/#api/en/math/Vector3
+
+## Methods
+
+### enableShadow {#enableShadow}
+
+<div className="bulma-tags">
+
+</div>
+
+Make light cast a shadow
+
+### disableShadow {#disableShadow}
+
+<div className="bulma-tags">
+
+</div>
+
+Make light don't cast a shadow
+
+### fit {#fit}
+
+<div className="bulma-tags">
+
+</div>
+
+Modify light's position & shadow camera size from model's bounding box
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|model|[Model](Model)|||Model to fit size|
+|scale||✔️|{}|Scale factor for shadow camera size|
+

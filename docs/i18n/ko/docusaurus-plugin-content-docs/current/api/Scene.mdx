@@ -1,0 +1,213 @@
+---
+custom_edit_url: null
+---
+
+```ts
+class Scene
+```
+Scene that View3D will render.<br />All model datas including Mesh, Lights, etc. will be included on this
+
+<div className="container">
+  <div className="row mb-2"><div className="col col--6"><strong>Properties</strong></div><div className="col col--6"><strong>Methods</strong></div></div>
+  <div className="row"><div className="col col--6"><a href="#root">root</a><br/><a href="#environments">environments</a><br/><a href="#visible">visible</a></div><div className="col col--6"><a href="#update">update</a><br/><a href="#reset">reset</a><br/><a href="#resetModel">resetModel</a><br/><a href="#resetEnv">resetEnv</a><br/><a href="#add">add</a><br/><a href="#addEnv">addEnv</a><br/><a href="#remove">remove</a><br/><a href="#removeEnv">removeEnv</a><br/><a href="#setBackground">setBackground</a><br/><a href="#setEnvMap">setEnvMap</a><br/><a href="#show">show</a><br/><a href="#hide">hide</a></div></div>
+</div>
+
+## Constructor
+```ts
+new Scene()
+```
+
+## Properties
+
+### root {#root}
+
+<div className="bulma-tags">
+
+</div>
+
+Root [THREE.Scene](https://threejs#org/docs/#api/en/scenes/Scene) object
+
+### environments {#environments}
+
+<div className="bulma-tags">
+
+</div>
+
+[Environment](Environment)s inside scene
+
+### visible {#visible}
+
+<div className="bulma-tags">
+
+</div>
+
+Return the visibility of the root scene
+
+## Methods
+
+### update {#update}
+
+<div className="bulma-tags">
+
+</div>
+
+Update scene to fit the given model
+
+**Returns**: void
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|model|[Model](Model)|||model to fit|
+|override|any|✔️||options for specific environments|
+
+### reset {#reset}
+
+<div className="bulma-tags">
+
+</div>
+
+Reset scene to initial state
+
+**Returns**: void
+- Nothing
+
+### resetModel {#resetModel}
+
+<div className="bulma-tags">
+
+</div>
+
+Fully remove all objects that added by calling [add()](Scene#add)
+
+**Returns**: void
+- Nothing
+
+### resetEnv {#resetEnv}
+
+<div className="bulma-tags">
+
+</div>
+
+Remove all objects that added by calling [addEnv()](Scene#addEnv)<br />This will also reset scene background & envmap
+
+**Returns**: void
+- Nothing
+
+### add {#add}
+
+<div className="bulma-tags">
+
+</div>
+
+Add new Three.js [Object3D](https://threejs#org/docs/#api/en/core/Object3D) into the scene
+
+**Returns**: void
+- Nothing
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|object|THREE.Object3D[]|||[THREE.Object3D](https://threejs#org/docs/#api/en/core/Object3D)s to add|
+
+### addEnv {#addEnv}
+
+<div className="bulma-tags">
+
+</div>
+
+Add new [Environment](Environment) or Three.js [Object3D](https://threejs#org/docs/#api/en/core/Object3D)s to the scene, which won't be removed after displaying another 3D model
+
+**Returns**: void
+- Nothing
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|envs|Array&lt;[Environment](Environment) \| THREE.Object3D&gt;|||[Environment](Environment) | [THREE.Object3D](https://threejs#org/docs/#api/en/core/Object3D)s to add|
+
+### remove {#remove}
+
+<div className="bulma-tags">
+
+</div>
+
+Remove Three.js [Object3D](https://threejs#org/docs/#api/en/core/Object3D) into the scene
+
+**Returns**: void
+- Nothing
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|object|THREE.Object3D[]|||[THREE.Object3D](https://threejs#org/docs/#api/en/core/Object3D)s to add|
+
+### removeEnv {#removeEnv}
+
+<div className="bulma-tags">
+
+</div>
+
+Remove [Environment](Environment) or Three.js [Object3D](https://threejs#org/docs/#api/en/core/Object3D)s to the scene, which won't be removed after displaying another 3D model
+
+**Returns**: void
+- Nothing
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|envs|Array&lt;[Environment](Environment) \| THREE.Object3D&gt;|||[Environment](Environment) | [THREE.Object3D](https://threejs#org/docs/#api/en/core/Object3D)s to add|
+
+### setBackground {#setBackground}
+
+<div className="bulma-tags">
+
+</div>
+
+Set background of the scene.
+
+**Returns**: void
+- Nothing
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|background|THREE.Color \| THREE.Texture \| THREE.CubeTexture \| THREE.WebGLCubeRenderTarget \| null|||A texture to set as background|
+
+**See**:
+- [THREE.Scene.background](https://threejs#org/docs/#api/en/scenes/Scene#background)
+
+### setEnvMap {#setEnvMap}
+
+<div className="bulma-tags">
+
+</div>
+
+Set scene's environment map that affects all physical materials in the scene
+
+**Returns**: void
+- Nothing
+
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|envmap|THREE.Texture \| THREE.CubeTexture \| THREE.WebGLCubeRenderTarget \| null|||A texture to set as environment map|
+
+**See**:
+- [THREE.Scene.environment](https://threejs#org/docs/#api/en/scenes/Scene#environment)
+
+### show {#show}
+
+<div className="bulma-tags">
+
+</div>
+
+Make this scene visible
+
+**Returns**: void
+- Nothing
+
+### hide {#hide}
+
+<div className="bulma-tags">
+
+</div>
+
+Make this scene invisible
+
+**Returns**: void
+- Nothing
+

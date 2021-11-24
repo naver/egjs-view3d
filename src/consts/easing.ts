@@ -7,11 +7,13 @@
  * Collection of easing functions
  * @namespace EASING
  * @example
+ * ```ts
  * import View3D, { RotateControl, EASING } from "@egjs/view3d";
  *
  * new RotateControl({
  *  easing: EASING.EASE_OUT_CUBIC,
  * });
+ * ```
  */
 
 /**

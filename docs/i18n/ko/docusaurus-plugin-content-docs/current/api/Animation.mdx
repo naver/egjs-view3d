@@ -1,0 +1,66 @@
+---
+custom_edit_url: null
+---
+
+```ts
+class Animation extends Component
+```
+Self-running animation
+
+<div className="container">
+  <div className="row mb-2"><div className="col col--12"><strong>Events</strong></div></div>
+  <div className="row"><div className="col col--12"><a href="#event-progress">progress</a><br/><a href="#event-loop">loop</a><br/><a href="#event-finish">finish</a></div></div>
+</div>
+
+## Constructor
+```ts
+new Animation(options)
+```
+|PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
+|:---:|:---:|:---:|:---:|:---:|
+|options|object|✔️|{}|Options|
+
+## Events
+### progress {#event-progress}
+
+<div className="bulma-tags">
+
+</div>
+
+Fires for every animation frame when animation is active.
+
+**Type**: object
+
+|PROPERTY|TYPE|DESCRIPTION|
+|:---:|:---:|:---:|
+|event|object|Event object.|
+|event.progress|number|Current animation progress value.<br />Value is ranged from 0(start) to 1(end).|
+|event.easedProgress|number|Eased progress value.|
+
+### loop {#event-loop}
+
+<div className="bulma-tags">
+
+</div>
+
+Fires for every animation loop except for the last loop<br />This will be triggered only when repeat > 0
+
+**Type**: object
+
+|PROPERTY|TYPE|DESCRIPTION|
+|:---:|:---:|:---:|
+|event|object|Event object.|
+|event.progress|number|Current animation progress value.<br />Value is ranged from 0(start) to 1(end).|
+|event.easedProgress|number|Eased progress value.|
+|event.loopIndex|number|Index of the current loop.|
+
+### finish {#event-finish}
+
+<div className="bulma-tags">
+
+</div>
+
+Fires when animation ends.
+
+**Type**: void
+
