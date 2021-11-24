@@ -1,4 +1,7 @@
 import * as THREE from "three";
+
+import { cleanup, createSandbox } from "./test-utils";
+
 import View3DError from "~/View3DError";
 import {
   getCanvas,
@@ -11,10 +14,9 @@ import {
   circulate,
   merge,
   getBoxPoints,
-  toPowerOfTwo,
+  toPowerOfTwo
 } from "~/utils";
 import * as ERROR from "~/consts/error";
-import { cleanup, createSandbox } from "./test-utils";
 
 describe("Utils", () => {
   describe("getElement", () => {
@@ -110,7 +112,7 @@ describe("Utils", () => {
   describe("getCanvas", () => {
     it("can return canvas element in document if parameter is proper query string", () => {
       // Given
-      document.body.innerHTML = `<canvas id="view3d-canvas"></canvas>`;
+      document.body.innerHTML = "<canvas id=\"view3d-canvas\"></canvas>";
 
       // When
       const canvas = getCanvas("#view3d-canvas");
@@ -121,7 +123,7 @@ describe("Utils", () => {
 
     it("can return canvas element in document if parameter is proper HTML canvas element", () => {
       // Given
-      document.body.innerHTML = `<canvas id="view3d-canvas"></canvas>`;
+      document.body.innerHTML = "<canvas id=\"view3d-canvas\"></canvas>";
 
       // When
       const canvas = getCanvas(document.querySelector("#view3d-canvas") as HTMLElement);
@@ -162,7 +164,7 @@ describe("Utils", () => {
 
     it("should throw an 'Element is not canvas' error when found element is not a canvas element", () => {
       // Given
-      document.body.innerHTML = `<div id="view3d-canvas"></div>`;
+      document.body.innerHTML = "<div id=\"view3d-canvas\"></div>";
 
       try {
         // When

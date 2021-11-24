@@ -1,4 +1,5 @@
 import * as THREE from "three";
+
 import Model from "~/core/Model";
 
 describe("Model", () => {

@@ -4,9 +4,11 @@
  */
 
 import * as THREE from "three";
+
+import Model from "../core/Model";
+import { getBoxPoints } from "../utils";
+
 import Environment from "./Environment";
-import Model from "~/core/Model";
-import { getBoxPoints } from "~/utils";
 
 /**
  * THREE.DirectionalLight wrapper that will automatically update its shadow size to model
@@ -48,8 +50,8 @@ class AutoDirectionalLight implements Environment {
    * @param {object} [options={}] Additional options
    * @param {THREE.Vector3} [options.direction=new THREE.Vector3(-1, -1, -1)] Direction of the light
    */
-  constructor(color: string | number | THREE.Color = "#ffffff", intensity: number = 1, {
-    direction = new THREE.Vector3(-1, -1, -1),
+  public constructor(color: string | number | THREE.Color = "#ffffff", intensity: number = 1, {
+    direction = new THREE.Vector3(-1, -1, -1)
   } = {}) {
     this._light = new THREE.DirectionalLight(color, intensity);
 
@@ -83,7 +85,7 @@ class AutoDirectionalLight implements Environment {
    * @param scale Scale factor for shadow camera size
    */
   public fit(model: Model, {
-    scale = 1.5,
+    scale = 1.5
   } = {}) {
     const bbox = model.bbox;
     const light = this._light;

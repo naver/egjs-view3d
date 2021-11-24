@@ -8,5 +8,5 @@ import ShadowPlane from "./ShadowPlane";
 
 export {
   AutoDirectionalLight,
-  ShadowPlane,
+  ShadowPlane
 };

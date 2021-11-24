@@ -4,10 +4,12 @@
  */
 
 import * as THREE from "three";
+
+import Environment from "../environments/Environment";
+import { STANDARD_MAPS } from "../consts/internal";
+import { findIndex } from "../utils";
+
 import Model from "./Model";
-import Environment from "~/environments/Environment";
-import { STANDARD_MAPS } from "~/consts/internal";
-import { findIndex } from "~/utils";
 
 /**
  * Scene that View3D will render.
@@ -38,7 +40,7 @@ class Scene {
   /**
    * Create new Scene instance
    */
-  constructor() {
+  public constructor() {
     this._root = new THREE.Scene();
     this._userObjects = new THREE.Group();
     this._envObjects = new THREE.Group();
@@ -108,7 +110,7 @@ class Scene {
    * @param envs {@link Environment} | {@link https://threejs.org/docs/#api/en/core/Object3D THREE.Object3D}s to add
    * @returns {void} Nothing
    */
-  public addEnv(...envs: (Environment | THREE.Object3D)[]): void {
+  public addEnv(...envs: Array<Environment | THREE.Object3D>): void {
     envs.forEach(env => {
       if ((env as THREE.Object3D).isObject3D) {
         this._envObjects.add(env as THREE.Object3D);
@@ -133,7 +135,7 @@ class Scene {
    * @param envs {@link Environment} | {@link https://threejs.org/docs/#api/en/core/Object3D THREE.Object3D}s to add
    * @returns {void} Nothing
    */
-  public removeEnv(...envs: (Environment | THREE.Object3D)[]): void {
+  public removeEnv(...envs: Array<Environment | THREE.Object3D>): void {
     envs.forEach(env => {
       if ((env as THREE.Object3D).isObject3D) {
         this._envObjects.remove(env as THREE.Object3D);

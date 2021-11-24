@@ -4,12 +4,14 @@
  */
 
 import * as THREE from "three";
-import ARHoverRotateControl, { ARHoverRotateControlOption } from "./ARHoverRotateControl";
-import ARHoverTranslateControl, { ARHoverTranslateControlOption } from "./ARHoverTranslateControl";
+
 import ARScaleControl, { ARScaleControlOption } from "../common/ARScaleControl";
 import DeadzoneChecker from "../common/DeadzoneChecker";
-import * as TOUCH from "~/consts/touch";
-import { XRRenderContext, XRContext } from "~/type/internal";
+import * as TOUCH from "../../../consts/touch";
+import { XRRenderContext, XRContext } from "../../../type/internal";
+
+import ARHoverRotateControl, { ARHoverRotateControlOption } from "./ARHoverRotateControl";
+import ARHoverTranslateControl, { ARHoverTranslateControlOption } from "./ARHoverTranslateControl";
 
 /**
  * Options for the {@link ARHoverControl}
@@ -63,7 +65,7 @@ class ARHoverControl {
    * Create new instance of ARHoverControl
    * @param {ARHoverControlOption} options Options
    */
-  constructor(options: Partial<ARHoverControlOption> = {}) {
+  public constructor(options: Partial<ARHoverControlOption> = {}) {
     this._rotateControl = new ARHoverRotateControl(options.rotate);
     this._translateControl = new ARHoverTranslateControl(options.translate);
     this._scaleControl = new ARScaleControl(options.scale);
@@ -177,11 +179,11 @@ class ARHoverControl {
         this._modelHit = true;
       }
     }
-  }
+  };
 
   public onSelectEnd = () => {
     this.deactivate();
-  }
+  };
 
   private _checkDeadzone(ctx: XRRenderContext, inputSources: any[]) {
     const coords = this._inputSourceToVector(inputSources);
@@ -209,7 +211,7 @@ class ARHoverControl {
         rotateControl.setInitialPos(coords);
         break;
       case TOUCH.GESTURE.PINCH:
-        scaleControl.activate(ctx, gesture);
+        scaleControl.activate(ctx);
         scaleControl.setInitialPos(coords);
         break;
     }

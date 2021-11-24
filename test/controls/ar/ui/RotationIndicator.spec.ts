@@ -1,4 +1,5 @@
 import * as THREE from "three";
+
 import RotationIndicator from "~/controls/ar/ui/RotationIndicator";
 
 describe("RotationIndicator", () => {

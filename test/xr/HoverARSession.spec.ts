@@ -1,7 +1,8 @@
 import * as sinon from "sinon";
-import HoverARSession from "~/xr/HoverARSession";
-import ARHoverControl from "~/controls/ar/hover/ARHoverControl"
 import { createXRRenderingContext } from "test/test-utils";
+
+import HoverARSession from "~/xr/HoverARSession";
+import ARHoverControl from "~/controls/ar/hover/ARHoverControl";
 
 
 describe("HoverARSession", () => {

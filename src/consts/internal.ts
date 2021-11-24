@@ -17,5 +17,5 @@ export const STANDARD_MAPS = [
   "map",
   "metalnessMap",
   "normalMap",
-  "roughnessMap",
+  "roughnessMap"
 ];

@@ -1,4 +1,5 @@
 import * as sinon from "sinon";
+
 import OrbitControl from "~/controls/OrbitControl";
 import RotateControl from "~/controls/RotateControl";
 import TranslateControl from "~/controls/TranslateControl";

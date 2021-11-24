@@ -4,14 +4,16 @@
  */
 
 import * as THREE from "three";
+
+import View3DError from "../View3DError";
+import Camera from "../core/camera/Camera";
+import { getElement } from "../utils";
+import { EVENTS } from "../consts/event";
+import * as DEFAULT from "../consts/default";
+import * as ERROR from "../consts/error";
+
 import CameraControl from "./CameraControl";
 import Motion from "./Motion";
-import View3DError from "~/View3DError";
-import Camera from "~/core/camera/Camera";
-import { getElement } from "~/utils";
-import { EVENTS } from "~/consts/event";
-import * as DEFAULT from "~/consts/default";
-import * as ERROR from "~/consts/error";
 
 /**
  * Distance controller handling both mouse wheel and pinch zoom
@@ -59,11 +61,11 @@ class DistanceControl implements CameraControl {
    * @param {object} [options.range={min: 0, max: 500}] Motion's range.
    * @param {function} [options.easing=(x: number) => 1 - Math.pow(1 - x, 3)] Motion's easing function.
    */
-  constructor({
+  public constructor({
     element = DEFAULT.NULL_ELEMENT,
     duration = DEFAULT.ANIMATION_DURATION,
     range = DEFAULT.DISTANCE_RANGE,
-    easing = DEFAULT.EASING,
+    easing = DEFAULT.EASING
   } = {}) {
     const targetEl = getElement(element);
     if (targetEl) {
@@ -92,7 +94,7 @@ class DistanceControl implements CameraControl {
     camera.distance += motion.update(deltaTime);
   }
 
-  // This is not documetned on purpose as it doesn't do nothing
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public resize(size: THREE.Vector2) {
     // DO NOTHING
   }
@@ -152,7 +154,7 @@ class DistanceControl implements CameraControl {
     this._targetEl = element;
   }
 
-  private _onWheel = (evt: MouseWheelEvent) => {
+  private _onWheel = (evt: WheelEvent) => {
     if (evt.deltaY === 0) return;
 
     evt.preventDefault();
@@ -162,7 +164,7 @@ class DistanceControl implements CameraControl {
     const delta = this._scale * this._scaleModifier * evt.deltaY;
 
     animation.setEndDelta(delta);
-  }
+  };
 
   private _onTouchMove = (evt: TouchEvent) => {
     const touches = evt.touches;
@@ -187,11 +189,11 @@ class DistanceControl implements CameraControl {
     if (prevTouchDistance < 0) return;
 
     animation.setEndDelta(delta);
-  }
+  };
 
   private _onTouchEnd = () => {
     this._prevTouchDistance = -1;
-  }
+  };
 }
 
 export default DistanceControl;

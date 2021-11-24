@@ -23,5 +23,5 @@ export const EVENT = {
   RESIZE: "resize",
   CONTEXT_MENU: "contextmenu",
   MOUSE_ENTER: "mouseenter",
-  MOUSE_LEAVE: "mouseleave",
-}
+  MOUSE_LEAVE: "mouseleave"
+};

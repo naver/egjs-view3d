@@ -1,4 +1,5 @@
 import * as THREE from "three";
+
 import Scene from "~/core/Scene";
 import AutoDirectionalLight from "~/environments/AutoDirectionalLight";
 
@@ -92,7 +93,7 @@ describe("Scene", () => {
 
     // Then
     expect(scene.root.getObjectById(testObj.id)).to.be.undefined;
-    expect(scene.environments).to.be.empty
+    expect(scene.environments).to.be.empty;
   });
 
   it("won't remove user objects on env reset", () => {

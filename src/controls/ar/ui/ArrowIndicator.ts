@@ -4,7 +4,8 @@
  */
 
 import * as THREE from "three";
-import { range } from "~/utils";
+
+import { range } from "../../../utils";
 
 /**
  * Options for {@link ArrowIndicator}
@@ -33,8 +34,8 @@ class ArrowIndicator {
    * Create new ArrowIndicator
    * @param {ArrowIndicatorOption} [options={}] Options
    */
-  constructor({
-    color = 0xffffff,
+  public constructor({
+    color = 0xffffff
   }: Partial<ArrowIndicatorOption> = {}) {
     const bodyGeometry = new THREE.CylinderBufferGeometry(0.1, 0.1, 1);
     const coneGeometry = new THREE.CylinderBufferGeometry(0, 0.5, 1, 30, 1);
@@ -91,7 +92,7 @@ class ArrowIndicator {
    * @param offset Offset vector.
    */
   public updateOffset(offset: THREE.Vector3) {
-    this._arrows.forEach((arrow, idx) => {
+    this._arrows.forEach(arrow => {
       const facingDirection = new THREE.Vector3(0, 1, 0).applyQuaternion(arrow.quaternion);
       const facingOffset = facingDirection.multiply(offset);
 

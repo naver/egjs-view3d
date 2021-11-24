@@ -4,6 +4,7 @@
  */
 
 import * as THREE from "three";
+
 import Scene from "./Scene";
 import Camera from "./camera/Camera";
 
@@ -49,14 +50,14 @@ class Renderer {
    * Create new Renderer instance
    * @param canvas \<canvas\> element to render 3d model
    */
-  constructor(canvas: HTMLCanvasElement) {
+  public constructor(canvas: HTMLCanvasElement) {
     this._canvas = canvas;
 
     this._renderer = new THREE.WebGLRenderer({
       canvas: this._canvas,
       alpha: true,
       antialias: true,
-      preserveDrawingBuffer: true,
+      preserveDrawingBuffer: true
     });
 
     this._renderer.xr.enabled = true;

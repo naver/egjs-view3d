@@ -4,7 +4,8 @@
  */
 
 import * as THREE from "three";
-import { toPowerOfTwo } from "~/utils";
+
+import { toPowerOfTwo } from "../../../utils";
 
 /**
  * Options for {@link ScaleUI}
@@ -59,12 +60,12 @@ class ScaleUI {
    * Create new instance of ScaleUI
    * @param {ScaleUIOption} [options={}] Options
    */
-  constructor({
+  public constructor({
     width = 0.1,
     padding = 20,
     offset = 0.05,
     font = "64px sans-serif",
-    color = "white",
+    color = "white"
   }: Partial<ScaleUIOption> = {}) {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d")!;
@@ -96,7 +97,7 @@ class ScaleUI {
       uiGeometry,
       new THREE.MeshBasicMaterial({
         map: this._texture,
-        transparent: true,
+        transparent: true
       }),
     );
     mesh.matrixAutoUpdate = false;

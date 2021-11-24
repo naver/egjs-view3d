@@ -144,6 +144,7 @@
         "@typescript-eslint/explicit-module-boundary-types": "off",
         "@typescript-eslint/restrict-template-expressions": "off",
         "@typescript-eslint/unbound-method": "off",
+        "@typescript-eslint/require-await": "off",
         "@typescript-eslint/semi": [
           "error",
           "always"

@@ -4,13 +4,16 @@
  */
 
 import * as THREE from "three";
+
+import Animation from "../core/Animation";
+import ARFloorControl, { ARFloorControlOption } from "../controls/ar/floor/ARFloorControl";
+import { merge } from "../utils";
+import * as XR from "../consts/xr";
+import { XRRenderContext, XRContext } from "../type/internal";
+
 import WebARSession, { WebARSessionOption } from "./WebARSession";
 import HitTest from "./features/HitTest";
-import Animation from "~/core/Animation";
-import ARFloorControl, { ARFloorControlOption } from "~/controls/ar/floor/ARFloorControl";
-import { merge } from "~/utils";
-import * as XR from "~/consts/xr";
-import { XRRenderContext, XRContext } from "~/type/internal";
+
 
 /**
  * Options for {@link FloorARSession}.
@@ -46,7 +49,7 @@ class FloorARSession extends WebARSession {
    * Create new instance of FloorARSession
    * @param {FloorARSessionOption} options Options
    */
-  constructor(options: Partial<FloorARSessionOption> = {}) {
+  public constructor(options: Partial<FloorARSessionOption> = {}) {
     super(options);
 
     this._control = null;
@@ -68,7 +71,7 @@ class FloorARSession extends WebARSession {
 
     view3d.scene.hide();
     this._hitTest.init(session);
-  }
+  };
 
   public onEnd = (ctx: XRContext) => {
     const { view3d, session } = ctx;
@@ -86,7 +89,7 @@ class FloorARSession extends WebARSession {
     this._control = null;
 
     view3d.scene.show();
-  }
+  };
 
   protected _beforeRender = (ctx: XRRenderContext) => {
     this._renderContext = ctx;
@@ -95,7 +98,7 @@ class FloorARSession extends WebARSession {
     } else {
       this._control!.update(ctx);
     }
-  }
+  };
 
   private _initModelPosition(ctx: XRRenderContext) {
     const {view3d, frame, session} = ctx;
@@ -105,7 +108,7 @@ class FloorARSession extends WebARSession {
     // Make sure the model is loaded
     if (!hitTest.ready || !model) return;
 
-    const control = this._control!;
+    const control = this._control;
     const referenceSpace = view3d.renderer.threeRenderer.xr.getReferenceSpace();
     const hitTestResults = hitTest.getResults(frame);
 
@@ -151,7 +154,7 @@ class FloorARSession extends WebARSession {
     });
     scaleUpAnimation.on("finish", () => {
       modelRoot.scale.copy(originalModelScale);
-      control.init(ctx, hitPosition);
+      control!.init(ctx, hitPosition);
     });
     scaleUpAnimation.start();
   }
@@ -159,13 +162,13 @@ class FloorARSession extends WebARSession {
   private _onSelectStart = (e) => {
     this._control!.onSelectStart({
       ...this._renderContext!,
-      frame: e.frame,
+      frame: e.frame
     });
-  }
+  };
 
   private _onSelectEnd = () => {
     this._control!.onSelectEnd();
-  }
+  };
 }
 
 export default FloorARSession;

@@ -4,9 +4,11 @@
  */
 
 import * as THREE from "three";
+
+import CameraControl from "../../controls/CameraControl";
+import { findIndex } from "../../utils";
+
 import Camera from "./Camera";
-import CameraControl from "~/controls/CameraControl";
-import { findIndex } from "~/utils";
 
 /**
  * Controller that controls camera of the View3D
@@ -25,7 +27,7 @@ class Controller {
   /**
    * Create new Controller instance
    */
-  constructor(canvas: HTMLCanvasElement, camera: Camera) {
+  public constructor(canvas: HTMLCanvasElement, camera: Camera) {
     this._canvas = canvas;
     this._camera = camera;
   }

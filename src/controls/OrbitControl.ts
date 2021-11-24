@@ -4,15 +4,17 @@
  */
 
 import * as THREE from "three";
+
+import Camera from "../core/camera/Camera";
+import View3DError from "../View3DError";
+import { getElement } from "../utils";
+import * as ERROR from "../consts/error";
+import * as DEFAULT from "../consts/default";
+
 import CameraControl from "./CameraControl";
 import RotateControl from "./RotateControl";
 import TranslateControl from "./TranslateControl";
 import DistanceControl from "./DistanceControl";
-import Camera from "~/core/camera/Camera";
-import View3DError from "~/View3DError";
-import { getElement } from "~/utils";
-import * as ERROR from "~/consts/error";
-import * as DEFAULT from "~/consts/default";
 
 /**
  * Aggregation of {@link RotateControl}, {@link TranslateControl}, and {@link DistanceControl}.
@@ -57,16 +59,16 @@ class OrbitControl implements CameraControl {
    * @param {object} [options.distance={}] Constructor options of {@link DistanceControl}
    * @tutorial Adding Controls
    */
-  constructor({
+  public constructor({
     element = DEFAULT.NULL_ELEMENT,
     rotate = {},
     translate = {},
-    distance = {},
+    distance = {}
   }: Partial<{
-    rotate: ConstructorParameters<typeof RotateControl>[0],
-    translate: ConstructorParameters<typeof TranslateControl>[0],
-    distance: ConstructorParameters<typeof DistanceControl>[0],
-    element: HTMLElement | string | null,
+    rotate: ConstructorParameters<typeof RotateControl>[0];
+    translate: ConstructorParameters<typeof TranslateControl>[0];
+    distance: ConstructorParameters<typeof DistanceControl>[0];
+    element: HTMLElement | string | null;
   }> = {}) {
     this._targetEl = getElement(element);
     this._rotateControl = new RotateControl({ ...rotate, element: rotate.element || this._targetEl });

@@ -3,7 +3,7 @@
  * egjs projects are licensed under the MIT license
  */
 
-import { AnyFunction } from "~/type/external";
+import { AnyFunction } from "../type/external";
 
 type NoArguments = undefined | null | void | never;
 type EventMap = Record<string, any>;
@@ -17,10 +17,10 @@ type EventCallback<T extends EventMap, K extends EventKey<T>>
 
 class EventEmitter<T extends EventMap> {
   private _listenerMap: {
-    [keys: string]: EventCallback<T, EventKey<T>>[],
+    [keys: string]: Array<EventCallback<T, EventKey<T>>>;
   };
 
-  constructor() {
+  public constructor() {
     this._listenerMap = {};
   }
 
@@ -42,6 +42,7 @@ class EventEmitter<T extends EventMap> {
 
     const onceCallback = (...params: any[]) => {
       callback(params);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       this.off(eventName, onceCallback as any);
     };
 

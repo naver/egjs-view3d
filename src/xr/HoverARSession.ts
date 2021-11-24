@@ -4,12 +4,14 @@
  */
 
 import * as THREE from "three";
+
+import ARHoverControl, { ARHoverControlOption } from "../controls/ar/hover/ARHoverControl";
+import Animation from "../core/Animation";
+import { clamp } from "../utils";
+import * as XR from "../consts/xr";
+import { XRRenderContext, XRContext } from "../type/internal";
+
 import WebARSession, { WebARSessionOption } from "./WebARSession";
-import ARHoverControl, { ARHoverControlOption } from "~/controls/ar/hover/ARHoverControl";
-import Animation from "~/core/Animation";
-import * as XR from "~/consts/xr";
-import { XRRenderContext, XRContext } from "~/type/internal";
-import { clamp } from "~/utils";
 
 /**
  * Options for {@link HoverARSession}.
@@ -47,7 +49,7 @@ class HoverARSession extends WebARSession {
    * Create new instance of HoverARSession
    * @param {HoverARSessionOption} options Options
    */
-  constructor(options: Partial<HoverARSessionOption> = {}) {
+  public constructor(options: Partial<HoverARSessionOption> = {}) {
     super(options);
 
     this._control = null;
@@ -67,7 +69,7 @@ class HoverARSession extends WebARSession {
 
     const { session, view3d } = ctx;
     const modelRoot = view3d.model!.scene;
-    const control = this._control!;
+    const control = this._control;
 
     session.addEventListener(XR.EVENTS.SELECT_START, this._onSelectStart);
     session.addEventListener(XR.EVENTS.SELECT_END, this._onSelectEnd);
@@ -85,7 +87,7 @@ class HoverARSession extends WebARSession {
     });
     scaleUpAnimation.on("finish", () => {
       modelRoot.scale.copy(originalModelScale);
-      control.init(ctx);
+      control!.init(ctx);
     });
     scaleUpAnimation.start();
   }
@@ -98,7 +100,7 @@ class HoverARSession extends WebARSession {
     this._control = new ARHoverControl(this._options);
 
     view3d.scene.hide();
-  }
+  };
 
   public onEnd = (ctx: XRContext) => {
     const { view3d, session } = ctx;
@@ -115,7 +117,7 @@ class HoverARSession extends WebARSession {
     this._control = null;
 
     view3d.scene.show();
-  }
+  };
 
   protected _beforeRender = (ctx: XRRenderContext) => {
     this._renderContext = ctx;
@@ -125,7 +127,7 @@ class HoverARSession extends WebARSession {
     } else {
       this._control!.update(ctx);
     }
-  }
+  };
 
   private _initModelPosition(ctx: XRRenderContext) {
     const {view3d, xrCam} = ctx;
@@ -160,13 +162,13 @@ class HoverARSession extends WebARSession {
   private _onSelectStart = (e) => {
     this._control!.onSelectStart({
       ...this._renderContext!,
-      frame: e.frame,
+      frame: e.frame
     });
-  }
+  };
 
   private _onSelectEnd = () => {
     this._control!.onSelectEnd();
-  }
+  };
 }
 
 export default HoverARSession;

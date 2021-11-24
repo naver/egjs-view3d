@@ -3,9 +3,10 @@
  * egjs projects are licensed under the MIT license
  */
 
+import { IS_IOS, IS_SAFARI } from "../consts/browser";
+import { QUICKLOOK_SUPPORTED } from "../consts/xr";
+
 import XRSession from "./XRSession";
-import { IS_IOS, IS_SAFARI } from "~/consts/browser";
-import { QUICKLOOK_SUPPORTED } from "~/consts/xr";
 
 /**
  * AR Session using Apple AR Quick Look Viewer
@@ -28,12 +29,12 @@ class QuickLookSession implements XRSession {
    * @param {string} [options.file] USDZ file's location URL.
    * @param {boolean} [options.allowsContentScaling=true] Whether to allow content scaling.
    */
-  constructor({
+  public constructor({
     file,
-    allowsContentScaling = true,
+    allowsContentScaling = true
   }: {
-    file: string,
-    allowsContentScaling?: boolean,
+    file: string;
+    allowsContentScaling?: boolean;
   }) {
     this._file = file;
     this._allowsContentScaling = allowsContentScaling;
@@ -54,7 +55,7 @@ class QuickLookSession implements XRSession {
    * Enter QuickLook AR Session
    */
   public enter() {
-    const anchor = document.createElement("a") as HTMLAnchorElement;
+    const anchor = document.createElement("a") ;
     anchor.setAttribute("rel", "ar");
     anchor.appendChild(document.createElement("img"));
 

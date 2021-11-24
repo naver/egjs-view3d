@@ -4,7 +4,8 @@
  */
 
 import * as THREE from "three";
-import * as TOUCH from "~/consts/touch";
+
+import * as TOUCH from "../../../consts/touch";
 
 enum STATE {
   WAITING,
@@ -57,8 +58,8 @@ class DeadzoneChecker {
    * Create new DeadzoneChecker
    * @param {DeadzoneCheckerOption} [options={}] Options
    */
-  constructor({
-    size = 0.1,
+  public constructor({
+    size = 0.1
   }: Partial<DeadzoneCheckerOption> = {}) {
     this._size = size;
   }

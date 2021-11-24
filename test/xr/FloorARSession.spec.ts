@@ -1,7 +1,8 @@
 import * as sinon from "sinon";
-import FloorARSession from "~/xr/FloorARSession";
-import ARFloorControl from "~/controls/ar/floor/ARFloorControl"
 import { createXRRenderingContext } from "test/test-utils";
+
+import FloorARSession from "~/xr/FloorARSession";
+import ARFloorControl from "~/controls/ar/floor/ARFloorControl";
 
 describe("FloorARSession", () => {
   it("is webxr session", () => {

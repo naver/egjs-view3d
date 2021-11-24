@@ -4,13 +4,15 @@
  */
 
 import * as THREE from "three";
-import Motion from "~/controls/Motion";
+
 import RotationIndicator from "../ui/RotationIndicator";
-import * as DEFAULT from "~/consts/default";
-import * as TOUCH from "~/consts/touch";
-import { XRRenderContext, XRContext, XRInputs } from "~/type/internal";
-import { getRotationAngle } from "~/utils";
+import Motion from "../../../controls/Motion";
+import * as DEFAULT from "../../../consts/default";
+import { getRotationAngle } from "../../../utils";
+import { XRRenderContext, XRContext, XRInputs } from "../../../type/internal";
+
 import ARControl from "./ARControl";
+
 
 /**
  * Options for {@link ARSwirlControl}
@@ -65,9 +67,9 @@ class ARSwirlControl implements ARControl {
    * Create new ARSwirlControl
    * @param {ARSwirlControlOption} [options={}] Options
    */
-  constructor({
+  public constructor({
     scale = 1,
-    showIndicator = true,
+    showIndicator = true
   }: Partial<ARSwirlControlOption> = {}) {
     this._motion = new Motion({ range: DEFAULT.INFINITE_RANGE });
     this._userScale = scale;
@@ -112,7 +114,7 @@ class ARSwirlControl implements ARControl {
     this._enabled = false;
   }
 
-  public activate({ view3d }: XRRenderContext, gesture: TOUCH.GESTURE) {
+  public activate({ view3d }: XRRenderContext) {
     if (!this._enabled) return;
 
     this._active = true;

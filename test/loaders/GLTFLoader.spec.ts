@@ -1,6 +1,7 @@
-import GLTFLoader from "~/loaders/GLTFLoader";
 import { GLTFLoader as ThreeGLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
+
+import GLTFLoader from "~/loaders/GLTFLoader";
 import Model from "~/core/Model";
 import View3D from "~/View3D";
 

@@ -1,4 +1,5 @@
 import * as THREE from "three";
+
 import ModelAnimator from "~/core/ModelAnimator";
 
 describe("ModelAnimator", () => {
@@ -31,7 +32,7 @@ describe("ModelAnimator", () => {
     animator.setClips([clip]);
 
     // When
-    animator.reset()
+    animator.reset();
 
     // Then
     expect(animator.clips).to.be.empty;

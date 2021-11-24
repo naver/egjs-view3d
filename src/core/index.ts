@@ -20,5 +20,5 @@ export {
   XRManager,
   Camera,
   Controller,
-  Pose,
+  Pose
 };

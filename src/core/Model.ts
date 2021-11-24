@@ -27,13 +27,14 @@ class Model {
    * {@link https://threejs.org/docs/#api/en/animation/AnimationClip THREE.AnimationClip}s inside model
    */
   public get animations() { return this._animations; }
-  /***
+  /** *
    * {@link https://threejs.org/docs/#api/en/lights/Light THREE.Light}s inside model if there's any.
    * @readonly
    */
   public get lights() {
     return this._cachedLights ? this._cachedLights : this._getAllLights();
   }
+
   /**
    * {@link https://threejs.org/docs/#api/en/objects/Mesh THREE.Mesh}es inside model if there's any.
    * @readonly
@@ -41,6 +42,7 @@ class Model {
   public get meshes() {
     return this._cachedMeshes ? this._cachedMeshes : this._getAllMeshes();
   }
+
   /**
    * Get a copy of model's current bounding box
    * @type THREE#Box3
@@ -49,12 +51,14 @@ class Model {
   public get bbox() {
     return this._getTransformedBbox();
   }
+
   /**
    * Get a copy of model's initial bounding box without transform
    */
   public get initialBbox() {
     return this._initialBbox.clone();
   }
+
   /**
    * Model's bounding box size
    * Changing this will scale the model.
@@ -121,18 +125,18 @@ class Model {
   /**
    * Create new Model instance
    */
-  constructor({
+  public constructor({
     scenes,
     animations = [],
     fixSkinnedBbox = false,
     castShadow = true,
-    receiveShadow = false,
+    receiveShadow = false
   }: {
-    scenes: THREE.Object3D[],
-    animations?: THREE.AnimationClip[],
-    fixSkinnedBbox?: boolean,
-    castShadow?: boolean,
-    receiveShadow?: boolean,
+    scenes: THREE.Object3D[];
+    animations?: THREE.AnimationClip[];
+    fixSkinnedBbox?: boolean;
+    castShadow?: boolean;
+    receiveShadow?: boolean;
   }) {
     // This guarantees model's root has identity matrix at creation
     this._scene = new THREE.Group();
@@ -220,14 +224,14 @@ class Model {
           skinWeights.getX(posIdx),
           skinWeights.getY(posIdx),
           skinWeights.getZ(posIdx),
-          skinWeights.getW(posIdx),
+          skinWeights.getW(posIdx)
         ];
 
         const indicies = [
           skinIndicies.getX(posIdx),
           skinIndicies.getY(posIdx),
           skinIndicies.getZ(posIdx),
-          skinIndicies.getW(posIdx),
+          skinIndicies.getW(posIdx)
         ];
 
         weights.forEach((weight, index) => {

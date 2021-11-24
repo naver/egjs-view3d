@@ -3,9 +3,9 @@
  * egjs projects are licensed under the MIT license
  */
 
-import { clamp, mix, circulate } from "~/utils";
-import { Range } from "~/type/internal";
-import * as DEFAULT from "~/consts/default";
+import { clamp, mix, circulate } from "../utils";
+import * as DEFAULT from "../consts/default";
+import { Range } from "../type/internal";
 
 class Motion {
   // Options
@@ -35,11 +35,11 @@ class Motion {
   public set range(val: Range) { this._range = val; }
   public set easing(val: (x: number) => number) { this._easing = val; }
 
-  constructor({
+  public constructor({
     duration = DEFAULT.ANIMATION_DURATION,
     loop = DEFAULT.ANIMATION_LOOP,
     range = DEFAULT.ANIMATION_RANGE,
-    easing = DEFAULT.EASING,
+    easing = DEFAULT.EASING
   } = {}) {
     this._duration = duration;
     this._loop = loop;
@@ -66,8 +66,8 @@ class Motion {
     const nextProgress = this._progress + deltaTime / duration;
 
     this._progress = loop
-     ? circulate(nextProgress, 0, 1)
-     : clamp(nextProgress, 0, 1);
+      ? circulate(nextProgress, 0, 1)
+      : clamp(nextProgress, 0, 1);
 
     const easedProgress = this._easing(this._progress);
     this._val = mix(start, end, easedProgress);

@@ -3,7 +3,7 @@
  * egjs projects are licensed under the MIT license
  */
 
-import * as XR from "~/consts/xr";
+import * as XR from "../../consts/xr";
 
 /**
  * Manager for WebXR dom-overlay feature
@@ -32,9 +32,9 @@ class DOMOverlay {
    * @param {HTMLElement} [options.root] Overlay root element
    * @param {HTMLElement | null} [options.loadingEl] Model loading indicator element which will be invisible after placing model on the floor.
    */
-  constructor(options: {
-    root: HTMLElement,
-    loadingEl: HTMLElement | null,
+  public constructor(options: {
+    root: HTMLElement;
+    loadingEl: HTMLElement | null;
   }) {
     this._root = options.root;
     this._loadingEl = options.loadingEl;

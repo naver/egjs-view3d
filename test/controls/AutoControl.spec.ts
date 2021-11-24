@@ -1,4 +1,5 @@
 import Sinon, * as sinon from "sinon";
+
 import AutoControl from "~/controls/AutoControl";
 import View3DError from "~/View3DError";
 import * as ERROR from "~/consts/error";
@@ -12,11 +13,11 @@ describe("AutoControl", () => {
   });
 
   beforeEach(() => {
-    clock.reset()
+    clock.reset();
   });
 
   after(() => {
-    clock.restore()
+    clock.restore();
   });
 
   describe("Initial State", () => {
@@ -135,7 +136,7 @@ describe("AutoControl", () => {
         EVENTS.MOUSE_DOWN, EVENTS.MOUSE_UP,
         EVENTS.TOUCH_START, EVENTS.TOUCH_END,
         EVENTS.MOUSE_ENTER, EVENTS.MOUSE_LEAVE,
-        EVENTS.WHEEL,
+        EVENTS.WHEEL
       ]);
       const listenersRemoved = removeEventSpy.args.map(args => args[0]); // Take the first argument(event name) only
       expect(listenersRemoved.length).to.greaterThan(0);

@@ -6,5 +6,5 @@
 import TextureModel from "./TextureModel";
 
 export {
-  TextureModel,
+  TextureModel
 };

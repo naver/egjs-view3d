@@ -1,9 +1,10 @@
 import * as THREE from "three";
 import * as sinon from "sinon";
+import { createXRRenderingContext } from "test/test-utils";
+
 import ARWallTranslateControl from "~/controls/ar/wall/ARWallTranslateControl";
 import View3D from "~/View3D";
 import Model from "~/core/Model";
-import { createXRRenderingContext } from "test/test-utils";
 
 describe("ARWallTranslateControl", () => {
   describe("Initial properties", () => {
@@ -93,7 +94,7 @@ describe("ARWallTranslateControl", () => {
         hitPosition: new THREE.Vector3(5, 4, -23),
         hitRotation: new THREE.Quaternion().setFromEuler(new THREE.Euler(30, -41, 72)),
         modelPosition: new THREE.Vector3(1, -1, -1),
-        wallRotation: new THREE.Quaternion().setFromEuler(new THREE.Euler(0, -5, 1)),
+        wallRotation: new THREE.Quaternion().setFromEuler(new THREE.Euler(0, -5, 1))
       };
       const control = new ARWallTranslateControl();
 

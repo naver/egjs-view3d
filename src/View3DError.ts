@@ -4,12 +4,15 @@
  */
 
 class View3DError extends Error {
-  constructor(
-    public message: string,
-    public code: number) {
+  public code: number;
+
+  public constructor(message: string, code: number) {
     super(message);
+
     Object.setPrototypeOf(this, View3DError.prototype);
+
     this.name = "View3DError";
+    this.code = code;
   }
 }
 

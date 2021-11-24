@@ -14,7 +14,7 @@ export const EVENTS = {
   RESIZE: "resize",
   CONTEXT_MENU: "contextmenu",
   MOUSE_ENTER: "mouseenter",
-  MOUSE_LEAVE: "mouseleave",
+  MOUSE_LEAVE: "mouseleave"
 };
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button

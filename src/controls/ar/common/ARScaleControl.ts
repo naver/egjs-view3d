@@ -4,11 +4,12 @@
  */
 
 import * as THREE from "three";
-import ARControl from "./ARControl";
-import Motion from "~/controls/Motion";
+
 import ScaleUI from "../ui/ScaleUI";
-import * as TOUCH from "~/consts/touch";
-import { XRRenderContext, XRContext, XRInputs } from "~/type/internal";
+import Motion from "../../../controls/Motion";
+import { XRRenderContext, XRContext, XRInputs } from "../../../type/internal";
+
+import ARControl from "./ARControl";
 
 /**
  * Options for {@link ARScaleControl}
@@ -46,6 +47,7 @@ class ARScaleControl implements ARControl {
   public get scale() {
     return this._initialScale.clone().multiplyScalar(this._scaleMultiplier);
   }
+
   public get scaleMultiplier() { return this._scaleMultiplier; }
   /**
    * Range of the scale
@@ -57,9 +59,9 @@ class ARScaleControl implements ARControl {
    * Create new instance of ARScaleControl
    * @param {ARScaleControlOption} [options={}] Options
    */
-  constructor({
+  public constructor({
     min = 0.05,
-    max = 2,
+    max = 2
   } = {}) {
     this._motion = new Motion({ duration: 0, range: { min, max } });
     this._motion.reset(1); // default scale is 1(100%)
@@ -94,7 +96,7 @@ class ARScaleControl implements ARControl {
     this.deactivate();
   }
 
-  public activate(ctx: XRRenderContext, gesture: TOUCH.GESTURE) {
+  public activate(ctx: XRRenderContext) {
     this._active = true;
     this._ui.show();
     this._updateUIPosition(ctx);

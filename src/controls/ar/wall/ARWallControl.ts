@@ -4,14 +4,16 @@
  */
 
 import * as THREE from "three";
-import ARWallTranslateControl, { ARWallTranslateControlOption } from "./ARWallTranslateControl";
+
 import ARScaleControl, { ARScaleControlOption } from "../common/ARScaleControl";
 import DeadzoneChecker, { DeadzoneCheckerOption } from "../common/DeadzoneChecker";
 import ARSwirlControl, { ARSwirlControlOption } from "../common/ARSwirlControl";
 import FloorIndicator, { FloorIndicatorOption } from "../ui/FloorIndicator";
-import * as XR from "~/consts/xr";
-import * as TOUCH from "~/consts/touch";
-import { XRRenderContext, XRContext, XRInputs } from "~/type/internal";
+import * as XR from "../../../consts/xr";
+import * as TOUCH from "../../../consts/touch";
+import { XRRenderContext, XRContext, XRInputs } from "../../../type/internal";
+
+import ARWallTranslateControl, { ARWallTranslateControlOption } from "./ARWallTranslateControl";
 
 /**
  * Options for the {@link ARWallControl}
@@ -70,11 +72,11 @@ class ARWallControl {
    * Create new instance of ARControl
    * @param {ARWallControlOption} options Options
    */
-  constructor(options: Partial<ARWallControlOption> = {}) {
+  public constructor(options: Partial<ARWallControlOption> = {}) {
     // TODO: bind options
     this._rotateControl = new ARSwirlControl({
       ...options.rotate,
-      showIndicator: false,
+      showIndicator: false
     });
     this._translateControl = new ARWallTranslateControl(options.translate);
     this._scaleControl = new ARScaleControl(options.scale);
@@ -83,10 +85,10 @@ class ARWallControl {
   }
 
   public init(ctx: XRRenderContext, initialTransform: {
-    hitPosition: THREE.Vector3,
-    hitRotation: THREE.Quaternion,
-    wallRotation: THREE.Quaternion,
-    modelPosition: THREE.Vector3,
+    hitPosition: THREE.Vector3;
+    hitRotation: THREE.Quaternion;
+    wallRotation: THREE.Quaternion;
+    modelPosition: THREE.Vector3;
   }) {
     const { session, view3d, size } = ctx;
 
@@ -158,7 +160,7 @@ class ARWallControl {
     const xrInputs = {
       coords,
       inputSources,
-      hitResults,
+      hitResults
     };
 
     if (deadzoneChecker.inDeadzone) {
@@ -214,12 +216,12 @@ class ARWallControl {
     }
 
     this._floorIndicator.show();
-  }
+  };
 
   public onSelectEnd = () => {
     this.deactivate();
     this._floorIndicator.fadeout();
-  }
+  };
 
   private _checkDeadzone(ctx: XRRenderContext, { coords }: XRInputs) {
     const { model } = ctx;
@@ -234,17 +236,17 @@ class ARWallControl {
       case TOUCH.GESTURE.ONE_FINGER_HORIZONTAL:
       case TOUCH.GESTURE.ONE_FINGER_VERTICAL:
         if (this._modelHit) {
-          translateControl.activate(ctx, gesture);
+          translateControl.activate(ctx);
           translateControl.setInitialPos(coords);
         } else {
-          rotateControl.activate(ctx, gesture);
+          rotateControl.activate(ctx);
           rotateControl.updateAxis(new THREE.Vector3(0, 1, 0).applyQuaternion(translateControl.hitRotation));
           rotateControl.updateRotation(model.scene.quaternion);
           rotateControl.setInitialPos(coords);
         }
         break;
       case TOUCH.GESTURE.PINCH:
-        scaleControl.activate(ctx, gesture);
+        scaleControl.activate(ctx);
         scaleControl.setInitialPos(coords);
         break;
     }
@@ -265,7 +267,7 @@ class ARWallControl {
     const floorPosition = translateControl.wallPosition;
     view3d.scene.update(model, {
       floorPosition,
-      floorRotation: translateControl.hitRotation,
+      floorRotation: translateControl.hitRotation
     });
 
     // Get a scaled bbox, which only has scale applied on it.
@@ -283,7 +285,7 @@ class ARWallControl {
       delta: deltaMilisec,
       scale: boundingSphere.radius,
       position: floorPosition,
-      rotation: floorRotation,
+      rotation: floorRotation
     });
   }
 

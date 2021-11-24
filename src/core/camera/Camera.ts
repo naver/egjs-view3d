@@ -4,11 +4,13 @@
  */
 
 import * as THREE from "three";
+
+import AnimationControl from "../../controls/AnimationControl";
+import { toRadian, clamp, circulate } from "../../utils";
+import * as DEFAULT from "../../consts/default";
+
 import Pose from "./Pose";
 import Controller from "./Controller";
-import AnimationControl from "~/controls/AnimationControl";
-import { toRadian, clamp, circulate } from "~/utils";
-import * as DEFAULT from "~/consts/default";
 
 /**
  * Camera that renders the scene of View3D
@@ -127,6 +129,7 @@ class Camera {
     this._currentPose = val;
     this._controller.syncToCamera();
   }
+
   public set yaw(val: number) { this._currentPose.yaw = val; }
   public set pitch(val: number) { this._currentPose.pitch = val; }
   public set distance(val: number) { this._currentPose.distance = val; }
@@ -141,7 +144,7 @@ class Camera {
    * Create new Camera instance
    * @param canvas \<canvas\> element to render 3d model
    */
-  constructor(canvas: HTMLCanvasElement) {
+  public constructor(canvas: HTMLCanvasElement) {
     this._threeCamera = new THREE.PerspectiveCamera();
     this._controller = new Controller(canvas, this);
   }
@@ -204,10 +207,10 @@ class Camera {
    * @returns {void} Nothing
    */
   public setDefaultPose(newDefaultPose: Partial<{
-    yaw: number,
-    pitch: number,
-    distance: number,
-    pivot: THREE.Vector3,
+    yaw: number;
+    pitch: number;
+    distance: number;
+    pivot: THREE.Vector3;
   }>): void {
     const defaultPose = this._defaultPose;
     const { yaw, pitch, distance, pivot } = newDefaultPose;

@@ -4,13 +4,15 @@
  */
 
 import * as THREE from "three";
+
+import ARWallControl, { ARWallControlOption } from "../controls/ar/wall/ARWallControl";
+import Animation from "../core/Animation";
+import { merge } from "../utils";
+import * as XR from "../consts/xr";
+import { XRRenderContext, XRContext } from "../type/internal";
+
 import WebARSession, { WebARSessionOption } from "./WebARSession";
 import HitTest from "./features/HitTest";
-import ARWallControl, { ARWallControlOption } from "~/controls/ar/wall/ARWallControl";
-import Animation from "~/core/Animation";
-import { merge } from "~/utils";
-import * as XR from "~/consts/xr";
-import { XRRenderContext, XRContext } from "~/type/internal";
 
 /**
  * Options for {@link WallARSession}.
@@ -47,7 +49,7 @@ class WallARSession extends WebARSession {
    * Create new instance of WallARSession
    * @param {WallARSessionOption} [options={}] Options
    */
-  constructor(options: Partial<WallARSessionOption> = {}) {
+  public constructor(options: Partial<WallARSessionOption> = {}) {
     super(options);
 
     this._control = null;
@@ -69,7 +71,7 @@ class WallARSession extends WebARSession {
 
     view3d.scene.hide();
     this._hitTest.init(session);
-  }
+  };
 
   public onEnd = (ctx: XRContext) => {
     const { view3d, session } = ctx;
@@ -87,7 +89,7 @@ class WallARSession extends WebARSession {
     this._control = null;
 
     view3d.scene.show();
-  }
+  };
 
   protected _beforeRender = (ctx: XRRenderContext) => {
     this._renderContext = ctx;
@@ -96,7 +98,7 @@ class WallARSession extends WebARSession {
     } else {
       this._control!.update(ctx);
     }
-  }
+  };
 
   private _initModelPosition(ctx: XRRenderContext) {
     const {view3d, frame, session} = ctx;
@@ -106,7 +108,7 @@ class WallARSession extends WebARSession {
     // Make sure the model is loaded
     if (!hitTest.ready || !model) return;
 
-    const control = this._control!;
+    const control = this._control;
     const referenceSpace = view3d.renderer.threeRenderer.xr.getReferenceSpace();
     const hitTestResults = hitTest.getResults(frame);
 
@@ -169,11 +171,11 @@ class WallARSession extends WebARSession {
     });
     scaleUpAnimation.on("finish", () => {
       model.scene.scale.copy(originalModelScale);
-      control.init(ctx, {
+      control!.init(ctx, {
         hitPosition,
         hitRotation,
         wallRotation,
-        modelPosition,
+        modelPosition
       });
     });
     scaleUpAnimation.start();
@@ -182,13 +184,13 @@ class WallARSession extends WebARSession {
   private _onSelectStart = (e) => {
     this._control!.onSelectStart({
       ...this._renderContext!,
-      frame: e.frame,
+      frame: e.frame
     });
-  }
+  };
 
   private _onSelectEnd = () => {
     this._control!.onSelectEnd();
-  }
+  };
 }
 
 export default WallARSession;

@@ -1,7 +1,9 @@
 import * as sinon from "sinon";
+
+import XRSessionMock from "../xr/XRSessionMock";
+
 import View3D from "~/View3D";
 import XRManager from "~/core/XRManager";
-import XRSessionMock from "../xr/XRSessionMock";
 
 describe("XRManager", () => {
   describe("Default properties", () => {

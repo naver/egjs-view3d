@@ -1,9 +1,10 @@
 import * as THREE from "three";
 import * as sinon from "sinon";
+import { createXRRenderingContext } from "test/test-utils";
+
 import View3D from "~/View3D";
 import Model from "~/core/Model";
 import ARSwirlControl from "~/controls/ar/common/ARSwirlControl";
-import { createXRRenderingContext } from "test/test-utils";
 import { GESTURE } from "~/consts/touch";
 
 describe("ARSwirlControl", () => {
@@ -129,7 +130,7 @@ describe("ARSwirlControl", () => {
       { from: new THREE.Vector2(0, 1), to: new THREE.Vector2(1, 1) },
       { from: new THREE.Vector2(1, 0), to: new THREE.Vector2(1, -1) },
       { from: new THREE.Vector2(0, -1), to: new THREE.Vector2(-1, -1) },
-      { from: new THREE.Vector2(-1, 0), to: new THREE.Vector2(-1, 1) },
+      { from: new THREE.Vector2(-1, 0), to: new THREE.Vector2(-1, 1) }
     ];
 
     cases.forEach(suite => {
@@ -190,7 +191,7 @@ describe("ARSwirlControl", () => {
       { from: new THREE.Vector2(0, 1), to: new THREE.Vector2(-1, 1) },
       { from: new THREE.Vector2(1, 0), to: new THREE.Vector2(1, 1) },
       { from: new THREE.Vector2(0, -1), to: new THREE.Vector2(1, -1) },
-      { from: new THREE.Vector2(-1, 0), to: new THREE.Vector2(-1, -1) },
+      { from: new THREE.Vector2(-1, 0), to: new THREE.Vector2(-1, -1) }
     ];
 
     cases.forEach(suite => {

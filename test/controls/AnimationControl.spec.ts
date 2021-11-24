@@ -1,4 +1,5 @@
 import Sinon, * as sinon from "sinon";
+
 import AnimationControl from "~/controls/AnimationControl";
 import Camera from "~/core/camera/Camera";
 import Pose from "~/core/camera/Pose";
@@ -30,7 +31,7 @@ describe("AnimationControl", () => {
     });
 
     it("should have default easing function same to the one in constants", () => {
-      expect(new AnimationControl(new Pose(0, 0, 0), new Pose(0, 0, 100)).easing).to.equal(DEFAULT.EASING)
+      expect(new AnimationControl(new Pose(0, 0, 0), new Pose(0, 0, 100)).easing).to.equal(DEFAULT.EASING);
     });
 
     it("is not enabled by default", () => {

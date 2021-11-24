@@ -1,4 +1,5 @@
 import * as THREE from "three";
+
 import ScaleUI from "~/controls/ar/ui/ScaleUI";
 
 describe("ScaleUI", () => {
@@ -12,7 +13,7 @@ describe("ScaleUI", () => {
     ui.hide();
 
     // When
-    ui.show()
+    ui.show();
 
     // Then
     expect(ui.visible).to.be.true;

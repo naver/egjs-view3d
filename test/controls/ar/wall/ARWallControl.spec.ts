@@ -1,12 +1,14 @@
 import * as THREE from "three";
 import * as sinon from "sinon";
+
 import ARWallControl from "~/controls/ar/wall/ARWallControl";
 import ARSwirlControl from "~/controls/ar/common/ARSwirlControl";
 import ARWallTranslateControl from "~/controls/ar/wall/ARWallTranslateControl";
 import ARScaleControl from "~/controls/ar/common/ARScaleControl";
 import View3D from "~/View3D";
 import Model from "~/core/Model";
-import { createXRRenderingContext } from "test/test-utils";
+
+import { createXRRenderingContext } from "../../../test-utils";
 
 describe("ARWallControl", () => {
   describe("Default properties", () => {
@@ -78,12 +80,12 @@ describe("ARWallControl", () => {
       hitPosition: new THREE.Vector3(),
       hitRotation: new THREE.Quaternion(),
       modelPosition: new THREE.Vector3(),
-      wallRotation: new THREE.Quaternion(),
+      wallRotation: new THREE.Quaternion()
     };
     view3d.display(model);
 
     const ctx = createXRRenderingContext({ view3d, model, session: { requestHitTestSourceForTransientInput: () => Promise.resolve() } });
-    const initSpies = control.controls.map(control => sinon.spy(control, "init"));
+    const initSpies = control.controls.map(ctrl => sinon.spy(ctrl, "init"));
 
     // When
     control.init(ctx, initialTransform);
@@ -101,7 +103,7 @@ describe("ARWallControl", () => {
       hitPosition: new THREE.Vector3(),
       hitRotation: new THREE.Quaternion(),
       modelPosition: new THREE.Vector3(),
-      wallRotation: new THREE.Quaternion(),
+      wallRotation: new THREE.Quaternion()
     };
     view3d.display(model);
 
@@ -120,7 +122,7 @@ describe("ARWallControl", () => {
     const control = new ARWallControl();
 
     // When
-    const deactivateSpies = control.controls.map(control => sinon.spy(control, "deactivate"));
+    const deactivateSpies = control.controls.map(ctrl => sinon.spy(ctrl, "deactivate"));
     control.deactivate();
 
     // Then
@@ -160,7 +162,7 @@ describe("ARWallControl", () => {
       hitPosition: new THREE.Vector3(),
       hitRotation: new THREE.Quaternion(),
       modelPosition: new THREE.Vector3(),
-      wallRotation: new THREE.Quaternion(),
+      wallRotation: new THREE.Quaternion()
     };
     view3d.display(model);
 
@@ -182,7 +184,7 @@ describe("ARWallControl", () => {
       hitPosition: new THREE.Vector3(),
       hitRotation: new THREE.Quaternion(),
       modelPosition: new THREE.Vector3(),
-      wallRotation: new THREE.Quaternion(),
+      wallRotation: new THREE.Quaternion()
     };
     view3d.display(model);
     control.init(ctx, initialTransform);

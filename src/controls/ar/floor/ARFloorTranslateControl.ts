@@ -4,12 +4,12 @@
  */
 
 import * as THREE from "three";
+
 import Motion from "../../Motion";
-import * as DEFAULT from "~/consts/default";
-import * as EASING from "~/consts/easing";
-import * as TOUCH from "~/consts/touch";
-import { XRRenderContext, XRContext, XRInputs } from "~/type/internal";
 import ARControl from "../common/ARControl";
+import * as DEFAULT from "../../../consts/default";
+import * as EASING from "../../../consts/easing";
+import { XRRenderContext, XRContext, XRInputs } from "../../../type/internal";
 
 enum STATE {
   WAITING,
@@ -90,25 +90,25 @@ class ARFloorTranslateControl implements ARControl {
    * Create new instance of ARTranslateControl
    * @param {ARFloorTranslateControlOption} [options={}] Options
    */
-  constructor({
+  public constructor({
     hoverAmplitude = 0.01,
     hoverHeight = 0.1,
     hoverPeriod = 1000,
     hoverEasing = EASING.SINE_WAVE,
     bounceDuration = 1000,
-    bounceEasing = EASING.EASE_OUT_BOUNCE,
+    bounceEasing = EASING.EASE_OUT_BOUNCE
   }: Partial<ARFloorTranslateControlOption> = {}) {
     this._hoverAmplitude = hoverAmplitude;
     this._hoverHeight = hoverHeight;
     this._hoverMotion = new Motion({
       loop: true,
       duration: hoverPeriod,
-      easing: hoverEasing,
+      easing: hoverEasing
     });
     this._bounceMotion = new Motion({
       duration: bounceDuration,
       easing: bounceEasing,
-      range: DEFAULT.INFINITE_RANGE,
+      range: DEFAULT.INFINITE_RANGE
     });
   }
 
@@ -119,10 +119,10 @@ class ARFloorTranslateControl implements ARControl {
     this._hoverPosition.setY(position.y + this._hoverHeight);
   }
 
-  // tslint:disable-next-line no-empty
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   public init(ctx: XRRenderContext) {}
 
-  // tslint:disable-next-line no-empty
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   public destroy(ctx: XRContext) {}
 
   /**
@@ -140,7 +140,7 @@ class ARFloorTranslateControl implements ARControl {
     this.deactivate();
   }
 
-  public activate({ model }: XRRenderContext, gesture: TOUCH.GESTURE) {
+  public activate({ model }: XRRenderContext) {
     if (!this._enabled) return;
 
     const modelBbox = model.bbox;

@@ -1,4 +1,5 @@
 import * as THREE from "three";
+
 import AutoDirectionalLight from "~/environments/AutoDirectionalLight";
 import Model from "~/core/Model";
 
@@ -99,7 +100,7 @@ describe("AutoDirectionalLight", () => {
       const model = new Model({ scenes: [obj], animations: [] });
 
       // When
-      light.fit(model)
+      light.fit(model);
 
       // Then
       const modelBboxCenter = model.bbox.getCenter(new THREE.Vector3());
@@ -115,7 +116,7 @@ describe("AutoDirectionalLight", () => {
       const model = new Model({ scenes: [obj], animations: [] });
 
       // When
-      light.fit(model)
+      light.fit(model);
 
       // Then
       const modelBboxCenter = model.bbox.getCenter(new THREE.Vector3());

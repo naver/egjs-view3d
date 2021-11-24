@@ -1,9 +1,10 @@
 import * as THREE from "three";
 import * as sinon from "sinon";
+import { createXRRenderingContext } from "test/test-utils";
+
 import View3D from "~/View3D";
 import Model from "~/core/Model";
 import ARScaleControl from "~/controls/ar/common/ARScaleControl";
-import { createXRRenderingContext } from "test/test-utils";
 import { GESTURE } from "~/consts/touch";
 
 describe("ARScaleControl", () => {

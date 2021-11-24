@@ -1,4 +1,5 @@
 import * as sinon from "sinon";
+
 import TranslateControl from "~/controls/TranslateControl";
 import View3DError from "~/View3DError";
 import * as ERROR from "~/consts/error";

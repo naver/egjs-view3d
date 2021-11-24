@@ -1,6 +1,7 @@
+import { PointsMaterial } from "three";
+
 import DracoLoader from "~/loaders/DracoLoader";
 import Model from "~/core/Model";
-import { PointsMaterial } from "three";
 
 describe("GLTFLoader", () => {
   it("can load a DRC model with URL", async () => {

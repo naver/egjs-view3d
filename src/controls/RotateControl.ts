@@ -4,16 +4,18 @@
  */
 
 import * as THREE from "three";
+
+import View3DError from "../View3DError";
+import Camera from "../core/camera/Camera";
+import { getElement } from "../utils";
+import { EVENTS, MOUSE_BUTTON } from "../consts/event";
+import { CURSOR } from "../consts/css";
+import * as DEFAULT from "../consts/default";
+import * as ERROR from "../consts/error";
+import { ValueOf } from "../type/internal";
+
 import CameraControl from "./CameraControl";
 import Motion from "./Motion";
-import View3DError from "~/View3DError";
-import Camera from "~/core/camera/Camera";
-import { getElement } from "~/utils";
-import { EVENTS, MOUSE_BUTTON } from "~/consts/event";
-import { CURSOR } from "~/consts/css";
-import * as DEFAULT from "~/consts/default";
-import * as ERROR from "~/consts/error";
-import { ValueOf } from "~/type/internal";
 
 /**
  * Model's rotation control that supports both mouse & touch
@@ -78,6 +80,7 @@ class RotateControl implements CameraControl {
   public set scale(val: THREE.Vector2) {
     this._userScale.copy(val);
   }
+
   public set useGrabCursor(val: boolean) {
     if (!val) {
       this._setCursor("");
@@ -87,6 +90,7 @@ class RotateControl implements CameraControl {
       this._setCursor(CURSOR.GRAB);
     }
   }
+
   public set scaleToElement(val: boolean) {
     this._scaleToElement = val;
   }
@@ -102,13 +106,13 @@ class RotateControl implements CameraControl {
    * @param {boolean} [options.scaleToElement=true] Whether to scale control to fit element size.
    * @tutorial Adding Controls
    */
-  constructor({
+  public constructor({
     element = DEFAULT.NULL_ELEMENT,
     duration = DEFAULT.ANIMATION_DURATION,
     easing = DEFAULT.EASING,
     scale = new THREE.Vector2(1, 1),
     useGrabCursor = true,
-    scaleToElement = true,
+    scaleToElement = true
   } = {}) {
     const targetEl = getElement(element);
     if (targetEl) {
@@ -234,14 +238,18 @@ class RotateControl implements CameraControl {
     const targetEl = this._targetEl!;
     evt.preventDefault();
 
-    targetEl.focus ? targetEl.focus() : window.focus();
+    if (!!targetEl.focus) {
+      targetEl.focus();
+    } else {
+      window.focus();
+    }
 
     this._prevPos.set(evt.clientX, evt.clientY);
     window.addEventListener(EVENTS.MOUSE_MOVE, this._onMouseMove, false);
     window.addEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
 
     this._setCursor(CURSOR.GRABBING);
-  }
+  };
 
   private _onMouseMove = (evt: MouseEvent) => {
     evt.preventDefault();
@@ -259,7 +267,7 @@ class RotateControl implements CameraControl {
     this._yMotion.setEndDelta(rotateDelta.y);
 
     prevPos.set(evt.clientX, evt.clientY);
-  }
+  };
 
   private _onMouseUp = () => {
     this._prevPos.set(0, 0);
@@ -267,14 +275,14 @@ class RotateControl implements CameraControl {
     window.removeEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
 
     this._setCursor(CURSOR.GRAB);
-  }
+  };
 
   private _onTouchStart = (evt: TouchEvent) => {
     evt.preventDefault();
 
     const touch = evt.touches[0];
     this._prevPos.set(touch.clientX, touch.clientY);
-  }
+  };
 
   private _onTouchMove = (evt: TouchEvent) => {
     // Only the one finger motion should be considered
@@ -300,7 +308,7 @@ class RotateControl implements CameraControl {
     this._yMotion.setEndDelta(rotateDelta.y);
 
     prevPos.set(touch.clientX, touch.clientY);
-  }
+  };
 
   private _onTouchEnd = (evt: TouchEvent) => {
     const touch = evt.touches[0];
@@ -309,7 +317,7 @@ class RotateControl implements CameraControl {
     } else {
       this._prevPos.set(0, 0);
     }
-  }
+  };
 }
 
 export default RotateControl;

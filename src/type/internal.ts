@@ -3,8 +3,9 @@
  * egjs projects are licensed under the MIT license
  */
 import * as THREE from "three";
-import View3D from "~/View3D";
-import Model from "~/core/Model";
+
+import View3D from "../View3D";
+import Model from "../core/Model";
 
 export type ValueOf<T> = T[keyof T];
 

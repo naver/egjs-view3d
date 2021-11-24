@@ -6,11 +6,12 @@
 import * as THREE from "three";
 import { GLTFLoader as ThreeGLTFLoader, GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
-import Model from "~/core/Model";
-import * as DEFAULT from "~/consts/default";
-import View3D from "~/View3D";
-import { ShadowPlane, AutoDirectionalLight } from "~/environments";
-import { ModelLoadOption } from "~/type/external";
+
+import View3D from "../View3D";
+import Model from "../core/Model";
+import { ShadowPlane, AutoDirectionalLight } from "../environments";
+import * as DEFAULT from "../consts/default";
+import { ModelLoadOption } from "../type/external";
 
 /**
  * GLTFLoader
@@ -26,7 +27,7 @@ class GLTFLoader {
   /**
    * Create a new instance of GLTFLoader
    */
-  constructor() {
+  public constructor() {
     this._loader = new ThreeGLTFLoader();
     this._dracoLoader = new DRACOLoader();
 
@@ -82,7 +83,7 @@ class GLTFLoader {
 
           // Reset
           viewer.scene.reset();
-          viewer.camera.reset();
+          void viewer.camera.reset();
           viewer.animator.reset();
 
           const modelOptions = json.model;
@@ -91,7 +92,7 @@ class GLTFLoader {
 
           viewer.camera.setDefaultPose({
             yaw: cameraOptions.yaw,
-            pitch: cameraOptions.pitch,
+            pitch: cameraOptions.pitch
           });
           viewer.camera.minDistance = cameraOptions.distanceRange[0];
           viewer.camera.maxDistance = cameraOptions.distanceRange[1];
@@ -112,7 +113,7 @@ class GLTFLoader {
           lightOptions.forEach(lightOption => {
             const lightDirection = new THREE.Vector3(lightOption.x, lightOption.y, lightOption.z).negate();
             const directional = new AutoDirectionalLight(new THREE.Color(lightOption.color), lightOption.intensity, {
-              direction: lightDirection,
+              direction: lightDirection
             });
             directional.light.castShadow = lightOption.castShadow;
             directional.light.updateMatrixWorld();
@@ -133,7 +134,7 @@ class GLTFLoader {
 
               viewer.display(model, {
                 size: modelOptions.size,
-                resetView: isFirstLoad,
+                resetView: isFirstLoad
               });
               isFirstLoad = false;
 
@@ -240,12 +241,12 @@ class GLTFLoader {
   }
 
   private _parseToModel(gltf: GLTF, {
-    fixSkinnedBbox = false,
+    fixSkinnedBbox = false
   }: Partial<ModelLoadOption> = {}): Model {
     const model = new Model({
       scenes: gltf.scenes,
       animations: gltf.animations,
-      fixSkinnedBbox,
+      fixSkinnedBbox
     });
 
     model.meshes.forEach(mesh => {

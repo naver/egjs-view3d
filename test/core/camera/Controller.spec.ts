@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import * as sinon from "sinon";
+
 import Controller from "~/core/camera/Controller";
 import Camera from "~/core/camera/Camera";
 import RotateControl from "~/controls/RotateControl";
@@ -52,7 +53,7 @@ describe("Controller", () => {
       // Given
       const canvas = document.createElement("canvas");
       const controller = new Controller(canvas, new Camera(canvas));
-      const control = new RotateControl()
+      const control = new RotateControl();
 
       // When
       controller.add(control);
@@ -89,7 +90,7 @@ describe("Controller", () => {
       const controls = [
         new RotateControl(),
         new TranslateControl(),
-        new DistanceControl(),
+        new DistanceControl()
       ];
       controls.forEach(control => controller.add(control));
       const spies = controls.map(control => sinon.spy(control, "enable"));
@@ -123,7 +124,7 @@ describe("Controller", () => {
       const controls = [
         new RotateControl(),
         new TranslateControl(),
-        new DistanceControl(),
+        new DistanceControl()
       ];
       controls.forEach(control => controller.add(control));
       const spies = controls.map(control => sinon.spy(control, "disable"));
@@ -144,7 +145,7 @@ describe("Controller", () => {
       const controls = [
         new RotateControl(),
         new TranslateControl(),
-        new DistanceControl(),
+        new DistanceControl()
       ];
       controls.forEach(control => controller.add(control));
       const spies = controls.map(control => sinon.spy(control, "resize"));
@@ -166,7 +167,7 @@ describe("Controller", () => {
       const controls = [
         new RotateControl(),
         new TranslateControl(),
-        new DistanceControl(),
+        new DistanceControl()
       ];
       controls.forEach(control => controller.add(control));
       const spies = controls.map(control => sinon.spy(control, "sync"));
@@ -188,7 +189,7 @@ describe("Controller", () => {
       const controls = [
         new RotateControl(),
         new TranslateControl(),
-        new DistanceControl(),
+        new DistanceControl()
       ];
       controls.forEach(control => controller.add(control));
       const spies = controls.map(control => sinon.spy(control, "update"));

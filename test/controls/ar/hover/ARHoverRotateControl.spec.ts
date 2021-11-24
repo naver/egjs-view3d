@@ -1,11 +1,12 @@
 import * as THREE from "three";
 import * as sinon from "sinon";
+import { createXRRenderingContext } from "test/test-utils";
+
 import View3D from "~/View3D";
 import Model from "~/core/Model";
 import ARHoverRotateControl from "~/controls/ar/hover/ARHoverRotateControl";
 import ARSwirlControl from "~/controls/ar/common/ARSwirlControl";
 import ARSwipeControl from "~/controls/ar/common/ARSwipeControl";
-import { createXRRenderingContext } from "test/test-utils";
 import { GESTURE } from "~/consts/touch";
 
 describe("ARHoverRotateControl", () => {

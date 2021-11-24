@@ -1,9 +1,10 @@
 import * as THREE from "three";
 import * as sinon from "sinon";
+import { createXRRenderingContext } from "test/test-utils";
+
 import ARHoverTranslateControl from "~/controls/ar/hover/ARHoverTranslateControl";
 import View3D from "~/View3D";
 import Model from "~/core/Model";
-import { createXRRenderingContext } from "test/test-utils";
 
 describe("ARFloorTranslateControl", () => {
   describe("Initial properties", () => {

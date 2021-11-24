@@ -7,15 +7,15 @@ class XRSessionMock implements XRSession {
     addEventListener: () => {},
     removeEventListener: () => {},
     requestReferenceSpace: () => Promise.resolve(),
-    requestHitTestSource: () => Promise.resolve(),
+    requestHitTestSource: () => Promise.resolve()
   };
 
   private _isAvailable: boolean;
   private _canEnter: boolean;
 
-  constructor({
+  public constructor({
     isAvailable = true,
-    canEnter = true,
+    canEnter = true
   } = {}) {
     this._isAvailable = isAvailable;
     this._canEnter = canEnter;
@@ -25,7 +25,8 @@ class XRSessionMock implements XRSession {
   public enter(view3d: View3D) {
     return this._canEnter ? Promise.resolve() : Promise.reject();
   }
+
   public exit(view3d: View3D) {}
-};
+}
 
 export default XRSessionMock;

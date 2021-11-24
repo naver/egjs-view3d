@@ -1,4 +1,5 @@
 import * as sinon from "sinon";
+
 import View3D from "~/View3D";
 import { Camera, Controller, Model, ModelAnimator, Renderer, Scene, XRManager } from "~/index";
 

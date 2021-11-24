@@ -4,7 +4,9 @@
  */
 
 import * as THREE from "three";
-import Model from "~/core/Model";
+
+import Model from "../core/Model";
+
 import Environment from "./Environment";
 
 /**
@@ -57,9 +59,9 @@ class ShadowPlane implements Environment {
    * @param {number} [options.size=10000] Size of the shadow plane
    * @param {number} [options.opacity=0.3] Opacity of the shadow
    */
-  constructor({
+  public constructor({
     size = 10000,
-    opacity = 0.3,
+    opacity = 0.3
   } = {}) {
     this.geometry = new THREE.PlaneGeometry(size, size, 100, 100);
     this.material = new THREE.ShadowMaterial({ opacity });
@@ -76,10 +78,10 @@ class ShadowPlane implements Environment {
    */
   public fit(model: Model, {
     floorPosition,
-    floorRotation = new THREE.Quaternion(0, 0, 0, 1),
+    floorRotation = new THREE.Quaternion(0, 0, 0, 1)
   }: Partial<{
-    floorPosition: THREE.Vector3,
-    floorRotation: THREE.Quaternion,
+    floorPosition: THREE.Vector3;
+    floorRotation: THREE.Quaternion;
   }> = {}): void {
     const modelPosition = model.scene.position;
     const localYAxis = new THREE.Vector3(0, 1, 0).applyQuaternion(floorRotation);

@@ -19,5 +19,5 @@ export * from "./consts/external";
 export {
   View3DError,
   CODES as ERROR_CODES,
-  View3D as default,
+  View3D as default
 };

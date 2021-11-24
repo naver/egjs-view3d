@@ -20,5 +20,5 @@ export {
   OrbitControl,
   RotateControl,
   TranslateControl,
-  DistanceControl,
+  DistanceControl
 };

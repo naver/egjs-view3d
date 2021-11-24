@@ -4,13 +4,15 @@
  */
 
 import * as THREE from "three";
+
+import View3DError from "../View3DError";
+import Camera from "../core/camera/Camera";
+import { getElement } from "../utils";
+import { EVENTS, MOUSE_BUTTON } from "../consts/event";
+import * as ERROR from "../consts/error";
+import * as DEFAULT from "../consts/default";
+
 import CameraControl from "./CameraControl";
-import View3DError from "~/View3DError";
-import Camera from "~/core/camera/Camera";
-import { getElement } from "~/utils";
-import { EVENTS, MOUSE_BUTTON } from "~/consts/event";
-import * as ERROR from "~/consts/error";
-import * as DEFAULT from "~/consts/default";
 
 /**
  * Control that animates model without user input
@@ -91,14 +93,14 @@ class AutoControl implements CameraControl {
    * @param {boolean} [options.disableOnInterrupt=false] Whether to disable control on user interrupt
    * @tutorial Adding Controls
    */
-  constructor({
+  public constructor({
     element = DEFAULT.NULL_ELEMENT,
     delay = 2000,
     delayOnMouseLeave = 0,
     speed = 1,
     pauseOnHover = false,
     canInterrupt = true,
-    disableOnInterrupt = false,
+    disableOnInterrupt = false
   } = {}) {
     const targetEl = getElement(element);
     if (targetEl) {
@@ -140,7 +142,7 @@ class AutoControl implements CameraControl {
     camera.yaw += this._speed * deltaTime / 100;
   }
 
-  // This is not documetned on purpose as it doesn't do nothing
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public resize(size: THREE.Vector2) {
     // DO NOTHING
   }
@@ -197,7 +199,7 @@ class AutoControl implements CameraControl {
     this._clearTimeout();
   }
 
-  // This does nothing
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public sync(camera: Camera): void {
     // Do nothing
   }
@@ -218,40 +220,40 @@ class AutoControl implements CameraControl {
     this._interrupted = true;
     this._clearTimeout();
     window.addEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
-  }
+  };
 
   private _onMouseUp = () => {
     window.removeEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
     this._setUninterruptedAfterDelay(this._delay);
-  }
+  };
 
   private _onTouchStart = () => {
     if (!this._canInterrupt) return;
     this._interrupted = true;
     this._clearTimeout();
-  }
+  };
 
   private _onTouchEnd = () => {
     this._setUninterruptedAfterDelay(this._delay);
-  }
+  };
 
   private _onMouseEnter = () => {
     if (!this._pauseOnHover) return;
     this._interrupted = true;
     this._hovering = true;
-  }
+  };
 
   private _onMouseLeave = () => {
     if (!this._pauseOnHover) return;
     this._hovering = false;
     this._setUninterruptedAfterDelay(this._delayOnMouseLeave);
-  }
+  };
 
   private _onWheel = () => {
     if (!this._canInterrupt) return;
     this._interrupted = true;
     this._setUninterruptedAfterDelay(this._delay);
-  }
+  };
 
   private _setUninterruptedAfterDelay(delay: number): void {
     if (this._hovering) return;

@@ -1,12 +1,14 @@
 import * as THREE from "three";
 import * as sinon from "sinon";
+
 import ARFloorControl from "~/controls/ar/floor/ARFloorControl";
 import ARSwirlControl from "~/controls/ar/common/ARSwirlControl";
 import ARFloorTranslateControl from "~/controls/ar/floor/ARFloorTranslateControl";
 import ARScaleControl from "~/controls/ar/common/ARScaleControl";
 import View3D from "~/View3D";
 import Model from "~/core/Model";
-import { createXRRenderingContext } from "test/test-utils";
+
+import { createXRRenderingContext } from "../../../test-utils";
 
 describe("ARFloorControl", () => {
   describe("Default properties", () => {
@@ -81,7 +83,7 @@ describe("ARFloorControl", () => {
     view3d.display(model);
 
     const ctx = createXRRenderingContext({ view3d, model, session: { requestHitTestSourceForTransientInput: () => Promise.resolve() } });
-    const initSpies = control.controls.map(control => sinon.spy(control, "init"));
+    const initSpies = control.controls.map(ctrl => sinon.spy(ctrl, "init"));
 
     // When
     control.init(ctx, new THREE.Vector3(0, 0, 0));
@@ -95,7 +97,7 @@ describe("ARFloorControl", () => {
     const control = new ARFloorControl();
 
     // When
-    const deactivateSpies = control.controls.map(control => sinon.spy(control, "deactivate"));
+    const deactivateSpies = control.controls.map(ctrl => sinon.spy(ctrl, "deactivate"));
     control.deactivate();
 
     // Then

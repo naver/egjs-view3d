@@ -4,16 +4,18 @@
  */
 
 import * as THREE from "three";
+
+import View3DError from "../View3DError";
+import Camera from "../core/camera/Camera";
+import { getElement } from "../utils";
+import { EVENTS, MOUSE_BUTTON } from "../consts/event";
+import { CURSOR } from "../consts/css";
+import * as DEFAULT from "../consts/default";
+import * as ERROR from "../consts/error";
+import { ValueOf } from "../type/internal";
+
 import CameraControl from "./CameraControl";
 import Motion from "./Motion";
-import View3DError from "~/View3DError";
-import Camera from "~/core/camera/Camera";
-import { getElement } from "~/utils";
-import { EVENTS, MOUSE_BUTTON } from "~/consts/event";
-import { CURSOR } from "~/consts/css";
-import * as DEFAULT from "~/consts/default";
-import * as ERROR from "~/consts/error";
-import { ValueOf } from "~/type/internal";
 
 /**
  * Model's translation control that supports both mouse & touch
@@ -82,6 +84,7 @@ class TranslateControl implements CameraControl {
   public set scale(val: THREE.Vector2) {
     this._userScale.copy(val);
   }
+
   public set useGrabCursor(val: boolean) {
     if (!val) {
       this._setCursor("");
@@ -91,6 +94,7 @@ class TranslateControl implements CameraControl {
       this._setCursor(CURSOR.GRAB);
     }
   }
+
   public set scaleToElement(val: boolean) {
     this._scaleToElement = val;
   }
@@ -105,12 +109,12 @@ class TranslateControl implements CameraControl {
    * @param {boolean} [options.scaleToElement=true] Whether to scale control to fit element size.
    * @tutorial Adding Controls
    */
-  constructor({
+  public constructor({
     element = DEFAULT.NULL_ELEMENT,
     easing = DEFAULT.EASING,
     scale = new THREE.Vector2(1, 1),
     useGrabCursor = true,
-    scaleToElement = true,
+    scaleToElement = true
   } = {}) {
     const targetEl = getElement(element);
     if (targetEl) {
@@ -220,7 +224,7 @@ class TranslateControl implements CameraControl {
    * @param camera Camera to match state
    * @returns {void} Nothing
    */
-  public sync(camera: Camera): void {
+  public sync(camera: Camera): void { // eslint-disable-line @typescript-eslint/no-unused-vars
     this._xMotion.reset(0);
     this._yMotion.reset(0);
   }
@@ -248,14 +252,18 @@ class TranslateControl implements CameraControl {
     const targetEl = this._targetEl!;
     evt.preventDefault();
 
-    targetEl.focus ? targetEl.focus() : window.focus();
+    if (!!targetEl.focus) {
+      targetEl.focus();
+    } else {
+      window.focus();
+    }
 
     this._prevPos.set(evt.clientX, evt.clientY);
     window.addEventListener(EVENTS.MOUSE_MOVE, this._onMouseMove, false);
     window.addEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
 
     this._setCursor(CURSOR.GRABBING);
-  }
+  };
 
   private _onMouseMove = (evt: MouseEvent) => {
     evt.preventDefault();
@@ -270,7 +278,7 @@ class TranslateControl implements CameraControl {
     this._yMotion.setEndDelta(delta.y);
 
     prevPos.set(evt.clientX, evt.clientY);
-  }
+  };
 
   private _onMouseUp = () => {
     this._prevPos.set(0, 0);
@@ -278,7 +286,7 @@ class TranslateControl implements CameraControl {
     window.removeEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
 
     this._setCursor(CURSOR.GRAB);
-  }
+  };
 
   private _onTouchStart = (evt: TouchEvent) => {
     // Only the two finger motion should be considered
@@ -287,7 +295,7 @@ class TranslateControl implements CameraControl {
 
     this._prevPos.copy(this._getTouchesMiddle(evt.touches));
     this._touchInitialized = true;
-  }
+  };
 
   private _onTouchMove = (evt: TouchEvent) => {
     // Only the two finger motion should be considered
@@ -316,7 +324,7 @@ class TranslateControl implements CameraControl {
     this._yMotion.setEndDelta(delta.y);
 
     prevPos.copy(middlePoint);
-  }
+  };
 
   private _onTouchEnd = (evt: TouchEvent) => {
     // Only the two finger motion should be considered
@@ -328,7 +336,7 @@ class TranslateControl implements CameraControl {
     // Three fingers to two fingers
     this._prevPos.copy(this._getTouchesMiddle(evt.touches));
     this._touchInitialized = true;
-  }
+  };
 
   private _getTouchesMiddle(touches: TouchEvent["touches"]): THREE.Vector2 {
     return new THREE.Vector2(
@@ -339,7 +347,7 @@ class TranslateControl implements CameraControl {
 
   private _onContextMenu = (evt: MouseEvent) => {
     evt.preventDefault();
-  }
+  };
 }
 
 export default TranslateControl;

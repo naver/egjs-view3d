@@ -3,10 +3,11 @@
  * egjs projects are licensed under the MIT license
  */
 
+import * as DEFAULT from "../consts/default";
+import * as EASING from "../consts/easing";
+import { circulate } from "../utils";
+
 import EventEmitter from "./EventEmitter";
-import * as DEFAULT from "~/consts/default";
-import * as EASING from "~/consts/easing";
-import { circulate } from "~/utils";
 
 /**
  * Fires for every animation frame when animation is active.
@@ -41,9 +42,9 @@ import { circulate } from "~/utils";
  * @category Core
  */
 class Animation extends EventEmitter<{
-  progress: (event: { progress: number, easedProgress: number }) => any,
-  loop: (event: { progress: number, easedProgress: number, loopIndex: number }) => any,
-  finish: void,
+  progress: (event: { progress: number; easedProgress: number }) => any;
+  loop: (event: { progress: number; easedProgress: number; loopIndex: number }) => any;
+  finish: void;
 }> {
   // Options
   private _ctx: any; // Window or XRSession
@@ -61,15 +62,15 @@ class Animation extends EventEmitter<{
    * Create new instance of the Animation
    * @param {object} [options={}] Options
    */
-  constructor({
+  public constructor({
     context = window,
     repeat = 0,
     duration = DEFAULT.ANIMATION_DURATION,
-    easing = EASING.EASE_OUT_CUBIC,
+    easing = EASING.EASE_OUT_CUBIC
   }: Partial<{
-    context: any,
-    repeat: number,
-    duration: number,
+    context: any;
+    repeat: number;
+    duration: number;
     easing: (x: number) => number;
   }> = {}) {
     super();
@@ -120,7 +121,7 @@ class Animation extends EventEmitter<{
     const progress = this._time / duration;
     const progressEvent = {
       progress,
-      easedProgress: this._easing(progress),
+      easedProgress: this._easing(progress)
     };
     this.emit("progress", progressEvent);
 
@@ -133,13 +134,13 @@ class Animation extends EventEmitter<{
       } else {
         this.emit("loop", {
           ...progressEvent,
-          loopIndex: this._loopCount,
+          loopIndex: this._loopCount
         });
       }
     }
 
     this._rafId = this._ctx.requestAnimationFrame(this._loop);
-  }
+  };
 
   private _stopLoop() {
     this._ctx.cancelAnimationFrame(this._rafId);

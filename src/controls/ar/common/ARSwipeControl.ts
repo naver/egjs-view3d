@@ -4,12 +4,14 @@
  */
 
 import * as THREE from "three";
-import ARControl from "./ARControl";
-import Motion from "~/controls/Motion";
+
 import RotationIndicator from "../ui/RotationIndicator";
-import * as DEFAULT from "~/consts/default";
-import { XRRenderContext, XRContext, XRInputs } from "~/type/internal";
-import * as TOUCH from "~/consts/touch";
+import Motion from "../../../controls/Motion";
+import * as DEFAULT from "../../../consts/default";
+import * as TOUCH from "../../../consts/touch";
+import { XRRenderContext, XRContext, XRInputs } from "../../../type/internal";
+
+import ARControl from "./ARControl";
 
 enum STATE {
   WAITING,
@@ -73,10 +75,10 @@ class ARSwipeControl implements ARControl {
    * Create new ARSwipeControl
    * @param {ARSwipeControlOption} [options={}] Options
    */
-  constructor({
-    scale = 1,
+  public constructor({
+    scale = 1
   }: Partial<{
-    scale: number,
+    scale: number;
   }> = {}) {
     this._motion = new Motion({ range: DEFAULT.INFINITE_RANGE });
     this._rotationIndicator = new RotationIndicator();

@@ -1,11 +1,13 @@
 import * as sinon from "sinon";
+
 import ARHoverControl from "~/controls/ar/hover/ARHoverControl";
 import ARHoverRotateControl from "~/controls/ar/hover/ARHoverRotateControl";
 import ARHoverTranslateControl from "~/controls/ar/hover/ARHoverTranslateControl";
 import ARScaleControl from "~/controls/ar/common/ARScaleControl";
 import View3D from "~/View3D";
 import Model from "~/core/Model";
-import { createXRRenderingContext } from "test/test-utils";
+
+import { createXRRenderingContext } from "../../../test-utils";
 
 describe("ARHoverControl", () => {
   describe("Default properties", () => {
@@ -76,7 +78,7 @@ describe("ARHoverControl", () => {
     view3d.display(model);
 
     const ctx = createXRRenderingContext({ view3d, model });
-    const initSpies = control.controls.map(control => sinon.spy(control, "init"));
+    const initSpies = control.controls.map(ctrl => sinon.spy(ctrl, "init"));
 
     // When
     control.init(ctx);
@@ -90,7 +92,7 @@ describe("ARHoverControl", () => {
     const control = new ARHoverControl();
 
     // When
-    const deactivateSpies = control.controls.map(control => sinon.spy(control, "deactivate"));
+    const deactivateSpies = control.controls.map(ctrl => sinon.spy(ctrl, "deactivate"));
     control.deactivate();
 
     // Then

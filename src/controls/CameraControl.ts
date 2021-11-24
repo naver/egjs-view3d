@@ -3,7 +3,7 @@
  * egjs projects are licensed under the MIT license
  */
 
-import Camera from "~/core/camera/Camera";
+import Camera from "../core/camera/Camera";
 
 /**
  * @interface

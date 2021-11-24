@@ -4,11 +4,13 @@
  */
 
 import * as THREE from "three";
+
+import ARControl from "../common/ARControl";
 import ARSwirlControl, { ARSwirlControlOption } from "../common/ARSwirlControl";
 import ARSwipeControl, { ARSwipeControlOption } from "../common/ARSwipeControl";
-import { XRRenderContext, XRContext, XRInputs } from "~/type/internal";
-import * as TOUCH from "~/consts/touch";
-import ARControl from "../common/ARControl";
+import * as TOUCH from "../../../consts/touch";
+import { XRRenderContext, XRContext, XRInputs } from "../../../type/internal";
+
 
 /**
  * Options for {@link ARHoverRotateControl}
@@ -57,7 +59,7 @@ class ARHoverRotateControl implements ARControl {
    * Create new instance of ARRotateControl
    * @param {ARHoverRotateControlOption} options Options
    */
-  constructor(options: Partial<ARHoverRotateControlOption> = {}) {
+  public constructor(options: Partial<ARHoverRotateControlOption> = {}) {
     this._zRotationControl = new ARSwirlControl(options.swirl);
     this._xyRotationControl = new ARSwipeControl(options.swipe);
     this._activatedControl = null;
@@ -97,7 +99,7 @@ class ARHoverRotateControl implements ARControl {
     const xyRotationControl = this._xyRotationControl;
 
     if (gesture & TOUCH.GESTURE.ONE_FINGER) {
-      zRotationControl.activate(ctx, gesture);
+      zRotationControl.activate(ctx);
       zRotationControl.updateRotation(this.rotation);
       this._activatedControl = zRotationControl;
     } else if (gesture & TOUCH.GESTURE.TWO_FINGER) {
@@ -140,13 +142,13 @@ class ARHoverRotateControl implements ARControl {
     const cameraBasis = [
       new THREE.Vector3(1, 0, 0),
       new THREE.Vector3(0, 1, 0),
-      new THREE.Vector3(0, 0, 1),
+      new THREE.Vector3(0, 0, 1)
     ].map(axis => axis.applyQuaternion(cameraRotation).normalize());
 
     const modelBasis = [
       new THREE.Vector3(1, 0, 0),
       new THREE.Vector3(0, 1, 0),
-      new THREE.Vector3(0, 0, 1),
+      new THREE.Vector3(0, 0, 1)
     ].map(axis => axis.applyQuaternion(model.scene.quaternion));
 
     // Always use z-rotation

@@ -4,10 +4,10 @@
  */
 
 import * as THREE from "three";
+
 import ARControl from "../common/ARControl";
 import ArrowIndicator, { ArrowIndicatorOption } from "../ui/ArrowIndicator";
-import * as TOUCH from "~/consts/touch";
-import { XRRenderContext, XRContext, XRInputs } from "~/type/internal";
+import { XRRenderContext, XRContext, XRInputs } from "../../../type/internal";
 /**
  * Options for {@link ARTranslateControl}
  * @category Controls-AR
@@ -48,15 +48,15 @@ class ARWallTranslateControl implements ARControl {
    * Create new instance of ARTranslateControl
    * @param {ARWallTranslateControlOption} [options={}] Options
    */
-  constructor(options: Partial<ARWallTranslateControlOption> = {}) {
+  public constructor(options: Partial<ARWallTranslateControlOption> = {}) {
     this._arrowIndicator = new ArrowIndicator(options.arrow);
   }
 
   public initWallTransform({ hitPosition, hitRotation, modelPosition, wallRotation }: {
-    hitPosition: THREE.Vector3,
-    hitRotation: THREE.Quaternion,
-    modelPosition: THREE.Vector3,
-    wallRotation: THREE.Quaternion,
+    hitPosition: THREE.Vector3;
+    hitRotation: THREE.Quaternion;
+    modelPosition: THREE.Vector3;
+    wallRotation: THREE.Quaternion;
   }) {
     this.position.copy(modelPosition);
     this.hitRotation.copy(hitRotation);
@@ -91,7 +91,7 @@ class ARWallTranslateControl implements ARControl {
     this.deactivate();
   }
 
-  public activate({ model }: XRRenderContext, gesture: TOUCH.GESTURE) {
+  public activate({ model }: XRRenderContext) {
     if (!this._enabled) return;
 
     this._active = true;
@@ -191,7 +191,7 @@ class ARWallTranslateControl implements ARControl {
     }
   }
 
-  public update({ model }: XRRenderContext, delta: number) {
+  public update({ model }: XRRenderContext) {
     model.scene.position.copy(this.position);
     this._arrowIndicator.updatePosition(this.position);
     model.scene.updateMatrix();

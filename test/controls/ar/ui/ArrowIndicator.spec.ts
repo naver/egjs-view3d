@@ -1,4 +1,5 @@
 import * as THREE from "three";
+
 import ArrowIndicator from "~/controls/ar/ui/ArrowIndicator";
 
 describe("ArrowIndicator", () => {
@@ -9,7 +10,7 @@ describe("ArrowIndicator", () => {
 
       // Then
       arrow.object.traverse(obj => {
-        if ((obj as any).isMesh) {
+        if ((obj ).isMesh) {
           const material = (obj as THREE.Mesh).material as THREE.MeshBasicMaterial;
           expect(material.color).to.deep.equal(new THREE.Color(0x123987));
         }
@@ -26,7 +27,7 @@ describe("ArrowIndicator", () => {
     const arrow = new ArrowIndicator();
 
     // When
-    arrow.show()
+    arrow.show();
 
     // Then
     expect(arrow.object.visible).to.be.true;

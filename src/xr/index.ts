@@ -18,5 +18,5 @@ export {
   WallARSession,
   HoverARSession,
   SceneViewerSession,
-  QuickLookSession,
+  QuickLookSession
 };

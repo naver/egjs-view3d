@@ -3,7 +3,7 @@
  * egjs projects are licensed under the MIT license
  */
 
-import View3D from "~/View3D";
+import View3D from "../View3D";
 import XRSession from "../xr/XRSession";
 import WebARSession from "../xr/WebARSession";
 
@@ -29,7 +29,7 @@ class XRManager {
    * Create a new instance of the XRManager
    * @param view3d Instance of the View3D
    */
-  constructor(view3d: View3D) {
+  public constructor(view3d: View3D) {
     this._view3d = view3d;
     this._sessions = [];
     this._currentSession = null;

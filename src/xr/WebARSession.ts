@@ -4,17 +4,19 @@
  */
 
 import * as THREE from "three";
-import View3D from "~/View3D";
+
+import View3D from "../View3D";
+import EventEmitter from "../core/EventEmitter";
+import { getElement, merge } from "../utils";
+import * as DEFAULT from "../consts/default";
+import * as XR from "../consts/xr";
+import { XRContext, XRRenderContext } from "../type/internal";
+
 import XRSession from "./XRSession";
 import DOMOverlay from "./features/DOMOverlay";
-import EventEmitter from "~/core/EventEmitter";
-import { getElement, merge } from "~/utils";
-import * as DEFAULT from "~/consts/default";
-import * as XR from "~/consts/xr";
-import { XRContext, XRRenderContext } from "~/type/internal";
 
 declare global {
-  interface Navigator { xr: any; }
+  interface Navigator { xr: any }
 }
 
 /**
@@ -111,21 +113,21 @@ abstract class WebARSession extends EventEmitter<{
    * @param {HTMLElement|string|null} [options.loadingEl=null] This will be used for loading indicator element, which will automatically invisible after placing 3D model by setting `visibility: hidden`. This element must be placed under `overlayRoot`. You can set either HTMLElement or query selector for that element.
    * @param {boolean} [options.forceOverlay=false] Whether to apply `dom-overlay` feature as required. If set to false, `dom-overlay` will be optional feature.
    */
-  constructor({
+  public constructor({
     features: userFeatures = XR.EMPTY_FEATURES, // https://developer.mozilla.org/en-US/docs/Web/API/XRSessionInit
     maxModelSize = Infinity,
     overlayRoot = DEFAULT.NULL_ELEMENT,
     loadingEl = DEFAULT.NULL_ELEMENT,
-    forceOverlay = false,
+    forceOverlay = false
   }: Partial<WebARSessionOption> = {}) {
     super();
     const overlayEl = getElement(overlayRoot);
 
-    const features: (typeof XR.EMPTY_FEATURES)[] = [];
+    const features: Array<typeof XR.EMPTY_FEATURES> = [];
     if (overlayEl) {
       this._domOverlay = new DOMOverlay({
         root: overlayEl,
-        loadingEl: getElement(loadingEl, overlayEl),
+        loadingEl: getElement(loadingEl, overlayEl)
       });
       features.push(this._domOverlay.features);
     }
@@ -134,6 +136,8 @@ abstract class WebARSession extends EventEmitter<{
     this._maxModelSize = maxModelSize;
     this._forceOverlay = forceOverlay;
   }
+
+  protected abstract _beforeRender(ctx: XRRenderContext): void;
 
   /**
    * Return availability of this session
@@ -168,7 +172,7 @@ abstract class WebARSession extends EventEmitter<{
         const xrContext = {
           view3d,
           model,
-          session,
+          session
         };
 
         // Cache original values
@@ -216,7 +220,7 @@ abstract class WebARSession extends EventEmitter<{
           const glLayer = session.renderState.baseLayer;
           const size = {
             width: glLayer.framebufferWidth,
-            height: glLayer.framebufferHeight,
+            height: glLayer.framebufferHeight
           };
           const renderContext: XRRenderContext = {
             ...xrContext,
@@ -224,7 +228,7 @@ abstract class WebARSession extends EventEmitter<{
             frame,
             referenceSpace,
             xrCam,
-            size,
+            size
           };
 
           this._beforeRender(renderContext);
@@ -248,13 +252,12 @@ abstract class WebARSession extends EventEmitter<{
     this.emit("start");
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public onEnd(ctx: XRContext) {
     this._session = null;
     this._domOverlay?.hideLoading();
     this.emit("end");
   }
-
-  protected abstract _beforeRender(ctx: XRRenderContext): void;
 }
 
 export default WebARSession;

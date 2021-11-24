@@ -3,7 +3,7 @@
  * egjs projects are licensed under the MIT license
  */
 
-import View3D from "~/View3D";
+import View3D from "../View3D";
 
 /**
  * Interface for XR sessions

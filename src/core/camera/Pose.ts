@@ -21,7 +21,7 @@ class Pose {
    *
    * const pose = new Pose(180, 45, 150, new THREE.Vector3(5, -1, 3));
    */
-  constructor(
+  public constructor(
     public yaw: number,
     public pitch: number,
     public distance: number,

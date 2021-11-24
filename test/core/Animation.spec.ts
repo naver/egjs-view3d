@@ -1,4 +1,5 @@
 import * as sinon from "sinon";
+
 import Animation from "~/core/Animation";
 
 describe("Animation", () => {

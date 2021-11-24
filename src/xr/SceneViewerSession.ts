@@ -3,9 +3,10 @@
  * egjs projects are licensed under the MIT license
  */
 
+import { IS_ANDROID } from "../consts/browser";
+import * as XR from "../consts/xr";
+
 import XRSession from "./XRSession";
-import { IS_ANDROID } from "~/consts/browser";
-import * as XR from "~/consts/xr";
 
 /**
  * AR session using Google's scene-viewer
@@ -27,15 +28,16 @@ class SceneViewerSession implements XRSession {
    * @param {string} [params.sound] A URL to a looping audio track that is synchronized with the first animation embedded in a glTF file. It should be provided alongside a glTF with an animation of matching length. If present, the sound is looped after the model is loaded. This should be URL-escaped.
    * @param {string} [params.resizable=true] When set to false, users will not be able to scale the model in the AR experience. Scaling works normally in the 3D experience.
    */
-  constructor(public params: {
-    file: string,
-    browser_fallback_url?: string,
-    mode?: "3d_preferred" | "3d_only" | "ar_preferred" | "ar_only" | string,
-    title?: string,
-    link?: string,
-    sound?: string,
-    resizable?: "true" | "false" | boolean,
-    [key: string]: any,
+  public constructor(public params: {
+    file: string;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    browser_fallback_url?: string;
+    mode?: "3d_preferred" | "3d_only" | "ar_preferred" | "ar_only" | string;
+    title?: string;
+    link?: string;
+    sound?: string;
+    resizable?: "true" | "false" | boolean;
+    [key: string]: any;
   }) {
     if (!this.params.mode) {
       // Default mode is "ar_only", which should use com.google.ar.core package
@@ -78,7 +80,7 @@ class SceneViewerSession implements XRSession {
       ? XR.SCENE_VIEWER.INTENT_AR_CORE(queryString, fallback)
       : XR.SCENE_VIEWER.INTENT_SEARCHBOX(queryString, fallback || XR.SCENE_VIEWER.FALLBACK_DEFAULT(queryString));
 
-    const anchor = document.createElement("a") as HTMLAnchorElement;
+    const anchor = document.createElement("a") ;
     anchor.href = intentURL;
     anchor.click();
 

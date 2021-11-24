@@ -35,9 +35,9 @@ class RotationIndicator {
    * Create new RotationIndicator
    * @param {RotationIndicatorOption} [options={}] Options
    */
-  constructor({
+  public constructor({
     ringColor = 0xffffff,
-    axisColor = 0xffffff,
+    axisColor = 0xffffff
   }: Partial<RotationIndicatorOption> = {}) {
     const ringGeometry = new THREE.RingGeometry(0.99, 1, 150, 1, 0, Math.PI * 2);
     const ringMaterial = new THREE.MeshBasicMaterial({ color: ringColor, side: THREE.DoubleSide });
@@ -46,7 +46,7 @@ class RotationIndicator {
 
     const axisVertices = [
       new THREE.Vector3(0, 0, -1000),
-      new THREE.Vector3(0, 0, +1000),
+      new THREE.Vector3(0, 0, +1000)
     ];
     const axisGeometry = new THREE.BufferGeometry().setFromPoints(axisVertices);
     const axisMaterial = new THREE.LineBasicMaterial({ color: axisColor });

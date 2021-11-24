@@ -4,9 +4,9 @@
  */
 
 export const CURSOR: {
-  GRAB: "grab",
-  GRABBING: "grabbing",
+  GRAB: "grab";
+  GRABBING: "grabbing";
 } = {
   GRAB: "grab",
-  GRABBING: "grabbing",
+  GRABBING: "grabbing"
 };

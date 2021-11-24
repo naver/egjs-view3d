@@ -4,9 +4,10 @@
  */
 
 import * as THREE from "three";
-import Model from "~/core/Model";
-import View3DError from "~/View3DError";
-import * as ERR from "~/consts/error";
+
+import Model from "../core/Model";
+import View3DError from "../View3DError";
+import * as ERR from "../consts/error";
 
 /**
  * Texture(image) model
@@ -37,11 +38,11 @@ class TextureModel extends Model {
    * @param {boolean} [options.billboard=false] When set to true, model will keep rotate to show its front face to camera. Only Y-axis rotation is considered.
    * @throws {View3DError} `CODES.PROVIDE_WIDTH_OR_HEIGHT` When both width and height are not given.
    */
-  constructor({
+  public constructor({
     image,
     width,
     height,
-    billboard = false,
+    billboard = false
   }: {
     image: THREE.Texture | HTMLImageElement | HTMLCanvasElement | HTMLVideoElement;
     width?: number;
@@ -58,7 +59,7 @@ class TextureModel extends Model {
     if (width == null) {
       width = height! * aspect;
     } else if (height == null) {
-      height = width! / aspect;
+      height = width / aspect;
     }
     texture.encoding = THREE.sRGBEncoding;
     const geometry = new THREE.PlaneGeometry(width, height);

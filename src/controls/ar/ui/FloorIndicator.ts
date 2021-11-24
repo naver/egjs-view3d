@@ -4,8 +4,9 @@
  */
 
 import * as THREE from "three";
+
 import Motion from "../../Motion";
-import { Range } from "~/type/internal";
+import { Range } from "../../../type/internal";
 
 /**
  * Options for {@link FloorIndicator}
@@ -39,10 +40,10 @@ class FloorIndicator {
    * Create new instance of FloorIndicator
    * @param {FloorIndicatorOption} [options={}] Options
    */
-  constructor({
+  public constructor({
     ringOpacity = 0.3,
     dirIndicatorOpacity = 1,
-    fadeoutDuration = 1000,
+    fadeoutDuration = 1000
   } = {}) {
     const deg10 = Math.PI / 18;
 
@@ -71,12 +72,12 @@ class FloorIndicator {
     const dimmedMaterial = new THREE.MeshBasicMaterial({
       transparent: true,
       opacity: ringOpacity,
-      color: 0xffffff,
+      color: 0xffffff
     });
     const highlightMaterial = new THREE.MeshBasicMaterial({
       transparent: true,
       opacity: dirIndicatorOpacity,
-      color: 0xffffff,
+      color: 0xffffff
     });
     const materials = [dimmedMaterial, highlightMaterial];
 
@@ -85,7 +86,7 @@ class FloorIndicator {
     this._animator = new Motion({ duration: fadeoutDuration });
     this._opacityRange = {
       min: ringOpacity,
-      max: dirIndicatorOpacity,
+      max: dirIndicatorOpacity
     };
   }
 
@@ -93,12 +94,12 @@ class FloorIndicator {
     delta,
     scale,
     position,
-    rotation,
+    rotation
   }: {
-    delta: number,
-    scale: number,
-    position: THREE.Vector3,
-    rotation: THREE.Quaternion,
+    delta: number;
+    scale: number;
+    position: THREE.Vector3;
+    rotation: THREE.Quaternion;
   }) {
     const mesh = this._mesh;
     const animator = this._animator;

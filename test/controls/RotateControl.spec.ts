@@ -1,4 +1,5 @@
 import * as sinon from "sinon";
+
 import RotateControl from "~/controls/RotateControl";
 import View3DError from "~/View3DError";
 import * as ERROR from "~/consts/error";
@@ -146,7 +147,7 @@ describe("RotateControl", () => {
       // Then
       const listenersShouldBeRemoved = new Set([
         EVENTS.MOUSE_DOWN, EVENTS.MOUSE_MOVE, EVENTS.MOUSE_UP,
-        EVENTS.TOUCH_START, EVENTS.TOUCH_MOVE, EVENTS.TOUCH_END,
+        EVENTS.TOUCH_START, EVENTS.TOUCH_MOVE, EVENTS.TOUCH_END
       ]);
       const listenersRemoved = removeEventSpy.args.map(args => args[0]); // Take the first argument(event name) only
       expect(listenersRemoved.length).to.greaterThan(0);

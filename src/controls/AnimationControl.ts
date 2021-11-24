@@ -4,13 +4,15 @@
  */
 
 import * as THREE from "three";
+
+import Camera from "../core/camera/Camera";
+import Pose from "../core/camera/Pose";
+import * as DEFAULT from "../consts/default";
+import { AnyFunction } from "../type/external";
+import { mix, circulate } from "../utils";
+
 import CameraControl from "./CameraControl";
 import Motion from "./Motion";
-import Camera from "~/core/camera/Camera";
-import Pose from "~/core/camera/Pose";
-import * as DEFAULT from "~/consts/default";
-import { AnyFunction } from "~/type/external";
-import { mix, circulate } from "~/utils";
 
 /**
  * Control that animates model without user input
@@ -52,9 +54,9 @@ class AnimationControl implements CameraControl {
    * @param {number} [options.duration=500] Animation duration
    * @param {function} [options.easing=(x: number) => 1 - Math.pow(1 - x, 3)] Animation easing function
    */
-  constructor(from: Pose, to: Pose, {
+  public constructor(from: Pose, to: Pose, {
     duration = DEFAULT.ANIMATION_DURATION,
-    easing = DEFAULT.EASING,
+    easing = DEFAULT.EASING
   } = {}) {
     from = from.clone();
     to = to.clone();
@@ -150,6 +152,7 @@ class AnimationControl implements CameraControl {
     this._finishCallbacks = [];
   }
 
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   public resize(size: THREE.Vector2) {
     // DO NOTHING
   }
@@ -161,6 +164,7 @@ class AnimationControl implements CameraControl {
   public sync(camera: Camera): void {
     // Do nothing
   }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 }
 
 export default AnimationControl;

@@ -5,7 +5,8 @@
 
 import * as THREE from "three";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
-import Renderer from "~/core/Renderer";
+
+import Renderer from "../core/Renderer";
 
 /**
  * Texture loader
@@ -18,7 +19,7 @@ class TextureLoader {
    * Create new TextureLoader instance
    * @param renderer {@link Renderer} instance of View3D
    */
-  constructor(renderer: Renderer) {
+  public constructor(renderer: Renderer) {
     this._renderer = renderer;
   }
 

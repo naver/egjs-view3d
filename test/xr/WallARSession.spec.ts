@@ -1,7 +1,8 @@
 import * as sinon from "sinon";
-import WallARSession from "~/xr/WallARSession";
-import ARWallControl from "~/controls/ar/wall/ARWallControl"
 import { createXRRenderingContext } from "test/test-utils";
+
+import WallARSession from "~/xr/WallARSession";
+import ARWallControl from "~/controls/ar/wall/ARWallControl";
 
 
 describe("WallARSession", () => {

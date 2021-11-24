@@ -4,7 +4,8 @@
  */
 
 import * as THREE from "three";
-import Model from "~/core/Model";
+
+import Model from "../core/Model";
 
 /**
  * Interface of the environmental objects used by View3D

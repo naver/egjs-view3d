@@ -4,14 +4,17 @@
  */
 
 import * as THREE from "three";
+
 import ARSwirlControl, { ARSwirlControlOption } from "../common/ARSwirlControl";
-import ARFloorTranslateControl, { ARFloorTranslateControlOption } from "./ARFloorTranslateControl";
 import ARScaleControl, { ARScaleControlOption } from "../common/ARScaleControl";
 import FloorIndicator, { FloorIndicatorOption } from "../ui/FloorIndicator";
-import * as XR from "~/consts/xr";
-import * as TOUCH from "~/consts/touch";
-import { XRRenderContext, XRContext, XRInputs } from "~/type/internal";
 import DeadzoneChecker, { DeadzoneCheckerOption } from "../common/DeadzoneChecker";
+import * as XR from "../../../consts/xr";
+import * as TOUCH from "../../../consts/touch";
+import { XRRenderContext, XRContext, XRInputs } from "../../../type/internal";
+
+import ARFloorTranslateControl, { ARFloorTranslateControlOption } from "./ARFloorTranslateControl";
+
 
 /**
  * Options for the {@link ARFloorControl}
@@ -70,10 +73,10 @@ class ARFloorControl {
    * Create new instance of ARFloorControl
    * @param {ARFloorControlOption} options Options
    */
-  constructor(options: Partial<ARFloorControlOption> = {}) {
+  public constructor(options: Partial<ARFloorControlOption> = {}) {
     this._rotateControl = new ARSwirlControl({
       showIndicator: false,
-      ...options.rotate,
+      ...options.rotate
     });
     this._translateControl = new ARFloorTranslateControl(options.translate);
     this._scaleControl = new ARScaleControl(options.scale);
@@ -152,7 +155,7 @@ class ARFloorControl {
     const xrInputs = {
       coords,
       inputSources,
-      hitResults,
+      hitResults
     };
 
     if (deadzoneChecker.inDeadzone) {
@@ -208,12 +211,12 @@ class ARFloorControl {
     }
 
     this._floorIndicator.show();
-  }
+  };
 
   public onSelectEnd = () => {
     this.deactivate();
     this._floorIndicator.fadeout();
-  }
+  };
 
   private _checkDeadzone(ctx: XRRenderContext, { coords }: XRInputs) {
     const gesture = this._deadzoneChecker.check(coords.map(coord => coord.clone()));
@@ -227,15 +230,15 @@ class ARFloorControl {
       case TOUCH.GESTURE.ONE_FINGER_HORIZONTAL:
       case TOUCH.GESTURE.ONE_FINGER_VERTICAL:
         if (this._modelHit) {
-          translateControl.activate(ctx, gesture);
+          translateControl.activate(ctx);
           translateControl.setInitialPos(coords);
         } else {
-          rotateControl.activate(ctx, gesture);
+          rotateControl.activate(ctx);
           rotateControl.setInitialPos(coords);
         }
         break;
       case TOUCH.GESTURE.PINCH:
-        scaleControl.activate(ctx, gesture);
+        scaleControl.activate(ctx);
         scaleControl.setInitialPos(coords);
         break;
     }
@@ -256,7 +259,7 @@ class ARFloorControl {
     const modelRotation = this._rotateControl.rotation;
     const floorPosition = this._translateControl.floorPosition;
     view3d.scene.update(model, {
-      floorPosition,
+      floorPosition
     });
 
     // Get a scaled bbox, which only has scale applied on it.
@@ -272,7 +275,7 @@ class ARFloorControl {
       delta: deltaMilisec,
       scale: boundingSphere.radius,
       position: floorPosition,
-      rotation: modelRotation,
+      rotation: modelRotation
     });
   }
 

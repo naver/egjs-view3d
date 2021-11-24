@@ -4,9 +4,10 @@
  */
 import * as THREE from "three";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
-import Model from "~/core/Model";
-import * as DEFAULT from "~/consts/default";
-import { DracoLoadOption } from "~/type/external";
+
+import Model from "../core/Model";
+import * as DEFAULT from "../consts/default";
+import { DracoLoadOption } from "../type/external";
 
 /**
  * DracoLoader
@@ -45,16 +46,16 @@ class DracoLoader {
   }: Partial<DracoLoadOption> = {}): Model {
     geometry.computeVertexNormals();
 
-		const material = point
+    const material = point
       ? new THREE.PointsMaterial({ color, ...pointOptions })
       : new THREE.MeshStandardMaterial({ color });
-		const mesh = point
+    const mesh = point
       ? new THREE.Points(geometry, material)
       : new THREE.Mesh(geometry, material);
 
     const model = new Model({
       scenes: [mesh],
-      fixSkinnedBbox,
+      fixSkinnedBbox
     });
 
     return model;

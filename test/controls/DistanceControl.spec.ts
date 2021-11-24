@@ -1,4 +1,5 @@
 import * as sinon from "sinon";
+
 import DistanceControl from "~/controls/DistanceControl";
 import View3DError from "~/View3DError";
 import * as ERROR from "~/consts/error";
@@ -115,7 +116,7 @@ describe("DistanceControl", () => {
 
       // Then
       const listenersShouldBeRemoved = new Set([
-        EVENTS.TOUCH_START, EVENTS.TOUCH_MOVE, EVENTS.TOUCH_END, EVENTS.WHEEL,
+        EVENTS.TOUCH_START, EVENTS.TOUCH_MOVE, EVENTS.TOUCH_END, EVENTS.WHEEL
       ]);
       const listenersRemoved = removeEventSpy.args.map(args => args[0]); // Take the first argument(event name) only
       expect(listenersRemoved.length).to.greaterThan(0);

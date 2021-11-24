@@ -1,4 +1,5 @@
 import * as THREE from "three";
+
 import ShadowPlane from "~/environments/ShadowPlane";
 import Model from "~/core/Model";
 

@@ -109,7 +109,7 @@ class View3D extends Component<{
    * @see Controller
    * @see XRManager
    */
-  constructor(el: string | HTMLCanvasElement) {
+  public constructor(el: string | HTMLCanvasElement) {
     super();
     const canvas = getCanvas(el);
 
@@ -149,7 +149,7 @@ class View3D extends Component<{
     this._camera.resize(newSize);
 
     this.emit("resize", { ...newSize, target: this });
-  }
+  };
 
   /**
    * Display the given model.
@@ -165,7 +165,7 @@ class View3D extends Component<{
   public display(model: Model, {
     applySize = true,
     size = DEFAULT.MODEL_SIZE,
-    resetView = true,
+    resetView = true
   } = {}): void {
     const renderer = this._renderer;
     const scene = this._scene;
@@ -213,7 +213,7 @@ class View3D extends Component<{
     this.emit("beforeRender", this);
     renderer.render(scene, camera);
     this.emit("afterRender", this);
-  }
+  };
 }
 
 export default View3D;

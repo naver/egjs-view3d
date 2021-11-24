@@ -1,6 +1,8 @@
 import * as THREE from "three";
-import Renderer from "~/core/Renderer";
+
 import { createSandbox } from "../test-utils";
+
+import Renderer from "~/core/Renderer";
 
 describe("Renderer", () => {
   describe("default values", () => {
