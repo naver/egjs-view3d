@@ -1,3 +1,10 @@
+---
+title: Loading a 3D model
+id: loading-model
+slug: /loading-model
+custom_edit_url: null
+---
+
 Loading models can be done with [GLTFLoader](GLTFLoader.html)
 
 # Basic usage

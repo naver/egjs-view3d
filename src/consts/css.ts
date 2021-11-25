@@ -3,10 +3,8 @@
  * egjs projects are licensed under the MIT license
  */
 
-export const CURSOR: {
-  GRAB: "grab";
-  GRABBING: "grabbing";
-} = {
+export const CURSOR = {
   GRAB: "grab",
-  GRABBING: "grabbing"
-};
+  GRABBING: "grabbing",
+  NONE: "none"
+} as const;

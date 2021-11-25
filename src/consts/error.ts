@@ -22,8 +22,8 @@ export const CODES: {
   ELEMENT_NOT_FOUND: 1,
   ELEMENT_NOT_CANVAS: 2,
   WEBGL_NOT_SUPPORTED: 3,
-  ADD_CONTROL_FIRST: 4,
-  PROVIDE_WIDTH_OR_HEIGHT: 5
+  PROVIDE_WIDTH_OR_HEIGHT: 4,
+  FORMAT_NOT_SUPPORTED: 5
 };
 
 export const MESSAGES = {
@@ -31,6 +31,6 @@ export const MESSAGES = {
   ELEMENT_NOT_FOUND: (query: string) => `Element with selector "${query}" not found.`,
   ELEMENT_NOT_CANVAS: (el: HTMLElement) => `Given element <${el.tagName}> is not a canvas.`,
   WEBGL_NOT_SUPPORTED: "WebGL is not supported on this browser.",
-  ADD_CONTROL_FIRST: "Control is enabled before setting a target element.",
-  PROVIDE_WIDTH_OR_HEIGHT: "Either width or height should be given."
+  PROVIDE_WIDTH_OR_HEIGHT: "Either width or height should be given.",
+  FORMAT_NOT_SUPPORTED: (format: string) => `Given format "${format}" is not supported by View3D or invalid`
 };

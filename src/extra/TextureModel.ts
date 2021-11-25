@@ -6,7 +6,7 @@
 import * as THREE from "three";
 
 import Model from "../core/Model";
-import View3DError from "../View3DError";
+import View3DError from "../core/View3DError";
 import * as ERR from "../consts/error";
 
 /**

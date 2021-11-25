@@ -5,12 +5,8 @@
 
 import * as THREE from "three";
 
-import View3DError from "../View3DError";
-import Camera from "../core/camera/Camera";
-import { getElement } from "../utils";
+import View3D from "../View3D";
 import * as BROWSER from "../consts/browser";
-import * as ERROR from "../consts/error";
-import * as DEFAULT from "../consts/default";
 
 import CameraControl from "./CameraControl";
 
@@ -28,17 +24,12 @@ class AutoControl implements CameraControl {
   private _disableOnInterrupt: boolean;
 
   // Internal values
-  private _targetEl: HTMLElement | null = null;
+  private _view3D: View3D;
   private _enabled: boolean = false;
   private _interrupted: boolean = false;
   private _interruptionTimer: number = -1;
   private _hovering: boolean = false;
 
-  /**
-   * Control's current target element to attach event listeners
-   * @readonly
-   */
-  public get element() { return this._targetEl; }
   /**
    * Whether this control is enabled or not
    * @readonly
@@ -83,18 +74,16 @@ class AutoControl implements CameraControl {
 
   /**
    * Create new RotateControl instance
+   * @param {View3D} view3D An instance of View3D
    * @param {object} options Options
-   * @param {HTMLElement | string | null} [options.element=null] Attaching element / selector of the element
    * @param {number} [options.delay=2000] Reactivation delay after mouse input in milisecond
    * @param {number} [options.delayOnMouseLeave=0] Reactivation delay after mouse leave
    * @param {number} [options.speed=1] Y-axis(yaw) rotation speed
    * @param {boolean} [options.pauseOnHover=false] Whether to pause rotation on mouse hover
    * @param {boolean} [options.canInterrupt=true] Whether user can interrupt the rotation with click/wheel input
    * @param {boolean} [options.disableOnInterrupt=false] Whether to disable control on user interrupt
-   * @tutorial Adding Controls
    */
-  public constructor({
-    element = DEFAULT.NULL_ELEMENT,
+  public constructor(view3D: View3D, {
     delay = 2000,
     delayOnMouseLeave = 0,
     speed = 1,
@@ -102,10 +91,7 @@ class AutoControl implements CameraControl {
     canInterrupt = true,
     disableOnInterrupt = false
   } = {}) {
-    const targetEl = getElement(element);
-    if (targetEl) {
-      this.setElement(targetEl);
-    }
+    this._view3D = view3D;
     this._delay = delay;
     this._delayOnMouseLeave = delayOnMouseLeave;
     this._speed = speed;
@@ -129,7 +115,7 @@ class AutoControl implements CameraControl {
    * @param deltaTime Number of milisec to update
    * @returns {void} Nothing
    */
-  public update(camera: Camera, deltaTime: number): void {
+  public update(deltaTime: number): void {
     if (!this._enabled) return;
     if (this._interrupted) {
       if (this._disableOnInterrupt) {
@@ -138,6 +124,8 @@ class AutoControl implements CameraControl {
 
       return;
     }
+
+    const camera = this._view3D.camera;
 
     camera.yaw += this._speed * deltaTime / 100;
   }
@@ -153,11 +141,8 @@ class AutoControl implements CameraControl {
    */
   public enable(): void {
     if (this._enabled) return;
-    if (!this._targetEl) {
-      throw new View3DError(ERROR.MESSAGES.ADD_CONTROL_FIRST, ERROR.CODES.ADD_CONTROL_FIRST);
-    }
 
-    const targetEl = this._targetEl;
+    const targetEl = this._view3D.renderer.canvas;
 
     targetEl.addEventListener(BROWSER.EVENTS.MOUSE_DOWN, this._onMouseDown, false);
 
@@ -177,9 +162,9 @@ class AutoControl implements CameraControl {
    * @returns {void} Nothing
    */
   public disable(): void {
-    if (!this._enabled || !this._targetEl) return;
+    if (!this._enabled) return;
 
-    const targetEl = this._targetEl;
+    const targetEl = this._view3D.renderer.canvas;
 
     targetEl.removeEventListener(BROWSER.EVENTS.MOUSE_DOWN, this._onMouseDown, false);
     window.removeEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
@@ -199,18 +184,8 @@ class AutoControl implements CameraControl {
     this._clearTimeout();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public sync(camera: Camera): void {
+  public sync(): void {
     // Do nothing
-  }
-
-  /**
-   * Set target element to attach event listener
-   * @param element target element
-   * @returns {void} Nothing
-   */
-  public setElement(element: HTMLElement): void {
-    this._targetEl = element;
   }
 
   private _onMouseDown = (evt: MouseEvent) => {

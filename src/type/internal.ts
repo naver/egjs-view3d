@@ -8,6 +8,7 @@ import View3D from "../View3D";
 import Model from "../core/Model";
 
 export type ValueOf<T> = T[keyof T];
+export type LiteralUnion<T extends U, U = string> = T | (Pick<U, never> & {_?: never});
 
 export interface Range {
   min: number;

@@ -9,7 +9,7 @@ Yet another 3d model viewer
 
 <div className="container">
   <div className="row mb-2"><div className="col col--4"><strong>Properties</strong></div><div className="col col--4"><strong>Methods</strong></div><div className="col col--4"><strong>Events</strong></div></div>
-  <div className="row"><div className="col col--4"><a href="#VERSION">VERSION</a><span className="bulma-tag is-info ml-2">static</span><br/><a href="#renderer">renderer</a><br/><a href="#scene">scene</a><br/><a href="#camera">camera</a><br/><a href="#controller">controller</a><br/><a href="#animator">animator</a><br/><a href="#renderLoop">renderLoop</a></div><div className="col col--4"><a href="#destroy">destroy</a><br/><a href="#resize">resize</a><br/><a href="#display">display</a></div><div className="col col--4"><a href="#event-resize">resize</a><br/><a href="#event-beforeRender">beforeRender</a><br/><a href="#event-afterRender">afterRender</a></div></div>
+  <div className="row"><div className="col col--4"><a href="#VERSION">VERSION</a><span className="bulma-tag is-info ml-2">static</span><br/><a href="#renderer">renderer</a><br/><a href="#scene">scene</a><br/><a href="#camera">camera</a><br/><a href="#controller">controller</a><br/><a href="#animator">animator</a><br/><a href="#src">src</a><br/><a href="#format">format</a><br/><a href="#autoInit">autoInit</a><br/><a href="#autoResize">autoResize</a><br/><a href="#renderLoop">renderLoop</a></div><div className="col col--4"><a href="#destroy">destroy</a><br/><a href="#resize">resize</a><br/><a href="#display">display</a></div><div className="col col--4"><a href="#event-resize">resize</a><br/><a href="#event-beforeRender">beforeRender</a><br/><a href="#event-afterRender">afterRender</a></div></div>
 </div>
 
 ## Constructor
@@ -19,7 +19,7 @@ new View3D(canvasEl, options)
 |PARAMETER|TYPE|OPTIONAL|DEFAULT|DESCRIPTION|
 |:---:|:---:|:---:|:---:|:---:|
 |canvasEl|string \| HTMLElement|||View3D를 초기화할 캔버스 엘리먼트 혹은 선택자|
-|options|object|✔️|{}|View3D에 적용할 옵션 오브젝트|
+|options|[View3DOptions](View3DOptions)|✔️|{}|View3D에 적용할 옵션 오브젝트|
 
 ## Properties
 ### VERSION {#VERSION}
@@ -82,6 +82,54 @@ Current version of the View3D
 [ModelAnimator](ModelAnimator) instance of the View3D
 
 **Type**: [ModelAnimator](ModelAnimator)
+
+### src {#src}
+
+<div className="bulma-tags">
+
+</div>
+
+Source URL to fetch 3D model from<br />For further information, check our [Tutorial](/docs/loading-model) page
+
+**Type**: string \| null
+
+**Default**: null
+
+### format {#format}
+
+<div className="bulma-tags">
+
+</div>
+
+File extension format of the 3D model (glTF, glb, ...)<br />If `"auto"` is given, View3D will try to infer the format of the 3D model
+
+**Type**: string
+
+**Default**: "auto"
+
+### autoInit {#autoInit}
+
+<div className="bulma-tags">
+  <span className="bulma-tag is-warning">readonly</span>
+</div>
+
+Call [init()](View3D#init) automatically when creating View3D's instance<br />This option won't work if `src` is not given
+
+**Type**: boolean
+
+**Default**: true
+
+### autoResize {#autoResize}
+
+<div className="bulma-tags">
+
+</div>
+
+Whether to automatically call [resize()](View3D#resize) when the canvas element's size is changed
+
+**Type**: boolean
+
+**Default**: true
 
 ### renderLoop {#renderLoop}
 

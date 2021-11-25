@@ -1,8 +1,8 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require("prism-react-renderer/themes/github");
-const darkCodeTheme = require("prism-react-renderer/themes/dracula");
+const lightCodeTheme = require("prism-react-renderer/themes/oceanicNext");
+const darkCodeTheme = require("prism-react-renderer/themes/palenight");
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -36,6 +36,7 @@ const config = {
         theme: {
           customCss: [
             require.resolve("./src/css/custom.css"),
+            require.resolve("./src/css/global.css"),
             require.resolve("./src/css/bulma-override.sass")
           ]
         }
@@ -47,10 +48,11 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        logo: {
-          alt: "egjs",
-          src: "img/view3d.png"
-        },
+        title: "View3D",
+        // logo: {
+        //   alt: "egjs",
+        //   src: "img/view3d.png"
+        // },
         items: [
           {
             type: "doc",

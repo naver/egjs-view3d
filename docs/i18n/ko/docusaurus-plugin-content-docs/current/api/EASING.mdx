@@ -3,25 +3,30 @@ custom_edit_url: null
 ---
 
 ```ts
-namespace EASING
+const EASING
 ```
 
-Collection of easing functions
-
-## Members
-### SINE_WAVE {#SINE_WAVE}
-
 <div className="bulma-tags">
-  <span className="bulma-tag is-info">static</span>
+
 </div>
 
-### EASE_OUT_CUBIC {#EASE_OUT_CUBIC}
+Collection of predefined easing functions
 
-<div className="bulma-tags">
-  <span className="bulma-tag is-info">static</span>
-</div>
+**Type**: object
 
-### EASE_OUT_BOUNCE {#EASE_OUT_BOUNCE}
+|PROPERTY|TYPE|DESCRIPTION|
+|:---:|:---:|:---:|
+|SINE_WAVE|||
+|EASE_OUT_CUBIC|||
+|EASE_OUT_BOUNCE|||
+
+```ts
+import View3D, { RotateControl, EASING } from "@egjs/view3d";
+
+new RotateControl({
+ easing: EASING.EASE_OUT_CUBIC,
+});
+```
 
 <div className="bulma-tags">
   <span className="bulma-tag is-info">static</span>

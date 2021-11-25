@@ -5,17 +5,14 @@
 
 import * as THREE from "three";
 
-import View3DError from "../View3DError";
-import Camera from "../core/camera/Camera";
-import { getElement } from "../utils";
+import View3D from "../View3D";
+import Motion from "../core/Motion";
 import { CURSOR } from "../consts/css";
 import * as BROWSER from "../consts/browser";
 import * as DEFAULT from "../consts/default";
-import * as ERROR from "../consts/error";
 import { ValueOf } from "../type/internal";
 
 import CameraControl from "./CameraControl";
-import Motion from "./Motion";
 
 /**
  * Model's rotation control that supports both mouse & touch
@@ -28,18 +25,13 @@ class RotateControl implements CameraControl {
   private _userScale: THREE.Vector2;
 
   // Internal values
-  private _targetEl: HTMLElement | null = null;
+  private _view3D: View3D;
   private _xMotion: Motion;
   private _yMotion: Motion;
   private _screenScale: THREE.Vector2 = new THREE.Vector2(0, 0);
   private _prevPos: THREE.Vector2 = new THREE.Vector2(0, 0);
   private _enabled: boolean = false;
 
-  /**
-   * Control's current target element to attach event listeners
-   * @readonly
-   */
-  public get element() { return this._targetEl; }
   /**
    * Scale factor for panning, x is for horizontal and y is for vertical panning.
    * @type THREE.Vector2
@@ -103,8 +95,8 @@ class RotateControl implements CameraControl {
 
   /**
    * Create new RotateControl instance
+   * @param {View3D} view3D An instance of View3D
    * @param {object} options Options
-   * @param {HTMLElement | null} [options.element] Target element.
    * @param {number} [options.duration=500] Motion's duration.
    * @param {function} [options.easing=(x: number) => 1 - Math.pow(1 - x, 3)] Motion's easing function.
    * @param {THREE.Vector2} [options.scale=new THREE.Vector2(1, 1)] Scale factor for panning, x is for horizontal and y is for vertical panning.
@@ -112,18 +104,14 @@ class RotateControl implements CameraControl {
    * @param {boolean} [options.scaleToElement=true] Whether to scale control to fit element size.
    * @tutorial Adding Controls
    */
-  public constructor({
-    element = DEFAULT.NULL_ELEMENT,
+  public constructor(view3D: View3D, {
     duration = DEFAULT.ANIMATION_DURATION,
     easing = DEFAULT.EASING,
     scale = new THREE.Vector2(1, 1),
     useGrabCursor = true,
     scaleToElement = true
   } = {}) {
-    const targetEl = getElement(element);
-    if (targetEl) {
-      this.setElement(targetEl);
-    }
+    this._view3D = view3D;
     this._userScale = scale;
     this._useGrabCursor = useGrabCursor;
     this._scaleToElement = scaleToElement;
@@ -146,7 +134,8 @@ class RotateControl implements CameraControl {
    * @param deltaTime Number of milisec to update
    * @returns {void} Nothing
    */
-  public update(camera: Camera, deltaTime: number): void {
+  public update(deltaTime: number): void {
+    const camera = this._view3D.camera;
     const xMotion = this._xMotion;
     const yMotion = this._yMotion;
 
@@ -174,11 +163,8 @@ class RotateControl implements CameraControl {
    */
   public enable(): void {
     if (this._enabled) return;
-    if (!this._targetEl) {
-      throw new View3DError(ERROR.MESSAGES.ADD_CONTROL_FIRST, ERROR.CODES.ADD_CONTROL_FIRST);
-    }
 
-    const targetEl = this._targetEl;
+    const targetEl = this._view3D.renderer.canvas;
 
     targetEl.addEventListener(BROWSER.EVENTS.MOUSE_DOWN, this._onMouseDown, false);
 
@@ -188,6 +174,8 @@ class RotateControl implements CameraControl {
 
     this._enabled = true;
     this._setCursor(CURSOR.GRAB);
+
+    this.sync();
   }
 
   /**
@@ -195,9 +183,9 @@ class RotateControl implements CameraControl {
    * @returns {void} Nothing
    */
   public disable(): void {
-    if (!this._enabled || !this._targetEl) return;
+    if (!this._enabled) return;
 
-    const targetEl = this._targetEl;
+    const targetEl = this._view3D.renderer.canvas;
 
     targetEl.removeEventListener(BROWSER.EVENTS.MOUSE_DOWN, this._onMouseDown, false);
     window.removeEventListener(BROWSER.EVENTS.MOUSE_MOVE, this._onMouseMove, false);
@@ -216,24 +204,16 @@ class RotateControl implements CameraControl {
    * @param camera Camera to match state
    * @returns {void} Nothing
    */
-  public sync(camera: Camera): void {
+  public sync(): void {
+    const camera = this._view3D.camera;
+
     this._xMotion.reset(camera.yaw);
     this._yMotion.reset(camera.pitch);
   }
 
-  /**
-   * Set target element to attach event listener
-   * @param element target element
-   * @returns {void} Nothing
-   */
-  public setElement(element: HTMLElement): void {
-    this._targetEl = element;
-    this.resize(new THREE.Vector2(element.offsetWidth, element.offsetHeight));
-  }
-
   private _setCursor(val: ValueOf<typeof CURSOR> | "") {
-    const targetEl = this._targetEl;
-    if (!this._useGrabCursor || !targetEl || !this._enabled) return;
+    const targetEl = this._view3D.renderer.canvas;
+    if (!this._useGrabCursor || !this._enabled) return;
 
     targetEl.style.cursor = val;
   }
@@ -241,7 +221,7 @@ class RotateControl implements CameraControl {
   private _onMouseDown = (evt: MouseEvent) => {
     if (evt.button !== BROWSER.MOUSE_BUTTON.LEFT) return;
 
-    const targetEl = this._targetEl!;
+    const targetEl = this._view3D.renderer.canvas;
     evt.preventDefault();
 
     if (!!targetEl.focus) {

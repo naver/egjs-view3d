@@ -1,6 +1,7 @@
 module.exports = {
   docs: [
-    "installation"
+    "installation",
+    "loading-model"
   ],
   ...require("./sidebars-api.js")
 };

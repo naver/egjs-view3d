@@ -5,11 +5,7 @@
 
 import * as THREE from "three";
 
-import Camera from "../core/camera/Camera";
-import View3DError from "../View3DError";
-import { getElement } from "../utils";
-import * as ERROR from "../consts/error";
-import * as DEFAULT from "../consts/default";
+import View3D from "../View3D";
 
 import CameraControl from "./CameraControl";
 import RotateControl from "./RotateControl";
@@ -21,17 +17,11 @@ import DistanceControl from "./DistanceControl";
  * @category Controls
  */
 class OrbitControl implements CameraControl {
-  private _targetEl: HTMLElement | null;
   private _rotateControl: RotateControl;
   private _translateControl: TranslateControl;
   private _distanceControl: DistanceControl;
   private _enabled: boolean = false;
 
-  /**
-   * Control's current target element to attach event listeners
-   * @readonly
-   */
-  public get element() { return this._targetEl; }
   /**
    * Whether this control is enabled or not
    * @readonly
@@ -52,27 +42,24 @@ class OrbitControl implements CameraControl {
 
   /**
    * Create new OrbitControl instance
+   * @param {View3D} view3D An instance of View3D
    * @param {object} options Options
-   * @param {HTMLElement | string | null} [options.element=null] Attaching element / selector of the element
    * @param {object} [options.rotate={}] Constructor options of {@link RotateControl}
    * @param {object} [options.translate={}] Constructor options of {@link TranslateControl}
    * @param {object} [options.distance={}] Constructor options of {@link DistanceControl}
    */
-  public constructor({
-    element = DEFAULT.NULL_ELEMENT,
+  public constructor(view3D: View3D, {
     rotate = {},
     translate = {},
     distance = {}
   }: Partial<{
-    rotate: ConstructorParameters<typeof RotateControl>[0];
-    translate: ConstructorParameters<typeof TranslateControl>[0];
-    distance: ConstructorParameters<typeof DistanceControl>[0];
-    element: HTMLElement | string | null;
+    rotate: ConstructorParameters<typeof RotateControl>[1];
+    translate: ConstructorParameters<typeof TranslateControl>[1];
+    distance: ConstructorParameters<typeof DistanceControl>[1];
   }> = {}) {
-    this._targetEl = getElement(element);
-    this._rotateControl = new RotateControl({ ...rotate, element: rotate.element || this._targetEl });
-    this._translateControl = new TranslateControl({ ...translate, element: translate.element || this._targetEl });
-    this._distanceControl = new DistanceControl({ ...distance, element: distance.element || this._targetEl });
+    this._rotateControl = new RotateControl(view3D, rotate);
+    this._translateControl = new TranslateControl(view3D, translate);
+    this._distanceControl = new DistanceControl(view3D, distance);
   }
 
   /**
@@ -92,10 +79,10 @@ class OrbitControl implements CameraControl {
    * @param deltaTime Number of milisec to update
    * @returns {void} Nothing
    */
-  public update(camera: Camera, deltaTime: number): void {
-    this._rotateControl.update(camera, deltaTime);
-    this._translateControl.update(camera, deltaTime);
-    this._distanceControl.update(camera, deltaTime);
+  public update(delta: number): void {
+    this._rotateControl.update(delta);
+    this._translateControl.update(delta);
+    this._distanceControl.update(delta);
   }
 
   /**
@@ -114,9 +101,6 @@ class OrbitControl implements CameraControl {
    */
   public enable(): void {
     if (this._enabled) return;
-    if (!this._targetEl) {
-      throw new View3DError(ERROR.MESSAGES.ADD_CONTROL_FIRST, ERROR.CODES.ADD_CONTROL_FIRST);
-    }
 
     this._rotateControl.enable();
     this._translateControl.enable();
@@ -130,7 +114,7 @@ class OrbitControl implements CameraControl {
    * @returns {void} Nothing
    */
   public disable(): void {
-    if (!this._enabled || !this._targetEl) return;
+    if (!this._enabled) return;
 
     this._rotateControl.disable();
     this._translateControl.disable();
@@ -140,26 +124,13 @@ class OrbitControl implements CameraControl {
   }
 
   /**
-   * Synchronize this control's state to given camera position
-   * @param camera Camera to match state
+   * Synchronize this control's state to current camera position
    * @returns {void} Nothing
    */
-  public sync(camera: Camera): void {
-    this._rotateControl.sync(camera);
-    this._translateControl.sync(camera);
-    this._distanceControl.sync(camera);
-  }
-
-  /**
-   * Set target element to attach event listener
-   * @param element target element
-   * @returns {void} Nothing
-   */
-  public setElement(element: HTMLElement): void {
-    this._targetEl = element;
-    this._rotateControl.setElement(element);
-    this._translateControl.setElement(element);
-    this._distanceControl.setElement(element);
+  public sync(): void {
+    this._rotateControl.sync();
+    this._translateControl.sync();
+    this._distanceControl.sync();
   }
 }
 

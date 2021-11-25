@@ -5,7 +5,7 @@
 
 import * as THREE from "three";
 
-import View3DError from "./View3DError";
+import View3DError from "./core/View3DError";
 import * as ERROR from "./consts/error";
 
 export const getElement = (el: HTMLElement | string | null, parent?: HTMLElement): HTMLElement | null => {

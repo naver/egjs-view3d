@@ -5,16 +5,17 @@
 
 import * as THREE from "three";
 
-import Pose from "../core/camera/Pose";
+import Pose from "../core/Pose";
 import { Range } from "../type/internal";
 
-import { EASE_OUT_CUBIC } from "./easing";
+import { EASING as EASING_CONST } from "./external";
 
-
+// View3D Options
+export const FORMAT = "auto";
 export const MODEL_SIZE = 80;
 
 // Animation
-export const EASING = EASE_OUT_CUBIC;
+export const EASING = EASING_CONST.EASE_OUT_CUBIC;
 export const ANIMATION_DURATION = 500;
 export const ANIMATION_LOOP = false;
 export const ANIMATION_RANGE: Readonly<Range> = {

@@ -5,15 +5,12 @@
 
 import * as THREE from "three";
 
-import View3DError from "../View3DError";
-import Camera from "../core/camera/Camera";
-import { getElement } from "../utils";
+import View3D from "../View3D";
+import Motion from "../core/Motion";
 import * as BROWSER from "../consts/browser";
 import * as DEFAULT from "../consts/default";
-import * as ERROR from "../consts/error";
 
 import CameraControl from "./CameraControl";
-import Motion from "./Motion";
 
 /**
  * Distance controller handling both mouse wheel and pinch zoom
@@ -24,17 +21,12 @@ class DistanceControl implements CameraControl {
   private _scale: number = 1;
 
   // Internal values
-  private _targetEl: HTMLElement | null = null;
+  private _view3D: View3D;
   private _scaleModifier: number = 0.25;
   private _motion: Motion;
   private _prevTouchDistance: number = -1;
   private _enabled: boolean = false;
 
-  /**
-   * Control's current target element to attach event listeners
-   * @readonly
-   */
-  public get element() { return this._targetEl; }
   /**
    * Scale factor of the distance
    * @type number
@@ -56,23 +48,19 @@ class DistanceControl implements CameraControl {
 
   /**
    * Create new DistanceControl instance
-   * @tutorial Adding Controls
+   * @param {View3D} view3D An instance of View3D
    * @param {object} options Options
    * @param {HTMLElement | string | null} [options.element=null] Attaching element / selector of the element.
    * @param {number} [options.duration=500] Motion's duration.
    * @param {object} [options.range={min: 0, max: 500}] Motion's range.
    * @param {function} [options.easing=(x: number) => 1 - Math.pow(1 - x, 3)] Motion's easing function.
    */
-  public constructor({
-    element = DEFAULT.NULL_ELEMENT,
+  public constructor(view3D: View3D, {
     duration = DEFAULT.ANIMATION_DURATION,
     range = DEFAULT.DISTANCE_RANGE,
     easing = DEFAULT.EASING
   } = {}) {
-    const targetEl = getElement(element);
-    if (targetEl) {
-      this.setElement(targetEl);
-    }
+    this._view3D = view3D;
     this._motion = new Motion({ duration, range, easing });
   }
 
@@ -90,7 +78,8 @@ class DistanceControl implements CameraControl {
    * @param deltaTime Number of milisec to update
    * @returns {void} Nothing
    */
-  public update(camera: Camera, deltaTime: number): void {
+  public update(deltaTime: number): void {
+    const camera = this._view3D.camera;
     const motion = this._motion;
 
     camera.distance += motion.update(deltaTime);
@@ -107,17 +96,16 @@ class DistanceControl implements CameraControl {
    */
   public enable(): void {
     if (this._enabled) return;
-    if (!this._targetEl) {
-      throw new View3DError(ERROR.MESSAGES.ADD_CONTROL_FIRST, ERROR.CODES.ADD_CONTROL_FIRST);
-    }
 
-    const targetEl = this._targetEl;
+    const targetEl = this._view3D.renderer.canvas;
 
     targetEl.addEventListener(BROWSER.EVENTS.WHEEL, this._onWheel, false);
     targetEl.addEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove, false);
     targetEl.addEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, false);
 
     this._enabled = true;
+
+    this.sync();
   }
 
   /**
@@ -125,9 +113,9 @@ class DistanceControl implements CameraControl {
    * @returns {void} Nothing
    */
   public disable(): void {
-    if (!this._enabled || !this._targetEl) return;
+    if (!this._enabled) return;
 
-    const targetEl = this._targetEl;
+    const targetEl = this._view3D.renderer.canvas;
 
     targetEl.removeEventListener(BROWSER.EVENTS.WHEEL, this._onWheel, false);
     targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove, false);
@@ -141,19 +129,12 @@ class DistanceControl implements CameraControl {
    * @param camera Camera to match state
    * @returns {void} Nothing
    */
-  public sync(camera: Camera): void {
+  public sync(): void {
+    const camera = this._view3D.camera;
+
     this._motion.range.min = camera.minDistance;
     this._motion.range.max = camera.maxDistance;
     this._motion.reset(camera.distance);
-  }
-
-  /**
-   * Set target element to attach event listener
-   * @param element target element
-   * @returns {void} Nothing
-   */
-  public setElement(element: HTMLElement): void {
-    this._targetEl = element;
   }
 
   private _onWheel = (evt: WheelEvent) => {

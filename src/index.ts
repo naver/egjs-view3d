@@ -4,9 +4,7 @@
  */
 
 import View3D from "./View3D";
-import View3DError from "./View3DError";
 
-export * as EASING from "./consts/easing";
 export * from "./type/external";
 export * from "./core";
 export * from "./controls";
@@ -14,7 +12,5 @@ export * from "./loaders";
 export * from "./environments";
 export * from "./extra";
 export * from "./consts/external";
-export {
-  View3DError,
-  View3D as default
-};
+
+export default View3D;

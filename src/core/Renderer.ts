@@ -6,7 +6,7 @@
 import * as THREE from "three";
 
 import Scene from "./Scene";
-import Camera from "./camera/Camera";
+import Camera from "./Camera";
 
 /**
  * Renderer that renders View3D's Scene

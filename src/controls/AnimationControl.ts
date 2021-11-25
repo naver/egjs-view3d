@@ -5,14 +5,14 @@
 
 import * as THREE from "three";
 
-import Camera from "../core/camera/Camera";
-import Pose from "../core/camera/Pose";
+import View3D from "../View3D";
+import Pose from "../core/Pose";
+import Motion from "../core/Motion";
 import * as DEFAULT from "../consts/default";
 import { AnyFunction } from "../type/external";
 import { mix, circulate } from "../utils";
 
 import CameraControl from "./CameraControl";
-import Motion from "./Motion";
 
 /**
  * Control that animates model without user input
@@ -24,6 +24,7 @@ class AnimationControl implements CameraControl {
   private _to: Pose;
 
   // Internal values
+  private _view3D: View3D;
   private _motion: Motion;
   private _enabled: boolean = false;
   private _finishCallbacks: AnyFunction[] = [];
@@ -54,10 +55,12 @@ class AnimationControl implements CameraControl {
    * @param {number} [options.duration=500] Animation duration
    * @param {function} [options.easing=(x: number) => 1 - Math.pow(1 - x, 3)] Animation easing function
    */
-  public constructor(from: Pose, to: Pose, {
+  public constructor(view3D: View3D, from: Pose, to: Pose, {
     duration = DEFAULT.ANIMATION_DURATION,
     easing = DEFAULT.EASING
   } = {}) {
+    this._view3D = view3D;
+
     from = from.clone();
     to = to.clone();
 
@@ -91,9 +94,10 @@ class AnimationControl implements CameraControl {
    * @param deltaTime Number of milisec to update
    * @returns {void} Nothing
    */
-  public update(camera: Camera, deltaTime: number): void {
+  public update(deltaTime: number): void {
     if (!this._enabled) return;
 
+    const camera = this._view3D.camera;
     const from = this._from;
     const to = this._to;
     const motion = this._motion;
@@ -157,11 +161,7 @@ class AnimationControl implements CameraControl {
     // DO NOTHING
   }
 
-  public setElement(element: HTMLElement) {
-    // DO NOTHING
-  }
-
-  public sync(camera: Camera): void {
+  public sync(): void {
     // Do nothing
   }
   /* eslint-enable @typescript-eslint/no-unused-vars */
