@@ -9,7 +9,6 @@ import WebARSession from "../xr/WebARSession";
 
 /**
  * XRManager that manages XRSessions
- * @category Core
  */
 class XRManager {
   private _view3d: View3D;

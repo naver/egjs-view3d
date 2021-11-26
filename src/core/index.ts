@@ -3,22 +3,28 @@
  * egjs projects are licensed under the MIT license
  */
 
-import View3DError from "./View3DError";
-import ModelAnimator from "./ModelAnimator";
+import Animation from "./Animation";
+import AutoResizer from "./AutoResizer";
+import Camera from "./Camera";
 import Model from "./Model";
+import ModelAnimator from "./ModelAnimator";
+import ModelLoader from "./ModelLoader";
+import Motion from "./Motion";
+import Pose from "./Pose";
 import Renderer from "./Renderer";
 import Scene from "./Scene";
-import Camera from "./Camera";
-import Pose from "./Pose";
-import Motion from "./Motion";
+import View3DError from "./View3DError";
 
 export {
-  View3DError,
-  ModelAnimator,
+  Animation,
+  AutoResizer,
+  Camera,
   Model,
+  ModelAnimator,
+  ModelLoader,
+  Motion,
+  Pose,
   Renderer,
   Scene,
-  Camera,
-  Pose,
-  Motion
+  View3DError
 };

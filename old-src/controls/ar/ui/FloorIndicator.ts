@@ -10,7 +10,6 @@ import { Range } from "../../../type/internal";
 
 /**
  * Options for {@link FloorIndicator}
- * @category Controls-AR
  * @interface
  * @property {number} [ringOpacity=0.3] Ring's opacity.
  * @property {number} [dirIndicatorOpacity=1] Direction indicator's opacity.
@@ -24,7 +23,6 @@ export interface FloorIndicatorOption {
 
 /**
  * Ring type indicator for showing where the model's at.
- * @category Controls-AR
  */
 class FloorIndicator {
   private _mesh: THREE.Mesh;

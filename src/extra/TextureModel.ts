@@ -11,7 +11,6 @@ import * as ERR from "../consts/error";
 
 /**
  * Texture(image) model
- * @category Extra
  */
 class TextureModel extends Model {
   private _texture: THREE.Texture;

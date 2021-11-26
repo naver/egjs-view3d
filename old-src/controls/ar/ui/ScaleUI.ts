@@ -9,7 +9,6 @@ import { toPowerOfTwo } from "../../../utils";
 
 /**
  * Options for {@link ScaleUI}
- * @category Controls-AR
  * @interface
  * @property {number} [width=0.1] UI width, in meter.
  * @property {number} [padding=20] UI's padding value, in px.
@@ -27,7 +26,6 @@ export interface ScaleUIOption {
 
 /**
  * UI element displaying model's scale percentage info when user chaning model's scale.
- * @category Controls-AR
  */
 class ScaleUI {
   private _canvas: HTMLCanvasElement;

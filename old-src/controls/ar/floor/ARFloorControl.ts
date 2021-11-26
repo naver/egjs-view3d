@@ -18,7 +18,6 @@ import ARFloorTranslateControl, { ARFloorTranslateControlOption } from "./ARFloo
 
 /**
  * Options for the {@link ARFloorControl}
- * @category Controls-AR
  * @interface
  * @property {ARSwirlControlOptions} rotate Options for {@link ARSwirlControl}
  * @property {ARFloorTranslateControlOption} translate Options for {@link ARFloorTranslateControl}
@@ -36,7 +35,6 @@ export interface ARFloorControlOption {
 
 /**
  * AR control for {@link FloorARSession}
- * @category Controls-AR
  */
 class ARFloorControl {
   private _enabled = true;

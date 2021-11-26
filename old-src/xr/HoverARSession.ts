@@ -16,7 +16,6 @@ import WebARSession, { WebARSessionOption } from "./WebARSession";
 /**
  * Options for {@link HoverARSession}.
  * This type is intersection of {@link WebARSessionOption} and {@link ARHoverControlOption}
- * @category XR
  * @interface
  * @extends WebARSessionOption
  * @extends ARHoverControlOption
@@ -27,7 +26,6 @@ interface HoverARSessionOption extends WebARSessionOption, ARHoverControlOption 
 
 /**
  * WebXR based AR session which puts model at the space front of camera.
- * @category XR
  * @fires WebARSession#start
  * @fires WebARSession#end
  * @fires WebARSession#canPlace

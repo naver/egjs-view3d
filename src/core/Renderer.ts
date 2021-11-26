@@ -10,7 +10,6 @@ import Camera from "./Camera";
 
 /**
  * Renderer that renders View3D's Scene
- * @category Core
  */
 class Renderer {
   private _renderer: THREE.WebGLRenderer;
@@ -30,20 +29,21 @@ class Renderer {
    */
   public get context() { return this._renderer.context; }
   /**
-   * The width and height of the renderer's output canvas
-   * @see https://threejs.org/docs/#api/en/math/Vector2
-   * @type THREE.Vector2
-   */
-  public get size() { return this._renderer.getSize(new THREE.Vector2()); }
-  /**
    * Three.js {@link https://threejs.org/docs/#api/en/renderers/WebGLRenderer WebGLRenderer} instance
    * @type THREE.WebGLRenderer
    * @readonly
    */
   public get threeRenderer() { return this._renderer; }
+  /**
+   * The width and height of the renderer's output canvas
+   * @type {object}
+   * @param {number} width Width of the canvas
+   * @param {number} height Height of the canvas
+   */
+  public get size() {
+    const canvasSize = this._renderer.getSize(new THREE.Vector2());
 
-  public set size(val: THREE.Vector2) {
-    this._renderer.setSize(val.x, val.y, false);
+    return { width: canvasSize.width, height: canvasSize.y };
   }
 
   /**
@@ -70,7 +70,7 @@ class Renderer {
 
   /**
    * Resize the renderer based on current canvas width / height
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public resize(): void {
     const renderer = this._renderer;

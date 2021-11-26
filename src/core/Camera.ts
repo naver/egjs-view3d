@@ -14,7 +14,6 @@ import Pose from "./Pose";
 
 /**
  * Camera that renders the scene of View3D
- * @category Core
  */
 class Camera {
   private _view3D: View3D;
@@ -185,12 +184,14 @@ class Camera {
 
   /**
    * Update camera's aspect to given size
-   * @param size {@link THREE.Vector2} instance that has width(x), height(y)
-   * @returns {void} Nothing
+   * @param {object} size New size to apply
+   * @param {number} [size.width] New width
+   * @param {number} [size.height] New height
+   * @returns {void}
    */
-  public resize(size: THREE.Vector2): void {
+  public resize(size: { width: number; height: number }): void {
     const cam = this._threeCamera;
-    const aspect = size.x / size.y;
+    const aspect = size.width / size.height;
 
     cam.aspect = aspect;
     cam.updateProjectionMatrix();
@@ -200,7 +201,7 @@ class Camera {
    * Set default position of camera relative to the 3d model
    * New default pose will be used when {@link Camera#reset reset()} is called
    * @param newDefaultPose new default pose to apply
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public setDefaultPose(newDefaultPose: Partial<{
     yaw: number;
@@ -227,7 +228,7 @@ class Camera {
 
   /**
    * Update camera position base on the {@link Camera#currentPose currentPose} value
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public updatePosition(): void {
     this._clampCurrentPose();

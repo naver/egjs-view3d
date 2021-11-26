@@ -7,7 +7,6 @@ import * as XR from "../../../src/consts/xr";
 
 /**
  * Manager for WebXR hit-test feature
- * @category XR
  */
 class HitTest {
   private _source: any = null;

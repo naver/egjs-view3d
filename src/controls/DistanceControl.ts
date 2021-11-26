@@ -14,7 +14,6 @@ import CameraControl from "./CameraControl";
 
 /**
  * Distance controller handling both mouse wheel and pinch zoom
- * @category Controls
  */
 class DistanceControl implements CameraControl {
   // Options
@@ -66,7 +65,7 @@ class DistanceControl implements CameraControl {
 
   /**
    * Destroy the instance and remove all event listeners attached
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public destroy(): void {
     this.disable();
@@ -76,7 +75,7 @@ class DistanceControl implements CameraControl {
    * Update control by given deltaTime
    * @param camera Camera to update position
    * @param deltaTime Number of milisec to update
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public update(deltaTime: number): void {
     const camera = this._view3D.camera;
@@ -86,13 +85,13 @@ class DistanceControl implements CameraControl {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public resize(size: THREE.Vector2) {
+  public resize(size: { width: number; height: number }) {
     // DO NOTHING
   }
 
   /**
    * Enable this input and add event listeners
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public enable(): void {
     if (this._enabled) return;
@@ -110,7 +109,7 @@ class DistanceControl implements CameraControl {
 
   /**
    * Disable this input and remove all event handlers
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public disable(): void {
     if (!this._enabled) return;
@@ -127,7 +126,7 @@ class DistanceControl implements CameraControl {
   /**
    * Synchronize this control's state to given camera position
    * @param camera Camera to match state
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public sync(): void {
     const camera = this._view3D.camera;

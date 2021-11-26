@@ -19,7 +19,6 @@ enum STATE {
 
 /**
  * Options for {@link ARFloorTranslateControl}
- * @category Controls-AR
  * @interface
  * @property {number} [threshold=0.05] Threshold until translation works, this value is relative to screen size.
  * @property {number} [hoverAmplitude=0.01] How much model will hover up and down, in meter. Default value is 0.01(1cm).
@@ -41,7 +40,6 @@ export interface ARFloorTranslateControlOption {
 
 /**
  * Model's translation(position) control for {@link ARFloorControl}
- * @category Controls-AR
  */
 class ARFloorTranslateControl implements ARControl {
   // Options

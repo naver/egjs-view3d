@@ -13,7 +13,6 @@ import { XRRenderContext, XRContext, XRInputs } from "../../../type/internal";
 
 /**
  * Options for {@link ARHoverTranslateControl}
- * @category Controls-AR
  * @interface
  * @property {ArrowIndicatorOption} arrow Options for {@link ArrowIndicator}
  */
@@ -23,7 +22,6 @@ export interface ARHoverTranslateControlOption {
 
 /**
  * Model's translation(position) control for {@link ARHoverControl}
- * @category Controls-AR
  */
 class ARHoverTranslateControl implements ARControl {
   // Internal states

@@ -101,7 +101,7 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
   /**
    * Destroy the instance and remove all event listeners attached
    * This also will reset CSS cursor to intial
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public destroy(): void {
     this.disable();
@@ -110,7 +110,7 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
   /**
    * Update control by given deltaTime
    * @param deltaTime Number of milisec to update
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public update(deltaTime: number): void {
     const camera = this._view3D.camera;
@@ -136,17 +136,19 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
   /**
    * Resize control to match target size
    * This method is only meaningful when {@link RotateControl#scaleToElementSize scaleToElementSize} is enabled
-   * @param size {@link https://threejs.org/docs/#api/en/math/Vector2 THREE.Vector2} instance of width(x), height(y)
+   * @param {object} size New size to apply
+   * @param {number} [size.width] New width
+   * @param {number} [size.height] New height
    */
-  public resize(size: THREE.Vector2) {
+  public resize(size: { width: number; height: number }) {
     const screenSize = this._screenSize;
 
-    screenSize.copy(size);
+    screenSize.copy(new THREE.Vector2(size.width, size.height));
   }
 
   /**
    * Enable this input and add event listeners
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public enable(): void {
     if (this._enabled) return;
@@ -169,7 +171,7 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
 
   /**
    * Disable this input and remove all event handlers
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public disable(): void {
     if (!this._enabled) return;
@@ -193,7 +195,7 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
 
   /**
    * Synchronize this control's state to the camera position
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public sync(): void {
     this._xMotion.reset(0);

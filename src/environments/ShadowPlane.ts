@@ -11,7 +11,6 @@ import Environment from "./Environment";
 
 /**
  * Helper class to easily add shadow plane under your 3D model
- * @category Environment
  * @example
  * ```ts
  * import View3D, { ShadowPlane } from "@egjs/view3d";

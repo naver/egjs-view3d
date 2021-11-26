@@ -10,7 +10,6 @@ import Renderer from "../core/Renderer";
 
 /**
  * Texture loader
- * @category Loaders
  */
 class TextureLoader {
   private _renderer: Renderer;

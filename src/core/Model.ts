@@ -7,7 +7,6 @@ import * as THREE from "three";
 
 /**
  * Data class for loaded 3d model
- * @category Core
  */
 class Model {
   private _scene: THREE.Group;

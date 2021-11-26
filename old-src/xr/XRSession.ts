@@ -7,7 +7,6 @@ import View3D from "../../src/View3D";
 
 /**
  * Interface for XR sessions
- * @category XR
  * @interface
  * @property {boolean} isWebXRSession Returns whether this session is WebXR-based session or not.
  * @property {function} isAvailable Return a Promise of whether this session is available on current device.

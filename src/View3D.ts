@@ -47,7 +47,6 @@ export interface View3DOptions {
 
 /**
  * Yet another 3d model viewer
- * @category Core
  */
 class View3D extends Component<View3DEvents> {
   /**
@@ -274,10 +273,14 @@ class View3D extends Component<View3DEvents> {
     animator.update(delta);
     control.update(deltaMiliSec);
 
-    this.trigger(EVENTS.BEFORE_RENDER, this);
+    this.trigger(EVENTS.BEFORE_RENDER, {
+      target: this
+    });
     camera.updatePosition();
     renderer.render(scene, camera);
-    this.trigger(EVENTS.AFTER_RENDER, this);
+    this.trigger(EVENTS.AFTER_RENDER, {
+      target: this
+    });
   };
 
   /**

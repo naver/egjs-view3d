@@ -17,7 +17,6 @@ import ARWallTranslateControl, { ARWallTranslateControlOption } from "./ARWallTr
 
 /**
  * Options for the {@link ARWallControl}
- * @category Controls-AR
  * @interface
  * @property {ARSwirlControlOptions} rotate Options for {@link ARSwirlControl}
  * @property {ARTranslateControlOption} translate Options for {@link ARWallTranslateControl}
@@ -35,7 +34,6 @@ export interface ARWallControlOption {
 
 /**
  * AR control for {@link WallARSession}.
- * @category Controls-AR
  */
 class ARWallControl {
   private _enabled = true;

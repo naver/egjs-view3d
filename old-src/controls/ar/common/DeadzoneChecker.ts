@@ -15,7 +15,6 @@ enum STATE {
 
 /**
  * Options for {@link DeadzoneChecker}
- * @category Controls-AR
  * @interface
  * @property {number} size Size of the deadzone circle.
  */
@@ -25,7 +24,6 @@ export interface DeadzoneCheckerOption {
 
 /**
  * Deadzone checker for deadzone-based controls
- * @category Controls-AR
  */
 class DeadzoneChecker {
   // Options

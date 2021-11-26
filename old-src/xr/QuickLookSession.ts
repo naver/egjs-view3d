@@ -10,7 +10,6 @@ import XRSession from "./XRSession";
 
 /**
  * AR Session using Apple AR Quick Look Viewer
- * @category XR
  * @see https://developer.apple.com/augmented-reality/quick-look/
  */
 class QuickLookSession implements XRSession {

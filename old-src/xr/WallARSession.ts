@@ -17,7 +17,6 @@ import HitTest from "./features/HitTest";
 /**
  * Options for {@link WallARSession}.
  * This type is intersection of {@link WebARSessionOption} and {@link ARWallControlOption}
- * @category XR
  * @interface
  * @extends WebARSessionOption
  * @extends ARWallControlOption
@@ -26,7 +25,6 @@ interface WallARSessionOption extends WebARSessionOption, ARWallControlOption {}
 
 /**
  * AR session which places model on the wall
- * @category XR
  * @fires WebARSession#start
  * @fires WebARSession#end
  * @fires WebARSession#canPlace

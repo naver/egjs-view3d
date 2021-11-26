@@ -3,8 +3,6 @@
  * egjs projects are licensed under the MIT license
  */
 
-import * as THREE from "three";
-
 import View3D from "../View3D";
 import * as BROWSER from "../consts/browser";
 
@@ -12,7 +10,6 @@ import CameraControl from "./CameraControl";
 
 /**
  * Control that animates model without user input
- * @category Controls
  */
 class AutoControl implements CameraControl {
   // Options
@@ -103,7 +100,7 @@ class AutoControl implements CameraControl {
   /**
    * Destroy the instance and remove all event listeners attached
    * This also will reset CSS cursor to intial
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public destroy(): void {
     this.disable();
@@ -113,7 +110,7 @@ class AutoControl implements CameraControl {
    * Update control by given deltaTime
    * @param camera Camera to update position
    * @param deltaTime Number of milisec to update
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public update(deltaTime: number): void {
     if (!this._enabled) return;
@@ -131,13 +128,13 @@ class AutoControl implements CameraControl {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public resize(size: THREE.Vector2) {
+  public resize(size: { width: number; height: number }) {
     // DO NOTHING
   }
 
   /**
    * Enable this input and add event listeners
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public enable(): void {
     if (this._enabled) return;
@@ -159,7 +156,7 @@ class AutoControl implements CameraControl {
 
   /**
    * Disable this input and remove all event handlers
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public disable(): void {
     if (!this._enabled) return;

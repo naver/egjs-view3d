@@ -5,7 +5,6 @@
 
 /**
  * @interface
- * @category Controls
  * @property enabled Whether this control is enabled or not.
  * @property destroy Destroy this control.
  * @property resize Resize the control. Usually, the element size is used for parameter.
@@ -17,7 +16,7 @@
 interface CameraControl {
   readonly enabled: boolean;
   destroy(): void;
-  resize(size: THREE.Vector2): void;
+  resize(size: { width: number; height: number }): void;
   sync(): void;
   update(delta: number): void;
   enable(): void;

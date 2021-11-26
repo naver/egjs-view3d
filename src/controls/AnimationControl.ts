@@ -3,8 +3,6 @@
  * egjs projects are licensed under the MIT license
  */
 
-import * as THREE from "three";
-
 import View3D from "../View3D";
 import Pose from "../core/Pose";
 import Motion from "../core/Motion";
@@ -16,7 +14,6 @@ import CameraControl from "./CameraControl";
 
 /**
  * Control that animates model without user input
- * @category Controls
  */
 class AnimationControl implements CameraControl {
   // Options
@@ -82,7 +79,7 @@ class AnimationControl implements CameraControl {
   /**
    * Destroy the instance and remove all event listeners attached
    * This also will reset CSS cursor to intial
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public destroy(): void {
     this.disable();
@@ -92,7 +89,7 @@ class AnimationControl implements CameraControl {
    * Update control by given deltaTime
    * @param camera Camera to update position
    * @param deltaTime Number of milisec to update
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public update(deltaTime: number): void {
     if (!this._enabled) return;
@@ -119,7 +116,7 @@ class AnimationControl implements CameraControl {
 
   /**
    * Enable this input and add event listeners
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public enable(): void {
     if (this._enabled) return;
@@ -131,7 +128,7 @@ class AnimationControl implements CameraControl {
 
   /**
    * Disable this input and remove all event handlers
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public disable(): void {
     if (!this._enabled) return;
@@ -142,7 +139,7 @@ class AnimationControl implements CameraControl {
   /**
    * Add callback which is called when animation is finished
    * @param callback Callback that will be called when animation finishes
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public onFinished(callback: AnyFunction): void {
     this._finishCallbacks.push(callback);
@@ -150,14 +147,14 @@ class AnimationControl implements CameraControl {
 
   /**
    * Remove all onFinished callbacks
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public clearFinished(): void {
     this._finishCallbacks = [];
   }
 
   /* eslint-disable @typescript-eslint/no-unused-vars */
-  public resize(size: THREE.Vector2) {
+  public resize(size: { width: number; height: number }) {
     // DO NOTHING
   }
 

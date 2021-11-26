@@ -7,7 +7,6 @@ import * as TOUCH from "../../../../src/consts/touch";
 import { XRRenderContext, XRContext, XRInputs } from "../../../../src/type/internal";
 
 /**
- * @category Controls-AR
  * @interface
  */
 interface ARControl {

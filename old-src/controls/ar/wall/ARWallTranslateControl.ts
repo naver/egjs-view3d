@@ -10,7 +10,6 @@ import ArrowIndicator, { ArrowIndicatorOption } from "../ui/ArrowIndicator";
 import { XRRenderContext, XRContext, XRInputs } from "../../../type/internal";
 /**
  * Options for {@link ARTranslateControl}
- * @category Controls-AR
  * @interface
  * @property {ArrowIndicatorOption} arrow Options for {@link ArrowIndicator}
  */
@@ -20,7 +19,6 @@ export interface ARWallTranslateControlOption {
 
 /**
  * Model's translation(position) control for {@link ARWallControl}
- * @category Controls-AR
  */
 class ARWallTranslateControl implements ARControl {
   public readonly position = new THREE.Vector3();

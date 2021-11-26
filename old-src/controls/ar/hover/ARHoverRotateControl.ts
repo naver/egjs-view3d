@@ -14,7 +14,6 @@ import { XRRenderContext, XRContext, XRInputs } from "../../../type/internal";
 
 /**
  * Options for {@link ARHoverRotateControl}
- * @category Controls-AR
  * @interface
  * @property {ARSwirlControlOption} swirl Options for {@link ARSwirlControl}
  * @property {ARSwipeControlOption} swipe Options for {@link ARSwipeControl}
@@ -26,7 +25,6 @@ export interface ARHoverRotateControlOption {
 
 /**
  * Model's yaw(local y-axis rotation) controller which works on AR(WebXR) mode.
- * @category Controls-AR
  */
 class ARHoverRotateControl implements ARControl {
   /**

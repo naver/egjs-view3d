@@ -7,7 +7,6 @@ import * as XR from "../../../src/consts/xr";
 
 /**
  * Manager for WebXR dom-overlay feature
- * @category XR
  */
 class DOMOverlay {
   private _root: HTMLElement;

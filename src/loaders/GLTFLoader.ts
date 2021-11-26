@@ -15,7 +15,6 @@ import { ModelLoadOption } from "../type/external";
 
 /**
  * GLTFLoader
- * @category Loaders
  */
 class GLTFLoader {
   private _loader: ThreeGLTFLoader;

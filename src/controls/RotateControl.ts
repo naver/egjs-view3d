@@ -76,12 +76,11 @@ class RotateControl extends Component<ControlEvents> implements CameraControl {
    * Create new RotateControl instance
    * @param {View3D} view3D An instance of View3D
    * @param {object} options Options
-   * @param {number} [options.duration=500] Motion's duration.
-   * @param {function} [options.easing=(x: number) => 1 - Math.pow(1 - x, 3)] Motion's easing function.
-   * @param {THREE.Vector2} [options.scale=new THREE.Vector2(1, 1)] Scale factor for panning, x is for horizontal and y is for vertical panning.
-   * @param {boolean} [options.useGrabCursor=true] Whether to apply CSS style `cursor: grab` on the target element or not.
-   * @param {boolean} [options.scaleToElement=true] Whether to scale control to fit element size.
-   * @tutorial Adding Controls
+   * @param {number} [options.duration=500] Motion's duration
+   * @param {function} [options.easing=(x: number) => 1 - Math.pow(1 - x, 3)] Motion's easing function
+   * @param {THREE.Vector2} [options.scale=new THREE.Vector2(1, 1)] Scale factor for panning, x is for horizontal and y is for vertical panning
+   * @param {boolean} [options.useGrabCursor=true] Whether to apply CSS style `cursor: grab` on the target element or not
+   * @param {boolean} [options.scaleToElement=true] Whether to scale control to fit element size
    */
   public constructor(view3D: View3D, {
     duration = DEFAULT.ANIMATION_DURATION,
@@ -101,7 +100,7 @@ class RotateControl extends Component<ControlEvents> implements CameraControl {
   /**
    * Destroy the instance and remove all event listeners attached
    * This also will reset CSS cursor to intial
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public destroy(): void {
     this.disable();
@@ -111,7 +110,7 @@ class RotateControl extends Component<ControlEvents> implements CameraControl {
    * Update control by given deltaTime
    * @param camera Camera to update position
    * @param deltaTime Number of milisec to update
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public update(deltaTime: number): void {
     const camera = this._view3D.camera;
@@ -130,15 +129,17 @@ class RotateControl extends Component<ControlEvents> implements CameraControl {
   /**
    * Resize control to match target size
    * This method is only meaningful when {@link RotateControl#scaleToElement scaleToElement} is enabled
-   * @param size {@link https://threejs.org/docs/#api/en/math/Vector2 THREE.Vector2} instance of width(x), height(y)
+   * @param {object} size New size to apply
+   * @param {number} [size.width] New width
+   * @param {number} [size.height] New height
    */
-  public resize(size: THREE.Vector2) {
-    this._screenScale.set(360 / size.x, 180 / size.y);
+  public resize(size: { width: number; height: number }) {
+    this._screenScale.set(360 / size.width, 180 / size.height);
   }
 
   /**
    * Enable this input and add event listeners
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public enable(): void {
     if (this._enabled) return;
@@ -159,7 +160,7 @@ class RotateControl extends Component<ControlEvents> implements CameraControl {
 
   /**
    * Disable this input and remove all event handlers
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public disable(): void {
     if (!this._enabled) return;
@@ -182,7 +183,7 @@ class RotateControl extends Component<ControlEvents> implements CameraControl {
   /**
    * Synchronize this control's state to given camera position
    * @param camera Camera to match state
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public sync(): void {
     const camera = this._view3D.camera;

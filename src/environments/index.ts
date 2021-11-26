@@ -5,8 +5,13 @@
 
 import AutoDirectionalLight from "./AutoDirectionalLight";
 import ShadowPlane from "./ShadowPlane";
+import Environment from "./Environment";
 
 export {
   AutoDirectionalLight,
   ShadowPlane
+};
+
+export type {
+  Environment
 };

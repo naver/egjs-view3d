@@ -22,7 +22,6 @@ export interface AnyObject {
 /**
  * Loading option for the model
  * @interface
- * @category Loaders
  * @property {boolean} fixSkinnedBbox Whether to apply inference from skeleton when calculating bounding box
  * This can fix some models with skinned mesh when it has wrong bounding box
  */
@@ -33,7 +32,6 @@ export interface ModelLoadOption {
 /**
  * Loading option for the .drc model
  * @interface
- * @category Loaders
  * @extends ModelLoadOption
  * @property {string|number} color Color of the loaded model's mesh / points
  * @property {boolean} point Whether to use Three.js's PointsMaterial & Points

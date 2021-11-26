@@ -11,7 +11,6 @@ import { DracoLoadOption } from "../type/external";
 
 /**
  * DracoLoader
- * @category Loaders
  */
 class DracoLoader {
   /**

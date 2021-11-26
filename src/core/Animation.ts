@@ -6,7 +6,7 @@
 import Component from "@egjs/component";
 
 import * as DEFAULT from "../consts/default";
-import * as EASING from "../consts/easing";
+import { EASING } from "../consts/external";
 import { circulate } from "../utils";
 
 /**
@@ -39,7 +39,6 @@ import { circulate } from "../utils";
 
 /**
  * Self-running animation
- * @category Core
  */
 class Animation extends Component<{
   progress: (event: { progress: number; easedProgress: number }) => any;

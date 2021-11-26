@@ -13,7 +13,6 @@ import ARControl from "./ARControl";
 
 /**
  * Options for {@link ARScaleControl}
- * @category Controls-AR
  * @interface
  * @property {number} [min=0.05] Minimum scale, default is 0.05(5%)
  * @property {number} [max=2] Maximum scale, default is 2(200%)
@@ -25,7 +24,6 @@ export interface ARScaleControlOption {
 
 /**
  * Model's scale controller which works on AR(WebXR) mode.
- * @category Controls-AR
  */
 class ARScaleControl implements ARControl {
   // TODO: add option for "user scale"

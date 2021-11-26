@@ -15,7 +15,6 @@ import ARHoverTranslateControl, { ARHoverTranslateControlOption } from "./ARHove
 
 /**
  * Options for the {@link ARHoverControl}
- * @category Controls-AR
  * @interface
  * @property {ARHoverRotateControlOption} rotate Options for {@link ARHoverRotateControl}
  * @property {ARHoverTranslateControlOption} translate Options for {@link ARHoverTranslateControl}
@@ -30,7 +29,6 @@ export interface ARHoverControlOption {
 
 /**
  * AR control for {@link HoverARSession}
- * @category Controls-AR
  */
 class ARHoverControl {
   private _enabled = true;

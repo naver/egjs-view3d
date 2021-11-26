@@ -10,7 +10,6 @@ import XRSession from "./XRSession";
 
 /**
  * AR session using Google's scene-viewer
- * @category XR
  * @see https://developers.google.com/ar/develop/java/scene-viewer
  */
 class SceneViewerSession implements XRSession {

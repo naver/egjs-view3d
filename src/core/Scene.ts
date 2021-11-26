@@ -14,7 +14,6 @@ import Model from "./Model";
 /**
  * Scene that View3D will render.
  * All model datas including Mesh, Lights, etc. will be included on this
- * @category Core
  */
 class Scene {
   private _root: THREE.Scene;
@@ -68,7 +67,7 @@ class Scene {
 
   /**
    * Reset scene to initial state
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public reset(): void {
     this.resetModel();
@@ -77,7 +76,7 @@ class Scene {
 
   /**
    * Fully remove all objects that added by calling {@link Scene#add add()}
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public resetModel(): void {
     this._removeChildsOf(this._userObjects);
@@ -86,7 +85,7 @@ class Scene {
   /**
    * Remove all objects that added by calling {@link Scene#addEnv addEnv()}
    * This will also reset scene background & envmap
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public resetEnv(): void {
     this._removeChildsOf(this._envObjects);
@@ -99,7 +98,7 @@ class Scene {
   /**
    * Add new Three.js {@link https://threejs.org/docs/#api/en/core/Object3D Object3D} into the scene
    * @param object {@link https://threejs.org/docs/#api/en/core/Object3D THREE.Object3D}s to add
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public add(...object: THREE.Object3D[]): void {
     this._userObjects.add(...object);
@@ -108,7 +107,7 @@ class Scene {
   /**
    * Add new {@link Environment} or Three.js {@link https://threejs.org/docs/#api/en/core/Object3D Object3D}s to the scene, which won't be removed after displaying another 3D model
    * @param envs {@link Environment} | {@link https://threejs.org/docs/#api/en/core/Object3D THREE.Object3D}s to add
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public addEnv(...envs: Array<Environment | THREE.Object3D>): void {
     envs.forEach(env => {
@@ -124,7 +123,7 @@ class Scene {
   /**
    * Remove Three.js {@link https://threejs.org/docs/#api/en/core/Object3D Object3D} into the scene
    * @param object {@link https://threejs.org/docs/#api/en/core/Object3D THREE.Object3D}s to add
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public remove(...object: THREE.Object3D[]): void {
     this._userObjects.remove(...object);
@@ -133,7 +132,7 @@ class Scene {
   /**
    * Remove {@link Environment} or Three.js {@link https://threejs.org/docs/#api/en/core/Object3D Object3D}s to the scene, which won't be removed after displaying another 3D model
    * @param envs {@link Environment} | {@link https://threejs.org/docs/#api/en/core/Object3D THREE.Object3D}s to add
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public removeEnv(...envs: Array<Environment | THREE.Object3D>): void {
     envs.forEach(env => {
@@ -153,7 +152,7 @@ class Scene {
    * Set background of the scene.
    * @see {@link https://threejs.org/docs/#api/en/scenes/Scene.background THREE.Scene.background}
    * @param background A texture to set as background
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public setBackground(background: THREE.Color | THREE.Texture | THREE.CubeTexture | THREE.WebGLCubeRenderTarget | null): void {
     // Three.js's type definition does not include WebGLCubeRenderTarget, but it works and defined on their document
@@ -165,7 +164,7 @@ class Scene {
    * Set scene's environment map that affects all physical materials in the scene
    * @see {@link https://threejs.org/docs/#api/en/scenes/Scene.environment THREE.Scene.environment}
    * @param envmap A texture to set as environment map
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public setEnvMap(envmap: THREE.Texture | THREE.CubeTexture | THREE.WebGLCubeRenderTarget | null): void {
     // Next line written to silence Three.js's warning
@@ -175,7 +174,7 @@ class Scene {
 
   /**
    * Make this scene visible
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public show(): void {
     this._root.visible = true;
@@ -183,7 +182,7 @@ class Scene {
 
   /**
    * Make this scene invisible
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public hide(): void {
     this._root.visible = false;

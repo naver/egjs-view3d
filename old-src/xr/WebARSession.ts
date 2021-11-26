@@ -21,7 +21,6 @@ declare global {
 
 /**
  * Options for WebARSession
- * @category XR
  * @interface
  * @property {object} [features={}] You can set additional features(see {@link https://developer.mozilla.org/en-US/docs/Web/API/XRSessionInit XRSessionInit}) with this option.
  * @property {number} [maxModelSize=Infinity] If model's size is too big to show on AR, you can restrict it's size with this option. Model with size bigger than this value will clamped to this value.
@@ -39,7 +38,6 @@ export interface WebARSessionOption {
 
 /**
  * WebXR based abstract AR session class
- * @category XR
  * @fires WebARSession#start
  * @fires WebARSession#end
  * @fires WebARSession#canPlace
@@ -78,29 +76,25 @@ abstract class WebARSession extends Component<{
   /**
    * Emitted when session is started.
    * @event start
-   * @category XR
-   * @memberof WebARSession
+     * @memberof WebARSession
    * @type void
    */
   /**
    * Emitted when session is ended.
    * @event end
-   * @category XR
-   * @memberof WebARSession
+     * @memberof WebARSession
    * @type void
    */
   /**
    * Emitted when model can be placed on the space.
    * @event canPlace
-   * @category XR
-   * @memberof WebARSession
+     * @memberof WebARSession
    * @type void
    */
   /**
    * Emitted when model is placed.
    * @event modelPlaced
-   * @category XR
-   * @memberof WebARSession
+     * @memberof WebARSession
    * @type void
    */
 

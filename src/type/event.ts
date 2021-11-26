@@ -47,14 +47,20 @@ export interface ResizeEvent {
  * Event that fires before rendering a frame
  * @ko 프레임 렌더링 직전 발생하는 이벤트
  * @event View3D#beforeRender
- * @type {View3D}
+ * @type {object}
+ * @property {View3D} target A View3D instance that triggered this event<ko>이 이벤트를 트리거한 View3D의 인스턴스</ko>
  */
-export type BeforeRenderEvent = View3D;
+export interface BeforeRenderEvent {
+  target: View3D;
+}
 
 /**
  * Event that fires after rendering a frame
  * @ko 프레임 렌더링 직후 발생하는 이벤트
  * @event View3D#afterRender
- * @type {View3D}
+ * @type {object}
+ * @property {View3D} target A View3D instance that triggered this event<ko>이 이벤트를 트리거한 View3D의 인스턴스</ko>
  */
-export type AfterRenderEvent = View3D;
+export interface AfterRenderEvent {
+  target: View3D;
+}

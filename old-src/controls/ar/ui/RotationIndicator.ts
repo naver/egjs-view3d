@@ -7,7 +7,6 @@ import * as THREE from "three";
 
 /**
  * Options for {@link RotationIndicator}
- * @category Controls-AR
  * @interface
  * @property {string | number | THREE.Color} [ringColor=0xffffff] Ring color
  * @property {string | number | THREE.Color} [axisColor=0xffffff] Axis color
@@ -19,7 +18,6 @@ export interface RotationIndicatorOption {
 
 /**
  * Rotation indicator for ARHoverSession
- * @category Controls-AR
  */
 class RotationIndicator {
   private _ring: THREE.Mesh;

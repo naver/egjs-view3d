@@ -16,7 +16,6 @@ import ARControl from "./ARControl";
 
 /**
  * Options for {@link ARSwirlControl}
- * @category Controls-AR
  * @interface
  * @property {number} [scale=1] Scale(speed) factor of the rotation
  * @property {boolean} [showIndicator=true] Whether to show rotation indicator or not.
@@ -28,7 +27,6 @@ export interface ARSwirlControlOption {
 
 /**
  * One finger swirl control on single axis
- * @category Controls-AR
  */
 class ARSwirlControl implements ARControl {
   /**

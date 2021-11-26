@@ -3,8 +3,6 @@
  * egjs projects are licensed under the MIT license
  */
 
-import * as THREE from "three";
-
 import View3D from "../View3D";
 import { CURSOR } from "../consts/css";
 import { CONTROL_EVENTS } from "../consts/internal";
@@ -108,7 +106,7 @@ class OrbitControl {
   /**
    * Destroy the instance and remove all event listeners attached
    * This also will reset CSS cursor to intial
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public destroy(): void {
     this._rotateControl.destroy();
@@ -118,9 +116,8 @@ class OrbitControl {
 
   /**
    * Update control by given deltaTime
-   * @param camera Camera to update position
    * @param deltaTime Number of milisec to update
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public update(delta: number): void {
     this._rotateControl.update(delta);
@@ -130,9 +127,11 @@ class OrbitControl {
 
   /**
    * Resize control to match target size
-   * @param size {@link https://threejs.org/docs/#api/en/math/Vector2 THREE.Vector2} instance of width(x), height(y)
+   * @param {object} size New size to apply
+   * @param {number} [size.width] New width
+   * @param {number} [size.height] New height
    */
-  public resize(size: THREE.Vector2) {
+  public resize(size: { width: number; height: number }) {
     this._rotateControl.resize(size);
     this._translateControl.resize(size);
     this._distanceControl.resize(size);

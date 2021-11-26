@@ -26,7 +26,6 @@ interface FloorARSessionOption extends WebARSessionOption, ARFloorControlOption 
 
 /**
  * WebXR based AR session which puts model on the detected floor.
- * @category XR
  * @fires WebARSession#start
  * @fires WebARSession#end
  * @fires WebARSession#canPlace

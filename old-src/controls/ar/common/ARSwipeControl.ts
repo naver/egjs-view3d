@@ -21,7 +21,6 @@ enum STATE {
 
 /**
  * Options for {@link ARSwipeControl}
- * @category Controls-AR
  * @interface
  * @property {number} [scale=1] Scale(speed) factor of the rotation
  */
@@ -31,7 +30,6 @@ export interface ARSwipeControlOption {
 
 /**
  * Two finger swipe control
- * @category Controls-AR
  */
 class ARSwipeControl implements ARControl {
   /**

@@ -9,7 +9,6 @@ import { range } from "../../../utils";
 
 /**
  * Options for {@link ArrowIndicator}
- * @category Controls-AR
  * @interface
  * @property {string | number | THREE.Color} [color=0xffffff] Arrow color
  */
@@ -19,7 +18,6 @@ export interface ArrowIndicatorOption {
 
 /**
  * Arrow indicator for AR model translatioon.
- * @category Controls-AR
  */
 class ArrowIndicator {
   private _arrows: THREE.Group[];

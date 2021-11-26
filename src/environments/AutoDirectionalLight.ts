@@ -13,7 +13,6 @@ import Environment from "./Environment";
 /**
  * THREE.DirectionalLight wrapper that will automatically update its shadow size to model
  * Shadow is enabled by default, use {@link AutoDirectionalLight#disableShadow disableShadow} to disable it
- * @category Environment
  */
 class AutoDirectionalLight implements Environment {
   private _light: THREE.DirectionalLight;
