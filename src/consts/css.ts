@@ -6,5 +6,5 @@
 export const CURSOR = {
   GRAB: "grab",
   GRABBING: "grabbing",
-  NONE: "none"
+  NONE: ""
 } as const;

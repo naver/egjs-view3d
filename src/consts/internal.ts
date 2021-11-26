@@ -19,3 +19,10 @@ export const STANDARD_MAPS = [
   "normalMap",
   "roughnessMap"
 ];
+
+export const CONTROL_EVENTS = {
+  HOLD: "hold",
+  RELEASE: "release",
+  ENABLE: "enable",
+  DISABLE: "disable"
+} as const;

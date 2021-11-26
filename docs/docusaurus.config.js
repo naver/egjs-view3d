@@ -14,7 +14,7 @@ const config = {
   baseUrl: isDev ? "/" : "/egjs-view3d/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
-  favicon: "img/favicon.ico",
+  favicon: "img/favicon.png",
   organizationName: "naver",
   projectName: "naver.github.io",
   plugins: ["docusaurus-plugin-sass"],

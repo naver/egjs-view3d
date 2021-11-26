@@ -6,27 +6,49 @@
 import * as THREE from "three";
 
 import View3D from "../View3D";
+import { CURSOR } from "../consts/css";
+import { CONTROL_EVENTS } from "../consts/internal";
+import { ValueOf } from "../type/internal";
 
-import CameraControl from "./CameraControl";
 import RotateControl from "./RotateControl";
 import TranslateControl from "./TranslateControl";
 import DistanceControl from "./DistanceControl";
 
 /**
- * Aggregation of {@link RotateControl}, {@link TranslateControl}, and {@link DistanceControl}.
- * @category Controls
+ * @interface
  */
-class OrbitControl implements CameraControl {
+interface OrbitControlOptions {
+  useGrabCursor: boolean;
+  rotate: ConstructorParameters<typeof RotateControl>[1];
+  translate: ConstructorParameters<typeof TranslateControl>[1];
+  distance: ConstructorParameters<typeof DistanceControl>[1];
+}
+
+/**
+ * Aggregation of {@link RotateControl}, {@link TranslateControl}, and {@link DistanceControl}.
+ */
+class OrbitControl {
+  // Options
+  private _useGrabCursor: boolean;
+
+  // Internal Values
+  private _view3D: View3D;
   private _rotateControl: RotateControl;
   private _translateControl: TranslateControl;
   private _distanceControl: DistanceControl;
-  private _enabled: boolean = false;
 
+  // Options Getter
   /**
-   * Whether this control is enabled or not
-   * @readonly
+   * Whether to apply CSS style `cursor: grab` on the target element or not
+   * @default true
+   * @example
+   * ```ts
+   * view3d.control.useGrabCursor = false;
+   * ```
    */
-  public get enabled() { return this._enabled; }
+  public get useGrabCursor() { return this._useGrabCursor; }
+
+  // Internal Values Getter
   /**
    * {@link RotateControl} of this control
    */
@@ -40,26 +62,47 @@ class OrbitControl implements CameraControl {
    */
   public get distance() { return this._distanceControl; }
 
+  // Options setter
+  public set useGrabCursor(val: boolean) {
+    if (!val) {
+      this._setCursor(CURSOR.NONE);
+      this._useGrabCursor = false;
+    } else {
+      this._useGrabCursor = true;
+      this._setCursor(CURSOR.GRAB);
+    }
+  }
+
   /**
    * Create new OrbitControl instance
    * @param {View3D} view3D An instance of View3D
-   * @param {object} options Options
+   * @param {object} [options={}] Options
+   * @param {object} [options.useGrabCursor=true] Whether to apply CSS style `cursor: grab` on the canvas element or not
    * @param {object} [options.rotate={}] Constructor options of {@link RotateControl}
    * @param {object} [options.translate={}] Constructor options of {@link TranslateControl}
    * @param {object} [options.distance={}] Constructor options of {@link DistanceControl}
    */
   public constructor(view3D: View3D, {
+    useGrabCursor = true,
     rotate = {},
     translate = {},
     distance = {}
-  }: Partial<{
-    rotate: ConstructorParameters<typeof RotateControl>[1];
-    translate: ConstructorParameters<typeof TranslateControl>[1];
-    distance: ConstructorParameters<typeof DistanceControl>[1];
-  }> = {}) {
+  }: Partial<OrbitControlOptions> = {}) {
+    this._view3D = view3D;
+
+    this._useGrabCursor = useGrabCursor;
     this._rotateControl = new RotateControl(view3D, rotate);
     this._translateControl = new TranslateControl(view3D, translate);
     this._distanceControl = new DistanceControl(view3D, distance);
+
+    [this._rotateControl, this._translateControl].forEach(control => {
+      control.on({
+        [CONTROL_EVENTS.HOLD]: this._onHold,
+        [CONTROL_EVENTS.RELEASE]: this._onRelease,
+        [CONTROL_EVENTS.ENABLE]: this._onEnable,
+        [CONTROL_EVENTS.DISABLE]: this._onDisable
+      });
+    });
   }
 
   /**
@@ -97,41 +140,81 @@ class OrbitControl implements CameraControl {
 
   /**
    * Enable this control and add event listeners
-   * @returns {void} Nothingß
+   * @returns {void}
    */
   public enable(): void {
-    if (this._enabled) return;
-
     this._rotateControl.enable();
     this._translateControl.enable();
     this._distanceControl.enable();
-
-    this._enabled = true;
   }
 
   /**
    * Disable this control and remove all event handlers
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public disable(): void {
-    if (!this._enabled) return;
-
     this._rotateControl.disable();
     this._translateControl.disable();
     this._distanceControl.disable();
-
-    this._enabled = false;
   }
 
   /**
    * Synchronize this control's state to current camera position
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public sync(): void {
     this._rotateControl.sync();
     this._translateControl.sync();
     this._distanceControl.sync();
   }
+
+  private _setCursor(val: ValueOf<typeof CURSOR>) {
+    if (!this._useGrabCursor) return;
+
+    const targetEl = this._view3D.renderer.canvas;
+    targetEl.style.cursor = val;
+  }
+
+  private _onEnable = () => {
+    const canvas = this._view3D.renderer.canvas;
+
+    const shouldSetGrabCursor = this._useGrabCursor
+      && (this._rotateControl.enabled || this._translateControl.enabled)
+      && canvas.style.cursor === CURSOR.NONE;
+
+    if (shouldSetGrabCursor) {
+      this._setCursor(CURSOR.GRAB);
+    }
+  };
+
+  private _onDisable = () => {
+    const canvas = this._view3D.renderer.canvas;
+
+    const shouldRemoveGrabCursor = canvas.style.cursor !== CURSOR.NONE
+      && (!this._rotateControl.enabled && !this._translateControl.enabled);
+
+    if (shouldRemoveGrabCursor) {
+      this._setCursor(CURSOR.NONE);
+    }
+  };
+
+  private _onHold = () => {
+    const grabCursorEnabled = this._useGrabCursor
+      && (this._rotateControl.enabled || this._translateControl.enabled);
+
+    if (grabCursorEnabled) {
+      this._setCursor(CURSOR.GRABBING);
+    }
+  };
+
+  private _onRelease = () => {
+    const grabCursorEnabled = this._useGrabCursor
+      && (this._rotateControl.enabled || this._translateControl.enabled);
+
+    if (grabCursorEnabled) {
+      this._setCursor(CURSOR.GRAB);
+    }
+  };
 }
 
 export default OrbitControl;

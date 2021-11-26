@@ -15,6 +15,13 @@ export interface Range {
   max: number;
 }
 
+export interface ControlEvents {
+  hold: void;
+  release: void;
+  enable: void;
+  disable: void;
+}
+
 export interface XRContext {
   view3d: View3D;
   model: Model;

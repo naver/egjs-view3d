@@ -170,9 +170,13 @@ class Camera {
       resetControl.duration = duration;
       resetControl.easing = easing;
 
+      // TODO: DISABLE CONTROLS
+      // FIXME: START ANIMATION
+
       return new Promise(resolve => {
         resetControl.onFinished(() => {
           view3D.control.sync();
+          // TODO: ENABLE CONTROLS
           resolve();
         });
       });

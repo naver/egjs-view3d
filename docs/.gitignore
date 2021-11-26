@@ -21,4 +21,5 @@ yarn-error.log*
 
 # API
 docs/api/
+i18n/
 sidebars-api.js

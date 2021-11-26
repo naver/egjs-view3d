@@ -173,6 +173,7 @@ class View3D extends Component<View3DEvents> {
    */
   public constructor(canvasEl: string | HTMLElement, {
     src = null,
+    format = "auto",
     autoInit = true,
     autoResize = true
   }: Partial<View3DOptions> = {}) {
@@ -189,6 +190,7 @@ class View3D extends Component<View3DEvents> {
 
     // Bind options
     this._src = src;
+    this._format = format;
     this._autoInit = autoInit;
     this._autoResize = autoResize;
 
@@ -238,12 +240,45 @@ class View3D extends Component<View3DEvents> {
     this.trigger(EVENTS.RESIZE, { ...newSize, target: this });
   }
 
+  /**
+   * Load a new 3D model and replace it with the current one
+   * @param {string} src Source URL to fetch 3D model from<ko>3D 모델을 가져올 URL 주소</ko>
+   * @param {string} [format="auto"] File extension format of the 3D model (glTF, glb, ...)
+   * If `"auto"` is given, View3D will try to detect the format of the 3D model with the name of `src` URL
+   * <ko>3D 모델의 파일 확장자 형식 (glTF, glb, ...)
+   * 값으로 `"auto"`가 주어졌을 경우, View3D는 자동으로 확장자 추론을 시도합니다</ko>
+   */
   public async load(src: string, format: View3DOptions["format"] = "auto") {
     const loader = new ModelLoader(this);
     const model = await loader.load(src, format);
 
-    this.display(model);
+    this._src = src;
+    this._format = format;
+
+    this._display(model);
   }
+
+  /**
+   * View3D's basic render loop function
+   * @param delta Number of seconds passed since last frame
+   */
+  public renderLoop = (delta: number) => {
+    const renderer = this._renderer;
+    const scene = this._scene;
+    const camera = this._camera;
+    const control = this._control;
+    const animator = this._animator;
+
+    const deltaMiliSec = delta * 1000;
+
+    animator.update(delta);
+    control.update(deltaMiliSec);
+
+    this.trigger(EVENTS.BEFORE_RENDER, this);
+    camera.updatePosition();
+    renderer.render(scene, camera);
+    this.trigger(EVENTS.AFTER_RENDER, this);
+  };
 
   /**
    * Display the given model.
@@ -256,7 +291,7 @@ class View3D extends Component<View3DEvents> {
    * @param {boolean} [options.resetView=true] Whether to reset the view to the camera's default pose.
    * @returns {void}
    */
-  public display(model: Model, {
+  private _display(model: Model, {
     applySize = true,
     size = DEFAULT.MODEL_SIZE,
     resetView = true
@@ -287,28 +322,6 @@ class View3D extends Component<View3DEvents> {
     renderer.stopAnimationLoop();
     renderer.setAnimationLoop(this.renderLoop);
   }
-
-  /**
-   * View3D's basic render loop function
-   * @param delta Number of seconds passed since last frame
-   */
-  public renderLoop = (delta: number) => {
-    const renderer = this._renderer;
-    const scene = this._scene;
-    const camera = this._camera;
-    const control = this._control;
-    const animator = this._animator;
-
-    const deltaMiliSec = delta * 1000;
-
-    animator.update(delta);
-    control.update(deltaMiliSec);
-
-    this.trigger(EVENTS.BEFORE_RENDER, this);
-    camera.updatePosition();
-    renderer.render(scene, camera);
-    this.trigger(EVENTS.AFTER_RENDER, this);
-  };
 }
 
 export default View3D;

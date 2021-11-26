@@ -11,6 +11,10 @@ class View3D extends React.Component<Partial<View3DOptions>> {
     this._view3d = new VanillaView3D(this._canvasRef.current, restProps);
   }
 
+  public componentWillUnmount() {
+    this._view3d.destroy();
+  }
+
   public render() {
     return <div className="view3d-canvas-wrapper">
       <canvas ref={this._canvasRef} className="view3d-canvas"></canvas>

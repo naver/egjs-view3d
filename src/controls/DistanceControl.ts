@@ -99,9 +99,9 @@ class DistanceControl implements CameraControl {
 
     const targetEl = this._view3D.renderer.canvas;
 
-    targetEl.addEventListener(BROWSER.EVENTS.WHEEL, this._onWheel, false);
-    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove, false);
-    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, false);
+    targetEl.addEventListener(BROWSER.EVENTS.WHEEL, this._onWheel, { passive: false, capture: false });
+    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove, { passive: false, capture: false });
+    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, { passive: false, capture: false });
 
     this._enabled = true;
 

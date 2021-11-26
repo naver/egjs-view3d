@@ -4,23 +4,22 @@
  */
 
 import * as THREE from "three";
+import Component from "@egjs/component";
 
 import View3D from "../View3D";
 import Motion from "../core/Motion";
-import { CURSOR } from "../consts/css";
 import * as BROWSER from "../consts/browser";
 import * as DEFAULT from "../consts/default";
-import { ValueOf } from "../type/internal";
+import { CONTROL_EVENTS } from "../consts/internal";
+import { ControlEvents } from "../type/internal";
 
 import CameraControl from "./CameraControl";
 
 /**
  * Model's translation control that supports both mouse & touch
- * @category Controls
  */
-class TranslateControl implements CameraControl {
+class TranslateControl extends Component<ControlEvents> implements CameraControl {
   // Options
-  private _useGrabCursor: boolean;
   private _scaleToElement: boolean;
   private _userScale: THREE.Vector2;
 
@@ -48,17 +47,6 @@ class TranslateControl implements CameraControl {
    */
   public get scale() { return this._userScale; }
   /**
-   * Whether to apply CSS style `cursor: grab` on the target element or not
-   * @default true
-   * @example
-   * ```ts
-   * import { TranslateControl } from "@egjs/view3d";
-   * const translateControl = new TranslateControl();
-   * translateControl.useGrabCursor = true;
-   * ```
-   */
-  public get useGrabCursor() { return this._useGrabCursor; }
-  /**
    * Scale control to fit element size.
    * When this is true, camera's pivot change will correspond same amount you've dragged.
    * @default true
@@ -83,16 +71,6 @@ class TranslateControl implements CameraControl {
     this._userScale.copy(val);
   }
 
-  public set useGrabCursor(val: boolean) {
-    if (!val) {
-      this._setCursor("");
-      this._useGrabCursor = false;
-    } else {
-      this._useGrabCursor = true;
-      this._setCursor(CURSOR.GRAB);
-    }
-  }
-
   public set scaleToElement(val: boolean) {
     this._scaleToElement = val;
   }
@@ -109,14 +87,14 @@ class TranslateControl implements CameraControl {
   public constructor(view3D: View3D, {
     easing = DEFAULT.EASING,
     scale = new THREE.Vector2(1, 1),
-    useGrabCursor = true,
     scaleToElement = true
   } = {}) {
+    super();
+
     this._view3D = view3D;
     this._xMotion = new Motion({ duration: 0, range: DEFAULT.INFINITE_RANGE, easing });
     this._yMotion = new Motion({ duration: 0, range: DEFAULT.INFINITE_RANGE, easing });
     this._userScale = scale;
-    this._useGrabCursor = useGrabCursor;
     this._scaleToElement = scaleToElement;
   }
 
@@ -177,16 +155,16 @@ class TranslateControl implements CameraControl {
 
     targetEl.addEventListener(BROWSER.EVENTS.MOUSE_DOWN, this._onMouseDown, false);
 
-    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_START, this._onTouchStart, false);
-    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove, false);
-    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, false);
+    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_START, this._onTouchStart, { passive: false, capture: false });
+    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove, { passive: false, capture: false });
+    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, { passive: false, capture: false });
 
     targetEl.addEventListener(BROWSER.EVENTS.CONTEXT_MENU, this._onContextMenu, false);
 
     this._enabled = true;
-    this._setCursor(CURSOR.GRAB);
-
     this.sync();
+
+    this.trigger(CONTROL_EVENTS.ENABLE);
   }
 
   /**
@@ -208,8 +186,9 @@ class TranslateControl implements CameraControl {
 
     targetEl.removeEventListener(BROWSER.EVENTS.CONTEXT_MENU, this._onContextMenu, false);
 
-    this._setCursor("");
     this._enabled = false;
+
+    this.trigger(CONTROL_EVENTS.DISABLE);
   }
 
   /**
@@ -219,14 +198,6 @@ class TranslateControl implements CameraControl {
   public sync(): void {
     this._xMotion.reset(0);
     this._yMotion.reset(0);
-  }
-
-  private _setCursor(val: ValueOf<typeof CURSOR> | "") {
-    const targetEl = this._view3D.renderer.canvas;
-
-    if (!this._useGrabCursor || !targetEl || !this._enabled) return;
-
-    targetEl.style.cursor = val;
   }
 
   private _onMouseDown = (evt: MouseEvent) => {
@@ -245,7 +216,7 @@ class TranslateControl implements CameraControl {
     window.addEventListener(BROWSER.EVENTS.MOUSE_MOVE, this._onMouseMove, false);
     window.addEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
 
-    this._setCursor(CURSOR.GRABBING);
+    this.trigger(CONTROL_EVENTS.HOLD);
   };
 
   private _onMouseMove = (evt: MouseEvent) => {
@@ -268,7 +239,7 @@ class TranslateControl implements CameraControl {
     window.removeEventListener(BROWSER.EVENTS.MOUSE_MOVE, this._onMouseMove, false);
     window.removeEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
 
-    this._setCursor(CURSOR.GRAB);
+    this.trigger(CONTROL_EVENTS.RELEASE);
   };
 
   private _onTouchStart = (evt: TouchEvent) => {
