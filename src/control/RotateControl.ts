@@ -8,55 +8,52 @@ import Component from "@egjs/component";
 
 import View3D from "../View3D";
 import Motion from "../core/Motion";
-import * as BROWSER from "../consts/browser";
-import * as DEFAULT from "../consts/default";
-import { CONTROL_EVENTS } from "../consts/internal";
+import * as BROWSER from "../const/browser";
+import * as DEFAULT from "../const/default";
+import { CONTROL_EVENTS } from "../const/internal";
 import { ControlEvents } from "../type/internal";
 
 import CameraControl from "./CameraControl";
 
 /**
- * Model's translation control that supports both mouse & touch
+ * Model's rotation control that supports both mouse & touch
  */
-class TranslateControl extends Component<ControlEvents> implements CameraControl {
+class RotateControl extends Component<ControlEvents> implements CameraControl {
   // Options
   private _scaleToElement: boolean;
   private _userScale: THREE.Vector2;
 
   // Internal values
   private _view3D: View3D;
-  private _enabled: boolean = false;
-  // Sometimes, touchstart for second finger doesn't triggered.
-  // This flag checks whether that happened
-  private _touchInitialized: boolean = false;
   private _xMotion: Motion;
   private _yMotion: Motion;
+  private _screenScale: THREE.Vector2 = new THREE.Vector2(0, 0);
   private _prevPos: THREE.Vector2 = new THREE.Vector2(0, 0);
-  private _screenSize: THREE.Vector2 = new THREE.Vector2(0, 0);
+  private _enabled: boolean = false;
 
   /**
-   * Scale factor for translation
+   * Scale factor for panning, x is for horizontal and y is for vertical panning.
    * @type THREE.Vector2
    * @see https://threejs.org/docs/#api/en/math/Vector2
    * @example
    * ```ts
-   * import { TranslateControl } from "@egjs/view3d";
-   * const translateControl = new TranslateControl();
-   * translateControl.scale.set(2, 2);
+   * const rotateControl = new View3D.RotateControl();
+   * rotateControl.scale.setX(2);
    * ```
    */
   public get scale() { return this._userScale; }
   /**
-   * Scale control to fit element size.
-   * When this is true, camera's pivot change will correspond same amount you've dragged.
+   * Whether to scale control to fit element size.
+   * When this is true and {@link RotateControl#scale scale.x} is 1, panning through element's width will make 3d model's yaw rotate 360°.
+   * When this is true and {@link RotateControl#scale scale.y} is 1, panning through element's height will make 3d model's pitch rotate 180°.
    * @default true
    * @example
    * ```ts
-   * import View3D, { TranslateControl } from "@egjs/view3d";
+   * import View3D, { RotateControl } from "@egjs/view3d";
    * const view3d = new View3D("#view3d-canvas");
-   * const translateControl = new TranslateControl();
-   * translateControl.scaleToElement = true;
-   * view3d.controller.add(translateControl);
+   * const rotateControl = new RotateControl();
+   * rotateControl.scaleToElement = true;
+   * view3d.controller.add(rotateControl);
    * view3d.resize();
    * ```
    */
@@ -76,15 +73,17 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
   }
 
   /**
-   * Create new TranslateControl instance
+   * Create new RotateControl instance
    * @param {View3D} view3D An instance of View3D
    * @param {object} options Options
-   * @param {function} [options.easing=(x: number) => 1 - Math.pow(1 - x, 3)] Motion's easing function.
-   * @param {THREE.Vector2} [options.scale=new THREE.Vector2(1, 1)] Scale factor for translation.
-   * @param {boolean} [options.useGrabCursor=true] Whether to apply CSS style `cursor: grab` on the target element or not.
-   * @param {boolean} [options.scaleToElement=true] Whether to scale control to fit element size.
+   * @param {number} [options.duration=500] Motion's duration
+   * @param {function} [options.easing=(x: number) => 1 - Math.pow(1 - x, 3)] Motion's easing function
+   * @param {THREE.Vector2} [options.scale=new THREE.Vector2(1, 1)] Scale factor for panning, x is for horizontal and y is for vertical panning
+   * @param {boolean} [options.useGrabCursor=true] Whether to apply CSS style `cursor: grab` on the target element or not
+   * @param {boolean} [options.scaleToElement=true] Whether to scale control to fit element size
    */
   public constructor(view3D: View3D, {
+    duration = DEFAULT.ANIMATION_DURATION,
     easing = DEFAULT.EASING,
     scale = new THREE.Vector2(1, 1),
     scaleToElement = true
@@ -92,10 +91,10 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
     super();
 
     this._view3D = view3D;
-    this._xMotion = new Motion({ duration: 0, range: DEFAULT.INFINITE_RANGE, easing });
-    this._yMotion = new Motion({ duration: 0, range: DEFAULT.INFINITE_RANGE, easing });
     this._userScale = scale;
     this._scaleToElement = scaleToElement;
+    this._xMotion = new Motion({ duration, range: DEFAULT.INFINITE_RANGE, easing });
+    this._yMotion = new Motion({ duration, range: DEFAULT.PITCH_RANGE, easing });
   }
 
   /**
@@ -109,41 +108,33 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
 
   /**
    * Update control by given deltaTime
+   * @param camera Camera to update position
    * @param deltaTime Number of milisec to update
    * @returns {void}
    */
   public update(deltaTime: number): void {
     const camera = this._view3D.camera;
-    const screenSize = this._screenSize;
+    const xMotion = this._xMotion;
+    const yMotion = this._yMotion;
 
     const delta = new THREE.Vector2(
-      this._xMotion.update(deltaTime),
-      this._yMotion.update(deltaTime),
+      xMotion.update(deltaTime),
+      yMotion.update(deltaTime),
     );
 
-    const viewXDir = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.threeCamera.quaternion);
-    const viewYDir = new THREE.Vector3(0, 1, 0).applyQuaternion(camera.threeCamera.quaternion);
-
-    if (this._scaleToElement) {
-      const screenScale = new THREE.Vector2(camera.renderWidth, camera.renderHeight).divide(screenSize);
-      delta.multiply(screenScale);
-    }
-
-    camera.pivot.add(viewXDir.multiplyScalar(delta.x));
-    camera.pivot.add(viewYDir.multiplyScalar(delta.y));
+    camera.yaw += delta.x;
+    camera.pitch += delta.y;
   }
 
   /**
    * Resize control to match target size
-   * This method is only meaningful when {@link RotateControl#scaleToElementSize scaleToElementSize} is enabled
+   * This method is only meaningful when {@link RotateControl#scaleToElement scaleToElement} is enabled
    * @param {object} size New size to apply
    * @param {number} [size.width] New width
    * @param {number} [size.height] New height
    */
   public resize(size: { width: number; height: number }) {
-    const screenSize = this._screenSize;
-
-    screenSize.copy(new THREE.Vector2(size.width, size.height));
+    this._screenScale.set(360 / size.width, 180 / size.height);
   }
 
   /**
@@ -160,8 +151,6 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
     targetEl.addEventListener(BROWSER.EVENTS.TOUCH_START, this._onTouchStart, { passive: false, capture: false });
     targetEl.addEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove, { passive: false, capture: false });
     targetEl.addEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, { passive: false, capture: false });
-
-    targetEl.addEventListener(BROWSER.EVENTS.CONTEXT_MENU, this._onContextMenu, false);
 
     this._enabled = true;
     this.sync();
@@ -186,24 +175,25 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
     targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove, false);
     targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, false);
 
-    targetEl.removeEventListener(BROWSER.EVENTS.CONTEXT_MENU, this._onContextMenu, false);
-
     this._enabled = false;
 
     this.trigger(CONTROL_EVENTS.DISABLE);
   }
 
   /**
-   * Synchronize this control's state to the camera position
+   * Synchronize this control's state to given camera position
+   * @param camera Camera to match state
    * @returns {void}
    */
   public sync(): void {
-    this._xMotion.reset(0);
-    this._yMotion.reset(0);
+    const camera = this._view3D.camera;
+
+    this._xMotion.reset(camera.yaw);
+    this._yMotion.reset(camera.pitch);
   }
 
   private _onMouseDown = (evt: MouseEvent) => {
-    if (evt.button !== BROWSER.MOUSE_BUTTON.RIGHT) return;
+    if (evt.button !== BROWSER.MOUSE_BUTTON.LEFT) return;
 
     const targetEl = this._view3D.renderer.canvas;
     evt.preventDefault();
@@ -225,13 +215,16 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
     evt.preventDefault();
 
     const prevPos = this._prevPos;
-    const delta = new THREE.Vector2(evt.clientX, evt.clientY)
+    const rotateDelta = new THREE.Vector2(evt.clientX, evt.clientY)
       .sub(prevPos)
       .multiply(this._userScale);
 
-    // X value is negated to match cursor direction
-    this._xMotion.setEndDelta(-delta.x);
-    this._yMotion.setEndDelta(delta.y);
+    if (this._scaleToElement) {
+      rotateDelta.multiply(this._screenScale);
+    }
+
+    this._xMotion.setEndDelta(rotateDelta.x);
+    this._yMotion.setEndDelta(rotateDelta.y);
 
     prevPos.set(evt.clientX, evt.clientY);
   };
@@ -245,65 +238,46 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
   };
 
   private _onTouchStart = (evt: TouchEvent) => {
-    // Only the two finger motion should be considered
-    if (evt.touches.length !== 2) return;
     evt.preventDefault();
 
-    this._prevPos.copy(this._getTouchesMiddle(evt.touches));
-    this._touchInitialized = true;
+    const touch = evt.touches[0];
+    this._prevPos.set(touch.clientX, touch.clientY);
   };
 
   private _onTouchMove = (evt: TouchEvent) => {
-    // Only the two finger motion should be considered
-    if (evt.touches.length !== 2) return;
+    // Only the one finger motion should be considered
+    if (evt.touches.length > 1) return;
 
     if (evt.cancelable !== false) {
       evt.preventDefault();
     }
     evt.stopPropagation();
 
+    const touch = evt.touches[0];
+
     const prevPos = this._prevPos;
-    const middlePoint = this._getTouchesMiddle(evt.touches);
-
-    if (!this._touchInitialized) {
-      prevPos.copy(middlePoint);
-      this._touchInitialized = true;
-      return;
-    }
-
-    const delta = new THREE.Vector2()
-      .subVectors(middlePoint, prevPos)
+    const rotateDelta = new THREE.Vector2(touch.clientX, touch.clientY)
+      .sub(prevPos)
       .multiply(this._userScale);
 
-    // X value is negated to match cursor direction
-    this._xMotion.setEndDelta(-delta.x);
-    this._yMotion.setEndDelta(delta.y);
+    if (this._scaleToElement) {
+      rotateDelta.multiply(this._screenScale);
+    }
 
-    prevPos.copy(middlePoint);
+    this._xMotion.setEndDelta(rotateDelta.x);
+    this._yMotion.setEndDelta(rotateDelta.y);
+
+    prevPos.set(touch.clientX, touch.clientY);
   };
 
   private _onTouchEnd = (evt: TouchEvent) => {
-    // Only the two finger motion should be considered
-    if (evt.touches.length !== 2) {
-      this._touchInitialized = false;
-      return;
+    const touch = evt.touches[0];
+    if (touch) {
+      this._prevPos.set(touch.clientX, touch.clientY);
+    } else {
+      this._prevPos.set(0, 0);
     }
-
-    // Three fingers to two fingers
-    this._prevPos.copy(this._getTouchesMiddle(evt.touches));
-    this._touchInitialized = true;
-  };
-
-  private _getTouchesMiddle(touches: TouchEvent["touches"]): THREE.Vector2 {
-    return new THREE.Vector2(
-      touches[0].clientX + touches[1].clientX,
-      touches[0].clientY + touches[1].clientY,
-    ).multiplyScalar(0.5);
-  }
-
-  private _onContextMenu = (evt: MouseEvent) => {
-    evt.preventDefault();
   };
 }
 
-export default TranslateControl;
+export default RotateControl;

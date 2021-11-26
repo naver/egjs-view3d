@@ -7,10 +7,10 @@ import View3D from "./View3D";
 
 export * from "./type/external";
 export * from "./core";
-export * from "./controls";
+export * from "./control";
 export * from "./loaders";
-export * from "./environments";
+export * from "./environment";
 export * from "./extra";
-export * from "./consts/external";
+export * from "./const/external";
 
 export default View3D;

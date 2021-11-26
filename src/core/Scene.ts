@@ -5,8 +5,8 @@
 
 import * as THREE from "three";
 
-import Environment from "../environments/Environment";
-import { STANDARD_MAPS } from "../consts/internal";
+import Environment from "../environment/Environment";
+import { STANDARD_MAPS } from "../const/internal";
 import { findIndex } from "../utils";
 
 import Model from "./Model";

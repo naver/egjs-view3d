@@ -7,7 +7,7 @@ import * as THREE from "three";
 
 import Model from "../core/Model";
 import View3DError from "../core/View3DError";
-import * as ERR from "../consts/error";
+import * as ERR from "../const/error";
 
 /**
  * Texture(image) model

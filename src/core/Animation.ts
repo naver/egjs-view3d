@@ -5,8 +5,8 @@
 
 import Component from "@egjs/component";
 
-import * as DEFAULT from "../consts/default";
-import { EASING } from "../consts/external";
+import * as DEFAULT from "../const/default";
+import { EASING } from "../const/external";
 import { circulate } from "../utils";
 
 /**

@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 
 import Model from "../core/Model";
-import * as DEFAULT from "../consts/default";
+import * as DEFAULT from "../const/default";
 import { DracoLoadOption } from "../type/external";
 
 /**

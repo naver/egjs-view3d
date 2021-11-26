@@ -7,8 +7,8 @@ import * as THREE from "three";
 
 import View3D from "../View3D";
 import Motion from "../core/Motion";
-import * as BROWSER from "../consts/browser";
-import * as DEFAULT from "../consts/default";
+import * as BROWSER from "../const/browser";
+import * as DEFAULT from "../const/default";
 
 import CameraControl from "./CameraControl";
 

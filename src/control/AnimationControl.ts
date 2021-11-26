@@ -6,7 +6,7 @@
 import View3D from "../View3D";
 import Pose from "../core/Pose";
 import Motion from "../core/Motion";
-import * as DEFAULT from "../consts/default";
+import * as DEFAULT from "../const/default";
 import { AnyFunction } from "../type/external";
 import { mix, circulate } from "../utils";
 

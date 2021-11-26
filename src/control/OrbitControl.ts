@@ -4,8 +4,8 @@
  */
 
 import View3D from "../View3D";
-import { CURSOR } from "../consts/css";
-import { CONTROL_EVENTS } from "../consts/internal";
+import { CURSOR } from "../const/css";
+import { CONTROL_EVENTS } from "../const/internal";
 import { ValueOf } from "../type/internal";
 
 import RotateControl from "./RotateControl";

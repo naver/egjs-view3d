@@ -4,7 +4,7 @@
  */
 
 import View3D from "../View3D";
-import * as BROWSER from "../consts/browser";
+import * as BROWSER from "../const/browser";
 
 class AutoResizer {
   private _view3d: View3D;

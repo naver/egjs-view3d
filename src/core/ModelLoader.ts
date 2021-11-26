@@ -4,9 +4,9 @@
  */
 
 import View3D, { View3DOptions } from "../View3D";
-import { MODEL_FORMAT, MODEL_MIME } from "../consts/external";
-import * as BROWSER from "../consts/browser";
-import * as ERROR from "../consts/error";
+import { MODEL_FORMAT, MODEL_MIME } from "../const/external";
+import * as BROWSER from "../const/browser";
+import * as ERROR from "../const/error";
 import { ValueOf } from "../type/internal";
 import GLTFLoader from "../loaders/GLTFLoader";
 import DracoLoader from "../loaders/DracoLoader";

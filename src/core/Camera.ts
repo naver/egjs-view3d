@@ -6,9 +6,9 @@
 import * as THREE from "three";
 
 import View3D from "../View3D";
-import AnimationControl from "../controls/AnimationControl";
+import AnimationControl from "../control/AnimationControl";
 import { toRadian, clamp, circulate } from "../utils";
-import * as DEFAULT from "../consts/default";
+import * as DEFAULT from "../const/default";
 
 import Pose from "./Pose";
 

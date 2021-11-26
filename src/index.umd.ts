@@ -6,12 +6,11 @@
 import View3D from "./View3D";
 import View3DError from "./core/View3DError";
 import * as Core from "./core";
-import * as Controls from "./controls";
+import * as Controls from "./control";
 import * as Loaders from "./loaders";
-import * as Environments from "./environments";
+import * as Environments from "./environment";
 import * as Extra from "./extra";
-import * as Constants from "./consts/external";
-import { CODES } from "./consts/error";
+import * as Constants from "./const/external";
 import { merge } from "./utils";
 
 merge(View3D, Core);
@@ -21,6 +20,5 @@ merge(View3D, Loaders);
 merge(View3D, Extra);
 merge(View3D, Constants);
 (View3D as any).View3DError = View3DError;
-(View3D as any).ERROR_CODES = CODES;
 
 export default View3D;
