@@ -1,0 +1,13 @@
+.view3d-canvas-wrapper {
+  width: 100%;
+  display: flex;
+}
+
+.view3d-canvas {
+  width: 100%;
+  height: 400px;
+}
+
+.view3d-canvas-wrapper {
+  border: 2px dotted black;
+}

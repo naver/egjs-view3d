@@ -21,7 +21,7 @@ class DistanceControl implements CameraControl {
 
   // Internal values
   private _view3D: View3D;
-  private _scaleModifier: number = 0.25;
+  private _scaleModifier: number = 0.025;
   private _motion: Motion;
   private _prevTouchDistance: number = -1;
   private _enabled: boolean = false;

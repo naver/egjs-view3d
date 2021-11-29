@@ -157,7 +157,7 @@ class GLTFLoader {
 
       materials.forEach((mat: THREE.MeshStandardMaterial) => {
         if (mat.map) {
-          mat.map.encoding = THREE.sRGBEncoding;
+          // mat.map.encoding = THREE.sRGBEncoding;
         }
       });
     });

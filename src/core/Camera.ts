@@ -7,7 +7,7 @@ import * as THREE from "three";
 
 import View3D from "../View3D";
 import AnimationControl from "../control/AnimationControl";
-import { toRadian, clamp, circulate } from "../utils";
+import { toRadian, clamp, circulate, getBoxPoints } from "../utils";
 import * as DEFAULT from "../const/default";
 
 import Pose from "./Pose";
@@ -101,8 +101,9 @@ class Camera {
   public get maxDistance() { return this._maxDistance; }
 
   /**
-   * Camera's focus of view value
+   * Camera's focus of view value (vertical)
    * @type number
+   * @default 50
    * @see {@link https://threejs.org/docs/#api/en/cameras/PerspectiveCamera.fov THREE#PerspectiveCamera}
    */
   public get fov() { return this._threeCamera.fov; }
@@ -151,7 +152,7 @@ class Camera {
    * @param easing Easing function for the reset animation
    * @returns Promise that resolves when the animation finishes
    */
-  public reset(duration: number = 0, easing: (x: number) => number = DEFAULT.EASING): Promise<void> {
+  public async reset(duration: number = 0, easing: (x: number) => number = DEFAULT.EASING): Promise<void> {
     const view3D = this._view3D;
     const currentPose = this._currentPose;
     const defaultPose = this._defaultPose;
@@ -195,6 +196,47 @@ class Camera {
 
     cam.aspect = aspect;
     cam.updateProjectionMatrix();
+  }
+
+  /**
+   * Fit camera frame to the given bbox
+   */
+  public fit(min: number[], max: number[]): void {
+    const camera = this._threeCamera;
+    const defaultPose = this._defaultPose;
+
+    const minPoint = new THREE.Vector3().fromArray(min);
+    const maxPoint = new THREE.Vector3().fromArray(max);
+    const bbox = new THREE.Box3(minPoint, maxPoint);
+    const bboxCenter = bbox.getCenter(new THREE.Vector3());
+    bbox.translate(bboxCenter.clone().negate());
+
+    // As bbox points are symmetrical, use only half of them
+    const bboxPoints = getBoxPoints(bbox).slice(0, 4);
+    const defaultPoseTransform = new THREE.Matrix4()
+      .makeRotationFromEuler(new THREE.Euler(toRadian(defaultPose.pitch), toRadian(defaultPose.yaw), 0));
+
+    const transformedPoints = bboxPoints.map(point => {
+      return point.applyMatrix4(defaultPoseTransform);
+    });
+
+    const vfov = toRadian(camera.fov); // in radians
+    const tanHalfVFov = Math.tan(vfov / 2);
+
+    const hfov = 2 * Math.atan(tanHalfVFov * camera.aspect); // in radians
+    const tanHalfHFov = Math.tan(hfov / 2);
+
+    const effectiveDist = transformedPoints.reduce((dist, point) => {
+      return Math.max(
+        Math.abs(point.y) / tanHalfVFov + Math.abs(point.z),
+        Math.abs(point.x) / tanHalfHFov + Math.abs(point.z),
+        dist
+      );
+    }, 0);
+
+    const currentPose = this._currentPose;
+    currentPose.pivot = bboxCenter;
+    currentPose.distance = effectiveDist;
   }
 
   /**

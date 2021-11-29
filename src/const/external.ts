@@ -34,6 +34,7 @@ export const MODEL_FORMAT = {
   DRC: "drc"
 } as const;
 
+// https://www.iana.org/assignments/media-types/media-types.xhtml#model
 export const MODEL_MIME = {
   "model/gltf-binary": MODEL_FORMAT.GLB,
   "model/gltf+json": MODEL_FORMAT.GLTF

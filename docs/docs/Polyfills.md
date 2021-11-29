@@ -1,1 +1,0 @@
-This requires Promise polyfill

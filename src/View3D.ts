@@ -13,10 +13,10 @@ import Model from "./core/Model";
 import ModelAnimator from "./core/ModelAnimator";
 import OrbitControl from "./control/OrbitControl";
 import { EVENTS } from "./const/external";
-import * as DEFAULT from "./const/default";
 import * as EVENT_TYPES from "./type/event";
 import { getCanvas } from "./utils";
 import { LiteralUnion } from "./type/internal";
+import Afternoon from "./preset/Afternoon";
 
 /**
  * @interface
@@ -38,8 +38,15 @@ export interface View3DEvents {
  * @see {@link /Options Options} page for detailed information
  */
 export interface View3DOptions {
+  // Sources
   src: string | null;
   format: LiteralUnion<"auto">;
+  envmap: string | null;
+
+  // Display
+  playInitialAnimation: boolean;
+
+  // Others
   autoInit: boolean;
   autoResize: boolean;
   useResizeObserver: boolean;
@@ -67,6 +74,7 @@ class View3D extends Component<View3DEvents> {
   // Options
   private _src: View3DOptions["src"];
   private _format: View3DOptions["format"];
+  private _envmap: View3DOptions["envmap"];
   private _autoInit: View3DOptions["autoInit"];
   private _autoResize: View3DOptions["autoResize"];
   private _useResizeObserver: View3DOptions["useResizeObserver"];
@@ -173,6 +181,7 @@ class View3D extends Component<View3DEvents> {
   public constructor(canvasEl: string | HTMLElement, {
     src = null,
     format = "auto",
+    envmap = null,
     autoInit = true,
     autoResize = true
   }: Partial<View3DOptions> = {}) {
@@ -183,13 +192,14 @@ class View3D extends Component<View3DEvents> {
     this._renderer = new Renderer(canvas);
     this._camera = new Camera(this);
     this._control = new OrbitControl(this);
-    this._scene = new Scene();
+    this._scene = new Scene(this);
     this._animator = new ModelAnimator(this._scene.root);
     this._autoResizer = new AutoResizer(this);
 
     // Bind options
     this._src = src;
     this._format = format;
+    this._envmap = envmap;
     this._autoInit = autoInit;
     this._autoResize = autoResize;
 
@@ -218,8 +228,14 @@ class View3D extends Component<View3DEvents> {
       this._autoResizer.enable();
     }
 
+    if (this._envmap) {
+      await this._scene.setEnvMap(this._envmap);
+    }
+
     await this.load(this._src!, this._format);
     this._control.enable();
+
+    this._scene.addEnv(Afternoon());
 
     this._initialized = true;
     this.trigger(EVENTS.READY, { target: this });
@@ -248,7 +264,7 @@ class View3D extends Component<View3DEvents> {
    * 값으로 `"auto"`가 주어졌을 경우, View3D는 자동으로 확장자 추론을 시도합니다</ko>
    */
   public async load(src: string, format: View3DOptions["format"] = "auto") {
-    const loader = new ModelLoader(this);
+    const loader = new ModelLoader();
     const model = await loader.load(src, format);
 
     this._src = src;
@@ -289,38 +305,26 @@ class View3D extends Component<View3DEvents> {
    * View3D can only show one model at a time
    * @param model {@link Model} instance to show
    * @param {object} [options={}] Display options
-   * @param {number} [options.applySize=true] Whether to change model size to given "size" option.
-   * @param {number} [options.size=80] Size of the model to show as.
    * @param {boolean} [options.resetView=true] Whether to reset the view to the camera's default pose.
    * @returns {void}
    */
   private _display(model: Model, {
-    applySize = true,
-    size = DEFAULT.MODEL_SIZE,
     resetView = true
   } = {}): void {
     const renderer = this._renderer;
     const scene = this._scene;
     const camera = this._camera;
+    const control = this._control;
     const animator = this._animator;
 
-    if (applySize) {
-      model.size = size;
-    }
-    // model.moveToOrigin();
+    scene.resetObjects();
+    scene.add(model.scene);
+    scene.update(model);
 
-    scene.resetModel();
-
-    if (resetView) {
-      void camera.reset();
-    }
+    camera.fit(model.bbox.min.toArray(), model.bbox.max.toArray());
 
     animator.reset();
-
-    scene.add(model.scene);
     animator.setClips(model.animations);
-
-    scene.update(model);
 
     renderer.stopAnimationLoop();
     renderer.setAnimationLoop(this.renderLoop);

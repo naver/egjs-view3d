@@ -1,0 +1,372 @@
+{
+  "asset": {
+    "generator": "Khronos glTF Blender I/O v1.6.16",
+    "version": "2.0"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "korean_fire_extinguisher_01"
+    }
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "name": "korean_fire_extinguisher_01_body",
+      "normalTexture": {
+        "index": 0
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 1
+        },
+        "metallicRoughnessTexture": {
+          "index": 2
+        }
+      }
+    },
+    {
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "name": "korean_fire_extinguisher_01_glass",
+      "normalTexture": {
+        "index": 3
+      },
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          1,
+          1,
+          1,
+          0.30000001192092896
+        ],
+        "baseColorTexture": {
+          "index": 4
+        },
+        "metallicRoughnessTexture": {
+          "index": 5
+        }
+      }
+    },
+    {
+      "alphaMode": "BLEND",
+      "name": "korean_fire_extinguisher_01_paper",
+      "normalTexture": {
+        "index": 6
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 7
+        },
+        "metallicRoughnessTexture": {
+          "index": 8
+        }
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "02_low",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "material": 0
+        },
+        {
+          "attributes": {
+            "POSITION": 4,
+            "NORMAL": 5,
+            "TEXCOORD_0": 6
+          },
+          "indices": 7,
+          "material": 1
+        },
+        {
+          "attributes": {
+            "POSITION": 8,
+            "NORMAL": 9,
+            "TEXCOORD_0": 10
+          },
+          "indices": 11,
+          "material": 2
+        }
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 0,
+      "source": 1
+    },
+    {
+      "sampler": 0,
+      "source": 2
+    },
+    {
+      "sampler": 0,
+      "source": 3
+    },
+    {
+      "sampler": 0,
+      "source": 4
+    },
+    {
+      "sampler": 0,
+      "source": 5
+    },
+    {
+      "sampler": 0,
+      "source": 6
+    },
+    {
+      "sampler": 0,
+      "source": 7
+    },
+    {
+      "sampler": 0,
+      "source": 8
+    }
+  ],
+  "images": [
+    {
+      "mimeType": "image/jpeg",
+      "name": "korean_fire_extinguisher_01_body_nor_gl",
+      "uri": "textures/korean_fire_extinguisher_01_body_nor_gl_4k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "korean_fire_extinguisher_01_body_diff.png",
+      "uri": "textures/korean_fire_extinguisher_01_body_diff_4k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "korean_fire_extinguisher_01_body_metal.png-korean_fire_extinguisher_01_body_rough.png",
+      "uri": "textures/korean_fire_extinguisher_01_body_arm_4k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "korean_fire_extinguisher_01_glass_nor_gl",
+      "uri": "textures/korean_fire_extinguisher_01_glass_nor_gl_4k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "korean_fire_extinguisher_01_glass_diff",
+      "uri": "textures/korean_fire_extinguisher_01_glass_diff_4k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "korean_fire_extinguisher_01_glass_metal-korean_fire_extinguisher_01_glass_rough",
+      "uri": "textures/korean_fire_extinguisher_01_glass_arm_4k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "korean_fire_extinguisher_01_paper_nor_gl",
+      "uri": "textures/korean_fire_extinguisher_01_paper_nor_gl_4k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "korean_fire_extinguisher_01_paper_diff-korean_fire_extinguisher_01_paper_opacity",
+      "uri": "textures/korean_fire_extinguisher_01_paper_diff_4k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "korean_fire_extinguisher_01_paper_metal-korean_fire_extinguisher_01_paper_rough",
+      "uri": "textures/korean_fire_extinguisher_01_paper_arm_4k.jpg"
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 6575,
+      "max": [
+        0.1399787962436676,
+        0.6592506766319275,
+        0.24420279264450073
+      ],
+      "min": [
+        -0.1399787813425064,
+        -3.978568940965488e-8,
+        -0.12324045598506927
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 6575,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 6575,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5123,
+      "count": 28683,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5126,
+      "count": 270,
+      "max": [
+        0.021115895360708237,
+        0.5971118211746216,
+        0.07201548665761948
+      ],
+      "min": [
+        -0.02108774706721306,
+        0.5549080967903137,
+        0.06598098576068878
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 5,
+      "componentType": 5126,
+      "count": 270,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 6,
+      "componentType": 5126,
+      "count": 270,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 7,
+      "componentType": 5123,
+      "count": 960,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 8,
+      "componentType": 5126,
+      "count": 30,
+      "max": [
+        -0.0016376094426959753,
+        0.5324327349662781,
+        0.007371075451374054
+      ],
+      "min": [
+        -0.08279979974031448,
+        0.47684013843536377,
+        -0.07724466919898987
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 9,
+      "componentType": 5126,
+      "count": 30,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 10,
+      "componentType": 5126,
+      "count": 30,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 11,
+      "componentType": 5123,
+      "count": 96,
+      "type": "SCALAR"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 78900,
+      "byteOffset": 0
+    },
+    {
+      "buffer": 0,
+      "byteLength": 78900,
+      "byteOffset": 78900
+    },
+    {
+      "buffer": 0,
+      "byteLength": 52600,
+      "byteOffset": 157800
+    },
+    {
+      "buffer": 0,
+      "byteLength": 57366,
+      "byteOffset": 210400
+    },
+    {
+      "buffer": 0,
+      "byteLength": 3240,
+      "byteOffset": 267768
+    },
+    {
+      "buffer": 0,
+      "byteLength": 3240,
+      "byteOffset": 271008
+    },
+    {
+      "buffer": 0,
+      "byteLength": 2160,
+      "byteOffset": 274248
+    },
+    {
+      "buffer": 0,
+      "byteLength": 1920,
+      "byteOffset": 276408
+    },
+    {
+      "buffer": 0,
+      "byteLength": 360,
+      "byteOffset": 278328
+    },
+    {
+      "buffer": 0,
+      "byteLength": 360,
+      "byteOffset": 278688
+    },
+    {
+      "buffer": 0,
+      "byteLength": 240,
+      "byteOffset": 279048
+    },
+    {
+      "buffer": 0,
+      "byteLength": 192,
+      "byteOffset": 279288
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 279480,
+      "uri": "korean_fire_extinguisher_01.bin"
+    }
+  ]
+}

@@ -10,11 +10,8 @@ import * as THREE from "three";
  */
 class Model {
   private _scene: THREE.Group;
+  private _bbox: THREE.Box3;
   private _animations: THREE.AnimationClip[];
-  private _initialBbox: THREE.Box3;
-  private _originalSize: number;
-  private _cachedLights: THREE.Light[] | null;
-  private _cachedMeshes: THREE.Mesh[] | null;
   private _fixSkinnedBbox: boolean;
 
   /**
@@ -31,7 +28,7 @@ class Model {
    * @readonly
    */
   public get lights() {
-    return this._cachedLights ? this._cachedLights : this._getAllLights();
+    return this._getAllLights();
   }
 
   /**
@@ -39,7 +36,7 @@ class Model {
    * @readonly
    */
   public get meshes() {
-    return this._cachedMeshes ? this._cachedMeshes : this._getAllMeshes();
+    return this._getAllMeshes();
   }
 
   /**
@@ -48,31 +45,7 @@ class Model {
    * @see https://threejs.org/docs/#api/en/math/Box3
    */
   public get bbox() {
-    return this._getTransformedBbox();
-  }
-
-  /**
-   * Get a copy of model's initial bounding box without transform
-   */
-  public get initialBbox() {
-    return this._initialBbox.clone();
-  }
-
-  /**
-   * Model's bounding box size
-   * Changing this will scale the model.
-   * @type number
-   * @example
-   * ```ts
-   * import { GLTFLoader } from "@egjs/view3d";
-   * new GLTFLoader().load(URL_TO_GLTF)
-   *  .then(model => {
-   *    model.size = 100;
-   *  })
-   * ```
-   */
-  public get size() {
-    return this._getTransformedBbox().getSize(new THREE.Vector3()).length();
+    return this._bbox;
   }
 
   /**
@@ -81,12 +54,6 @@ class Model {
    * @type boolean
    */
   public get fixSkinnedBbox() { return this._fixSkinnedBbox; }
-
-  /**
-   * Return the model's original bbox size before applying any transform
-   * @type number
-   */
-  public get originalSize() { return this._originalSize; }
 
   /**
    * Whether the model's meshes gets rendered into shadow map
@@ -114,17 +81,6 @@ class Model {
     meshes.forEach(mesh => mesh.receiveShadow = val);
   }
 
-  public set size(val: number) {
-    const scene = this._scene;
-    const initialBbox = this._initialBbox;
-
-    // Modify scale
-    const bboxSize = initialBbox.getSize(new THREE.Vector3());
-    const scale = val / bboxSize.length();
-    scene.scale.setScalar(scale);
-    scene.updateMatrix();
-  }
-
   public set fixSkinnedBbox(val: boolean) { this._fixSkinnedBbox = val; }
 
   /**
@@ -145,51 +101,29 @@ class Model {
   }) {
     // This guarantees model's root has identity matrix at creation
     this._scene = new THREE.Group();
-    const pivot = new THREE.Object3D();
-    pivot.name = "Pivot";
-    pivot.add(...scenes);
-    this._scene.add(pivot);
+    this._scene.add(...scenes);
 
     this._animations = animations;
     this._fixSkinnedBbox = fixSkinnedBbox;
-    this._cachedLights = null;
-    this._cachedMeshes = null;
 
-    this._setInitialBbox();
+    this._bbox = this._getInitialBbox();
 
-    const bboxCenter = this._initialBbox.getCenter(new THREE.Vector3());
-    pivot.position.copy(bboxCenter.negate());
-
-    this._moveInitialBboxToCenter();
-
-    this._originalSize = this.size;
+    // Move to position where bbox.min.y = 0
+    const offset = this._bbox.min.y;
+    this._scene.translateY(-offset);
+    this._bbox.translate(new THREE.Vector3(0, -offset, 0));
 
     this.castShadow = castShadow;
     this.receiveShadow = receiveShadow;
   }
 
-  /**
-   * Translate the model to center the model's bounding box to world origin (0, 0, 0).
-   */
-  public moveToOrigin() {
-    // Translate scene position to origin
-    const scene = this._scene;
-    const initialBbox = this._initialBbox.clone();
-
-    initialBbox.min.multiply(scene.scale);
-    initialBbox.max.multiply(scene.scale);
-
-    const bboxCenter = initialBbox.getCenter(new THREE.Vector3());
-    scene.position.copy(bboxCenter.negate());
-    scene.updateMatrix();
-  }
-
-  private _setInitialBbox() {
+  private _getInitialBbox() {
     this._scene.updateMatrixWorld();
+
     if (this._fixSkinnedBbox && this._hasSkinnedMesh()) {
-      this._initialBbox = this._getSkeletonBbox();
+      return this._getSkeletonBbox();
     } else {
-      this._initialBbox = new THREE.Box3().setFromObject(this._scene);
+      return new THREE.Box3().setFromObject(this._scene);
     }
   }
 
@@ -254,11 +188,6 @@ class Model {
     return bbox;
   }
 
-  private _moveInitialBboxToCenter() {
-    const bboxCenter = this._initialBbox.getCenter(new THREE.Vector3());
-    this._initialBbox.translate(bboxCenter.negate());
-  }
-
   private _getAllLights(): THREE.Light[] {
     const lights: THREE.Light[] = [];
 
@@ -267,8 +196,6 @@ class Model {
         lights.push(obj as THREE.Light);
       }
     });
-
-    this._cachedLights = lights;
 
     return lights;
   }
@@ -287,17 +214,11 @@ class Model {
       }
     });
 
-    this._cachedMeshes = meshes;
-
     return meshes;
   }
 
   private _hasSkinnedMesh(): boolean {
     return this.meshes.some(mesh => (mesh as THREE.SkinnedMesh).isSkinnedMesh);
-  }
-
-  private _getTransformedBbox(): THREE.Box3 {
-    return this._initialBbox.clone().applyMatrix4(this._scene.matrix);
   }
 }
 

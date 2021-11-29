@@ -1,0 +1,26 @@
+#view3d-controls {
+  width: 100%;
+  position: absolute;
+  bottom: 5%;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center ;
+}
+.buttons-wrapper {
+  width: 240px;
+  height: 32px;
+  padding: 15px 5px;
+  border-radius: 32px;
+  background-color: rgba(0, 0, 0, 0.217);
+  color: white;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+.buttons-wrapper i {
+  cursor: pointer;
+}
+.buttons-wrapper i.hidden {
+  display: none;
+}

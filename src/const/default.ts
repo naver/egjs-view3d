@@ -12,7 +12,6 @@ import { EASING as EASING_CONST } from "./external";
 
 // View3D Options
 export const FORMAT = "auto";
-export const MODEL_SIZE = 80;
 
 // Animation
 export const EASING = EASING_CONST.EASE_OUT_CUBIC;
@@ -33,7 +32,8 @@ export const PITCH_RANGE: Readonly<Range> = {
 export const DISTANCE_RANGE: Readonly<Range> = {
   min: 0, max: 500
 };
-export const MINIMUM_DISTANCE = 1;
+
+export const MINIMUM_DISTANCE = 0.0001; // 1mm
 export const MAXIMUM_DISTANCE = 500;
 export const NULL_ELEMENT: HTMLElement | string | null = null;
 export const DRACO_DECODER_URL = "https://www.gstatic.com/draco/v1/decoders/";

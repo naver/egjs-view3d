@@ -3,7 +3,7 @@
  * egjs projects are licensed under the MIT license
  */
 
-import View3D, { View3DOptions } from "../View3D";
+import { View3DOptions } from "../View3D";
 import { MODEL_FORMAT, MODEL_MIME } from "../const/external";
 import * as BROWSER from "../const/browser";
 import * as ERROR from "../const/error";
@@ -14,30 +14,28 @@ import DracoLoader from "../loaders/DracoLoader";
 import View3DError from "./View3DError";
 
 class ModelLoader {
-  private _view3d: View3D;
-
-  public constructor(view3d: View3D) {
-    this._view3d = view3d;
-  }
-
   public async load(url: string, format: View3DOptions["format"]) {
     const fileFormat = format === "auto"
       ? await this._detectFileFormat(url)
       : format as string;
 
-    const loader = this._createLoaderByFormat(fileFormat, format as string);
+    const loader = this._createLoaderByFormat(fileFormat, url, format as string);
 
     return await loader.load(url);
   }
 
-  private _createLoaderByFormat(format: string | null, givenFormat: string) {
+  private _createLoaderByFormat(format: string | null, url: string, givenFormat: string) {
     if (format === MODEL_FORMAT.GLTF || format === MODEL_FORMAT.GLB) {
       return new GLTFLoader();
     } else if (format === MODEL_FORMAT.DRC) {
       return new DracoLoader();
     }
 
-    throw new View3DError(ERROR.MESSAGES.FORMAT_NOT_SUPPORTED(givenFormat), ERROR.CODES.FORMAT_NOT_SUPPORTED);
+    // File format not found
+    const expectedFormat = givenFormat === "auto"
+      ? this._getFileExtension(url)
+      : givenFormat;
+    throw new View3DError(ERROR.MESSAGES.FORMAT_NOT_SUPPORTED(expectedFormat), ERROR.CODES.FORMAT_NOT_SUPPORTED);
   }
 
   private async _detectFileFormat(url: string): Promise<ValueOf<typeof MODEL_FORMAT> | null> {
@@ -56,7 +54,7 @@ class ModelLoader {
   }
 
   private _detectFileFormatByName(url: string): ValueOf<typeof MODEL_FORMAT> | null {
-    const format = url.slice((url.lastIndexOf(".") - 1 >>> 0) + 2).toUpperCase();
+    const format = this._getFileExtension(url).toUpperCase();
 
     if (format in MODEL_FORMAT) {
       return MODEL_FORMAT[format];
@@ -86,6 +84,10 @@ class ModelLoader {
       fetchMIME.open("HEAD", url);
       fetchMIME.send();
     });
+  }
+
+  private _getFileExtension(url: string): string {
+    return url.slice((url.lastIndexOf(".") - 1 >>> 0) + 2);
   }
 }
 

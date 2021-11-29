@@ -4,8 +4,11 @@
  */
 
 import * as THREE from "three";
+import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
 
+import View3D from "../View3D";
 import Environment from "../environment/Environment";
+import ShadowPlane from "../environment/ShadowPlane";
 import { STANDARD_MAPS } from "../const/internal";
 import { findIndex } from "../utils";
 
@@ -16,6 +19,7 @@ import Model from "./Model";
  * All model datas including Mesh, Lights, etc. will be included on this
  */
 class Scene {
+  private _view3D: View3D;
   private _root: THREE.Scene;
   private _userObjects: THREE.Group;
   private _envObjects: THREE.Group;
@@ -39,7 +43,8 @@ class Scene {
   /**
    * Create new Scene instance
    */
-  public constructor() {
+  public constructor(view3D: View3D) {
+    this._view3D = view3D;
     this._root = new THREE.Scene();
     this._userObjects = new THREE.Group();
     this._envObjects = new THREE.Group();
@@ -54,6 +59,9 @@ class Scene {
 
     root.add(userObjects);
     root.add(envObjects);
+
+    const shadowPlane = new ShadowPlane();
+    this.addEnv(shadowPlane.mesh);
   }
 
   /**
@@ -70,7 +78,7 @@ class Scene {
    * @returns {void}
    */
   public reset(): void {
-    this.resetModel();
+    this.resetObjects();
     this.resetEnv();
   }
 
@@ -78,7 +86,7 @@ class Scene {
    * Fully remove all objects that added by calling {@link Scene#add add()}
    * @returns {void}
    */
-  public resetModel(): void {
+  public resetObjects(): void {
     this._removeChildsOf(this._userObjects);
   }
 
@@ -166,10 +174,16 @@ class Scene {
    * @param envmap A texture to set as environment map
    * @returns {void}
    */
-  public setEnvMap(envmap: THREE.Texture | THREE.CubeTexture | THREE.WebGLCubeRenderTarget | null): void {
-    // Next line written to silence Three.js's warning
-    const environment = (envmap as THREE.WebGLCubeRenderTarget).texture ? (envmap as THREE.WebGLCubeRenderTarget).texture : envmap;
-    this._root.environment = environment as THREE.Texture | null;
+  public async setEnvMap(url: string): Promise<void> {
+    const textureLoader = new RGBELoader();
+    textureLoader.setCrossOrigin("anonymous");
+    const equirectTexture = await textureLoader.loadAsync(url);
+    const pmremGenerator = new THREE.PMREMGenerator(this._view3D.renderer.threeRenderer);
+    const hdrCubeRenderTarget = pmremGenerator.fromEquirectangular(equirectTexture);
+    pmremGenerator.compileCubemapShader();
+
+    this._root.environment = hdrCubeRenderTarget.texture;
+    // this._root.background = cubemap.texture;
   }
 
   /**

@@ -1,0 +1,527 @@
+{
+  "asset": {
+    "generator": "Khronos glTF Blender I/O v1.6.16",
+    "version": "2.0"
+  },
+  "extensionsUsed": [
+    "KHR_materials_clearcoat"
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "alarm_clock_01"
+    },
+    {
+      "mesh": 1,
+      "name": "alarm_clock_01_hour_hand",
+      "rotation": [
+        -0.39852431416511536,
+        -0.5841047167778015,
+        -0.5841047763824463,
+        -0.39852431416511536
+      ],
+      "translation": [
+        0,
+        0.06489445269107819,
+        0
+      ]
+    },
+    {
+      "mesh": 2,
+      "name": "alarm_clock_01_minute_hand",
+      "rotation": [
+        0.6842025518417358,
+        -0.1785130798816681,
+        -0.17851299047470093,
+        0.6842024922370911
+      ],
+      "translation": [
+        0,
+        0.06489445269107819,
+        0
+      ]
+    },
+    {
+      "mesh": 3,
+      "name": "alarm_clock_01_second_hand",
+      "rotation": [
+        -0.1445818543434143,
+        -0.6921676993370056,
+        -0.1445818692445755,
+        0.6921676397323608
+      ],
+      "translation": [
+        0,
+        0.06489445269107819,
+        0
+      ]
+    },
+    {
+      "mesh": 4,
+      "name": "alarm_clock_01_glass"
+    }
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "name": "alarm_clock_01",
+      "normalTexture": {
+        "index": 0
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 1
+        },
+        "metallicRoughnessTexture": {
+          "index": 2
+        }
+      }
+    },
+    {
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "extensions": {
+        "KHR_materials_clearcoat": {
+          "clearcoatFactor": 1,
+          "clearcoatRoughnessFactor": 0.029999999329447746
+        }
+      },
+      "name": "alarm_clock_01_glass",
+      "normalTexture": {
+        "index": 3
+      },
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.030317356809973717,
+          0.030317356809973717,
+          0.030317356809973717,
+          0.30000001192092896
+        ],
+        "metallicFactor": 0,
+        "metallicRoughnessTexture": {
+          "index": 4
+        }
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Cylinder.030",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "material": 0
+        }
+      ]
+    },
+    {
+      "name": "Plane.012",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 4,
+            "NORMAL": 5,
+            "TEXCOORD_0": 6
+          },
+          "indices": 7,
+          "material": 0
+        }
+      ]
+    },
+    {
+      "name": "Plane.013",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 8,
+            "NORMAL": 9,
+            "TEXCOORD_0": 10
+          },
+          "indices": 11,
+          "material": 0
+        }
+      ]
+    },
+    {
+      "name": "Plane.014",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 12,
+            "NORMAL": 13,
+            "TEXCOORD_0": 14
+          },
+          "indices": 15,
+          "material": 0
+        }
+      ]
+    },
+    {
+      "name": "Cylinder.001",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 16,
+            "NORMAL": 17,
+            "TEXCOORD_0": 18
+          },
+          "indices": 19,
+          "material": 1
+        }
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 0,
+      "source": 1
+    },
+    {
+      "sampler": 0,
+      "source": 2
+    },
+    {
+      "sampler": 0,
+      "source": 3
+    },
+    {
+      "sampler": 0,
+      "source": 4
+    }
+  ],
+  "images": [
+    {
+      "mimeType": "image/jpeg",
+      "name": "alarm_clock_01_nor_gl.png",
+      "uri": "textures/alarm_clock_01_nor_gl_4k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "alarm_clock_01_diff.png",
+      "uri": "textures/alarm_clock_01_diff_4k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "alarm_clock_01_metal.png-alarm_clock_01_rough.png",
+      "uri": "textures/alarm_clock_01_arm_4k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "alarm_clock_01_nor_gl",
+      "uri": "textures/alarm_clock_01_nor_gl_4k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "alarm_clock_01_rough",
+      "uri": "textures/alarm_clock_01_rough_4k.jpg"
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 6424,
+      "max": [
+        0.06582528352737427,
+        0.1732245534658432,
+        0.037977274507284164
+      ],
+      "min": [
+        -0.06582528352737427,
+        -0.0009308308362960815,
+        -0.024242695420980453
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 6424,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 6424,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5123,
+      "count": 23520,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5126,
+      "count": 193,
+      "max": [
+        0.004351007752120495,
+        0.0254962295293808,
+        0.0043509965762495995
+      ],
+      "min": [
+        -0.04333455115556717,
+        0.02490372210741043,
+        -0.004351010546088219
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 5,
+      "componentType": 5126,
+      "count": 193,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 6,
+      "componentType": 5126,
+      "count": 193,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 7,
+      "componentType": 5123,
+      "count": 600,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 8,
+      "componentType": 5126,
+      "count": 147,
+      "max": [
+        0.004351008217781782,
+        0.02489468827843666,
+        0.004351007752120495
+      ],
+      "min": [
+        -0.05332012102007866,
+        0.0242923591285944,
+        -0.004351000301539898
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 9,
+      "componentType": 5126,
+      "count": 147,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 10,
+      "componentType": 5126,
+      "count": 147,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 11,
+      "componentType": 5123,
+      "count": 456,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 12,
+      "componentType": 5126,
+      "count": 81,
+      "max": [
+        0.024226035922765732,
+        0.05301994830369949,
+        0.0033735933247953653
+      ],
+      "min": [
+        0.024067969992756844,
+        -0.0033736019395291805,
+        -0.003373598912730813
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 13,
+      "componentType": 5126,
+      "count": 81,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 14,
+      "componentType": 5126,
+      "count": 81,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 15,
+      "componentType": 5123,
+      "count": 219,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 16,
+      "componentType": 5126,
+      "count": 385,
+      "max": [
+        0.05906614288687706,
+        0.12396059930324554,
+        0.04250587522983551
+      ],
+      "min": [
+        -0.05906614288687706,
+        0.0058283135294914246,
+        0.030722394585609436
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 17,
+      "componentType": 5126,
+      "count": 385,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 18,
+      "componentType": 5126,
+      "count": 385,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 19,
+      "componentType": 5123,
+      "count": 2160,
+      "type": "SCALAR"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 77088,
+      "byteOffset": 0
+    },
+    {
+      "buffer": 0,
+      "byteLength": 77088,
+      "byteOffset": 77088
+    },
+    {
+      "buffer": 0,
+      "byteLength": 51392,
+      "byteOffset": 154176
+    },
+    {
+      "buffer": 0,
+      "byteLength": 47040,
+      "byteOffset": 205568
+    },
+    {
+      "buffer": 0,
+      "byteLength": 2316,
+      "byteOffset": 252608
+    },
+    {
+      "buffer": 0,
+      "byteLength": 2316,
+      "byteOffset": 254924
+    },
+    {
+      "buffer": 0,
+      "byteLength": 1544,
+      "byteOffset": 257240
+    },
+    {
+      "buffer": 0,
+      "byteLength": 1200,
+      "byteOffset": 258784
+    },
+    {
+      "buffer": 0,
+      "byteLength": 1764,
+      "byteOffset": 259984
+    },
+    {
+      "buffer": 0,
+      "byteLength": 1764,
+      "byteOffset": 261748
+    },
+    {
+      "buffer": 0,
+      "byteLength": 1176,
+      "byteOffset": 263512
+    },
+    {
+      "buffer": 0,
+      "byteLength": 912,
+      "byteOffset": 264688
+    },
+    {
+      "buffer": 0,
+      "byteLength": 972,
+      "byteOffset": 265600
+    },
+    {
+      "buffer": 0,
+      "byteLength": 972,
+      "byteOffset": 266572
+    },
+    {
+      "buffer": 0,
+      "byteLength": 648,
+      "byteOffset": 267544
+    },
+    {
+      "buffer": 0,
+      "byteLength": 438,
+      "byteOffset": 268192
+    },
+    {
+      "buffer": 0,
+      "byteLength": 4620,
+      "byteOffset": 268632
+    },
+    {
+      "buffer": 0,
+      "byteLength": 4620,
+      "byteOffset": 273252
+    },
+    {
+      "buffer": 0,
+      "byteLength": 3080,
+      "byteOffset": 277872
+    },
+    {
+      "buffer": 0,
+      "byteLength": 4320,
+      "byteOffset": 280952
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 285272,
+      "uri": "alarm_clock_01.bin"
+    }
+  ]
+}
