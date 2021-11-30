@@ -13,10 +13,10 @@ import Model from "./core/Model";
 import ModelAnimator from "./core/ModelAnimator";
 import OrbitControl from "./control/OrbitControl";
 import { EVENTS } from "./const/external";
+import * as DEFAULT from "./const/default";
 import * as EVENT_TYPES from "./type/event";
 import { getCanvas } from "./utils";
 import { LiteralUnion } from "./type/internal";
-import Afternoon from "./preset/Afternoon";
 
 /**
  * @interface
@@ -44,6 +44,8 @@ export interface View3DOptions {
   envmap: string | null;
 
   // Display
+  fov: number;
+  center: "auto" | number[];
   playInitialAnimation: boolean;
 
   // Others
@@ -75,6 +77,8 @@ class View3D extends Component<View3DEvents> {
   private _src: View3DOptions["src"];
   private _format: View3DOptions["format"];
   private _envmap: View3DOptions["envmap"];
+  private _fov: View3DOptions["fov"];
+  private _center: View3DOptions["center"];
   private _autoInit: View3DOptions["autoInit"];
   private _autoResize: View3DOptions["autoResize"];
   private _useResizeObserver: View3DOptions["useResizeObserver"];
@@ -128,6 +132,8 @@ class View3D extends Component<View3DEvents> {
    * @default "auto"
    */
   public get format() { return this._format; }
+  public get fov() { return this._fov; }
+  public get center() { return this._center; }
   /**
    * Call {@link View3D#init init()} automatically when creating View3D's instance
    * This option won't work if `src` is not given
@@ -181,6 +187,8 @@ class View3D extends Component<View3DEvents> {
   public constructor(canvasEl: string | HTMLElement, {
     src = null,
     format = "auto",
+    fov = 45,
+    center = "auto",
     envmap = null,
     autoInit = true,
     autoResize = true
@@ -199,6 +207,8 @@ class View3D extends Component<View3DEvents> {
     // Bind options
     this._src = src;
     this._format = format;
+    this._fov = fov;
+    this._center = center;
     this._envmap = envmap;
     this._autoInit = autoInit;
     this._autoResize = autoResize;
@@ -235,7 +245,7 @@ class View3D extends Component<View3DEvents> {
     await this.load(this._src!, this._format);
     this._control.enable();
 
-    this._scene.addEnv(Afternoon());
+    // this._scene.addEnv(Afternoon());
 
     this._initialized = true;
     this.trigger(EVENTS.READY, { target: this });
@@ -308,9 +318,7 @@ class View3D extends Component<View3DEvents> {
    * @param {boolean} [options.resetView=true] Whether to reset the view to the camera's default pose.
    * @returns {void}
    */
-  private _display(model: Model, {
-    resetView = true
-  } = {}): void {
+  private _display(model: Model): void {
     const renderer = this._renderer;
     const scene = this._scene;
     const camera = this._camera;
@@ -321,7 +329,7 @@ class View3D extends Component<View3DEvents> {
     scene.add(model.scene);
     scene.update(model);
 
-    camera.fit(model.bbox.min.toArray(), model.bbox.max.toArray());
+    camera.fit(model, this._center);
 
     animator.reset();
     animator.setClips(model.animations);

@@ -7,10 +7,11 @@ import * as THREE from "three";
 
 import View3D from "../View3D";
 import AnimationControl from "../control/AnimationControl";
-import { toRadian, clamp, circulate, getBoxPoints } from "../utils";
+import { toRadian, clamp, circulate, toDegree } from "../utils";
 import * as DEFAULT from "../const/default";
 
 import Pose from "./Pose";
+import Model from "./Model";
 
 /**
  * Camera that renders the scene of View3D
@@ -190,53 +191,49 @@ class Camera {
    * @param {number} [size.height] New height
    * @returns {void}
    */
-  public resize(size: { width: number; height: number }): void {
+  public resize({ width, height }: { width: number; height: number }): void {
     const cam = this._threeCamera;
-    const aspect = size.width / size.height;
+    const aspect = width / height;
 
     cam.aspect = aspect;
     cam.updateProjectionMatrix();
   }
 
   /**
-   * Fit camera frame to the given bbox
+   * Fit camera frame to the given model
    */
-  public fit(min: number[], max: number[]): void {
+  public fit(model: Model, center: "auto" | number[]): void {
+    const view3D = this._view3D;
     const camera = this._threeCamera;
     const defaultPose = this._defaultPose;
+    const bbox = model.bbox;
 
-    const minPoint = new THREE.Vector3().fromArray(min);
-    const maxPoint = new THREE.Vector3().fromArray(max);
-    const bbox = new THREE.Box3(minPoint, maxPoint);
-    const bboxCenter = bbox.getCenter(new THREE.Vector3());
-    bbox.translate(bboxCenter.clone().negate());
+    const modelCenter = Array.isArray(center)
+      ? new THREE.Vector3().fromArray(center)
+      : bbox.getCenter(new THREE.Vector3());
 
-    // As bbox points are symmetrical, use only half of them
-    const bboxPoints = getBoxPoints(bbox).slice(0, 4);
-    const defaultPoseTransform = new THREE.Matrix4()
-      .makeRotationFromEuler(new THREE.Euler(toRadian(defaultPose.pitch), toRadian(defaultPose.yaw), 0));
-
-    const transformedPoints = bboxPoints.map(point => {
-      return point.applyMatrix4(defaultPoseTransform);
-    });
-
-    const vfov = toRadian(camera.fov); // in radians
-    const tanHalfVFov = Math.tan(vfov / 2);
-
-    const hfov = 2 * Math.atan(tanHalfVFov * camera.aspect); // in radians
-    const tanHalfHFov = Math.tan(hfov / 2);
-
-    const effectiveDist = transformedPoints.reduce((dist, point) => {
-      return Math.max(
-        Math.abs(point.y) / tanHalfVFov + Math.abs(point.z),
-        Math.abs(point.x) / tanHalfHFov + Math.abs(point.z),
-        dist
-      );
+    const maxDistToCenterSquared = model.reduceVertices((dist, vertice) => {
+      return Math.max(dist, vertice.distanceToSquared(modelCenter));
     }, 0);
+    const maxDistToCenter = Math.sqrt(maxDistToCenterSquared);
+    const hfov = view3D.fov;
+    const tanHalfHFov = Math.tan(toRadian(hfov / 2));
+    const effectiveCamDist = maxDistToCenter / Math.sin(toRadian(hfov / 2));
 
-    const currentPose = this._currentPose;
-    currentPose.pivot = bboxCenter;
-    currentPose.distance = effectiveDist;
+    const maxTanHalfHFov = model.reduceVertices((res, vertex) => {
+      const distToCenter = new THREE.Vector3().subVectors(vertex, modelCenter);
+      const radiusXZ = Math.sqrt(distToCenter.x * distToCenter.x + distToCenter.z * distToCenter.z);
+      return Math.max(res, radiusXZ / (effectiveCamDist - Math.abs(distToCenter.y)));
+    }, 0);
+    const tanHalfVFov = tanHalfHFov * Math.max(1, (maxTanHalfHFov / tanHalfHFov) / camera.aspect);
+
+    defaultPose.pivot = modelCenter.clone();
+    defaultPose.distance = effectiveCamDist;
+
+    camera.fov = toDegree(2 * Math.atan(tanHalfVFov));
+    camera.updateProjectionMatrix();
+
+    void this.reset();
   }
 
   /**

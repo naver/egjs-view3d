@@ -5,6 +5,8 @@
 
 import * as THREE from "three";
 
+import { range } from "../utils";
+
 /**
  * Data class for loaded 3d model
  */
@@ -115,6 +117,28 @@ class Model {
 
     this.castShadow = castShadow;
     this.receiveShadow = receiveShadow;
+  }
+
+  public reduceVertices<T>(callbackfn: (previousVal: T, currentVal: THREE.Vector3) => T, initialVal: T) {
+    const meshes = this.meshes;
+
+    let result = initialVal;
+
+    meshes.forEach(mesh => {
+      const { position } = mesh.geometry.attributes;
+      if (!position) return;
+
+      mesh.updateMatrixWorld();
+
+      range(position.count).forEach(idx => {
+        const vertex = new THREE.Vector3().fromBufferAttribute(position, idx);
+
+        vertex.applyMatrix4(mesh.matrixWorld);
+        result = callbackfn(result, vertex);
+      });
+    });
+
+    return result;
   }
 
   private _getInitialBbox() {

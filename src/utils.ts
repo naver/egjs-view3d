@@ -51,6 +51,10 @@ export const toRadian = (x: number) => {
   return x * Math.PI / 180;
 };
 
+export const toDegree = (x: number) => {
+  return x * 180 / Math.PI;
+};
+
 export const clamp = (x: number, min: number, max: number) => {
   return Math.max(Math.min(x, max), min);
 };
