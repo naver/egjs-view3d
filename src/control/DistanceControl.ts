@@ -21,7 +21,7 @@ class DistanceControl implements CameraControl {
 
   // Internal values
   private _view3D: View3D;
-  private _scaleModifier: number = 0.025;
+  private _scaleModifier: number = 1;
   private _motion: Motion;
   private _prevTouchDistance: number = -1;
   private _enabled: boolean = false;
@@ -82,6 +82,10 @@ class DistanceControl implements CameraControl {
     const motion = this._motion;
 
     camera.distance += motion.update(deltaTime);
+  }
+
+  public updateScaleModifier(defaultDist: number, minDist: number) {
+    this._scaleModifier = (defaultDist - minDist) / 500;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -57,8 +57,8 @@ class AutoDirectionalLight implements Environment {
     // Set the default position ratio of the directional light
     const light = this._light;
     light.castShadow = true; // Is enabled by default
-    light.shadow.mapSize.width = 2048;
-    light.shadow.mapSize.height = 2048;
+    light.shadow.mapSize.width = 64;
+    light.shadow.mapSize.height = 64;
     light.matrixAutoUpdate = false;
 
     this._direction = direction.clone().normalize();

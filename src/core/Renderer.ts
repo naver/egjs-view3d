@@ -5,6 +5,8 @@
 
 import * as THREE from "three";
 
+import View3D from "../View3D";
+
 import Scene from "./Scene";
 import Camera from "./Camera";
 
@@ -12,6 +14,7 @@ import Camera from "./Camera";
  * Renderer that renders View3D's Scene
  */
 class Renderer {
+  private _view3D: View3D;
   private _renderer: THREE.WebGLRenderer;
   private _canvas: HTMLCanvasElement;
   private _clock: THREE.Clock;
@@ -50,20 +53,23 @@ class Renderer {
    * Create new Renderer instance
    * @param canvas \<canvas\> element to render 3d model
    */
-  public constructor(canvas: HTMLCanvasElement) {
+  public constructor(view3D: View3D, canvas: HTMLCanvasElement) {
+    this._view3D = view3D;
     this._canvas = canvas;
 
-    this._renderer = new THREE.WebGLRenderer({
+    const renderer = new THREE.WebGLRenderer({
       canvas: this._canvas,
       alpha: true,
       antialias: true,
       preserveDrawingBuffer: true
     });
 
-    this._renderer.xr.enabled = true;
+    renderer.xr.enabled = true;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.5;
+    renderer.outputEncoding = THREE.sRGBEncoding;
 
-    this._renderer.outputEncoding = THREE.sRGBEncoding;
-
+    this._renderer = renderer;
     this._clock = new THREE.Clock(false);
     this.enableShadow();
   }

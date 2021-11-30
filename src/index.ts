@@ -11,6 +11,7 @@ export * from "./control";
 export * from "./loaders";
 export * from "./environment";
 export * from "./extra";
+export * from "./preset";
 export * from "./const/external";
 
 export default View3D;

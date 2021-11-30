@@ -14,9 +14,12 @@ import DistanceControl from "./DistanceControl";
 export {
   AnimationControl,
   AutoControl,
-  CameraControl,
   OrbitControl,
   RotateControl,
   TranslateControl,
   DistanceControl
+};
+
+export type {
+  CameraControl
 };

@@ -10,6 +10,7 @@ import * as Controls from "./control";
 import * as Loaders from "./loaders";
 import * as Environments from "./environment";
 import * as Extra from "./extra";
+import * as Preset from "./preset";
 import * as Constants from "./const/external";
 import { merge } from "./utils";
 
@@ -18,6 +19,7 @@ merge(View3D, Environments);
 merge(View3D, Controls);
 merge(View3D, Loaders);
 merge(View3D, Extra);
+merge(View3D, Preset);
 merge(View3D, Constants);
 (View3D as any).View3DError = View3DError;
 

@@ -11,9 +11,9 @@ import AutoResizer from "./core/AutoResizer";
 import ModelLoader from "./core/ModelLoader";
 import Model from "./core/Model";
 import ModelAnimator from "./core/ModelAnimator";
+import Preset from "./preset/Preset";
 import OrbitControl from "./control/OrbitControl";
 import { EVENTS } from "./const/external";
-import * as DEFAULT from "./const/default";
 import * as EVENT_TYPES from "./type/event";
 import { getCanvas } from "./utils";
 import { LiteralUnion } from "./type/internal";
@@ -41,11 +41,13 @@ export interface View3DOptions {
   // Sources
   src: string | null;
   format: LiteralUnion<"auto">;
+  skybox: string | null;
   envmap: string | null;
 
   // Display
   fov: number;
   center: "auto" | number[];
+  preset: Preset | null;
   playInitialAnimation: boolean;
 
   // Others
@@ -70,6 +72,7 @@ class View3D extends Component<View3DEvents> {
   private _scene: Scene;
   private _camera: Camera;
   private _control: OrbitControl;
+  private _model: Model | null;
   private _animator: ModelAnimator;
   private _autoResizer: AutoResizer;
 
@@ -79,6 +82,7 @@ class View3D extends Component<View3DEvents> {
   private _envmap: View3DOptions["envmap"];
   private _fov: View3DOptions["fov"];
   private _center: View3DOptions["center"];
+  private _preset: View3DOptions["preset"];
   private _autoInit: View3DOptions["autoInit"];
   private _autoResize: View3DOptions["autoResize"];
   private _useResizeObserver: View3DOptions["useResizeObserver"];
@@ -107,6 +111,7 @@ class View3D extends Component<View3DEvents> {
    * @type {OrbitControl}
    */
   public get control() { return this._control; }
+  public get model() { return this._model; }
   /**
    * {@link ModelAnimator} instance of the View3D
    * @type {ModelAnimator}
@@ -187,9 +192,11 @@ class View3D extends Component<View3DEvents> {
   public constructor(canvasEl: string | HTMLElement, {
     src = null,
     format = "auto",
+    skybox = null,
+    envmap = null,
     fov = 45,
     center = "auto",
-    envmap = null,
+    preset = null,
     autoInit = true,
     autoResize = true
   }: Partial<View3DOptions> = {}) {
@@ -197,7 +204,7 @@ class View3D extends Component<View3DEvents> {
     const canvas = getCanvas(canvasEl);
 
     // Create internal components
-    this._renderer = new Renderer(canvas);
+    this._renderer = new Renderer(this, canvas);
     this._camera = new Camera(this);
     this._control = new OrbitControl(this);
     this._scene = new Scene(this);
@@ -207,9 +214,10 @@ class View3D extends Component<View3DEvents> {
     // Bind options
     this._src = src;
     this._format = format;
+    this._envmap = envmap;
     this._fov = fov;
     this._center = center;
-    this._envmap = envmap;
+    this._preset = preset;
     this._autoInit = autoInit;
     this._autoResize = autoResize;
 
@@ -244,8 +252,7 @@ class View3D extends Component<View3DEvents> {
 
     await this.load(this._src!, this._format);
     this._control.enable();
-
-    // this._scene.addEnv(Afternoon());
+    this._preset?.init(this);
 
     this._initialized = true;
     this.trigger(EVENTS.READY, { target: this });
@@ -322,7 +329,6 @@ class View3D extends Component<View3DEvents> {
     const renderer = this._renderer;
     const scene = this._scene;
     const camera = this._camera;
-    const control = this._control;
     const animator = this._animator;
 
     scene.resetObjects();
@@ -330,9 +336,12 @@ class View3D extends Component<View3DEvents> {
     scene.update(model);
 
     camera.fit(model, this._center);
+    void camera.reset(0);
 
     animator.reset();
     animator.setClips(model.animations);
+
+    this._model = model;
 
     renderer.stopAnimationLoop();
     renderer.setAnimationLoop(this.renderLoop);

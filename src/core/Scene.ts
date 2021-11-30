@@ -21,6 +21,7 @@ import Model from "./Model";
 class Scene {
   private _view3D: View3D;
   private _root: THREE.Scene;
+  private _shadowPlane: ShadowPlane;
   private _userObjects: THREE.Group;
   private _envObjects: THREE.Group;
   private _envs: Environment[];
@@ -48,6 +49,7 @@ class Scene {
     this._root = new THREE.Scene();
     this._userObjects = new THREE.Group();
     this._envObjects = new THREE.Group();
+    this._shadowPlane = new ShadowPlane();
     this._envs = [];
 
     const root = this._root;
@@ -60,8 +62,7 @@ class Scene {
     root.add(userObjects);
     root.add(envObjects);
 
-    const shadowPlane = new ShadowPlane();
-    this.addEnv(shadowPlane.mesh);
+    root.add(this._shadowPlane.mesh);
   }
 
   /**
@@ -183,7 +184,7 @@ class Scene {
     pmremGenerator.compileCubemapShader();
 
     this._root.environment = hdrCubeRenderTarget.texture;
-    // this._root.background = cubemap.texture;
+    this._root.background = hdrCubeRenderTarget.texture;
   }
 
   /**

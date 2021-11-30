@@ -57,19 +57,19 @@ class ShadowPlane implements Environment {
   /**
    * Create new shadow plane
    * @param {object} options Options
-   * @param {number} [options.size=10000] Size of the shadow plane
    * @param {number} [options.opacity=0.3] Opacity of the shadow
    */
   public constructor({
-    size = 10000,
-    opacity = 0.3
+    opacity = 0.15
   } = {}) {
-    this.geometry = new THREE.PlaneGeometry(size, size, 100, 100);
+    this.geometry = new THREE.PlaneBufferGeometry();
     this.material = new THREE.ShadowMaterial({ opacity });
     this.mesh = new THREE.Mesh(this.geometry, this.material);
 
     const mesh = this.mesh;
     mesh.rotateX(-Math.PI / 2);
+
+    mesh.scale.setScalar(100);
     mesh.receiveShadow = true;
   }
 

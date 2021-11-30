@@ -4,9 +4,10 @@ custom_edit_url: null
 ---
 
 import View3D from "../components/View3D";
+import { Afternoon } from "../../../src"
 
-### PBR
-<View3D src="/model/DragonAttenuation.glb" envmap="/img/spruit_sunrise_1k.hdr" />
+<!-- ### PBR
+<View3D src="/model/DragonAttenuation.glb" envmap="/img/spruit_sunrise_1k.hdr" /> -->
 
 <!-- ### PBR2
 <View3D src="/model/AttenuationTest.glb" />
@@ -14,5 +15,6 @@ import View3D from "../components/View3D";
 ### PBR3
 <View3D src="/model/MetalRoughSpheres.glb" /> -->
 
-<!-- ### DRC
-<View3D src="/model/bunny.drc" /> -->
+### DRC
+<View3D src="/model/bunny.drc" />
+<View3D src="/model/bunny.drc" preset={new Afternoon()} />
