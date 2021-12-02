@@ -2,7 +2,7 @@ import * as THREE from "three";
 
 import View3D from "../View3D";
 
-class MoonlightPreset {
+class MoonLightPreset {
   public init(view3D: View3D) {
     const skyColor = 0x232533;
     const bgColor = 0x393B47;
@@ -42,4 +42,4 @@ class MoonlightPreset {
   }
 }
 
-export default MoonlightPreset;
+export default MoonLightPreset;

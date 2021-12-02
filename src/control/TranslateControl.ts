@@ -161,8 +161,6 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
     targetEl.addEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove, { passive: false, capture: false });
     targetEl.addEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, { passive: false, capture: false });
 
-    targetEl.addEventListener(BROWSER.EVENTS.CONTEXT_MENU, this._onContextMenu, false);
-
     this._enabled = true;
     this.sync();
 
@@ -186,7 +184,7 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
     targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove, false);
     targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, false);
 
-    targetEl.removeEventListener(BROWSER.EVENTS.CONTEXT_MENU, this._onContextMenu, false);
+    window.removeEventListener(BROWSER.EVENTS.CONTEXT_MENU, this._onContextMenu, false);
 
     this._enabled = false;
 
@@ -217,6 +215,7 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
     this._prevPos.set(evt.clientX, evt.clientY);
     window.addEventListener(BROWSER.EVENTS.MOUSE_MOVE, this._onMouseMove, false);
     window.addEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
+    window.addEventListener(BROWSER.EVENTS.CONTEXT_MENU, this._onContextMenu, false);
 
     this.trigger(CONTROL_EVENTS.HOLD);
   };
@@ -303,6 +302,7 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
 
   private _onContextMenu = (evt: MouseEvent) => {
     evt.preventDefault();
+    window.removeEventListener(BROWSER.EVENTS.CONTEXT_MENU, this._onContextMenu, false);
   };
 }
 

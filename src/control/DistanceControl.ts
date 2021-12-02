@@ -51,12 +51,12 @@ class DistanceControl implements CameraControl {
    * @param {object} options Options
    * @param {HTMLElement | string | null} [options.element=null] Attaching element / selector of the element.
    * @param {number} [options.duration=500] Motion's duration.
-   * @param {object} [options.range={min: 0, max: 500}] Motion's range.
+   * @param {object} [options.range={min: 0, max: 0}] Motion's range.
    * @param {function} [options.easing=(x: number) => 1 - Math.pow(1 - x, 3)] Motion's easing function.
    */
   public constructor(view3D: View3D, {
     duration = DEFAULT.ANIMATION_DURATION,
-    range = DEFAULT.DISTANCE_RANGE,
+    range = { min: 0, max: 0 },
     easing = DEFAULT.EASING
   } = {}) {
     this._view3D = view3D;

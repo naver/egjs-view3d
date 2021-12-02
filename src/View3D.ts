@@ -80,6 +80,7 @@ class View3D extends Component<View3DEvents> {
   // Options
   private _src: View3DOptions["src"];
   private _format: View3DOptions["format"];
+  private _skybox: View3DOptions["skybox"];
   private _envmap: View3DOptions["envmap"];
   private _fov: View3DOptions["fov"];
   private _center: View3DOptions["center"];
@@ -210,6 +211,7 @@ class View3D extends Component<View3DEvents> {
     // Bind options
     this._src = src;
     this._format = format;
+    this._skybox = skybox;
     this._envmap = envmap;
     this._fov = fov;
     this._center = center;

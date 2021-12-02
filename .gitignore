@@ -107,4 +107,5 @@ demo/release/
 dist/
 outjs/
 declaration/
+TODO.md
 *.pem

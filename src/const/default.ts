@@ -29,11 +29,6 @@ export const INFINITE_RANGE: Readonly<Range> = {
 export const PITCH_RANGE: Readonly<Range> = {
   min: -89.9, max: 89.9
 };
-export const DISTANCE_RANGE: Readonly<Range> = {
-  min: 0, max: 500
-};
 
-export const MINIMUM_DISTANCE = 0.0001; // 1mm
-export const MAXIMUM_DISTANCE = 500;
 export const NULL_ELEMENT: HTMLElement | string | null = null;
 export const DRACO_DECODER_URL = "https://www.gstatic.com/draco/v1/decoders/";

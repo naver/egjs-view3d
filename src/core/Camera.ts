@@ -19,8 +19,8 @@ import Model from "./Model";
 class Camera {
   private _view3D: View3D;
   private _threeCamera: THREE.PerspectiveCamera;
-  private _minDistance: number = DEFAULT.MINIMUM_DISTANCE;
-  private _maxDistance: number = DEFAULT.MAXIMUM_DISTANCE;
+  private _minDistance: number = 0;
+  private _maxDistance: number = 0;
   private _defaultPose: Pose = DEFAULT.CAMERA_POSE;
   private _currentPose: Pose = this._defaultPose.clone();
   private _maxTanHalfHFov: number;
@@ -122,8 +122,6 @@ class Camera {
    */
   public get renderHeight() { return 2 * this.distance * Math.tan(toRadian(this.fov / 2)); }
 
-  public set minDistance(val: number) { this._minDistance = val; }
-  public set maxDistance(val: number) { this._maxDistance = val; }
   public set pose(val: Pose) {
     this._currentPose = val;
     this._view3D.control.sync();
@@ -233,6 +231,9 @@ class Camera {
     defaultPose.pivot = modelCenter.clone();
     defaultPose.distance = effectiveCamDist;
 
+    this._minDistance = maxDistToCenter / 10;
+    this._maxDistance = effectiveCamDist * 2;
+
     // Update distance control
     view3D.control.distance.updateScaleModifier(effectiveCamDist, effectiveCamDist - maxDistToCenter);
   }
@@ -278,10 +279,9 @@ class Camera {
 
     const yaw = toRadian(pose.yaw);
     const pitch = toRadian(pose.pitch);
-    // Should use minimum distance to prevent distance becomes 0, which makes whole x,y,z to 0 regardless of pose
-    const distance = Math.max(pose.distance + this._minDistance, DEFAULT.MINIMUM_DISTANCE);
-
+    const distance = Math.max(pose.distance, this._minDistance);
     const newCamPos = new THREE.Vector3(0, 0, 0);
+
     newCamPos.y = distance * Math.sin(pitch);
     newCamPos.z = distance * Math.cos(pitch);
 

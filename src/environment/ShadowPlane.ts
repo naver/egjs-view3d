@@ -63,7 +63,7 @@ class ShadowPlane implements Environment {
     opacity = 0.3
   } = {}) {
     this.geometry = new THREE.PlaneBufferGeometry();
-    this.material = new THREE.ShadowMaterial({ opacity });
+    this.material = new THREE.ShadowMaterial({ opacity, fog: false });
     this.mesh = new THREE.Mesh(this.geometry, this.material);
 
     const mesh = this.mesh;
