@@ -66,7 +66,7 @@ class Renderer {
 
     renderer.xr.enabled = true;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.5;
+    renderer.toneMappingExposure = view3D.exposure;
     renderer.outputEncoding = THREE.sRGBEncoding;
 
     this._renderer = renderer;

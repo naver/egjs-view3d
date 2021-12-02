@@ -48,6 +48,7 @@ export interface View3DOptions {
   fov: number;
   center: "auto" | number[];
   preset: Preset | null;
+  exposure: number;
   playInitialAnimation: boolean;
 
   // Others
@@ -83,6 +84,7 @@ class View3D extends Component<View3DEvents> {
   private _fov: View3DOptions["fov"];
   private _center: View3DOptions["center"];
   private _preset: View3DOptions["preset"];
+  private _exposure: View3DOptions["exposure"];
   private _autoInit: View3DOptions["autoInit"];
   private _autoResize: View3DOptions["autoResize"];
   private _useResizeObserver: View3DOptions["useResizeObserver"];
@@ -139,6 +141,7 @@ class View3D extends Component<View3DEvents> {
   public get format() { return this._format; }
   public get fov() { return this._fov; }
   public get center() { return this._center; }
+  public get exposure() { return this._exposure; }
   /**
    * Call {@link View3D#init init()} automatically when creating View3D's instance
    * This option won't work if `src` is not given
@@ -197,19 +200,12 @@ class View3D extends Component<View3DEvents> {
     fov = 45,
     center = "auto",
     preset = null,
+    exposure = 1,
     autoInit = true,
     autoResize = true
   }: Partial<View3DOptions> = {}) {
     super();
     const canvas = getCanvas(canvasEl);
-
-    // Create internal components
-    this._renderer = new Renderer(this, canvas);
-    this._camera = new Camera(this);
-    this._control = new OrbitControl(this);
-    this._scene = new Scene(this);
-    this._animator = new ModelAnimator(this._scene.root);
-    this._autoResizer = new AutoResizer(this);
 
     // Bind options
     this._src = src;
@@ -218,8 +214,17 @@ class View3D extends Component<View3DEvents> {
     this._fov = fov;
     this._center = center;
     this._preset = preset;
+    this._exposure = exposure;
     this._autoInit = autoInit;
     this._autoResize = autoResize;
+
+    // Create internal components
+    this._renderer = new Renderer(this, canvas);
+    this._camera = new Camera(this);
+    this._control = new OrbitControl(this);
+    this._scene = new Scene(this);
+    this._animator = new ModelAnimator(this._scene.root);
+    this._autoResizer = new AutoResizer(this);
 
     if (src && autoInit) {
       void this.init();

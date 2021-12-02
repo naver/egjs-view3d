@@ -1,8 +1,10 @@
 import Preset from "./Preset";
-import Afternoon from "./Afternoon";
+import WhiteLightPreset from "./WhiteLightPreset";
+import MoonlightPreset from "./MoonlightPreset";
 
 export {
-  Afternoon
+  WhiteLightPreset,
+  MoonlightPreset
 };
 
 export type {

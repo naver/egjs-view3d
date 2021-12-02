@@ -31,6 +31,8 @@ class Scene {
    */
   public get root() { return this._root; }
 
+  public get shadowPlane() { return this._shadowPlane; }
+
   /**
    * {@link Environment}s inside scene
    */

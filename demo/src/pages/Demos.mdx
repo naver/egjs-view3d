@@ -4,10 +4,10 @@ custom_edit_url: null
 ---
 
 import View3D from "../components/View3D";
-import { Afternoon } from "../../../src"
+import { WhiteLightPreset, MoonlightPreset } from "../../../src"
 
-<!-- ### PBR
-<View3D src="/model/DragonAttenuation.glb" envmap="/img/spruit_sunrise_1k.hdr" /> -->
+### PBR
+<View3D src="/model/DragonAttenuation.glb" exposure={1.5} envmap="/img/spruit_sunrise_1k.hdr" />
 
 <!-- ### PBR2
 <View3D src="/model/AttenuationTest.glb" />
@@ -16,5 +16,5 @@ import { Afternoon } from "../../../src"
 <View3D src="/model/MetalRoughSpheres.glb" /> -->
 
 ### DRC
-<View3D src="/model/bunny.drc" />
-<View3D src="/model/bunny.drc" preset={new Afternoon()} />
+<View3D src="/model/bunny.drc" preset={new WhiteLightPreset()} />
+<View3D src="/model/bunny.drc" preset={new MoonlightPreset()} />

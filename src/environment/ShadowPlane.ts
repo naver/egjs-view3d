@@ -60,7 +60,7 @@ class ShadowPlane implements Environment {
    * @param {number} [options.opacity=0.3] Opacity of the shadow
    */
   public constructor({
-    opacity = 0.15
+    opacity = 0.3
   } = {}) {
     this.geometry = new THREE.PlaneBufferGeometry();
     this.material = new THREE.ShadowMaterial({ opacity });
