@@ -1,0 +1,21 @@
+---
+sidebar_position: 4
+---
+
+import View3D, { WhiteLightPreset } from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+
+<OptionDescriptor type="number" defaultVal="0" />
+
+## Example
+<View3D src="/model/bunny.drc" pitch={45} preset={new WhiteLightPreset()} />
+
+```ts
+import View3D, { WhiteLightPreset } from "@egjs/view3d";
+
+new View3D("#view3d-canvas", {
+  src: "/model/bunny.drc",
+  pitch: 45,
+  preset: new WhiteLightPreset()
+})
+```

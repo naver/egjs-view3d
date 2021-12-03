@@ -1,0 +1,34 @@
+---
+sidebar_position: 2
+---
+
+import View3D, { WhiteLightPreset } from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+
+<OptionDescriptor type={`"auto" | number[]`} defaultVal={"auto"} />
+
+## Example
+### center: "auto"
+<View3D src="/model/bunny.drc" center="auto" preset={new WhiteLightPreset()} />
+
+```ts
+import View3D, { WhiteLightPreset } from "@egjs/view3d";
+
+new View3D("#view3d-canvas", {
+  src: "/model/bunny.drc",
+  center: "auto",
+  preset: new WhiteLightPreset()
+})
+```
+
+### center: [0.03, 0, 0]
+<View3D src="/model/bunny.drc" center={[0.03, 0, 0]} preset={new WhiteLightPreset()} />
+
+```ts
+import View3D, { WhiteLightPreset } from "@egjs/view3d";
+
+new View3D("#view3d-canvas", {
+  src: "/model/bunny.drc",
+  preset: new WhiteLightPreset()
+})
+```

@@ -69,7 +69,7 @@ class Camera {
    * {@link Camera#updatePosition} should be called after changing this value, and normally it is called every frame.
    * @type number
    */
-  public get zoom() { return this._currentPose.zoom; }
+  public get zoom() { return this._currentPose.fovOffset; }
 
   /**
    * Current pivot point of camera rotation
@@ -132,7 +132,7 @@ class Camera {
 
   public set yaw(val: number) { this._currentPose.yaw = val; }
   public set pitch(val: number) { this._currentPose.pitch = val; }
-  public set zoom(val: number) { this._currentPose.zoom = val; }
+  public set zoom(val: number) { this._currentPose.fovOffset = val; }
   public set pivot(val: THREE.Vector3) { this._currentPose.pivot = val; }
 
   /**
@@ -143,6 +143,9 @@ class Camera {
     this._view3D = view3D;
     this._threeCamera = new THREE.PerspectiveCamera();
     this._maxTanHalfHFov = 0;
+
+    this._defaultPose = new Pose(view3D.yaw, view3D.pitch, 0);
+    this._currentPose = this._defaultPose.clone();
   }
 
   /**
@@ -274,7 +277,7 @@ class Camera {
       defaultPose.pitch = pitch;
     }
     if (distance != null) {
-      defaultPose.zoom = distance;
+      defaultPose.fovOffset = distance;
     }
     if (pivot != null) {
       defaultPose.pivot = pivot;
@@ -304,8 +307,7 @@ class Camera {
 
     newCamPos.add(pose.pivot);
 
-    threeCamera.fov = this._baseFov + pose.zoom;
-    // threeCamera.zoom = pose.zoom;
+    threeCamera.fov = this._baseFov + pose.fovOffset;
     threeCamera.position.copy(newCamPos);
     threeCamera.lookAt(pose.pivot);
     threeCamera.updateProjectionMatrix();

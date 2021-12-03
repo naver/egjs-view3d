@@ -16,7 +16,7 @@ class View3D extends React.Component<Partial<View3DOptions>> {
   }
 
   public render() {
-    return <div className="view3d-canvas-wrapper image is-square">
+    return <div className="view3d-canvas-wrapper image is-square mb-2">
       <canvas ref={this._canvasRef} className="view3d-canvas"></canvas>
       { this.props.children }
     </div>;

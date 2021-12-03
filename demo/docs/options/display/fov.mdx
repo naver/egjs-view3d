@@ -1,0 +1,35 @@
+---
+sidebar_position: 1
+---
+
+import View3D from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+
+<OptionDescriptor type={`"auto" | null`} defaultVal={"auto"} />
+
+## Example
+### fov: "auto"
+<View3D src="/model/DragonAttenuation.glb" fov="auto" envmap="/img/spruit_sunrise_1k.hdr" />
+
+```ts
+import View3D from "@egjs/view3d";
+
+new View3D("#view3d-canvas", {
+  fov: "auto",
+  src: "/model/DragonAttenuation.glb",
+  envmap: "/img/spruit_sunrise_1k.hdr"
+})
+```
+
+### fov: 120
+<View3D src="/model/DragonAttenuation.glb" fov={120} envmap="/img/spruit_sunrise_1k.hdr" />
+
+```ts
+import View3D from "@egjs/view3d";
+
+new View3D("#view3d-canvas", {
+  fov: 120,
+  src: "/model/DragonAttenuation.glb",
+  envmap: "/img/spruit_sunrise_1k.hdr"
+})
+```

@@ -46,11 +46,11 @@ export interface View3DOptions {
 
   // Display
   fov: "auto" | number;
-  zoom: number;
   center: "auto" | number[];
+  yaw: number;
+  pitch: number;
   preset: Preset | null;
   exposure: number;
-  playInitialAnimation: boolean;
 
   // Others
   autoInit: boolean;
@@ -85,6 +85,8 @@ class View3D extends Component<View3DEvents> {
   private _envmap: View3DOptions["envmap"];
   private _fov: View3DOptions["fov"];
   private _center: View3DOptions["center"];
+  private _yaw: View3DOptions["yaw"];
+  private _pitch: View3DOptions["pitch"];
   private _preset: View3DOptions["preset"];
   private _exposure: View3DOptions["exposure"];
   private _autoInit: View3DOptions["autoInit"];
@@ -145,6 +147,8 @@ class View3D extends Component<View3DEvents> {
   public get envmap() { return this._envmap; }
   public get fov() { return this._fov; }
   public get center() { return this._center; }
+  public get yaw() { return this._yaw; }
+  public get pitch() { return this._pitch; }
   public get exposure() { return this._exposure; }
   /**
    * Call {@link View3D#init init()} automatically when creating View3D's instance
@@ -203,6 +207,8 @@ class View3D extends Component<View3DEvents> {
     envmap = null,
     fov = AUTO,
     center = AUTO,
+    yaw = 0,
+    pitch = 0,
     preset = null,
     exposure = 1,
     autoInit = true,
@@ -218,6 +224,8 @@ class View3D extends Component<View3DEvents> {
     this._envmap = envmap;
     this._fov = fov;
     this._center = center;
+    this._yaw = yaw;
+    this._pitch = pitch;
     this._preset = preset;
     this._exposure = exposure;
     this._autoInit = autoInit;
@@ -342,15 +350,6 @@ class View3D extends Component<View3DEvents> {
     return await loader.load(src, format);
   }
 
-  /**
-   * Display the given model.
-   * This method will remove the current displaying model, and reset the camera & control to default position.
-   * View3D can only show one model at a time
-   * @param model {@link Model} instance to show
-   * @param {object} [options={}] Display options
-   * @param {boolean} [options.resetView=true] Whether to reset the view to the camera's default pose.
-   * @returns {void}
-   */
   private _display(model: Model): void {
     const renderer = this._renderer;
     const scene = this._scene;

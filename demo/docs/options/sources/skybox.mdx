@@ -1,0 +1,20 @@
+---
+sidebar_position: 3
+---
+
+import View3D from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+
+<OptionDescriptor type="string | null" defaultVal="null" />
+
+## Example
+<View3D src="/model/DragonAttenuation.glb" skybox="/img/spruit_sunrise_1k.hdr" />
+
+```ts
+import View3D from "@egjs/view3d";
+
+new View3D("#view3d-canvas", {
+  src: "/model/DragonAttenuation.glb",
+  skybox: "/img/spruit_sunrise_1k.hdr"
+})
+```
