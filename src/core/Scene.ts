@@ -4,9 +4,9 @@
  */
 
 import * as THREE from "three";
-import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
 
 import View3D from "../View3D";
+import TextureLoader from "../loaders/TextureLoader";
 import Environment from "../environment/Environment";
 import ShadowPlane from "../environment/ShadowPlane";
 import { STANDARD_MAPS } from "../const/internal";
@@ -171,6 +171,14 @@ class Scene {
     this._root.background = background as THREE.Texture | null;
   }
 
+  public async setSkybox(url: string): Promise<void> {
+    const textureLoader = new TextureLoader(this._view3D.renderer);
+    const renderTarget = await textureLoader.loadHDRTexture(url);
+
+    this._root.background = renderTarget.texture;
+    this._root.environment = renderTarget.texture;
+  }
+
   /**
    * Set scene's environment map that affects all physical materials in the scene
    * @see {@link https://threejs.org/docs/#api/en/scenes/Scene.environment THREE.Scene.environment}
@@ -178,15 +186,10 @@ class Scene {
    * @returns {void}
    */
   public async setEnvMap(url: string): Promise<void> {
-    const textureLoader = new RGBELoader();
-    textureLoader.setCrossOrigin("anonymous");
-    const equirectTexture = await textureLoader.loadAsync(url);
-    const pmremGenerator = new THREE.PMREMGenerator(this._view3D.renderer.threeRenderer);
-    const hdrCubeRenderTarget = pmremGenerator.fromEquirectangular(equirectTexture);
-    pmremGenerator.compileCubemapShader();
+    const textureLoader = new TextureLoader(this._view3D.renderer);
+    const renderTarget = await textureLoader.loadHDRTexture(url);
 
-    this._root.environment = hdrCubeRenderTarget.texture;
-    this._root.background = hdrCubeRenderTarget.texture;
+    this._root.environment = renderTarget.texture;
   }
 
   /**

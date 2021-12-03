@@ -4,10 +4,9 @@
 }
 
 .view3d-canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
   width: 100%;
-  height: 800px;
-}
-
-.view3d-canvas-wrapper {
-  border: 2px dotted black;
+  height: 100%;
 }

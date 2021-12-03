@@ -2,7 +2,7 @@
 title: Loading a 3D model
 id: loading-model
 slug: /loading-model
-custom_edit_url: null
+sidebar_position: 1
 ---
 
 Loading models can be done with [GLTFLoader](GLTFLoader.html)
@@ -28,3 +28,7 @@ const view3d = new View3D("#view3d-wrapper");
 const loader = new GLTFLoader();
 loader.loadPreset(view3d, PATH_TO_YOUR_PRESET_JSON);
 ```
+
+# Headers
+Content-Type: Used for format inferrence
+Content-Length: Used for Progress

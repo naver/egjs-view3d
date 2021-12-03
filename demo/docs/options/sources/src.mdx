@@ -1,0 +1,29 @@
+---
+sidebar_position: 1
+---
+
+import View3D, { WhiteLightPreset } from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+
+<OptionDescriptor type="string | null" defaultVal="null" />
+
+Source URL to fetch 3D model from.
+For further information, check our [Tutorial](/docs/loading-model).
+
+```ts
+new View3D("#el", {
+  src: "SOURCE_TO_YOUR_3D_MODEL"
+})
+```
+
+## Example
+<View3D src="/model/bunny.drc" preset={new WhiteLightPreset()} />
+
+```ts
+import View3D, { WhiteLightPreset } from "@egjs/view3d";
+
+new View3D("#view3d-canvas", {
+  src: "/model/bunny.drc",
+  preset: new WhiteLightPreset()
+})
+```

@@ -13,7 +13,7 @@ import Model from "./core/Model";
 import ModelAnimator from "./core/ModelAnimator";
 import Preset from "./preset/Preset";
 import OrbitControl from "./control/OrbitControl";
-import { EVENTS } from "./const/external";
+import { EVENTS, AUTO } from "./const/external";
 import * as EVENT_TYPES from "./type/event";
 import { getCanvas } from "./utils";
 import { LiteralUnion } from "./type/internal";
@@ -45,7 +45,8 @@ export interface View3DOptions {
   envmap: string | null;
 
   // Display
-  fov: number;
+  fov: "auto" | number;
+  zoom: number;
   center: "auto" | number[];
   preset: Preset | null;
   exposure: number;
@@ -140,6 +141,8 @@ class View3D extends Component<View3DEvents> {
    * @default "auto"
    */
   public get format() { return this._format; }
+  public get skybox() { return this._skybox; }
+  public get envmap() { return this._envmap; }
   public get fov() { return this._fov; }
   public get center() { return this._center; }
   public get exposure() { return this._exposure; }
@@ -195,11 +198,11 @@ class View3D extends Component<View3DEvents> {
    */
   public constructor(canvasEl: string | HTMLElement, {
     src = null,
-    format = "auto",
+    format = AUTO,
     skybox = null,
     envmap = null,
-    fov = 45,
-    center = "auto",
+    fov = AUTO,
+    center = AUTO,
     preset = null,
     exposure = 1,
     autoInit = true,
@@ -239,6 +242,7 @@ class View3D extends Component<View3DEvents> {
    */
   public destroy(): void {
     this._scene.reset();
+    this._renderer.stopAnimationLoop();
     this._control.destroy();
     this._autoResizer.disable();
   }
@@ -253,11 +257,21 @@ class View3D extends Component<View3DEvents> {
       this._autoResizer.enable();
     }
 
-    if (this._envmap) {
-      await this._scene.setEnvMap(this._envmap);
+    const tasks: [Promise<Model>, ...Array<Promise<any>>] = [
+      this._loadModel(this._src!, this._format)
+    ];
+
+    // Load & set skybox / envmap before displaying model
+    if (this._skybox) {
+      tasks.push(this._scene.setSkybox(this._skybox));
+    } else if (this._envmap) {
+      tasks.push(this._scene.setEnvMap(this._envmap));
     }
 
-    await this.load(this._src!, this._format);
+    const [model] = await Promise.all(tasks);
+
+    this._display(model as Model);
+
     this._control.enable();
     this._preset?.init(this);
 
@@ -288,8 +302,7 @@ class View3D extends Component<View3DEvents> {
    * 값으로 `"auto"`가 주어졌을 경우, View3D는 자동으로 확장자 추론을 시도합니다</ko>
    */
   public async load(src: string, format: View3DOptions["format"] = "auto") {
-    const loader = new ModelLoader();
-    const model = await loader.load(src, format);
+    const model = await this._loadModel(src, format);
 
     this._src = src;
     this._format = format;
@@ -322,6 +335,12 @@ class View3D extends Component<View3DEvents> {
       target: this
     });
   };
+
+  private async _loadModel(src: string, format: View3DOptions["format"]) {
+    const loader = new ModelLoader();
+
+    return await loader.load(src, format);
+  }
 
   /**
    * Display the given model.

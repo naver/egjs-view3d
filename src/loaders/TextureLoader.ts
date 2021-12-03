@@ -40,7 +40,7 @@ class TextureLoader {
    * @param url url to fetch equirectangular image
    * @returns WebGLCubeRenderTarget created
    */
-  public loadEquirectagularTexture(url: string): Promise<THREE.WebGLCubeRenderTarget> {
+  public loadEquirectagularTexture(url: string): Promise<THREE.WebGLRenderTarget> {
     return new Promise((resolve, reject) => {
       const loader = new THREE.TextureLoader();
       loader.load(url, skyboxTexture => {
@@ -62,31 +62,28 @@ class TextureLoader {
     });
   }
 
-  public loadHDRTexture(url: string, isEquirectangular: false): Promise<THREE.DataTexture>;
-
-  public loadHDRTexture(url: string, isEquirectangular: true): Promise<THREE.WebGLCubeRenderTarget>;
-
   /**
    * Create new texture with given HDR(RGBE) image url
    * @param url image url
    * @param isEquirectangular Whether to read this image as a equirectangular texture
    */
-  public loadHDRTexture(url: string, isEquirectangular: boolean = true): Promise<THREE.DataTexture | THREE.WebGLCubeRenderTarget> {
+  public loadHDRTexture(url: string): Promise<THREE.WebGLRenderTarget> {
     return new Promise((resolve, reject) => {
       const loader = new RGBELoader();
+
+      loader.setCrossOrigin("anonymous");
       loader.load(url, texture => {
-        if (isEquirectangular) {
-          resolve(this._equirectToCubemap(texture));
-        } else {
-          resolve(texture);
-        }
+        resolve(this._equirectToCubemap(texture));
       }, undefined, reject);
     });
   }
 
-  private _equirectToCubemap(texture: THREE.Texture): THREE.WebGLCubeRenderTarget {
-    return new THREE.WebGLCubeRenderTarget(texture.image.height)
-      .fromEquirectangularTexture(this._renderer.threeRenderer, texture);
+  private _equirectToCubemap(texture: THREE.Texture): THREE.WebGLRenderTarget {
+    const pmremGenerator = new THREE.PMREMGenerator(this._renderer.threeRenderer);
+    const hdrCubeRenderTarget = pmremGenerator.fromEquirectangular(texture);
+    pmremGenerator.compileCubemapShader();
+
+    return hdrCubeRenderTarget;
   }
 }
 

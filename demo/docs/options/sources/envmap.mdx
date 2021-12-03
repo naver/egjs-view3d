@@ -1,0 +1,29 @@
+import View3D, { WhiteLightPreset } from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+
+<OptionDescriptor type="string | null" defaultVal="null" />
+
+File extension format of the 3D model (glTF, glb, ...)
+If `"auto"` is given, View3D will try to detect the format of the 3D model with the name of `src` URL
+
+Available formats:
+- glTF, glb, drc
+
+```ts
+new View3D("#el", {
+  envmap: "SOURCE_TO_YOUR_ENVMAP_IMAGE",
+  src: "SOURCE_TO_YOUR_3D_MODEL"
+})
+```
+
+## Example
+<View3D src="/model/MosquitoInAmber.glb" envmap="/img/spruit_sunrise_1k.hdr" />
+
+```ts
+import View3D, { WhiteLightPreset } from "@egjs/view3d";
+
+new View3D("#view3d-canvas", {
+  src: "/model/MosquitoInAmber.glb",
+  envmap: "/img/spruit_sunrise_1k.hdr"
+})
+```

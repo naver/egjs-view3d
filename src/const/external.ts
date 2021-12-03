@@ -5,6 +5,8 @@
 
 export { CODES as ERROR_CODES } from "./error";
 
+export const AUTO = "auto";
+
 /**
  * Event type object with event name strings of {@link View3D}
  * @ko {@link View3D}의 이벤트 이름 문자열들을 담은 객체

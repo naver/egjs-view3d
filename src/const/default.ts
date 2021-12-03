@@ -10,8 +10,7 @@ import { Range } from "../type/internal";
 
 import { EASING as EASING_CONST } from "./external";
 
-// View3D Options
-export const FORMAT = "auto";
+export const FOV = 45;
 
 // Animation
 export const EASING = EASING_CONST.EASE_OUT_CUBIC;
@@ -22,7 +21,7 @@ export const ANIMATION_RANGE: Readonly<Range> = {
 };
 
 // Camera
-export const CAMERA_POSE: Readonly<Pose> = new Pose(0, 15, 100, new THREE.Vector3(0, 0, 0));
+export const CAMERA_POSE: Readonly<Pose> = new Pose(0, 15, 0, new THREE.Vector3(0, 0, 0));
 export const INFINITE_RANGE: Readonly<Range> = {
   min: -Infinity, max: Infinity
 };

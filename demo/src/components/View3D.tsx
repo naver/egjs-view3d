@@ -16,11 +16,13 @@ class View3D extends React.Component<Partial<View3DOptions>> {
   }
 
   public render() {
-    return <div className="view3d-canvas-wrapper">
+    return <div className="view3d-canvas-wrapper image is-square">
       <canvas ref={this._canvasRef} className="view3d-canvas"></canvas>
       { this.props.children }
     </div>;
   }
 }
+
+export * from "../../../src";
 
 export default View3D;

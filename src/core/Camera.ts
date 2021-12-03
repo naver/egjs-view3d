@@ -9,6 +9,7 @@ import View3D from "../View3D";
 import AnimationControl from "../control/AnimationControl";
 import { toRadian, clamp, circulate, toDegree } from "../utils";
 import * as DEFAULT from "../const/default";
+import { AUTO } from "../const/external";
 
 import Pose from "./Pose";
 import Model from "./Model";
@@ -19,6 +20,8 @@ import Model from "./Model";
 class Camera {
   private _view3D: View3D;
   private _threeCamera: THREE.PerspectiveCamera;
+  private _distance: number = 0;
+  private _baseFov: number = 45;
   private _minDistance: number = 0;
   private _maxDistance: number = 0;
   private _defaultPose: Pose = DEFAULT.CAMERA_POSE;
@@ -33,7 +36,7 @@ class Camera {
   public get threeCamera() { return this._threeCamera; }
 
   /**
-   * Camera's default pose(yaw, pitch, distance, pivot)
+   * Camera's default pose(yaw, pitch, zoom, pivot)
    * This will be new currentPose when {@link Camera#reset reset()} is called
    * @readonly
    * @type Pose
@@ -62,11 +65,11 @@ class Camera {
   public get pitch() { return this._currentPose.pitch; }
 
   /**
-   * Camera's current distance
+   * Camera's current zoom value
    * {@link Camera#updatePosition} should be called after changing this value, and normally it is called every frame.
    * @type number
    */
-  public get distance() { return this._currentPose.distance; }
+  public get zoom() { return this._currentPose.zoom; }
 
   /**
    * Current pivot point of camera rotation
@@ -111,16 +114,16 @@ class Camera {
   public get fov() { return this._threeCamera.fov; }
 
   /**
-   * Camera's frustum width on current distance value
+   * Camera's frustum width
    * @type number
    */
   public get renderWidth() { return this.renderHeight * this._threeCamera.aspect; }
 
   /**
-   * Camera's frustum height on current distance value
+   * Camera's frustum height
    * @type number
    */
-  public get renderHeight() { return 2 * this.distance * Math.tan(toRadian(this.fov / 2)); }
+  public get renderHeight() { return 2 * this._distance * Math.tan(toRadian(this._threeCamera.getEffectiveFOV() / 2)); }
 
   public set pose(val: Pose) {
     this._currentPose = val;
@@ -129,13 +132,8 @@ class Camera {
 
   public set yaw(val: number) { this._currentPose.yaw = val; }
   public set pitch(val: number) { this._currentPose.pitch = val; }
-  public set distance(val: number) { this._currentPose.distance = val; }
+  public set zoom(val: number) { this._currentPose.zoom = val; }
   public set pivot(val: THREE.Vector3) { this._currentPose.pivot = val; }
-
-  public set fov(val: number) {
-    this._threeCamera.fov = val;
-    this._threeCamera.updateProjectionMatrix();
-  }
 
   /**
    * Create new Camera instance
@@ -194,9 +192,16 @@ class Camera {
   public resize({ width, height }: { width: number; height: number }): void {
     const cam = this._threeCamera;
     const aspect = width / height;
+    const fov = this._view3D.fov;
 
     cam.aspect = aspect;
-    this._applyEffectiveFov();
+
+    if (fov === AUTO) {
+      this._applyEffectiveFov(DEFAULT.FOV);
+    } else {
+      this._baseFov = fov;
+      // cam.fov = fov;
+    }
   }
 
   /**
@@ -204,8 +209,12 @@ class Camera {
    */
   public fit(model: Model, center: "auto" | number[]): void {
     const view3D = this._view3D;
+    const camera = this._threeCamera;
     const defaultPose = this._defaultPose;
     const bbox = model.bbox;
+
+    const fov = view3D.fov;
+    const hfov = fov === AUTO ? DEFAULT.FOV : fov;
 
     const modelCenter = Array.isArray(center)
       ? new THREE.Vector3().fromArray(center)
@@ -215,7 +224,6 @@ class Camera {
       return Math.max(dist, vertice.distanceToSquared(modelCenter));
     }, 0);
     const maxDistToCenter = Math.sqrt(maxDistToCenterSquared);
-    const hfov = view3D.fov;
     const effectiveCamDist = maxDistToCenter / Math.sin(toRadian(hfov / 2));
 
     const maxTanHalfHFov = model.reduceVertices((res, vertex) => {
@@ -224,18 +232,24 @@ class Camera {
       return Math.max(res, radiusXZ / (effectiveCamDist - Math.abs(distToCenter.y)));
     }, 0);
 
-    // Cache for later use in resize
-    this._maxTanHalfHFov = maxTanHalfHFov;
-    this._applyEffectiveFov();
+    if (fov === AUTO) {
+      // Cache for later use in resize
+      this._maxTanHalfHFov = maxTanHalfHFov;
+      this._applyEffectiveFov(hfov);
+    } else {
+      this._maxTanHalfHFov = fov;
+    }
 
     defaultPose.pivot = modelCenter.clone();
-    defaultPose.distance = effectiveCamDist;
+    this._distance = effectiveCamDist;
 
     this._minDistance = maxDistToCenter / 10;
     this._maxDistance = effectiveCamDist * 2;
 
+    camera.far = Math.max(2000, effectiveCamDist + maxDistToCenter);
+
     // Update distance control
-    view3D.control.distance.updateScaleModifier(effectiveCamDist, effectiveCamDist - maxDistToCenter);
+    // view3D.control.zoom.updateScaleModifier(effectiveCamDist, effectiveCamDist - maxDistToCenter);
   }
 
   /**
@@ -260,7 +274,7 @@ class Camera {
       defaultPose.pitch = pitch;
     }
     if (distance != null) {
-      defaultPose.distance = distance;
+      defaultPose.zoom = distance;
     }
     if (pivot != null) {
       defaultPose.pivot = pivot;
@@ -276,10 +290,10 @@ class Camera {
 
     const threeCamera = this._threeCamera;
     const pose = this._currentPose;
+    const distance = this._distance;
 
     const yaw = toRadian(pose.yaw);
     const pitch = toRadian(pose.pitch);
-    const distance = Math.max(pose.distance, this._minDistance);
     const newCamPos = new THREE.Vector3(0, 0, 0);
 
     newCamPos.y = distance * Math.sin(pitch);
@@ -290,6 +304,8 @@ class Camera {
 
     newCamPos.add(pose.pivot);
 
+    threeCamera.fov = this._baseFov + pose.zoom;
+    // threeCamera.zoom = pose.zoom;
     threeCamera.position.copy(newCamPos);
     threeCamera.lookAt(pose.pivot);
     threeCamera.updateProjectionMatrix();
@@ -300,16 +316,15 @@ class Camera {
 
     currentPose.yaw = circulate(currentPose.yaw, 0, 360);
     currentPose.pitch = clamp(currentPose.pitch, DEFAULT.PITCH_RANGE.min, DEFAULT.PITCH_RANGE.max);
-    currentPose.distance = clamp(currentPose.distance, this._minDistance, this._maxDistance);
+    // currentPose.zoom = clamp(currentPose.zoom, this._minDistance, this._maxDistance);
   }
 
-  private _applyEffectiveFov() {
-    const hfov = this._view3D.fov;
+  private _applyEffectiveFov(fov: number) {
     const camera = this._threeCamera;
-    const tanHalfHFov = Math.tan(toRadian(hfov / 2));
+    const tanHalfHFov = Math.tan(toRadian(fov / 2));
     const tanHalfVFov = tanHalfHFov * Math.max(1, (this._maxTanHalfHFov / tanHalfHFov) / camera.aspect);
 
-    camera.fov = toDegree(2 * Math.atan(tanHalfVFov));
+    this._baseFov = toDegree(2 * Math.atan(tanHalfVFov));
     camera.updateProjectionMatrix();
   }
 }

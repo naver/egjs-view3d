@@ -26,12 +26,11 @@ const config = {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
-          editUrl: "https://github.com/naver/egjs-view3d/edit/master/docs/"
+          editUrl: "https://github.com/naver/egjs-view3d/edit/master/demo/",
+          remarkPlugins: [require("remark-breaks")]
         },
-        blog: {
-          showReadingTime: true,
-          // Please change this to your repo.
-          editUrl: "https://github.com/naver/egjs-view3d/edit/master/blog/"
+        pages: {
+          remarkPlugins: [require("remark-breaks")]
         },
         theme: {
           customCss: [
@@ -56,7 +55,7 @@ const config = {
         items: [
           {
             type: "doc",
-            docId: "installation",
+            docId: "tutorials/installation",
             label: "Docs",
             position: "left"
           },
@@ -67,13 +66,15 @@ const config = {
             position: "left"
           },
           {
-            to: "Options",
+            type: "doc",
+            docId: "options/sources/src",
             label: "Options",
             position: "left"
           },
           {
-            to: "Demos",
-            label: "Demos",
+            type: "doc",
+            docId: "advanced/Preset",
+            label: "Advanced",
             position: "left"
           },
           {
@@ -104,25 +105,29 @@ const config = {
             title: "Docs",
             items: [
               {
-                label: "Tutorial",
-                to: "/docs/intro"
+                label: "Getting Started",
+                to: "docs/"
+              },
+              {
+                label: "API",
+                to: "docs/api/View3D"
+              },
+              {
+                label: "Options",
+                to: "Options/"
               }
             ]
           },
           {
-            title: "Community",
+            title: "Demo",
             items: [
               {
-                label: "Stack Overflow",
-                href: "https://stackoverflow.com/questions/tagged/docusaurus"
+                label: "Demos",
+                to: "Demos/"
               },
               {
-                label: "Discord",
-                href: "https://discordapp.com/invite/docusaurus"
-              },
-              {
-                label: "Twitter",
-                href: "https://twitter.com/docusaurus"
+                label: "Playground",
+                to: "Playground/"
               }
             ]
           },
@@ -130,17 +135,26 @@ const config = {
             title: "More",
             items: [
               {
-                label: "Blog",
-                to: "/blog"
+                label: "GitHub",
+                href: "https://github.com/naver/egjs-view3d"
               },
               {
-                label: "GitHub",
-                href: "https://github.com/facebook/docusaurus"
+                label: "Issues",
+                href: "https://github.com/naver/egjs-view3d/issues"
+              },
+              {
+                label: "Naver Open Source",
+                href: "https://naver.github.io/"
               }
             ]
           }
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`
+        logo: {
+          alt: "egjs",
+          src: "img/egjs_white.svg",
+          href: "https://naver.github.io/egjs/"
+        },
+        copyright: `Copyright © ${new Date().getFullYear()} NAVER, Inc. Built with Docusaurus & Bulma.`
       },
       prism: {
         theme: lightCodeTheme,

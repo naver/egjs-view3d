@@ -2,7 +2,7 @@
 title: Installation
 id: installation
 slug: /
-custom_edit_url: null
+sidebar_position: 1
 ---
 
 ## Using the package managers (recommended)

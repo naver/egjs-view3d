@@ -15,25 +15,23 @@ import CameraControl from "./CameraControl";
 /**
  * Distance controller handling both mouse wheel and pinch zoom
  */
-class DistanceControl implements CameraControl {
+class ZoomControl implements CameraControl {
   // Options
-  private _scale: number = 1;
+  private _scale: number;
 
   // Internal values
   private _view3D: View3D;
-  private _scaleModifier: number = 1;
+  private _scaleModifier: number = 0.02;
   private _motion: Motion;
   private _prevTouchDistance: number = -1;
   private _enabled: boolean = false;
 
   /**
-   * Scale factor of the distance
+   * Scale factor of the zoom
    * @type number
    * @example
    * ```ts
-   * import { DistanceControl } from "@egjs/view3d";
-   * const distanceControl = new DistanceControl();
-   * distanceControl.scale = 2;
+   * view3D.control.zoom.scale = 2;
    * ```
    */
   public get scale() { return this._scale; }
@@ -46,20 +44,23 @@ class DistanceControl implements CameraControl {
   public set scale(val: number) { this._scale = val; }
 
   /**
-   * Create new DistanceControl instance
+   * Create new ZoomControl instance
    * @param {View3D} view3D An instance of View3D
    * @param {object} options Options
    * @param {HTMLElement | string | null} [options.element=null] Attaching element / selector of the element.
+   * @param {number} [options.scale=1] Motion's scale.
    * @param {number} [options.duration=500] Motion's duration.
    * @param {object} [options.range={min: 0, max: 0}] Motion's range.
    * @param {function} [options.easing=(x: number) => 1 - Math.pow(1 - x, 3)] Motion's easing function.
    */
   public constructor(view3D: View3D, {
+    scale = 1,
     duration = DEFAULT.ANIMATION_DURATION,
-    range = { min: 0, max: 0 },
+    range = { min: -15, max: 45 },
     easing = DEFAULT.EASING
   } = {}) {
     this._view3D = view3D;
+    this._scale = scale;
     this._motion = new Motion({ duration, range, easing });
   }
 
@@ -81,7 +82,7 @@ class DistanceControl implements CameraControl {
     const camera = this._view3D.camera;
     const motion = this._motion;
 
-    camera.distance += motion.update(deltaTime);
+    camera.zoom -= motion.update(deltaTime);
   }
 
   public updateScaleModifier(defaultDist: number, minDist: number) {
@@ -135,9 +136,7 @@ class DistanceControl implements CameraControl {
   public sync(): void {
     const camera = this._view3D.camera;
 
-    this._motion.range.min = camera.minDistance;
-    this._motion.range.max = camera.maxDistance;
-    this._motion.reset(camera.distance);
+    this._motion.reset(camera.zoom);
   }
 
   private _onWheel = (evt: WheelEvent) => {
@@ -147,7 +146,7 @@ class DistanceControl implements CameraControl {
     evt.stopPropagation();
 
     const animation = this._motion;
-    const delta = this._scale * this._scaleModifier * evt.deltaY;
+    const delta = -this._scale * this._scaleModifier * evt.deltaY;
 
     animation.setEndDelta(delta);
   };
@@ -168,7 +167,7 @@ class DistanceControl implements CameraControl {
     const touchPoint2 = new THREE.Vector2(touches[1].pageX, touches[1].pageY);
     const touchDiff = touchPoint1.sub(touchPoint2);
     const touchDistance = touchDiff.length() * this._scale * this._scaleModifier;
-    const delta = -(touchDistance - prevTouchDistance);
+    const delta = touchDistance - prevTouchDistance;
 
     this._prevTouchDistance = touchDistance;
 
@@ -182,4 +181,4 @@ class DistanceControl implements CameraControl {
   };
 }
 
-export default DistanceControl;
+export default ZoomControl;

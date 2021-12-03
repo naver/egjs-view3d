@@ -9,7 +9,7 @@ import CameraControl from "./CameraControl";
 import OrbitControl from "./OrbitControl";
 import RotateControl from "./RotateControl";
 import TranslateControl from "./TranslateControl";
-import DistanceControl from "./DistanceControl";
+import ZoomControl from "./ZoomControl";
 
 export {
   AnimationControl,
@@ -17,7 +17,7 @@ export {
   OrbitControl,
   RotateControl,
   TranslateControl,
-  DistanceControl
+  ZoomControl
 };
 
 export type {

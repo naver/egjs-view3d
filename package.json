@@ -40,7 +40,7 @@
 	"homepage": "https://github.com/naver/egjs-view3d#readme",
 	"dependencies": {
 		"@egjs/component": "^3.0.2",
-		"three": "^0.134.0"
+		"three": "~0.134.0"
 	},
 	"devDependencies": {
 		"@babel/plugin-proposal-class-properties": "^7.8.3",

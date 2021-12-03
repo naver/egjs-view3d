@@ -11,14 +11,14 @@ import * as THREE from "three";
 class Pose {
   public yaw: number;
   public pitch: number;
-  public distance: number;
+  public zoom: number;
   public pivot: THREE.Vector3;
 
   /**
    * Create new instance of pose
    * @param {number} yaw yaw
    * @param {number} pitch pitch
-   * @param {number} distance distance
+   * @param {number} zoom zoom
    * @param {object} pivot pivot
    * @see https://threejs.org/docs/#api/en/math/Vector3
    * @example
@@ -31,12 +31,12 @@ class Pose {
   public constructor(
     yaw: number,
     pitch: number,
-    distance: number,
+    zoom: number,
     pivot: THREE.Vector3 = new THREE.Vector3(0, 0, 0),
   ) {
     this.yaw = yaw;
     this.pitch = pitch;
-    this.distance = distance;
+    this.zoom = zoom;
     this.pivot = pivot;
   }
 
@@ -46,7 +46,7 @@ class Pose {
    */
   public clone(): Pose {
     return new Pose(
-      this.yaw, this.pitch, this.distance,
+      this.yaw, this.pitch, this.zoom,
       this.pivot.clone(),
     );
   }

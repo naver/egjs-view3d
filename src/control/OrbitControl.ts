@@ -10,7 +10,7 @@ import { ValueOf } from "../type/internal";
 
 import RotateControl from "./RotateControl";
 import TranslateControl from "./TranslateControl";
-import DistanceControl from "./DistanceControl";
+import ZoomControl from "./ZoomControl";
 
 /**
  * @interface
@@ -19,7 +19,7 @@ interface OrbitControlOptions {
   useGrabCursor: boolean;
   rotate: ConstructorParameters<typeof RotateControl>[1];
   translate: ConstructorParameters<typeof TranslateControl>[1];
-  distance: ConstructorParameters<typeof DistanceControl>[1];
+  zoom: ConstructorParameters<typeof ZoomControl>[1];
 }
 
 /**
@@ -33,7 +33,7 @@ class OrbitControl {
   private _view3D: View3D;
   private _rotateControl: RotateControl;
   private _translateControl: TranslateControl;
-  private _distanceControl: DistanceControl;
+  private _zoomControl: ZoomControl;
 
   // Options Getter
   /**
@@ -56,9 +56,9 @@ class OrbitControl {
    */
   public get translate() { return this._translateControl; }
   /**
-   * {@link DistanceControl} of this control
+   * {@link ZoomControl} of this control
    */
-  public get distance() { return this._distanceControl; }
+  public get zoom() { return this._zoomControl; }
 
   // Options setter
   public set useGrabCursor(val: boolean) {
@@ -78,20 +78,20 @@ class OrbitControl {
    * @param {object} [options.useGrabCursor=true] Whether to apply CSS style `cursor: grab` on the canvas element or not
    * @param {object} [options.rotate={}] Constructor options of {@link RotateControl}
    * @param {object} [options.translate={}] Constructor options of {@link TranslateControl}
-   * @param {object} [options.distance={}] Constructor options of {@link DistanceControl}
+   * @param {object} [options.zoom={}] Constructor options of {@link ZoomControl}
    */
   public constructor(view3D: View3D, {
     useGrabCursor = true,
     rotate = {},
     translate = {},
-    distance = {}
+    zoom = {}
   }: Partial<OrbitControlOptions> = {}) {
     this._view3D = view3D;
 
     this._useGrabCursor = useGrabCursor;
     this._rotateControl = new RotateControl(view3D, rotate);
     this._translateControl = new TranslateControl(view3D, translate);
-    this._distanceControl = new DistanceControl(view3D, distance);
+    this._zoomControl = new ZoomControl(view3D, zoom);
 
     [this._rotateControl, this._translateControl].forEach(control => {
       control.on({
@@ -111,7 +111,7 @@ class OrbitControl {
   public destroy(): void {
     this._rotateControl.destroy();
     this._translateControl.destroy();
-    this._distanceControl.destroy();
+    this._zoomControl.destroy();
   }
 
   /**
@@ -122,7 +122,7 @@ class OrbitControl {
   public update(delta: number): void {
     this._rotateControl.update(delta);
     this._translateControl.update(delta);
-    this._distanceControl.update(delta);
+    this._zoomControl.update(delta);
   }
 
   /**
@@ -134,7 +134,7 @@ class OrbitControl {
   public resize(size: { width: number; height: number }) {
     this._rotateControl.resize(size);
     this._translateControl.resize(size);
-    this._distanceControl.resize(size);
+    this._zoomControl.resize(size);
   }
 
   /**
@@ -144,7 +144,7 @@ class OrbitControl {
   public enable(): void {
     this._rotateControl.enable();
     this._translateControl.enable();
-    this._distanceControl.enable();
+    this._zoomControl.enable();
   }
 
   /**
@@ -154,7 +154,7 @@ class OrbitControl {
   public disable(): void {
     this._rotateControl.disable();
     this._translateControl.disable();
-    this._distanceControl.disable();
+    this._zoomControl.disable();
   }
 
   /**
@@ -164,7 +164,7 @@ class OrbitControl {
   public sync(): void {
     this._rotateControl.sync();
     this._translateControl.sync();
-    this._distanceControl.sync();
+    this._zoomControl.sync();
   }
 
   private _setCursor(val: ValueOf<typeof CURSOR>) {
