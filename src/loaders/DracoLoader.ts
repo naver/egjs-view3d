@@ -5,7 +5,9 @@
 import * as THREE from "three";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 
+import View3D from "../View3D";
 import Model from "../core/Model";
+import { EVENTS } from "../const/external";
 import * as DEFAULT from "../const/default";
 import { DracoLoadOption } from "../type/external";
 
@@ -19,7 +21,7 @@ class DracoLoader {
    * @param options Options for a loaded model
    * @returns Promise that resolves {@link Model}
    */
-  public load(url: string, options: Partial<DracoLoadOption> = {}): Promise<Model> {
+  public load(view3D: View3D, url: string, options: Partial<DracoLoadOption> = {}): Promise<Model> {
     const loader = new DRACOLoader();
     loader.setCrossOrigin("anonymous");
     loader.setDecoderPath(DEFAULT.DRACO_DECODER_URL);
@@ -30,7 +32,9 @@ class DracoLoader {
         const model = this._parseToModel(geometry, options);
         loader.dispose();
         resolve(model);
-      }, undefined, err => {
+      }, evt => {
+        view3D.trigger(EVENTS.PROGRESS, { ...evt, target: view3D });
+      }, err => {
         loader.dispose();
         reject(err);
       });

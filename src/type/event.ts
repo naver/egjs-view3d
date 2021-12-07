@@ -64,3 +64,7 @@ export interface BeforeRenderEvent {
 export interface AfterRenderEvent {
   target: View3D;
 }
+
+export interface LoadProgressEvent extends Omit<ProgressEvent, "target"> {
+  target: View3D;
+}

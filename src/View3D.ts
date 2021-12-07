@@ -13,6 +13,7 @@ import Model from "./core/Model";
 import ModelAnimator from "./core/ModelAnimator";
 import Preset from "./preset/Preset";
 import OrbitControl from "./control/OrbitControl";
+import AutoControl, { AutoplayOptions } from "./control/AutoControl";
 import { EVENTS, AUTO } from "./const/external";
 import * as EVENT_TYPES from "./type/event";
 import { getCanvas } from "./utils";
@@ -25,6 +26,7 @@ export interface View3DEvents {
   ready: EVENT_TYPES.ReadyEvent;
   load: EVENT_TYPES.LoadEvent;
   resize: EVENT_TYPES.ResizeEvent;
+  progress: EVENT_TYPES.LoadProgressEvent;
   beforeRender: EVENT_TYPES.BeforeRenderEvent;
   afterRender: EVENT_TYPES.AfterRenderEvent;
 }
@@ -52,6 +54,10 @@ export interface View3DOptions {
   preset: Preset | null;
   exposure: number;
 
+  // Control
+  autoplay: boolean | Partial<AutoplayOptions>;
+  scrollable: boolean;
+
   // Others
   autoInit: boolean;
   autoResize: boolean;
@@ -74,6 +80,7 @@ class View3D extends Component<View3DEvents> {
   private _scene: Scene;
   private _camera: Camera;
   private _control: OrbitControl;
+  private _autoPlayer: AutoControl;
   private _model: Model | null;
   private _animator: ModelAnimator;
   private _autoResizer: AutoResizer;
@@ -89,6 +96,8 @@ class View3D extends Component<View3DEvents> {
   private _pitch: View3DOptions["pitch"];
   private _preset: View3DOptions["preset"];
   private _exposure: View3DOptions["exposure"];
+  private _autoplay: View3DOptions["autoplay"];
+  private _scrollable: View3DOptions["scrollable"];
   private _autoInit: View3DOptions["autoInit"];
   private _autoResize: View3DOptions["autoResize"];
   private _useResizeObserver: View3DOptions["useResizeObserver"];
@@ -150,6 +159,8 @@ class View3D extends Component<View3DEvents> {
   public get yaw() { return this._yaw; }
   public get pitch() { return this._pitch; }
   public get exposure() { return this._exposure; }
+  public get autoplay() { return this._autoplay; }
+  public get scrollable() { return this._scrollable; }
   /**
    * Call {@link View3D#init init()} automatically when creating View3D's instance
    * This option won't work if `src` is not given
@@ -211,6 +222,8 @@ class View3D extends Component<View3DEvents> {
     pitch = 0,
     preset = null,
     exposure = 1,
+    autoplay = false,
+    scrollable = false,
     autoInit = true,
     autoResize = true
   }: Partial<View3DOptions> = {}) {
@@ -228,6 +241,8 @@ class View3D extends Component<View3DEvents> {
     this._pitch = pitch;
     this._preset = preset;
     this._exposure = exposure;
+    this._autoplay = autoplay;
+    this._scrollable = scrollable;
     this._autoInit = autoInit;
     this._autoResize = autoResize;
 
@@ -237,6 +252,7 @@ class View3D extends Component<View3DEvents> {
     this._control = new OrbitControl(this);
     this._scene = new Scene(this);
     this._animator = new ModelAnimator(this._scene.root);
+    this._autoPlayer = new AutoControl(this, typeof autoplay === "object" ? autoplay : {});
     this._autoResizer = new AutoResizer(this);
 
     if (src && autoInit) {
@@ -281,6 +297,9 @@ class View3D extends Component<View3DEvents> {
     this._display(model as Model);
 
     this._control.enable();
+    if (this._autoplay) {
+      this._autoPlayer.enable();
+    }
     this._preset?.init(this);
 
     this._initialized = true;
@@ -327,12 +346,14 @@ class View3D extends Component<View3DEvents> {
     const scene = this._scene;
     const camera = this._camera;
     const control = this._control;
+    const autoPlayer = this._autoPlayer;
     const animator = this._animator;
 
     const deltaMiliSec = delta * 1000;
 
     animator.update(delta);
     control.update(deltaMiliSec);
+    autoPlayer.update(deltaMiliSec);
 
     this.trigger(EVENTS.BEFORE_RENDER, {
       target: this
@@ -347,7 +368,7 @@ class View3D extends Component<View3DEvents> {
   private async _loadModel(src: string, format: View3DOptions["format"]) {
     const loader = new ModelLoader();
 
-    return await loader.load(src, format);
+    return await loader.load(this, src, format);
   }
 
   private _display(model: Model): void {
@@ -365,6 +386,10 @@ class View3D extends Component<View3DEvents> {
 
     animator.reset();
     animator.setClips(model.animations);
+
+    if (model.animations.length > 0) {
+      animator.play(0);
+    }
 
     this._model = model;
 

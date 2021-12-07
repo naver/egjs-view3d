@@ -7,7 +7,9 @@ import * as THREE from "three";
 import { GLTFLoader as ThreeGLTFLoader, GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 
+import View3D from "../View3D";
 import Model from "../core/Model";
+import { EVENTS } from "../const/external";
 import * as DEFAULT from "../const/default";
 import { ModelLoadOption } from "../type/external";
 
@@ -42,7 +44,7 @@ class GLTFLoader {
    * @param options Options for a loaded model
    * @returns Promise that resolves {@link Model}
    */
-  public load(url: string, options: Partial<ModelLoadOption> = {}): Promise<Model> {
+  public load(view3D: View3D, url: string, options: Partial<ModelLoadOption> = {}): Promise<Model> {
     const loader = this._loader;
     loader.manager = new THREE.LoadingManager();
 
@@ -50,7 +52,9 @@ class GLTFLoader {
       loader.load(url, gltf => {
         const model = this._parseToModel(gltf, options);
         resolve(model);
-      }, undefined, err => {
+      }, evt => {
+        view3D.trigger(EVENTS.PROGRESS, { ...evt, target: view3D });
+      }, err => {
         reject(err);
       });
     });

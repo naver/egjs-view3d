@@ -27,7 +27,8 @@ export const EVENTS = {
   LOAD: "load",
   RESIZE: "resize",
   BEFORE_RENDER: "beforeRender",
-  AFTER_RENDER: "afterRender"
+  AFTER_RENDER: "afterRender",
+  PROGRESS: "progress"
 } as const;
 
 export const MODEL_FORMAT = {

@@ -3,7 +3,7 @@
  * egjs projects are licensed under the MIT license
  */
 
-import { View3DOptions } from "../View3D";
+import View3D, { View3DOptions } from "../View3D";
 import { MODEL_FORMAT, MODEL_MIME } from "../const/external";
 import * as BROWSER from "../const/browser";
 import * as ERROR from "../const/error";
@@ -14,14 +14,14 @@ import DracoLoader from "../loaders/DracoLoader";
 import View3DError from "./View3DError";
 
 class ModelLoader {
-  public async load(url: string, format: View3DOptions["format"]) {
+  public async load(view3D: View3D, url: string, format: View3DOptions["format"]) {
     const fileFormat = format === "auto"
       ? await this._detectFileFormat(url)
       : format as string;
 
     const loader = this._createLoaderByFormat(fileFormat, url, format as string);
 
-    return await loader.load(url);
+    return await loader.load(view3D, url);
   }
 
   private _createLoaderByFormat(format: string | null, url: string, givenFormat: string) {

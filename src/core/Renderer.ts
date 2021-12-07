@@ -65,7 +65,7 @@ class Renderer {
     });
 
     renderer.xr.enabled = true;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMapping = THREE.LinearToneMapping;
     renderer.toneMappingExposure = view3D.exposure;
     renderer.outputEncoding = THREE.sRGBEncoding;
 

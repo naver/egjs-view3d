@@ -142,9 +142,16 @@ class OrbitControl {
    * @returns {void}
    */
   public enable(): void {
+    const view3D = this._view3D;
+
     this._rotateControl.enable();
     this._translateControl.enable();
-    this._zoomControl.enable();
+
+    if (!view3D.scrollable) {
+      this._zoomControl.enable();
+    } else {
+      view3D.renderer.canvas.style.touchAction = "pan-y";
+    }
   }
 
   /**

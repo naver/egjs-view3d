@@ -1,5 +1,6 @@
 module.exports = {
   advanced: [
-    "advanced/Preset"
+    "advanced/Preset",
+    "advanced/Test"
   ]
 }

@@ -238,7 +238,9 @@ class RotateControl extends Component<ControlEvents> implements CameraControl {
   };
 
   private _onTouchStart = (evt: TouchEvent) => {
-    evt.preventDefault();
+    if (!this._view3D.scrollable) {
+      evt.preventDefault();
+    }
 
     const touch = evt.touches[0];
     this._prevPos.set(touch.clientX, touch.clientY);
@@ -248,9 +250,16 @@ class RotateControl extends Component<ControlEvents> implements CameraControl {
     // Only the one finger motion should be considered
     if (evt.touches.length > 1) return;
 
-    if (evt.cancelable !== false) {
+    const scrollable = this._view3D.scrollable;
+
+    if (!scrollable && evt.cancelable !== false) {
       evt.preventDefault();
     }
+
+    if (scrollable && !evt.cancelable) {
+      return;
+    }
+
     evt.stopPropagation();
 
     const touch = evt.touches[0];

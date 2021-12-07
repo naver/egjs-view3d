@@ -8,6 +8,15 @@ import * as BROWSER from "../const/browser";
 
 import CameraControl from "./CameraControl";
 
+export interface AutoplayOptions {
+  delay: number;
+  delayOnMouseLeave: number;
+  speed: number;
+  pauseOnHover: boolean;
+  canInterrupt: boolean;
+  disableOnInterrupt: boolean;
+}
+
 /**
  * Control that animates model without user input
  */
@@ -87,7 +96,7 @@ class AutoControl implements CameraControl {
     pauseOnHover = false,
     canInterrupt = true,
     disableOnInterrupt = false
-  } = {}) {
+  }: Partial<AutoplayOptions> = {}) {
     this._view3D = view3D;
     this._delay = delay;
     this._delayOnMouseLeave = delayOnMouseLeave;
