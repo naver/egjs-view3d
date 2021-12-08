@@ -22,7 +22,7 @@ const shadowPlane = new ShadowPlane();
 view3d.scene.addEnv(shadowPlane);
 
 view3d.controller.add(new OrbitControl());
-loader.load("../asset/animated_dragon/scene.gltf")
+loader.load("../asset/animated_dragon/dragon.glb")
   .then(model => {
     view3d.display(model, {
       size: 140
