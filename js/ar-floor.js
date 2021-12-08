@@ -48,7 +48,7 @@ const floorSession = new FloorARSession({
 
 view3d.xr.addSession(floorSession);
 view3d.xr.addSession(new SceneViewerSession({
-  file: new URL("../asset/animated_dragon/scene.gltf", location.href).href,
+  file: new URL("../asset/animated_dragon/dragon.glb", location.href).href,
   title: "Animated Dragon",
   link: "https://sketchfab.com/3d-models/animated-dragon-0ea921bb3d504023b891bba3fb8e6111",
   resizable: false,
