@@ -10,6 +10,10 @@ import Model from "../core/Model";
 export type ValueOf<T> = T[keyof T];
 export type LiteralUnion<T extends U, U = string> = T | (Pick<U, never> & {_?: never});
 
+export type OptionsGetters<T> = {
+  [key in keyof T]: T[key]
+};
+
 export interface Range {
   min: number;
   max: number;

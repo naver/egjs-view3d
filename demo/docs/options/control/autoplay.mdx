@@ -17,20 +17,20 @@ Autoplay Parameters
 
 ## Example
 ### autoplay: true
-<View3D src="/model/bunny.drc" autoplay={true} preset={new WhiteLightPreset()} />
+<View3D src="/model/bunny.glb" autoplay={true} preset={new WhiteLightPreset()} />
 
 ```ts
 import View3D, { WhiteLightPreset } from "@egjs/view3d";
 
 new View3D("#view3d-canvas", {
-  src: "/model/bunny.drc",
+  src: "/model/bunny.glb",
   preset: new WhiteLightPreset(),
   autoplay: true
 })
 ```
 
 ### Detailed
-<View3D src="/model/bunny.drc" preset={new WhiteLightPreset()} autoplay={{
+<View3D src="/model/bunny.glb" preset={new WhiteLightPreset()} autoplay={{
   delay: 1000,
   delayOnMouseLeave: 2000,
   speed: -2,
@@ -42,7 +42,7 @@ new View3D("#view3d-canvas", {
 import View3D, { WhiteLightPreset } from "@egjs/view3d";
 
 new View3D("#view3d-canvas", {
-  src: "/model/bunny.drc",
+  src: "/model/bunny.glb",
   preset: new WhiteLightPreset(),
   autoplay: true
 })

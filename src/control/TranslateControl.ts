@@ -11,7 +11,7 @@ import Motion from "../core/Motion";
 import * as BROWSER from "../const/browser";
 import * as DEFAULT from "../const/default";
 import { CONTROL_EVENTS } from "../const/internal";
-import { ControlEvents } from "../type/internal";
+import { ControlEvents } from "../type/utils";
 
 import CameraControl from "./CameraControl";
 

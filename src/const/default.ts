@@ -6,7 +6,7 @@
 import * as THREE from "three";
 
 import Pose from "../core/Pose";
-import { Range } from "../type/internal";
+import { Range } from "../type/utils";
 
 import { EASING as EASING_CONST } from "./external";
 

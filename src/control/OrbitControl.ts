@@ -6,7 +6,7 @@
 import View3D from "../View3D";
 import { CURSOR } from "../const/css";
 import { CONTROL_EVENTS } from "../const/internal";
-import { ValueOf } from "../type/internal";
+import { ValueOf } from "../type/utils";
 
 import RotateControl from "./RotateControl";
 import TranslateControl from "./TranslateControl";

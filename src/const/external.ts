@@ -15,7 +15,7 @@ export const AUTO = "auto";
  * @property {"load"} LOAD load event<ko>load 이벤트</ko>
  * @property {"resize"} RESIZE resize event<ko>resize 이벤트</ko>
  * @property {"beforeRender"} BEFORE_RENDER beforeRender event<ko>beforeRender 이벤트</ko>
- * @property {"afterRender"} AFTER_RENDER afterRender event<ko>afterRender 이벤트</ko>
+ * @property {"render"} RENDER render event<ko>render 이벤트</ko>
  * @example
  * ```ts
  * import { EVENTS } from "@egjs/view3d";
@@ -25,19 +25,28 @@ export const AUTO = "auto";
 export const EVENTS = {
   READY: "ready",
   LOAD: "load",
+  DISPLAY: "display",
   RESIZE: "resize",
   BEFORE_RENDER: "beforeRender",
-  AFTER_RENDER: "afterRender",
+  RENDER: "render",
   PROGRESS: "progress"
 } as const;
 
+/**
+ * Supported model formats
+ * @property {"gltf"} GLTF
+ * @property {"glb"} GLB
+ * @property {"drc"} DRC
+ */
 export const MODEL_FORMAT = {
   GLTF: "gltf",
   GLB: "glb",
   DRC: "drc"
 } as const;
 
-// https://www.iana.org/assignments/media-types/media-types.xhtml#model
+/**
+ * @see https://www.iana.org/assignments/media-types/media-types.xhtml#model
+ */
 export const MODEL_MIME = {
   "model/gltf-binary": MODEL_FORMAT.GLB,
   "model/gltf+json": MODEL_FORMAT.GLTF
@@ -46,12 +55,12 @@ export const MODEL_MIME = {
 /**
  * Collection of predefined easing functions
  * @type {object}
- * @property SINE_WAVE
- * @property EASE_OUT_CUBIC
- * @property EASE_OUT_BOUNCE
+ * @property {function} SINE_WAVE
+ * @property {function} EASE_OUT_CUBIC
+ * @property {function} EASE_OUT_BOUNCE
  * @example
  * ```ts
- * import View3D, { RotateControl, EASING } from "@egjs/view3d";
+ * import View3D, { EASING } from "@egjs/view3d";
  *
  * new RotateControl({
  *  easing: EASING.EASE_OUT_CUBIC,

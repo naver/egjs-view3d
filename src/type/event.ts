@@ -3,9 +3,10 @@
  * egjs projects are licensed under the MIT license
  */
 import View3D from "../View3D";
+import Model from "../core/Model";
 
 /**
- * Event that fires when View3D is initialized
+ * An event that fires when View3D is initialized
  * This will be called once after the first 3D model is loaded
  * @ko View3D가 초기화되었을 때 발생하는 이벤트
  * 이 이벤트는 첫번째 3D 모델이 로드된 직후 1회만 트리거됩니다
@@ -18,18 +19,33 @@ export interface ReadyEvent {
 }
 
 /**
- * Event that fires when the 3D model is loaded
- * @ko 3D 모델이 로드되었을 때 발생하는 이벤트
+ * An event that fires when the 3D model is loaded but not displayed yet
+ * @ko 3D 모델이 로드되었으며, 표시되기 전에 발생하는 이벤트
  * @event View3D#load
  * @type {object}
  * @property {View3D} target A View3D instance that triggered this event<ko>이 이벤트를 트리거한 View3D의 인스턴스</ko>
+ * @property {Model} model A new model that loaded<ko>로드된 모델</ko>
  */
 export interface LoadEvent {
   target: View3D;
+  model: Model;
 }
 
 /**
- * Event that fires when View3D's {@link View3D#resize resize()} is called
+ * An event that fires when the 3D Model is loaded and displayed on the canvas
+ * @ko 3D 모델이 로드되었으며, 캔버스에 표시된 이후에 발생하는 이벤트
+ * @event View3D#display
+ * @type {object}
+ * @property {View3D} target A View3D instance that triggered this event<ko>이 이벤트를 트리거한 View3D의 인스턴스</ko>
+ * @property {Model} model A new model that displayed<ko>표시된 모델</ko>
+ */
+export interface DisplayEvent {
+  target: View3D;
+  model: Model;
+}
+
+/**
+ * An event that fires when View3D's {@link View3D#resize resize()} is called
  * @ko View3D의 {@link View3D#resize resize())}가 호출되었을 때 발생하는 이벤트
  * @event View3D#resize
  * @type {object}
@@ -44,7 +60,7 @@ export interface ResizeEvent {
 }
 
 /**
- * Event that fires before rendering a frame
+ * An event that fires before rendering a frame
  * @ko 프레임 렌더링 직전 발생하는 이벤트
  * @event View3D#beforeRender
  * @type {object}
@@ -55,13 +71,13 @@ export interface BeforeRenderEvent {
 }
 
 /**
- * Event that fires after rendering a frame
+ * An event that fires after rendering a frame
  * @ko 프레임 렌더링 직후 발생하는 이벤트
  * @event View3D#afterRender
  * @type {object}
  * @property {View3D} target A View3D instance that triggered this event<ko>이 이벤트를 트리거한 View3D의 인스턴스</ko>
  */
-export interface AfterRenderEvent {
+export interface RenderEvent {
   target: View3D;
 }
 

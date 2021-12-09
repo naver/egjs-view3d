@@ -7,21 +7,26 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 
 import View3D from "../View3D";
 import Model from "../core/Model";
-import { EVENTS } from "../const/external";
 import * as DEFAULT from "../const/default";
-import { DracoLoadOption } from "../type/external";
 
 /**
  * DracoLoader
+ * @category Loaders
  */
 class DracoLoader {
+  private _view3D: View3D;
+
+  public constructor(view3D: View3D) {
+    this._view3D = view3D;
+  }
+
   /**
    * Load new DRC model from the given url
    * @param url URL to fetch .drc file
    * @param options Options for a loaded model
    * @returns Promise that resolves {@link Model}
    */
-  public load(view3D: View3D, url: string, options: Partial<DracoLoadOption> = {}): Promise<Model> {
+  public load(url: string): Promise<Model> {
     const loader = new DRACOLoader();
     loader.setCrossOrigin("anonymous");
     loader.setDecoderPath(DEFAULT.DRACO_DECODER_URL);
@@ -29,12 +34,10 @@ class DracoLoader {
 
     return new Promise((resolve, reject) => {
       loader.load(url, geometry => {
-        const model = this._parseToModel(geometry, options);
+        const model = this._parseToModel(geometry);
         loader.dispose();
         resolve(model);
-      }, evt => {
-        view3D.trigger(EVENTS.PROGRESS, { ...evt, target: view3D });
-      }, err => {
+      }, undefined, err => {
         loader.dispose();
         reject(err);
       });
@@ -42,11 +45,10 @@ class DracoLoader {
   }
 
   private _parseToModel(geometry: THREE.BufferGeometry, {
-    fixSkinnedBbox = false,
     color = 0xffffff,
     point = false,
     pointOptions = {}
-  }: Partial<DracoLoadOption> = {}): Model {
+  } = {}): Model {
     geometry.computeVertexNormals();
 
     const material = point
@@ -57,8 +59,7 @@ class DracoLoader {
       : new THREE.Mesh(geometry, material);
 
     const model = new Model({
-      scenes: [mesh],
-      fixSkinnedBbox
+      scenes: [mesh]
     });
 
     return model;

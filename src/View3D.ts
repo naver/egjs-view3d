@@ -17,18 +17,19 @@ import AutoControl, { AutoplayOptions } from "./control/AutoControl";
 import { EVENTS, AUTO } from "./const/external";
 import * as EVENT_TYPES from "./type/event";
 import { getCanvas } from "./utils";
-import { LiteralUnion } from "./type/internal";
+import { LiteralUnion, OptionsGetters } from "./type/utils";
 
 /**
  * @interface
  */
 export interface View3DEvents {
-  ready: EVENT_TYPES.ReadyEvent;
-  load: EVENT_TYPES.LoadEvent;
-  resize: EVENT_TYPES.ResizeEvent;
-  progress: EVENT_TYPES.LoadProgressEvent;
-  beforeRender: EVENT_TYPES.BeforeRenderEvent;
-  afterRender: EVENT_TYPES.AfterRenderEvent;
+  [EVENTS.READY]: EVENT_TYPES.ReadyEvent;
+  [EVENTS.LOAD]: EVENT_TYPES.LoadEvent;
+  [EVENTS.DISPLAY]: EVENT_TYPES.DisplayEvent;
+  [EVENTS.RESIZE]: EVENT_TYPES.ResizeEvent;
+  [EVENTS.PROGRESS]: EVENT_TYPES.LoadProgressEvent;
+  [EVENTS.BEFORE_RENDER]: EVENT_TYPES.BeforeRenderEvent;
+  [EVENTS.RENDER]: EVENT_TYPES.RenderEvent;
 }
 
 /**
@@ -42,9 +43,10 @@ export interface View3DEvents {
 export interface View3DOptions {
   // Sources
   src: string | null;
-  format: LiteralUnion<"auto">;
+  format: LiteralUnion<"auto", string>;
   skybox: string | null;
   envmap: string | null;
+  background: number | string | null;
 
   // Display
   fov: "auto" | number;
@@ -62,12 +64,14 @@ export interface View3DOptions {
   autoInit: boolean;
   autoResize: boolean;
   useResizeObserver: boolean;
+  fixSkinnedBbox: boolean;
 }
 
 /**
- * Yet another 3d model viewer
+ * @extends Component
+ * @see https://naver.github.io/egjs-component/
  */
-class View3D extends Component<View3DEvents> {
+class View3D extends Component<View3DEvents> implements OptionsGetters<View3DOptions> {
   /**
    * Current version of the View3D
    * @type {string}
@@ -90,6 +94,7 @@ class View3D extends Component<View3DEvents> {
   private _format: View3DOptions["format"];
   private _skybox: View3DOptions["skybox"];
   private _envmap: View3DOptions["envmap"];
+  private _background: View3DOptions["background"];
   private _fov: View3DOptions["fov"];
   private _center: View3DOptions["center"];
   private _yaw: View3DOptions["yaw"];
@@ -101,6 +106,7 @@ class View3D extends Component<View3DEvents> {
   private _autoInit: View3DOptions["autoInit"];
   private _autoResize: View3DOptions["autoResize"];
   private _useResizeObserver: View3DOptions["useResizeObserver"];
+  private _fixSkinnedBbox: View3DOptions["fixSkinnedBbox"];
 
   // Internal States
   private _initialized: boolean;
@@ -126,6 +132,10 @@ class View3D extends Component<View3DEvents> {
    * @type {OrbitControl}
    */
   public get control() { return this._control; }
+  /**
+   * Current {@link Model} displaying. `null` if nothing is displayed on the canvas.
+   * @type {Model | null}
+   */
   public get model() { return this._model; }
   /**
    * {@link ModelAnimator} instance of the View3D
@@ -154,10 +164,12 @@ class View3D extends Component<View3DEvents> {
   public get format() { return this._format; }
   public get skybox() { return this._skybox; }
   public get envmap() { return this._envmap; }
+  public get background() { return this._background; }
   public get fov() { return this._fov; }
   public get center() { return this._center; }
   public get yaw() { return this._yaw; }
   public get pitch() { return this._pitch; }
+  public get preset() { return this._preset; }
   public get exposure() { return this._exposure; }
   public get autoplay() { return this._autoplay; }
   public get scrollable() { return this._scrollable; }
@@ -185,6 +197,7 @@ class View3D extends Component<View3DEvents> {
    * @default true
    */
   public get useResizeObserver() { return this._useResizeObserver; }
+  public get fixSkinnedBbox() { return this._fixSkinnedBbox; }
 
   // Internal State Getter
   public get initialized() { return this._initialized; }
@@ -216,6 +229,7 @@ class View3D extends Component<View3DEvents> {
     format = AUTO,
     skybox = null,
     envmap = null,
+    background = null,
     fov = AUTO,
     center = AUTO,
     yaw = 0,
@@ -235,6 +249,7 @@ class View3D extends Component<View3DEvents> {
     this._format = format;
     this._skybox = skybox;
     this._envmap = envmap;
+    this._background = background;
     this._fov = fov;
     this._center = center;
     this._yaw = yaw;
@@ -294,7 +309,7 @@ class View3D extends Component<View3DEvents> {
 
     const [model] = await Promise.all(tasks);
 
-    this._display(model as Model);
+    this._display(model);
 
     this._control.enable();
     if (this._autoplay) {
@@ -358,17 +373,25 @@ class View3D extends Component<View3DEvents> {
     this.trigger(EVENTS.BEFORE_RENDER, {
       target: this
     });
+
     camera.updatePosition();
     renderer.render(scene, camera);
-    this.trigger(EVENTS.AFTER_RENDER, {
+
+    this.trigger(EVENTS.RENDER, {
       target: this
     });
   };
 
   private async _loadModel(src: string, format: View3DOptions["format"]) {
-    const loader = new ModelLoader();
+    const loader = new ModelLoader(this);
+    const model = await loader.load(src, format);
 
-    return await loader.load(this, src, format);
+    this.trigger(EVENTS.LOAD, {
+      target: this,
+      model
+    });
+
+    return model;
   }
 
   private _display(model: Model): void {
@@ -395,6 +418,11 @@ class View3D extends Component<View3DEvents> {
 
     renderer.stopAnimationLoop();
     renderer.setAnimationLoop(this.renderLoop);
+
+    this.trigger(EVENTS.DISPLAY, {
+      target: this,
+      model
+    });
   }
 }
 

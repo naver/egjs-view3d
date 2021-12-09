@@ -8,13 +8,13 @@ import OptionDescriptor from "@site/src/components/OptionDescriptor";
 <OptionDescriptor type="number" defaultVal="0" />
 
 ## Example
-<View3D src="/model/bunny.drc" yaw={180} preset={new WhiteLightPreset()} />
+<View3D src="/model/bunny.glb" yaw={180} preset={new WhiteLightPreset()} />
 
 ```ts
 import View3D, { WhiteLightPreset } from "@egjs/view3d";
 
 new View3D("#view3d-canvas", {
-  src: "/model/bunny.drc",
+  src: "/model/bunny.glb",
   yaw: 180,
   preset: new WhiteLightPreset()
 })

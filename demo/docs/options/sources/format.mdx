@@ -11,7 +11,7 @@ File extension format of the 3D model (glTF, glb, ...)
 If `"auto"` is given, View3D will try to detect the format of the 3D model with the name of `src` URL
 
 Available formats:
-- glTF, glb, drc
+- See [MODEL_FORMAT](/docs/api/MODEL_FORMAT)
 
 ```ts
 new View3D("#el", {
@@ -21,14 +21,14 @@ new View3D("#el", {
 ```
 
 ## Example
-<View3D src="/model/bunny.drc" format="drc" preset={new WhiteLightPreset()} />
+<View3D src="/model/bunny.glb" format="glb" preset={new WhiteLightPreset()} />
 
 ```ts
 import View3D, { WhiteLightPreset } from "@egjs/view3d";
 
 new View3D("#view3d-canvas", {
-  src: "/model/bunny.drc",
-  format: "drc",
+  src: "/model/bunny.glb",
+  format: "glb",
   preset: new WhiteLightPreset()
 })
 ```
