@@ -7,12 +7,11 @@ import * as THREE from "three";
 
 import View3D from "../View3D";
 import TextureLoader from "../loaders/TextureLoader";
-import Environment from "../environment/Environment";
-import ShadowPlane from "../environment/ShadowPlane";
 import { STANDARD_MAPS } from "../const/internal";
-import { findIndex } from "../utils";
+import { getObjectOption, isValidURL } from "../utils";
 
 import Model from "./Model";
+import ShadowPlane from "./ShadowPlane";
 
 /**
  * Scene that View3D will render.
@@ -22,9 +21,9 @@ class Scene {
   private _view3D: View3D;
   private _root: THREE.Scene;
   private _shadowPlane: ShadowPlane;
+  private _shadowLight: THREE.Light;
   private _userObjects: THREE.Group;
   private _envObjects: THREE.Group;
-  private _envs: Environment[];
 
   /**
    * Root {@link https://threejs.org/docs/#api/en/scenes/Scene THREE.Scene} object
@@ -32,11 +31,6 @@ class Scene {
   public get root() { return this._root; }
 
   public get shadowPlane() { return this._shadowPlane; }
-
-  /**
-   * {@link Environment}s inside scene
-   */
-  public get environments() { return this._envs; }
 
   /**
    * Return the visibility of the root scene
@@ -51,12 +45,13 @@ class Scene {
     this._root = new THREE.Scene();
     this._userObjects = new THREE.Group();
     this._envObjects = new THREE.Group();
-    this._shadowPlane = new ShadowPlane();
-    this._envs = [];
+    this._shadowPlane = new ShadowPlane(view3D, getObjectOption(view3D.shadow));
+    this._shadowLight = new THREE.DirectionalLight(0xffffff, 0);
 
     const root = this._root;
     const userObjects = this._userObjects;
     const envObjects = this._envObjects;
+    const shadowPlane = this._shadowPlane;
 
     userObjects.name = "userObjects";
     envObjects.name = "envObjects";
@@ -64,71 +59,43 @@ class Scene {
     root.add(userObjects);
     root.add(envObjects);
 
-    root.add(this._shadowPlane.mesh);
+    if (view3D.shadow) {
+      root.add(shadowPlane.mesh, shadowPlane.light);
+    }
   }
 
-  /**
-   * Update scene to fit the given model
-   * @param model model to fit
-   * @param override options for specific environments
-   */
-  public update(model: Model, override?: any): void {
-    this._envs.forEach(env => env.fit(model, override));
+  public fit(model: Model) {
+    // TODO:
   }
 
   /**
    * Reset scene to initial state
    * @returns {void}
    */
-  public reset(): void {
-    this.resetObjects();
-    this.resetEnv();
-  }
-
-  /**
-   * Fully remove all objects that added by calling {@link Scene#add add()}
-   * @returns {void}
-   */
-  public resetObjects(): void {
+  public reset({
+    volatileOnly = true
+  } = {}): void {
     this._removeChildsOf(this._userObjects);
-  }
 
-  /**
-   * Remove all objects that added by calling {@link Scene#addEnv addEnv()}
-   * This will also reset scene background & envmap
-   * @returns {void}
-   */
-  public resetEnv(): void {
-    this._removeChildsOf(this._envObjects);
-    this._envs = [];
-
-    this._root.background = null;
-    this._root.environment = null;
+    if (!volatileOnly) {
+      this._removeChildsOf(this._envObjects);
+    }
   }
 
   /**
    * Add new Three.js {@link https://threejs.org/docs/#api/en/core/Object3D Object3D} into the scene
    * @param object {@link https://threejs.org/docs/#api/en/core/Object3D THREE.Object3D}s to add
+   * @param volatile If set to true, objects will be removed after displaying another 3D model
    * @returns {void}
    */
-  public add(...object: THREE.Object3D[]): void {
-    this._userObjects.add(...object);
-  }
+  public add(object: THREE.Object3D | THREE.Object3D[], volatile: boolean = true): void {
+    const objRoot = volatile
+      ? this._userObjects
+      : this._envObjects;
 
-  /**
-   * Add new {@link Environment} or Three.js {@link https://threejs.org/docs/#api/en/core/Object3D Object3D}s to the scene, which won't be removed after displaying another 3D model
-   * @param envs {@link Environment} | {@link https://threejs.org/docs/#api/en/core/Object3D THREE.Object3D}s to add
-   * @returns {void}
-   */
-  public addEnv(...envs: Array<Environment | THREE.Object3D>): void {
-    envs.forEach(env => {
-      if ((env as THREE.Object3D).isObject3D) {
-        this._envObjects.add(env as THREE.Object3D);
-      } else {
-        this._envs.push(env as Environment);
-        this._envObjects.add(...(env as Environment).objects);
-      }
-    });
+    const objects = Array.isArray(object) ? object : [object];
+
+    objRoot.add(...objects);
   }
 
   /**
@@ -136,41 +103,37 @@ class Scene {
    * @param object {@link https://threejs.org/docs/#api/en/core/Object3D THREE.Object3D}s to add
    * @returns {void}
    */
-  public remove(...object: THREE.Object3D[]): void {
-    this._userObjects.remove(...object);
-  }
+  public remove(object: THREE.Object3D | THREE.Object3D[]): void {
+    const objects = Array.isArray(object) ? object : [object];
 
-  /**
-   * Remove {@link Environment} or Three.js {@link https://threejs.org/docs/#api/en/core/Object3D Object3D}s to the scene, which won't be removed after displaying another 3D model
-   * @param envs {@link Environment} | {@link https://threejs.org/docs/#api/en/core/Object3D THREE.Object3D}s to add
-   * @returns {void}
-   */
-  public removeEnv(...envs: Array<Environment | THREE.Object3D>): void {
-    envs.forEach(env => {
-      if ((env as THREE.Object3D).isObject3D) {
-        this._envObjects.remove(env as THREE.Object3D);
-      } else {
-        const envIndex = findIndex(env as Environment, this._envs);
-        if (envIndex > -1) {
-          this._envs.splice(envIndex, 1);
-        }
-        this._envObjects.remove(...(env as Environment).objects);
-      }
-    });
+    this._root.remove(...objects);
   }
 
   /**
    * Set background of the scene.
-   * @see {@link https://threejs.org/docs/#api/en/scenes/Scene.background THREE.Scene.background}
-   * @param background A texture to set as background
-   * @returns {void}
+   * @param background A color / image url to set as background
+   * @returns {Promise<void>}
    */
-  public setBackground(background: THREE.Color | THREE.Texture | THREE.CubeTexture | THREE.WebGLCubeRenderTarget | null): void {
-    // Three.js's type definition does not include WebGLCubeRenderTarget, but it works and defined on their document
-    // See https://threejs.org/docs/#api/en/scenes/Scene.background
-    this._root.background = background as THREE.Texture | null;
+  public async setBackground(background: number | string): Promise<void> {
+    const root = this._root;
+
+    if (typeof background === "number" || background.charAt(0) === "#") {
+      root.background = new THREE.Color(background);
+    } else {
+      const textureLoader = new TextureLoader(this._view3D.renderer);
+      const texture = await textureLoader.load(background);
+
+      texture.encoding = THREE.sRGBEncoding;
+
+      root.background = texture;
+    }
   }
 
+  /**
+   * Set scene's skybox, which both affects background & envmap
+   * @param url An URL to equirectangular image
+   * @returns {Promise<void>}
+   */
   public async setSkybox(url: string): Promise<void> {
     const textureLoader = new TextureLoader(this._view3D.renderer);
     const renderTarget = await textureLoader.loadHDRTexture(url);
@@ -181,8 +144,7 @@ class Scene {
 
   /**
    * Set scene's environment map that affects all physical materials in the scene
-   * @see {@link https://threejs.org/docs/#api/en/scenes/Scene.environment THREE.Scene.environment}
-   * @param envmap A texture to set as environment map
+   * @param url An URL to equirectangular image
    * @returns {void}
    */
   public async setEnvMap(url: string): Promise<void> {

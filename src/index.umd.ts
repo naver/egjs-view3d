@@ -8,14 +8,12 @@ import View3DError from "./core/View3DError";
 import * as Core from "./core";
 import * as Controls from "./control";
 import * as Loaders from "./loaders";
-import * as Environments from "./environment";
 import * as Extra from "./extra";
 import * as Preset from "./preset";
 import * as Constants from "./const/external";
 import { merge } from "./utils";
 
 merge(View3D, Core);
-merge(View3D, Environments);
 merge(View3D, Controls);
 merge(View3D, Loaders);
 merge(View3D, Extra);

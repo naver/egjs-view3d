@@ -10,7 +10,6 @@ class MoonLightPreset {
     const root = view3D.scene.root;
 
     const spotLight = new THREE.SpotLight(skyColor, 1, 0, Math.PI / 12, 0.1, 2);
-    spotLight.castShadow = true;
     spotLight.power = 5;
     spotLight.position.set(0.5, 1.75, 0.5);
     spotLight.shadow.mapSize.setScalar(1024);
@@ -38,7 +37,7 @@ class MoonLightPreset {
 
     root.fog = new THREE.FogExp2(bgColor, 0.5);
     root.background = new THREE.Color(bgColor);
-    view3D.scene.addEnv(spotLight, hemiLight, spotLight2, spotLight3, spotLight4, floor);
+    view3D.scene.add([spotLight, hemiLight, spotLight2, spotLight3, spotLight4, floor], false);
   }
 }
 

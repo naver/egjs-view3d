@@ -13,6 +13,7 @@ import Motion from "./Motion";
 import Pose from "./Pose";
 import Renderer from "./Renderer";
 import Scene from "./Scene";
+import ShadowPlane from "./ShadowPlane";
 import View3DError from "./View3DError";
 
 export {
@@ -26,5 +27,6 @@ export {
   Pose,
   Renderer,
   Scene,
+  ShadowPlane,
   View3DError
 };

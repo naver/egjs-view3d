@@ -7,6 +7,7 @@ import * as THREE from "three";
 
 import View3DError from "./core/View3DError";
 import * as ERROR from "./const/error";
+import { NoBoolean } from "./type/utils";
 
 export const getElement = (el: HTMLElement | string | null, parent?: HTMLElement): HTMLElement | null => {
   let targetEl: HTMLElement | null = null;
@@ -157,3 +158,5 @@ export const getRotationAngle = (center: THREE.Vector2, v1: THREE.Vector2, v2: T
 
   return rotationAngle;
 };
+
+export const getObjectOption = <T extends boolean | Partial<object>>(val: T): NoBoolean<T> => typeof val === "object" ? val : {} as any;

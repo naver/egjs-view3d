@@ -5,33 +5,24 @@
 
 import * as THREE from "three";
 
-import Model from "../core/Model";
-import { getBoxPoints } from "../utils";
+import { getBoxPoints } from "../src/utils";
 
-import Environment from "./Environment";
+import Model from "../src/core/Model";
 
 /**
  * THREE.DirectionalLight wrapper that will automatically update its shadow size to model
  * Shadow is enabled by default, use {@link AutoDirectionalLight#disableShadow disableShadow} to disable it
  */
-class AutoDirectionalLight implements Environment {
+class AutoDirectionalLight {
   private _light: THREE.DirectionalLight;
   private _direction: THREE.Vector3; // Direction to light, from (0, 0, 0)
-
-  /**
-   * Array of lights that used in this preset
-   * @see https://threejs.org/docs/#api/en/lights/Light
-   */
-  public get objects(): THREE.Object3D[] {
-    return [this._light, this._light.target];
-  }
 
   /**
    * The actual THREE.DirectionalLight
    * @type THREE#DirectionalLight
    * @see https://threejs.org/docs/#api/en/lights/DirectionalLight
    */
-  public get light() { return this._light; }
+  public get threeLight() { return this._light; }
 
   /**
    * Position of the light
@@ -50,7 +41,7 @@ class AutoDirectionalLight implements Environment {
    * @param {THREE.Vector3} [options.direction=new THREE.Vector3(-1, -1, -1)] Direction of the light
    */
   public constructor(color: string | number | THREE.Color = "#ffffff", intensity: number = 1, {
-    direction = new THREE.Vector3(-1, -1, -1)
+    direction = new THREE.Vector3(0, -1, 0)
   } = {}) {
     this._light = new THREE.DirectionalLight(color, intensity);
 

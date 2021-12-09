@@ -5,53 +5,40 @@
 
 import * as THREE from "three";
 
+import View3D from "../View3D";
 import Model from "../core/Model";
+import { OptionGetters } from "../type/utils";
 
-import Environment from "./Environment";
+/**
+ * @interface
+ */
+export interface ShadowOptions {
+  opacity: number;
+}
 
 /**
  * Helper class to easily add shadow plane under your 3D model
- * @example
- * ```ts
- * import View3D, { ShadowPlane } from "@egjs/view3d";
- *
- * const view3d = new View3D("#view3d-canvas");
- * const shadowPlane = new ShadowPlane();
- * view3d.scene.addEnv(shadowPlane);
- * ```
  */
-class ShadowPlane implements Environment {
-  // Developers can change those values if they know what they're doing
-  // So I'm leaving those values public
+class ShadowPlane implements OptionGetters<ShadowOptions> {
+  private _view3D: View3D;
+  private _geometry: THREE.PlaneGeometry;
+  private _material: THREE.ShadowMaterial;
+  private _mesh: THREE.Mesh;
+  private _light: THREE.DirectionalLight;
 
-  /**
-   * Geometry of the shadow plane
-   * @see https://threejs.org/docs/#api/en/geometries/PlaneGeometry
-   */
-  public geometry: THREE.PlaneGeometry;
-  /**
-   * Material of the shadow plane
-   * @see https://threejs.org/docs/#api/en/materials/ShadowMaterial
-   */
-  public material: THREE.ShadowMaterial;
-  /**
-   * Mesh of the shadow plane
-   * @see https://threejs.org/docs/#api/en/objects/Mesh
-   */
-  public mesh: THREE.Mesh;
-
-  public get objects() { return [this.mesh]; }
+  public get mesh() { return this._mesh; }
+  public get light() { return this._light; }
 
   /**
    * Shadow opacity, value can be between 0(invisible) and 1(solid)
    * @type number
    */
   public get opacity() {
-    return this.material.opacity;
+    return this._material.opacity;
   }
 
   public set opacity(val: number) {
-    this.material.opacity = val;
+    this._material.opacity = val;
   }
 
   /**
@@ -59,18 +46,29 @@ class ShadowPlane implements Environment {
    * @param {object} options Options
    * @param {number} [options.opacity=0.3] Opacity of the shadow
    */
-  public constructor({
+  public constructor(view3D: View3D, {
     opacity = 0.3
-  } = {}) {
-    this.geometry = new THREE.PlaneBufferGeometry();
-    this.material = new THREE.ShadowMaterial({ opacity, fog: false });
-    this.mesh = new THREE.Mesh(this.geometry, this.material);
+  }: Partial<ShadowOptions> = {}) {
+    this._view3D = view3D;
 
-    const mesh = this.mesh;
+    this._geometry = new THREE.PlaneBufferGeometry();
+    this._material = new THREE.ShadowMaterial({ opacity, fog: false });
+    this._mesh = new THREE.Mesh(this._geometry, this._material);
+    this._light = new THREE.DirectionalLight();
+
+    const mesh = this._mesh;
     mesh.rotateX(-Math.PI / 2);
 
     mesh.scale.setScalar(100);
     mesh.receiveShadow = true;
+
+    const light = this._light;
+    const maxTexSize = view3D.renderer.threeRenderer.capabilities.maxTextureSize;
+    const shadowSize = Math.min(1024, maxTexSize);
+
+    light.position.set(0, 1, 0);
+    light.castShadow = true;
+    light.shadow.mapSize.set(shadowSize, shadowSize);
   }
 
   /**
@@ -84,13 +82,14 @@ class ShadowPlane implements Environment {
     floorPosition: THREE.Vector3;
     floorRotation: THREE.Quaternion;
   }> = {}): void {
+    const mesh = this._mesh;
     const modelPosition = model.scene.position;
     const localYAxis = new THREE.Vector3(0, 1, 0).applyQuaternion(floorRotation);
 
     // Apply position
     if (floorPosition) {
       // Apply a tiny offset to prevent z-fighting with original model
-      this.mesh.position.copy(floorPosition.clone().add(localYAxis.clone().multiplyScalar(0.001)));
+      mesh.position.copy(floorPosition.clone().add(localYAxis.clone().multiplyScalar(0.001)));
     } else {
       const modelBbox = model.bbox;
       const modelBboxYOffset = modelBbox.getCenter(new THREE.Vector3()).y - modelBbox.min.y;
@@ -99,15 +98,15 @@ class ShadowPlane implements Environment {
         // Apply a tiny offset to prevent z-fighting with original model
         localYAxis.multiplyScalar(-modelBboxYOffset + 0.0001),
       );
-      this.mesh.position.copy(modelFloor);
+      mesh.position.copy(modelFloor);
     }
 
     // Apply rotation
     const rotX90 = new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI / 2, 0, 0));
     const shadowRotation = new THREE.Quaternion().multiplyQuaternions(floorRotation, rotX90);
 
-    this.mesh.quaternion.copy(shadowRotation);
-    this.mesh.updateMatrix();
+    mesh.quaternion.copy(shadowRotation);
+    mesh.updateMatrix();
   }
 }
 

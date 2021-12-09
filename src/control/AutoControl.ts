@@ -5,7 +5,7 @@
 
 import View3D from "../View3D";
 import * as BROWSER from "../const/browser";
-import { OptionsGetters } from "../type/utils";
+import { OptionGetters } from "../type/utils";
 
 import CameraControl from "./CameraControl";
 
@@ -21,7 +21,7 @@ export interface AutoplayOptions {
 /**
  * Control that animates model without user input
  */
-class AutoControl implements CameraControl, OptionsGetters<AutoplayOptions> {
+class AutoControl implements CameraControl, OptionGetters<AutoplayOptions> {
   // Options
   private _delay: number;
   private _delayOnMouseLeave: number;

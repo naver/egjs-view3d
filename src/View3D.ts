@@ -14,10 +14,11 @@ import ModelAnimator from "./core/ModelAnimator";
 import Preset from "./preset/Preset";
 import OrbitControl from "./control/OrbitControl";
 import AutoControl, { AutoplayOptions } from "./control/AutoControl";
+import { ShadowOptions } from "./core/ShadowPlane";
 import { EVENTS, AUTO } from "./const/external";
 import * as EVENT_TYPES from "./type/event";
-import { getCanvas } from "./utils";
-import { LiteralUnion, OptionsGetters } from "./type/utils";
+import { getCanvas, getObjectOption } from "./utils";
+import { LiteralUnion, OptionGetters } from "./type/utils";
 
 /**
  * @interface
@@ -56,6 +57,9 @@ export interface View3DOptions {
   preset: Preset | null;
   exposure: number;
 
+  // Shadow
+  shadow: boolean | Partial<ShadowOptions>;
+
   // Control
   autoplay: boolean | Partial<AutoplayOptions>;
   scrollable: boolean;
@@ -71,7 +75,7 @@ export interface View3DOptions {
  * @extends Component
  * @see https://naver.github.io/egjs-component/
  */
-class View3D extends Component<View3DEvents> implements OptionsGetters<View3DOptions> {
+class View3D extends Component<View3DEvents> implements OptionGetters<View3DOptions> {
   /**
    * Current version of the View3D
    * @type {string}
@@ -101,6 +105,7 @@ class View3D extends Component<View3DEvents> implements OptionsGetters<View3DOpt
   private _pitch: View3DOptions["pitch"];
   private _preset: View3DOptions["preset"];
   private _exposure: View3DOptions["exposure"];
+  private _shadow: View3DOptions["shadow"];
   private _autoplay: View3DOptions["autoplay"];
   private _scrollable: View3DOptions["scrollable"];
   private _autoInit: View3DOptions["autoInit"];
@@ -171,6 +176,7 @@ class View3D extends Component<View3DEvents> implements OptionsGetters<View3DOpt
   public get pitch() { return this._pitch; }
   public get preset() { return this._preset; }
   public get exposure() { return this._exposure; }
+  public get shadow() { return this._shadow; }
   public get autoplay() { return this._autoplay; }
   public get scrollable() { return this._scrollable; }
   /**
@@ -236,6 +242,7 @@ class View3D extends Component<View3DEvents> implements OptionsGetters<View3DOpt
     pitch = 0,
     preset = null,
     exposure = 1,
+    shadow = true,
     autoplay = false,
     scrollable = false,
     autoInit = true,
@@ -256,6 +263,7 @@ class View3D extends Component<View3DEvents> implements OptionsGetters<View3DOpt
     this._pitch = pitch;
     this._preset = preset;
     this._exposure = exposure;
+    this._shadow = shadow;
     this._autoplay = autoplay;
     this._scrollable = scrollable;
     this._autoInit = autoInit;
@@ -267,7 +275,7 @@ class View3D extends Component<View3DEvents> implements OptionsGetters<View3DOpt
     this._control = new OrbitControl(this);
     this._scene = new Scene(this);
     this._animator = new ModelAnimator(this._scene.root);
-    this._autoPlayer = new AutoControl(this, typeof autoplay === "object" ? autoplay : {});
+    this._autoPlayer = new AutoControl(this, getObjectOption(autoplay));
     this._autoResizer = new AutoResizer(this);
 
     if (src && autoInit) {
@@ -296,15 +304,24 @@ class View3D extends Component<View3DEvents> implements OptionsGetters<View3DOpt
       this._autoResizer.enable();
     }
 
+    const scene = this._scene;
+    const skybox = this._skybox;
+    const envmap = this._envmap;
+    const background = this._background;
+
     const tasks: [Promise<Model>, ...Array<Promise<any>>] = [
       this._loadModel(this._src!, this._format)
     ];
 
     // Load & set skybox / envmap before displaying model
-    if (this._skybox) {
-      tasks.push(this._scene.setSkybox(this._skybox));
-    } else if (this._envmap) {
-      tasks.push(this._scene.setEnvMap(this._envmap));
+    if (skybox) {
+      tasks.push(scene.setSkybox(skybox));
+    } else if (envmap) {
+      tasks.push(scene.setEnvMap(envmap));
+    }
+
+    if (!skybox && background) {
+      tasks.push(scene.setBackground(background));
     }
 
     const [model] = await Promise.all(tasks);
@@ -400,9 +417,9 @@ class View3D extends Component<View3DEvents> implements OptionsGetters<View3DOpt
     const camera = this._camera;
     const animator = this._animator;
 
-    scene.resetObjects();
+    scene.reset();
+    // scene.fit(model);
     scene.add(model.scene);
-    scene.update(model);
 
     camera.fit(model, this._center);
     void camera.reset(0);

@@ -1,0 +1,54 @@
+---
+sidebar_position: 5
+---
+
+import View3D from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+
+<OptionDescriptor type="string | number | null" defaultVal="null" />
+
+For transparent background, use `null`. (default value)
+
+```ts
+new View3D("#el", {
+  background: BACKGROUND_COLOR or URL_TO_IMAGE,
+  src: "SOURCE_TO_YOUR_3D_MODEL"
+})
+```
+
+## Example
+### Number
+<View3D src="/model/bunny.glb" background={0x456456} />
+
+```ts
+import View3D from "@egjs/view3d";
+
+new View3D("#view3d-canvas", {
+  src: "/model/bunny.glb",
+  background: 0x456456
+})
+```
+
+### Hex Color String
+<View3D src="/model/bunny.glb" background="#654654" />
+
+```ts
+import View3D from "@egjs/view3d";
+
+new View3D("#view3d-canvas", {
+  src: "/model/bunny.glb",
+  background: "#654654"
+})
+```
+
+### Texture URL
+<View3D src="/model/bunny.glb" background="/texture/egjs.png" />
+
+```ts
+import View3D from "@egjs/view3d";
+
+new View3D("#view3d-canvas", {
+  src: "/model/bunny.glb",
+  background: "#654654"
+})
+```
