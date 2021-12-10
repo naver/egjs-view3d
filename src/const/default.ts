@@ -3,8 +3,6 @@
  * egjs projects are licensed under the MIT license
  */
 
-import * as THREE from "three";
-
 import Pose from "../core/Pose";
 import { Range } from "../type/utils";
 
@@ -21,7 +19,7 @@ export const ANIMATION_RANGE: Readonly<Range> = {
 };
 
 // Camera
-export const CAMERA_POSE: Readonly<Pose> = new Pose(0, 15, 0, new THREE.Vector3(0, 0, 0));
+export const CAMERA_POSE: Readonly<Pose> = new Pose(0, 15, 0, [0, 0, 0]);
 export const INFINITE_RANGE: Readonly<Range> = {
   min: -Infinity, max: Infinity
 };

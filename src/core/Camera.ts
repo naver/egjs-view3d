@@ -22,8 +22,6 @@ class Camera {
   private _threeCamera: THREE.PerspectiveCamera;
   private _distance: number = 0;
   private _baseFov: number = 45;
-  private _minDistance: number = 0;
-  private _maxDistance: number = 0;
   private _defaultPose: Pose = DEFAULT.CAMERA_POSE;
   private _currentPose: Pose = this._defaultPose.clone();
   private _maxTanHalfHFov: number;
@@ -39,37 +37,44 @@ class Camera {
    * Camera's default pose(yaw, pitch, zoom, pivot)
    * This will be new currentPose when {@link Camera#reset reset()} is called
    * @readonly
-   * @type Pose
+   * @type {Pose}
    */
   public get defaultPose(): Readonly<Pose> { return this._defaultPose; }
 
   /**
    * Camera's current pose value
    * @readonly
-   * @type Pose
+   * @type {Pose}
    */
   public get currentPose(): Pose { return this._currentPose.clone(); }
 
   /**
    * Camera's current yaw
    * {@link Camera#updatePosition} should be called after changing this value, and normally it is called every frame.
-   * @type number
+   * @type {number}
    */
   public get yaw() { return this._currentPose.yaw; }
 
   /**
    * Camera's current pitch
    * {@link Camera#updatePosition} should be called after changing this value, and normally it is called every frame.
-   * @type number
+   * @type {number}
    */
   public get pitch() { return this._currentPose.pitch; }
 
   /**
    * Camera's current zoom value
    * {@link Camera#updatePosition} should be called after changing this value, and normally it is called every frame.
-   * @type number
+   * @type {number}
    */
-  public get zoom() { return this._currentPose.fovOffset; }
+  public get zoom() { return this._currentPose.zoom; }
+
+  /**
+   * Camera's default fov value.
+   * This will be automatically chosen when `view3D.fov` is "auto", otherwise it is equal to `view3D.fov`
+   * @type {number}
+   */
+  public get baseFov() { return this._baseFov; }
 
   /**
    * Current pivot point of camera rotation
@@ -80,35 +85,8 @@ class Camera {
   public get pivot() { return this._currentPose.pivot; }
 
   /**
-   * Minimum distance from lookAtPosition
-   * @type number
-   * @example
-   * ```ts
-   * import View3D from "@egjs/view3d";
-   *
-   * const view3d = new View3D("#view3d-canvas");
-   * view3d.camera.minDistance = 100;
-   * ```
-   */
-  public get minDistance() { return this._minDistance; }
-
-  /**
-   * Maximum distance from lookAtPosition
-   * @type number
-   * @example
-   * ```ts
-   * import View3D from "@egjs/view3d";
-   *
-   * const view3d = new View3D("#view3d-canvas");
-   * view3d.camera.maxDistance = 400;
-   * ```
-   */
-  public get maxDistance() { return this._maxDistance; }
-
-  /**
    * Camera's focus of view value (vertical)
    * @type number
-   * @default 50
    * @see {@link https://threejs.org/docs/#api/en/cameras/PerspectiveCamera.fov THREE#PerspectiveCamera}
    */
   public get fov() { return this._threeCamera.fov; }
@@ -132,7 +110,7 @@ class Camera {
 
   public set yaw(val: number) { this._currentPose.yaw = val; }
   public set pitch(val: number) { this._currentPose.pitch = val; }
-  public set zoom(val: number) { this._currentPose.fovOffset = val; }
+  public set zoom(val: number) { this._currentPose.zoom = val; }
   public set pivot(val: THREE.Vector3) { this._currentPose.pivot = val; }
 
   /**
@@ -203,7 +181,6 @@ class Camera {
       this._applyEffectiveFov(DEFAULT.FOV);
     } else {
       this._baseFov = fov;
-      // cam.fov = fov;
     }
   }
 
@@ -213,6 +190,7 @@ class Camera {
   public fit(model: Model, center: "auto" | number[]): void {
     const view3D = this._view3D;
     const camera = this._threeCamera;
+    const control = view3D.control;
     const defaultPose = this._defaultPose;
     const bbox = model.bbox;
 
@@ -246,13 +224,8 @@ class Camera {
     defaultPose.pivot = modelCenter.clone();
     this._distance = effectiveCamDist;
 
-    this._minDistance = maxDistToCenter / 10;
-    this._maxDistance = effectiveCamDist * 2;
-
     camera.far = Math.max(2000, effectiveCamDist + maxDistToCenter);
-
-    // Update distance control
-    // view3D.control.zoom.updateScaleModifier(effectiveCamDist, effectiveCamDist - maxDistToCenter);
+    control.zoom.updateRange();
   }
 
   /**
@@ -277,7 +250,7 @@ class Camera {
       defaultPose.pitch = pitch;
     }
     if (distance != null) {
-      defaultPose.fovOffset = distance;
+      defaultPose.zoom = distance;
     }
     if (pivot != null) {
       defaultPose.pivot = pivot;
@@ -289,14 +262,21 @@ class Camera {
    * @returns {void}
    */
   public updatePosition(): void {
-    this._clampCurrentPose();
-
+    const { control } = this._view3D;
     const threeCamera = this._threeCamera;
-    const pose = this._currentPose;
+    const currentPose = this._currentPose;
     const distance = this._distance;
+    const baseFov = this._baseFov;
+    const zoomRange = control.zoom.range;
 
-    const yaw = toRadian(pose.yaw);
-    const pitch = toRadian(pose.pitch);
+    // Clamp current pose
+    currentPose.yaw = circulate(currentPose.yaw, 0, 360);
+    currentPose.pitch = clamp(currentPose.pitch, DEFAULT.PITCH_RANGE.min, DEFAULT.PITCH_RANGE.max);
+    currentPose.zoom = clamp(baseFov + currentPose.zoom, zoomRange.min, zoomRange.max) - baseFov;
+
+    const yaw = toRadian(currentPose.yaw);
+    const pitch = toRadian(currentPose.pitch);
+    const fov = currentPose.zoom + baseFov;
     const newCamPos = new THREE.Vector3(0, 0, 0);
 
     newCamPos.y = distance * Math.sin(pitch);
@@ -305,20 +285,12 @@ class Camera {
     newCamPos.x = newCamPos.z * Math.sin(-yaw);
     newCamPos.z = newCamPos.z * Math.cos(-yaw);
 
-    newCamPos.add(pose.pivot);
+    newCamPos.add(currentPose.pivot);
 
-    threeCamera.fov = this._baseFov + pose.fovOffset;
+    threeCamera.fov = fov;
     threeCamera.position.copy(newCamPos);
-    threeCamera.lookAt(pose.pivot);
+    threeCamera.lookAt(currentPose.pivot);
     threeCamera.updateProjectionMatrix();
-  }
-
-  private _clampCurrentPose() {
-    const currentPose = this._currentPose;
-
-    currentPose.yaw = circulate(currentPose.yaw, 0, 360);
-    currentPose.pitch = clamp(currentPose.pitch, DEFAULT.PITCH_RANGE.min, DEFAULT.PITCH_RANGE.max);
-    // currentPose.zoom = clamp(currentPose.zoom, this._minDistance, this._maxDistance);
   }
 
   private _applyEffectiveFov(fov: number) {

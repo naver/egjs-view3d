@@ -9,13 +9,13 @@ export const AUTO = "auto";
 
 /**
  * Event type object with event name strings of {@link View3D}
- * @ko {@link View3D}의 이벤트 이름 문자열들을 담은 객체
  * @type {object}
- * @property {"ready"} READY ready event<ko>ready 이벤트</ko>
- * @property {"load"} LOAD load event<ko>load 이벤트</ko>
- * @property {"resize"} RESIZE resize event<ko>resize 이벤트</ko>
- * @property {"beforeRender"} BEFORE_RENDER beforeRender event<ko>beforeRender 이벤트</ko>
- * @property {"render"} RENDER render event<ko>render 이벤트</ko>
+ * @property {"ready"} READY ready event
+ * @property {"load"} LOAD load event
+ * @property {"resize"} RESIZE resize event
+ * @property {"beforeRender"} BEFORE_RENDER beforeRender event
+ * @property {"render"} RENDER render event
+ * @property {"progress"} PROGRESS progress event
  * @example
  * ```ts
  * import { EVENTS } from "@egjs/view3d";

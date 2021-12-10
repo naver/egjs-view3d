@@ -11,33 +11,32 @@ import * as THREE from "three";
 class Pose {
   public yaw: number;
   public pitch: number;
-  public fovOffset: number;
+  public zoom: number;
   public pivot: THREE.Vector3;
 
   /**
    * Create new instance of pose
    * @param {number} yaw yaw
    * @param {number} pitch pitch
-   * @param {number} fovOffset fovOffset
-   * @param {object} pivot pivot
-   * @see https://threejs.org/docs/#api/en/math/Vector3
+   * @param {number} zoom zoom
+   * @param {number[]} pivot pivot
    * @example
    * ```ts
    * import { THREE, Pose } from "@egjs/view3d";
    *
-   * const pose = new Pose(180, 45, 150, new THREE.Vector3(5, -1, 3));
+   * const pose = new Pose(180, 45, 150, [5, -1, 3]);
    * ```
    */
   public constructor(
     yaw: number,
     pitch: number,
-    fovOffset: number,
-    pivot: THREE.Vector3 = new THREE.Vector3(0, 0, 0),
+    zoom: number,
+    pivot: number[] = [0, 0, 0]
   ) {
     this.yaw = yaw;
     this.pitch = pitch;
-    this.fovOffset = fovOffset;
-    this.pivot = pivot;
+    this.zoom = zoom;
+    this.pivot = new THREE.Vector3().fromArray(pivot);
   }
 
   /**
@@ -46,8 +45,8 @@ class Pose {
    */
   public clone(): Pose {
     return new Pose(
-      this.yaw, this.pitch, this.fovOffset,
-      this.pivot.clone(),
+      this.yaw, this.pitch, this.zoom,
+      this.pivot.toArray(),
     );
   }
 }

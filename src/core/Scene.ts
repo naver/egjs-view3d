@@ -8,7 +8,7 @@ import * as THREE from "three";
 import View3D from "../View3D";
 import TextureLoader from "../loaders/TextureLoader";
 import { STANDARD_MAPS } from "../const/internal";
-import { getObjectOption, isValidURL } from "../utils";
+import { getObjectOption } from "../utils";
 
 import Model from "./Model";
 import ShadowPlane from "./ShadowPlane";
@@ -21,7 +21,6 @@ class Scene {
   private _view3D: View3D;
   private _root: THREE.Scene;
   private _shadowPlane: ShadowPlane;
-  private _shadowLight: THREE.Light;
   private _userObjects: THREE.Group;
   private _envObjects: THREE.Group;
 
@@ -30,6 +29,10 @@ class Scene {
    */
   public get root() { return this._root; }
 
+  /**
+   * Shadow plane & light
+   * @type {ShadowPlane}
+   */
   public get shadowPlane() { return this._shadowPlane; }
 
   /**
@@ -46,7 +49,6 @@ class Scene {
     this._userObjects = new THREE.Group();
     this._envObjects = new THREE.Group();
     this._shadowPlane = new ShadowPlane(view3D, getObjectOption(view3D.shadow));
-    this._shadowLight = new THREE.DirectionalLight(0xffffff, 0);
 
     const root = this._root;
     const userObjects = this._userObjects;
@@ -70,6 +72,8 @@ class Scene {
 
   /**
    * Reset scene to initial state
+   * @param {object} options Options
+   * @param {boolean} [options.volatileOnly=true] Remove only volatile objects
    * @returns {void}
    */
   public reset({

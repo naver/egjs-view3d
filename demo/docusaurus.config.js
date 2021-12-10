@@ -50,7 +50,7 @@ const config = {
         title: "View3D",
         // logo: {
         //   alt: "egjs",
-        //   src: "img/view3d.png"
+        //   src: "img/view3d.gif"
         // },
         items: [
           {
@@ -81,15 +81,6 @@ const config = {
             to: "Playground",
             label: "Playground",
             position: "left"
-          },
-          {
-            type: "docsVersionDropdown",
-            position: "right",
-            dropdownActiveClassDisabled: true
-          },
-          {
-            type: "localeDropdown",
-            position: "right"
           },
           {
             href: "https://github.com/naver/egjs-view3d",

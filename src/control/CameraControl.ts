@@ -5,13 +5,7 @@
 
 /**
  * @interface
- * @property enabled Whether this control is enabled or not.
- * @property destroy Destroy this control.
- * @property resize Resize the control. Usually, the element size is used for parameter.
- * @property sync Synchronize internal state with the camera.
- * @property update Update internal state by delta time, and apply it to the camera.
- * @property enable Enable this control.
- * @property disable Disable this control.
+ * @internal
  */
 interface CameraControl {
   readonly enabled: boolean;

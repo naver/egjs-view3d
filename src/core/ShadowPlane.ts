@@ -20,7 +20,6 @@ export interface ShadowOptions {
  * Helper class to easily add shadow plane under your 3D model
  */
 class ShadowPlane implements OptionGetters<ShadowOptions> {
-  private _view3D: View3D;
   private _geometry: THREE.PlaneGeometry;
   private _material: THREE.ShadowMaterial;
   private _mesh: THREE.Mesh;
@@ -49,8 +48,6 @@ class ShadowPlane implements OptionGetters<ShadowOptions> {
   public constructor(view3D: View3D, {
     opacity = 0.3
   }: Partial<ShadowOptions> = {}) {
-    this._view3D = view3D;
-
     this._geometry = new THREE.PlaneBufferGeometry();
     this._material = new THREE.ShadowMaterial({ opacity, fog: false });
     this._mesh = new THREE.Mesh(this._geometry, this._material);
@@ -58,7 +55,7 @@ class ShadowPlane implements OptionGetters<ShadowOptions> {
 
     const mesh = this._mesh;
     mesh.rotateX(-Math.PI / 2);
-
+    mesh.position.setY(-0.001); // Move slightly below model, to prevent z-fighting
     mesh.scale.setScalar(100);
     mesh.receiveShadow = true;
 

@@ -105,7 +105,7 @@ class AnimationControl implements CameraControl {
 
     camera.yaw = mix(from.yaw, to.yaw, progress);
     camera.pitch = mix(from.pitch, to.pitch, progress);
-    camera.zoom = mix(from.fovOffset, to.fovOffset, progress);
+    camera.zoom = mix(from.zoom, to.zoom, progress);
     camera.pivot = from.pivot.clone().lerp(to.pivot, progress);
 
     if (motion.progress >= 1) {

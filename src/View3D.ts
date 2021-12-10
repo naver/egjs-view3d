@@ -13,6 +13,9 @@ import Model from "./core/Model";
 import ModelAnimator from "./core/ModelAnimator";
 import Preset from "./preset/Preset";
 import OrbitControl from "./control/OrbitControl";
+import { RotateControlOptions } from "./control/RotateControl";
+import { TranslateControlOptions } from "./control/TranslateControl";
+import { ZoomControlOptions } from "./control/ZoomControl";
 import AutoControl, { AutoplayOptions } from "./control/AutoControl";
 import { ShadowOptions } from "./core/ShadowPlane";
 import { EVENTS, AUTO } from "./const/external";
@@ -35,40 +38,38 @@ export interface View3DEvents {
 
 /**
  * @interface
- * @property {string | null} src
- * @property {string} format
- * @property {boolean} autoInit
- * @property {boolean} autoResize
- * @see {@link /Options Options} page for detailed information
+ * @see [Options](/docs/options/sources/src) page for detailed information
  */
 export interface View3DOptions {
-  // Sources
+  // Model
   src: string | null;
-  format: LiteralUnion<"auto", string>;
+  format: LiteralUnion<typeof AUTO, string>;
+  fixSkinnedBbox: boolean;
+
+  // Control
+  fov: typeof AUTO | number;
+  center: typeof AUTO | number[];
+  yaw: number;
+  pitch: number;
+  rotate: Partial<RotateControlOptions>;
+  translate: Partial<TranslateControlOptions>;
+  zoom: Partial<ZoomControlOptions>;
+  autoplay: boolean | Partial<AutoplayOptions>;
+  scrollable: boolean;
+  useGrabCursor: boolean;
+
+  // Environment
   skybox: string | null;
   envmap: string | null;
   background: number | string | null;
-
-  // Display
-  fov: "auto" | number;
-  center: "auto" | number[];
-  yaw: number;
-  pitch: number;
-  preset: Preset | null;
   exposure: number;
-
-  // Shadow
+  preset: Preset | null;
   shadow: boolean | Partial<ShadowOptions>;
-
-  // Control
-  autoplay: boolean | Partial<AutoplayOptions>;
-  scrollable: boolean;
 
   // Others
   autoInit: boolean;
   autoResize: boolean;
   useResizeObserver: boolean;
-  fixSkinnedBbox: boolean;
 }
 
 /**
@@ -93,28 +94,35 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   private _animator: ModelAnimator;
   private _autoResizer: AutoResizer;
 
+  // Internal States
+  private _initialized: boolean;
+
   // Options
   private _src: View3DOptions["src"];
   private _format: View3DOptions["format"];
-  private _skybox: View3DOptions["skybox"];
-  private _envmap: View3DOptions["envmap"];
-  private _background: View3DOptions["background"];
+
   private _fov: View3DOptions["fov"];
   private _center: View3DOptions["center"];
   private _yaw: View3DOptions["yaw"];
   private _pitch: View3DOptions["pitch"];
-  private _preset: View3DOptions["preset"];
-  private _exposure: View3DOptions["exposure"];
-  private _shadow: View3DOptions["shadow"];
+  private _rotate: View3DOptions["rotate"];
+  private _translate: View3DOptions["translate"];
+  private _zoom: View3DOptions["zoom"];
   private _autoplay: View3DOptions["autoplay"];
   private _scrollable: View3DOptions["scrollable"];
+  private _useGrabCursor: View3DOptions["useGrabCursor"];
+
+  private _skybox: View3DOptions["skybox"];
+  private _envmap: View3DOptions["envmap"];
+  private _background: View3DOptions["background"];
+  private _exposure: View3DOptions["exposure"];
+  private _preset: View3DOptions["preset"];
+  private _shadow: View3DOptions["shadow"];
+
   private _autoInit: View3DOptions["autoInit"];
   private _autoResize: View3DOptions["autoResize"];
   private _useResizeObserver: View3DOptions["useResizeObserver"];
   private _fixSkinnedBbox: View3DOptions["fixSkinnedBbox"];
-
-  // Internal States
-  private _initialized: boolean;
 
   // Internal Components Getter
   /**
@@ -148,12 +156,13 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    */
   public get animator() { return this._animator; }
 
+  // Internal State Getter
+  public get initialized() { return this._initialized; }
+
   // Options Getter
   /**
    * Source URL to fetch 3D model from
    * For further information, check our [Tutorial](/docs/loading-model) page
-   * @ko 3D 모델을 가져올 URL 주소
-   * 자세한 설명은 [튜토리얼](/docs/loading-model) 페이지를 참조해주세요
    * @type {string | null}
    * @default null
    */
@@ -161,29 +170,30 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   /**
    * File extension format of the 3D model (glTF, glb, ...)
    * If `"auto"` is given, View3D will try to detect the format of the 3D model with the name of `src` URL
-   * @ko 3D 모델의 파일 확장자 형식 (glTF, glb, ...)
-   * 값으로 `"auto"`가 주어졌을 경우, View3D는 자동으로 확장자 추론을 시도합니다
    * @type {string}
    * @default "auto"
    */
   public get format() { return this._format; }
-  public get skybox() { return this._skybox; }
-  public get envmap() { return this._envmap; }
-  public get background() { return this._background; }
+  public get fixSkinnedBbox() { return this._fixSkinnedBbox; }
   public get fov() { return this._fov; }
   public get center() { return this._center; }
   public get yaw() { return this._yaw; }
   public get pitch() { return this._pitch; }
-  public get preset() { return this._preset; }
-  public get exposure() { return this._exposure; }
-  public get shadow() { return this._shadow; }
+  public get rotate() { return this._rotate; }
+  public get translate() { return this._translate; }
+  public get zoom() { return this._zoom; }
   public get autoplay() { return this._autoplay; }
   public get scrollable() { return this._scrollable; }
+  public get useGrabCursor() { return this._useGrabCursor; }
+  public get skybox() { return this._skybox; }
+  public get envmap() { return this._envmap; }
+  public get background() { return this._background; }
+  public get exposure() { return this._exposure; }
+  public get preset() { return this._preset; }
+  public get shadow() { return this._shadow; }
   /**
    * Call {@link View3D#init init()} automatically when creating View3D's instance
    * This option won't work if `src` is not given
-   * @ko Flicking 인스턴스를 생성할 때 자동으로 {@link Flicking#init init()}를 호출합니다
-   * 이 옵션은 `src` 값이 주어지지 않았을 경우 동작하지 않습니다
    * @type {boolean}
    * @default true
    * @readonly
@@ -191,27 +201,26 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   public get autoInit() { return this._autoInit; }
   /**
    * Whether to automatically call {@link View3D#resize resize()} when the canvas element's size is changed
-   * @ko 캔버스 엘리먼트의 크기 변경시 {@link View3D#resize resize()} 메소드를 자동으로 호출할지 여부를 설정합니다
    * @type {boolean}
    * @default true
    */
   public get autoResize() { return this._autoResize; }
   /**
-   * Whether to listen {@link https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver ResizeObserver}'s event instead of Window's {@link https://developer.mozilla.org/ko/docs/Web/API/Window/resize_event resize} event when using the `autoResize` option
-   * @ko autoResize 옵션 사용시 {@link https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver ResizeObserver}의 이벤트를 Window객체의 {@link https://developer.mozilla.org/ko/docs/Web/API/Window/resize_event resize} 이벤트 대신 수신할지 여부를 설정합니다
+   * Whether to listen {@link https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver ResizeObserver}'s event instead of Window's {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/resize_event resize} event when using the `autoResize` option
    * @type {boolean}
    * @default true
    */
   public get useResizeObserver() { return this._useResizeObserver; }
-  public get fixSkinnedBbox() { return this._fixSkinnedBbox; }
 
-  // Internal State Getter
-  public get initialized() { return this._initialized; }
+  public set useGrabCursor(val: View3DOptions["useGrabCursor"]) {
+    this._useGrabCursor = val;
+    this._control.updateCursor();
+  }
 
   /**
    * Creates new View3D instance.
-   * @param canvasEl A canvas element or selector of it to initialize View3D<ko>View3D를 초기화할 캔버스 엘리먼트 혹은 선택자</ko>
-   * @param {View3DOptions} [options={}] An options object for View3D<ko>View3D에 적용할 옵션 오브젝트</ko>
+   * @param canvasEl A canvas element or selector of it to initialize View3D
+   * @param {View3DOptions} [options={}] An options object for View3D
    * @throws {View3DError}
    * |code|condition|
    * |---|---|
@@ -219,20 +228,11 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    * |{@link ERROR_CODE ELEMENT_NOT_FOUND}|When the element with given CSS selector does not exist|
    * |{@link ERROR_CODE ELEMENT_NOT_CANVAS}|When the element given is not a \<canvas\> element|
    * |{@link ERROR_CODE WEBGL_NOT_SUPPORTED}|When the browser does not support WebGL|
-   * <ko>
-   *
-   * |code|조건|
-   * |---|---|
-   * |{@link ERROR_CODE WRONG_TYPE}|루트 엘리먼트가 string이나 HTMLElement가 아닐 경우|
-   * |{@link ERROR_CODE ELEMENT_NOT_FOUND}|주어진 CSS selector로 엘리먼트를 찾지 못했을 경우|
-   * |{@link ERROR_CODE ELEMENT_NOT_CANVAS}|주어진 엘리먼트가 캔버스 엘리먼트가 아닐 경우|
-   * |{@link ERROR_CODE WEBGL_NOT_SUPPORTED}|브라우저가 WebGL을 지원하지 않을 경우|
-   *
-   * </ko>
    */
   public constructor(canvasEl: string | HTMLElement, {
     src = null,
     format = AUTO,
+    fixSkinnedBbox = false,
     skybox = null,
     envmap = null,
     background = null,
@@ -240,11 +240,15 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     center = AUTO,
     yaw = 0,
     pitch = 0,
+    rotate = {},
+    translate = {},
+    zoom = {},
     preset = null,
     exposure = 1,
     shadow = true,
     autoplay = false,
     scrollable = false,
+    useGrabCursor = true,
     autoInit = true,
     autoResize = true
   }: Partial<View3DOptions> = {}) {
@@ -254,18 +258,26 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     // Bind options
     this._src = src;
     this._format = format;
-    this._skybox = skybox;
-    this._envmap = envmap;
-    this._background = background;
+    this._fixSkinnedBbox = fixSkinnedBbox;
+
     this._fov = fov;
     this._center = center;
     this._yaw = yaw;
     this._pitch = pitch;
-    this._preset = preset;
-    this._exposure = exposure;
-    this._shadow = shadow;
+    this._rotate = rotate;
+    this._translate = translate;
+    this._zoom = zoom;
     this._autoplay = autoplay;
     this._scrollable = scrollable;
+    this._useGrabCursor = useGrabCursor;
+
+    this._skybox = skybox;
+    this._envmap = envmap;
+    this._background = background;
+    this._exposure = exposure;
+    this._preset = preset;
+    this._shadow = shadow;
+
     this._autoInit = autoInit;
     this._autoResize = autoResize;
 
@@ -354,11 +366,9 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
 
   /**
    * Load a new 3D model and replace it with the current one
-   * @param {string} src Source URL to fetch 3D model from<ko>3D 모델을 가져올 URL 주소</ko>
+   * @param {string} src Source URL to fetch 3D model from
    * @param {string} [format="auto"] File extension format of the 3D model (glTF, glb, ...)
    * If `"auto"` is given, View3D will try to detect the format of the 3D model with the name of `src` URL
-   * <ko>3D 모델의 파일 확장자 형식 (glTF, glb, ...)
-   * 값으로 `"auto"`가 주어졌을 경우, View3D는 자동으로 확장자 추론을 시도합니다</ko>
    */
   public async load(src: string, format: View3DOptions["format"] = "auto") {
     const model = await this._loadModel(src, format);

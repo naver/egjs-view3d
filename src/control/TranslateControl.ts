@@ -11,17 +11,30 @@ import Motion from "../core/Motion";
 import * as BROWSER from "../const/browser";
 import * as DEFAULT from "../const/default";
 import { CONTROL_EVENTS } from "../const/internal";
-import { ControlEvents } from "../type/utils";
+import { ControlEvents, OptionGetters } from "../type/utils";
 
 import CameraControl from "./CameraControl";
 
 /**
+ * @interface
+ * @param {number} [scale=1] Scale factor for panning
+ * @param {number} [duration=0] Duration of the input animation (ms)
+ * @param {function} [easing=EASING.EASE_OUT_CUBIC] Easing function of the animation
+ */
+export interface TranslateControlOptions {
+  scale: number;
+  duration: number;
+  easing: (x: number) => number;
+}
+
+/**
  * Model's translation control that supports both mouse & touch
  */
-class TranslateControl extends Component<ControlEvents> implements CameraControl {
+class TranslateControl extends Component<ControlEvents> implements CameraControl, OptionGetters<TranslateControlOptions> {
   // Options
-  private _scaleToElement: boolean;
-  private _userScale: THREE.Vector2;
+  private _scale: TranslateControlOptions["scale"];
+  private _duration: TranslateControlOptions["duration"];
+  private _easing: TranslateControlOptions["easing"];
 
   // Internal values
   private _view3D: View3D;
@@ -35,72 +48,69 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
   private _screenSize: THREE.Vector2 = new THREE.Vector2(0, 0);
 
   /**
-   * Scale factor for translation
-   * @type THREE.Vector2
-   * @see https://threejs.org/docs/#api/en/math/Vector2
-   * @example
-   * ```ts
-   * import { TranslateControl } from "@egjs/view3d";
-   * const translateControl = new TranslateControl();
-   * translateControl.scale.set(2, 2);
-   * ```
-   */
-  public get scale() { return this._userScale; }
-  /**
-   * Scale control to fit element size.
-   * When this is true, camera's pivot change will correspond same amount you've dragged.
-   * @default true
-   * @example
-   * ```ts
-   * import View3D, { TranslateControl } from "@egjs/view3d";
-   * const view3d = new View3D("#view3d-canvas");
-   * const translateControl = new TranslateControl();
-   * translateControl.scaleToElement = true;
-   * view3d.controller.add(translateControl);
-   * view3d.resize();
-   * ```
-   */
-  public get scaleToElement() { return this._scaleToElement; }
-  /**
    * Whether this control is enabled or not
    * @readonly
+   * @type {boolean}
    */
   public get enabled() { return this._enabled; }
 
-  public set scale(val: THREE.Vector2) {
-    this._userScale.copy(val);
+  /**
+   * Scale factor for translation
+   * @type number
+   * @default 1
+   * @see https://threejs.org/docs/#api/en/math/Vector2
+   */
+  public get scale() { return this._scale; }
+  /**
+   * Duration of the input animation (ms)
+   * @type {number}
+   * @default 300
+   */
+  public get duration() { return this._duration; }
+  /**
+   * Easing function of the animation
+   * @type {function}
+   * @default EASING.EASE_OUT_CUBIC
+   * @see EASING
+   */
+  public get easing() { return this._easing; }
+
+  public set scale(val: TranslateControlOptions["scale"]) {
+    this._scale = val;
   }
 
-  public set scaleToElement(val: boolean) {
-    this._scaleToElement = val;
+  public set duration(val: TranslateControlOptions["duration"]) {
+    this._duration = val;
+    this._xMotion.duration = val;
+    this._yMotion.duration = val;
+  }
+
+  public set easing(val: TranslateControlOptions["easing"]) {
+    this._easing = val;
+    this._xMotion.easing = val;
+    this._yMotion.easing = val;
   }
 
   /**
    * Create new TranslateControl instance
    * @param {View3D} view3D An instance of View3D
-   * @param {object} options Options
-   * @param {function} [options.easing=(x: number) => 1 - Math.pow(1 - x, 3)] Motion's easing function.
-   * @param {THREE.Vector2} [options.scale=new THREE.Vector2(1, 1)] Scale factor for translation.
-   * @param {boolean} [options.useGrabCursor=true] Whether to apply CSS style `cursor: grab` on the target element or not.
-   * @param {boolean} [options.scaleToElement=true] Whether to scale control to fit element size.
+   * @param {TranslateControlOptions} options Options
    */
   public constructor(view3D: View3D, {
     easing = DEFAULT.EASING,
-    scale = new THREE.Vector2(1, 1),
-    scaleToElement = true
-  } = {}) {
+    duration = 0,
+    scale = 1
+  }: Partial<TranslateControlOptions> = {}) {
     super();
 
     this._view3D = view3D;
-    this._xMotion = new Motion({ duration: 0, range: DEFAULT.INFINITE_RANGE, easing });
-    this._yMotion = new Motion({ duration: 0, range: DEFAULT.INFINITE_RANGE, easing });
-    this._userScale = scale;
-    this._scaleToElement = scaleToElement;
+    this._xMotion = new Motion({ duration, range: DEFAULT.INFINITE_RANGE, easing });
+    this._yMotion = new Motion({ duration, range: DEFAULT.INFINITE_RANGE, easing });
+    this._scale = scale;
   }
 
   /**
    * Destroy the instance and remove all event listeners attached
-   * This also will reset CSS cursor to intial
    * @returns {void}
    */
   public destroy(): void {
@@ -124,10 +134,8 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
     const viewXDir = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.threeCamera.quaternion);
     const viewYDir = new THREE.Vector3(0, 1, 0).applyQuaternion(camera.threeCamera.quaternion);
 
-    if (this._scaleToElement) {
-      const screenScale = new THREE.Vector2(camera.renderWidth, camera.renderHeight).divide(screenSize);
-      delta.multiply(screenScale);
-    }
+    const screenScale = new THREE.Vector2(camera.renderWidth, camera.renderHeight).divide(screenSize);
+    delta.multiply(screenScale);
 
     camera.pivot.add(viewXDir.multiplyScalar(delta.x));
     camera.pivot.add(viewYDir.multiplyScalar(delta.y));
@@ -135,7 +143,6 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
 
   /**
    * Resize control to match target size
-   * This method is only meaningful when {@link RotateControl#scaleToElementSize scaleToElementSize} is enabled
    * @param {object} size New size to apply
    * @param {number} [size.width] New width
    * @param {number} [size.height] New height
@@ -226,7 +233,7 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
     const prevPos = this._prevPos;
     const delta = new THREE.Vector2(evt.clientX, evt.clientY)
       .sub(prevPos)
-      .multiply(this._userScale);
+      .multiplyScalar(this._scale);
 
     // X value is negated to match cursor direction
     this._xMotion.setEndDelta(-delta.x);
@@ -272,7 +279,7 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
 
     const delta = new THREE.Vector2()
       .subVectors(middlePoint, prevPos)
-      .multiply(this._userScale);
+      .multiplyScalar(this._scale);
 
     // X value is negated to match cursor direction
     this._xMotion.setEndDelta(-delta.x);

@@ -11,17 +11,30 @@ import Motion from "../core/Motion";
 import * as BROWSER from "../const/browser";
 import * as DEFAULT from "../const/default";
 import { CONTROL_EVENTS } from "../const/internal";
-import { ControlEvents } from "../type/utils";
+import { ControlEvents, OptionGetters } from "../type/utils";
 
 import CameraControl from "./CameraControl";
 
 /**
+ * @interface
+ * @param {number} [scale=1] Scale factor for rotation
+ * @param {number} [duration=300] Duration of the input animation (ms)
+ * @param {function} [easing=EASING.EASE_OUT_CUBIC] Easing function of the animation
+ */
+export interface RotateControlOptions {
+  scale: number;
+  duration: number;
+  easing: (x: number) => number;
+}
+
+/**
  * Model's rotation control that supports both mouse & touch
  */
-class RotateControl extends Component<ControlEvents> implements CameraControl {
+class RotateControl extends Component<ControlEvents> implements CameraControl, OptionGetters<RotateControlOptions> {
   // Options
-  private _scaleToElement: boolean;
-  private _userScale: THREE.Vector2;
+  private _scale: RotateControlOptions["scale"];
+  private _duration: RotateControlOptions["duration"];
+  private _easing: RotateControlOptions["easing"];
 
   // Internal values
   private _view3D: View3D;
@@ -32,74 +45,71 @@ class RotateControl extends Component<ControlEvents> implements CameraControl {
   private _enabled: boolean = false;
 
   /**
-   * Scale factor for panning, x is for horizontal and y is for vertical panning.
-   * @type THREE.Vector2
-   * @see https://threejs.org/docs/#api/en/math/Vector2
-   * @example
-   * ```ts
-   * const rotateControl = new View3D.RotateControl();
-   * rotateControl.scale.setX(2);
-   * ```
-   */
-  public get scale() { return this._userScale; }
-  /**
-   * Whether to scale control to fit element size.
-   * When this is true and {@link RotateControl#scale scale.x} is 1, panning through element's width will make 3d model's yaw rotate 360°.
-   * When this is true and {@link RotateControl#scale scale.y} is 1, panning through element's height will make 3d model's pitch rotate 180°.
-   * @default true
-   * @example
-   * ```ts
-   * import View3D, { RotateControl } from "@egjs/view3d";
-   * const view3d = new View3D("#view3d-canvas");
-   * const rotateControl = new RotateControl();
-   * rotateControl.scaleToElement = true;
-   * view3d.controller.add(rotateControl);
-   * view3d.resize();
-   * ```
-   */
-  public get scaleToElement() { return this._scaleToElement; }
-  /**
    * Whether this control is enabled or not
    * @readonly
+   * @type {boolean}
    */
   public get enabled() { return this._enabled; }
 
-  public set scale(val: THREE.Vector2) {
-    this._userScale.copy(val);
+  /**
+   * Scale factor for rotation
+   * @type {number}
+   * @default 1
+   */
+  public get scale() { return this._scale; }
+  /**
+   * Duration of the input animation (ms)
+   * @type {number}
+   * @default 300
+   */
+  public get duration() { return this._duration; }
+  /**
+   * Easing function of the animation
+   * @type {function}
+   * @default EASING.EASE_OUT_CUBIC
+   * @see EASING
+   */
+  public get easing() { return this._easing; }
+
+  public set scale(val: RotateControlOptions["scale"]) {
+    this._scale = val;
   }
 
-  public set scaleToElement(val: boolean) {
-    this._scaleToElement = val;
+  public set duration(val: RotateControlOptions["duration"]) {
+    this._duration = val;
+    this._xMotion.duration = val;
+    this._yMotion.duration = val;
+  }
+
+  public set easing(val: RotateControlOptions["easing"]) {
+    this._easing = val;
+    this._xMotion.easing = val;
+    this._yMotion.easing = val;
   }
 
   /**
    * Create new RotateControl instance
    * @param {View3D} view3D An instance of View3D
-   * @param {object} options Options
-   * @param {number} [options.duration=500] Motion's duration
-   * @param {function} [options.easing=(x: number) => 1 - Math.pow(1 - x, 3)] Motion's easing function
-   * @param {THREE.Vector2} [options.scale=new THREE.Vector2(1, 1)] Scale factor for panning, x is for horizontal and y is for vertical panning
-   * @param {boolean} [options.useGrabCursor=true] Whether to apply CSS style `cursor: grab` on the target element or not
-   * @param {boolean} [options.scaleToElement=true] Whether to scale control to fit element size
+   * @param {RotateControlOptions} options Options
    */
   public constructor(view3D: View3D, {
     duration = DEFAULT.ANIMATION_DURATION,
     easing = DEFAULT.EASING,
-    scale = new THREE.Vector2(1, 1),
-    scaleToElement = true
-  } = {}) {
+    scale = 1
+  }: Partial<RotateControlOptions> = {}) {
     super();
 
     this._view3D = view3D;
-    this._userScale = scale;
-    this._scaleToElement = scaleToElement;
+    this._scale = scale;
+    this._duration = duration;
+    this._easing = easing;
+
     this._xMotion = new Motion({ duration, range: DEFAULT.INFINITE_RANGE, easing });
     this._yMotion = new Motion({ duration, range: DEFAULT.PITCH_RANGE, easing });
   }
 
   /**
    * Destroy the instance and remove all event listeners attached
-   * This also will reset CSS cursor to intial
    * @returns {void}
    */
   public destroy(): void {
@@ -108,7 +118,6 @@ class RotateControl extends Component<ControlEvents> implements CameraControl {
 
   /**
    * Update control by given deltaTime
-   * @param camera Camera to update position
    * @param deltaTime Number of milisec to update
    * @returns {void}
    */
@@ -128,7 +137,6 @@ class RotateControl extends Component<ControlEvents> implements CameraControl {
 
   /**
    * Resize control to match target size
-   * This method is only meaningful when {@link RotateControl#scaleToElement scaleToElement} is enabled
    * @param {object} size New size to apply
    * @param {number} [size.width] New width
    * @param {number} [size.height] New height
@@ -182,7 +190,6 @@ class RotateControl extends Component<ControlEvents> implements CameraControl {
 
   /**
    * Synchronize this control's state to given camera position
-   * @param camera Camera to match state
    * @returns {void}
    */
   public sync(): void {
@@ -217,11 +224,9 @@ class RotateControl extends Component<ControlEvents> implements CameraControl {
     const prevPos = this._prevPos;
     const rotateDelta = new THREE.Vector2(evt.clientX, evt.clientY)
       .sub(prevPos)
-      .multiply(this._userScale);
+      .multiplyScalar(this._scale);
 
-    if (this._scaleToElement) {
-      rotateDelta.multiply(this._screenScale);
-    }
+    rotateDelta.multiply(this._screenScale);
 
     this._xMotion.setEndDelta(rotateDelta.x);
     this._yMotion.setEndDelta(rotateDelta.y);
@@ -267,11 +272,9 @@ class RotateControl extends Component<ControlEvents> implements CameraControl {
     const prevPos = this._prevPos;
     const rotateDelta = new THREE.Vector2(touch.clientX, touch.clientY)
       .sub(prevPos)
-      .multiply(this._userScale);
+      .multiplyScalar(this._scale);
 
-    if (this._scaleToElement) {
-      rotateDelta.multiply(this._screenScale);
-    }
+    rotateDelta.multiply(this._screenScale);
 
     this._xMotion.setEndDelta(rotateDelta.x);
     this._yMotion.setEndDelta(rotateDelta.y);

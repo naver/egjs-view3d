@@ -13,38 +13,15 @@ import TranslateControl from "./TranslateControl";
 import ZoomControl from "./ZoomControl";
 
 /**
- * @interface
- */
-interface OrbitControlOptions {
-  useGrabCursor: boolean;
-  rotate: ConstructorParameters<typeof RotateControl>[1];
-  translate: ConstructorParameters<typeof TranslateControl>[1];
-  zoom: ConstructorParameters<typeof ZoomControl>[1];
-}
-
-/**
  * Aggregation of {@link RotateControl}, {@link TranslateControl}, and {@link DistanceControl}.
  */
 class OrbitControl {
-  // Options
-  private _useGrabCursor: boolean;
-
   // Internal Values
   private _view3D: View3D;
   private _rotateControl: RotateControl;
   private _translateControl: TranslateControl;
   private _zoomControl: ZoomControl;
 
-  // Options Getter
-  /**
-   * Whether to apply CSS style `cursor: grab` on the target element or not
-   * @default true
-   * @example
-   * ```ts
-   * view3d.control.useGrabCursor = false;
-   * ```
-   */
-  public get useGrabCursor() { return this._useGrabCursor; }
 
   // Internal Values Getter
   /**
@@ -60,38 +37,16 @@ class OrbitControl {
    */
   public get zoom() { return this._zoomControl; }
 
-  // Options setter
-  public set useGrabCursor(val: boolean) {
-    if (!val) {
-      this._setCursor(CURSOR.NONE);
-      this._useGrabCursor = false;
-    } else {
-      this._useGrabCursor = true;
-      this._setCursor(CURSOR.GRAB);
-    }
-  }
-
   /**
    * Create new OrbitControl instance
    * @param {View3D} view3D An instance of View3D
-   * @param {object} [options={}] Options
-   * @param {object} [options.useGrabCursor=true] Whether to apply CSS style `cursor: grab` on the canvas element or not
-   * @param {object} [options.rotate={}] Constructor options of {@link RotateControl}
-   * @param {object} [options.translate={}] Constructor options of {@link TranslateControl}
-   * @param {object} [options.zoom={}] Constructor options of {@link ZoomControl}
    */
-  public constructor(view3D: View3D, {
-    useGrabCursor = true,
-    rotate = {},
-    translate = {},
-    zoom = {}
-  }: Partial<OrbitControlOptions> = {}) {
+  public constructor(view3D: View3D) {
     this._view3D = view3D;
 
-    this._useGrabCursor = useGrabCursor;
-    this._rotateControl = new RotateControl(view3D, rotate);
-    this._translateControl = new TranslateControl(view3D, translate);
-    this._zoomControl = new ZoomControl(view3D, zoom);
+    this._rotateControl = new RotateControl(view3D, view3D.rotate);
+    this._translateControl = new TranslateControl(view3D, view3D.translate);
+    this._zoomControl = new ZoomControl(view3D, view3D.zoom);
 
     [this._rotateControl, this._translateControl].forEach(control => {
       control.on({
@@ -130,8 +85,9 @@ class OrbitControl {
    * @param {object} size New size to apply
    * @param {number} [size.width] New width
    * @param {number} [size.height] New height
+   * @returns {void}
    */
-  public resize(size: { width: number; height: number }) {
+  public resize(size: { width: number; height: number }): void {
     this._rotateControl.resize(size);
     this._translateControl.resize(size);
     this._zoomControl.resize(size);
@@ -150,7 +106,8 @@ class OrbitControl {
     if (!view3D.scrollable) {
       this._zoomControl.enable();
     } else {
-      view3D.renderer.canvas.style.touchAction = "pan-y";
+      const canvas = view3D.renderer.canvas;
+      canvas.style.touchAction = "pan-y";
     }
   }
 
@@ -174,17 +131,30 @@ class OrbitControl {
     this._zoomControl.sync();
   }
 
-  private _setCursor(val: ValueOf<typeof CURSOR>) {
-    if (!this._useGrabCursor) return;
+  /**
+   * Update cursor to current option
+   * @returns {void}
+   */
+  public updateCursor(): void {
+    const cursor = this._view3D.useGrabCursor ? CURSOR.GRAB : CURSOR.NONE;
 
-    const targetEl = this._view3D.renderer.canvas;
-    targetEl.style.cursor = val;
+    this._setCursor(cursor);
+  }
+
+  private _setCursor(newCursor: ValueOf<typeof CURSOR>) {
+    const view3D = this._view3D;
+
+    if (!view3D.useGrabCursor && newCursor !== CURSOR.NONE) return;
+
+    const targetEl = view3D.renderer.canvas;
+    targetEl.style.cursor = newCursor;
   }
 
   private _onEnable = () => {
-    const canvas = this._view3D.renderer.canvas;
+    const view3D = this._view3D;
+    const canvas = view3D.renderer.canvas;
 
-    const shouldSetGrabCursor = this._useGrabCursor
+    const shouldSetGrabCursor = view3D.useGrabCursor
       && (this._rotateControl.enabled || this._translateControl.enabled)
       && canvas.style.cursor === CURSOR.NONE;
 
@@ -205,7 +175,7 @@ class OrbitControl {
   };
 
   private _onHold = () => {
-    const grabCursorEnabled = this._useGrabCursor
+    const grabCursorEnabled = this._view3D.useGrabCursor
       && (this._rotateControl.enabled || this._translateControl.enabled);
 
     if (grabCursorEnabled) {
@@ -214,7 +184,7 @@ class OrbitControl {
   };
 
   private _onRelease = () => {
-    const grabCursorEnabled = this._useGrabCursor
+    const grabCursorEnabled = this._view3D.useGrabCursor
       && (this._rotateControl.enabled || this._translateControl.enabled);
 
     if (grabCursorEnabled) {

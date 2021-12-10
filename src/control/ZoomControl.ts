@@ -9,59 +9,119 @@ import View3D from "../View3D";
 import Motion from "../core/Motion";
 import * as BROWSER from "../const/browser";
 import * as DEFAULT from "../const/default";
+import { AUTO } from "../const/external";
+import { OptionGetters, Range } from "../type/utils";
 
 import CameraControl from "./CameraControl";
 
 /**
- * Distance controller handling both mouse wheel and pinch zoom
+ * @interface
+ * @param {number} [scale=1] Scale factor for panning
+ * @param {number} [duration=300] Duration of the input animation (ms)
+ * @param {number} [minFov=1] Minimum vertical fov(field of view).
+ * You can get a bigger image with the smaller value of this.
+ * @param {number} [maxFov="auto"] Maximum vertical fov(field of view).
+ * You can get a smaller image with the bigger value of this.
+ * If `"auto"` is given, it will use Math.min(default fov + 45, 175).
+ * @param {function} [easing=EASING.EASE_OUT_CUBIC] Easing function of the animation
  */
-class ZoomControl implements CameraControl {
+export interface ZoomControlOptions {
+  scale: number;
+  duration: number;
+  minFov: number;
+  maxFov: typeof AUTO | number;
+  easing: (x: number) => number;
+}
+
+/**
+ * Distance controller handling both mouse wheel and pinch zoom(fov)
+ */
+class ZoomControl implements CameraControl, OptionGetters<ZoomControlOptions> {
   // Options
-  private _scale: number;
+  private _scale: ZoomControlOptions["scale"];
+  private _duration: ZoomControlOptions["duration"];
+  private _minFov: ZoomControlOptions["minFov"];
+  private _maxFov: ZoomControlOptions["maxFov"];
+  private _easing: ZoomControlOptions["easing"];
 
   // Internal values
   private _view3D: View3D;
+  private _range: Range;
   private _scaleModifier: number = 0.02;
   private _motion: Motion;
   private _prevTouchDistance: number = -1;
   private _enabled: boolean = false;
 
   /**
-   * Scale factor of the zoom
-   * @type number
-   * @example
-   * ```ts
-   * view3D.control.zoom.scale = 2;
-   * ```
-   */
-  public get scale() { return this._scale; }
-  /**
    * Whether this control is enabled or not
    * @readonly
    */
   public get enabled() { return this._enabled; }
+
+  /**
+   * Actual fov range
+   * @readonly
+   */
+  public get range() { return this._range; }
+
+  /**
+   * Scale factor of the zoom
+   * @type number
+   * @default 1
+   */
+  public get scale() { return this._scale; }
+  /**
+   * Duration of the input animation (ms)
+   * @type {number}
+   * @default 300
+   */
+  public get duration() { return this._duration; }
+  /**
+   * Minimum vertical fov(field of view).
+   * You can get a bigger image with the smaller value of this.
+   * @type {number}
+   * @default 1
+   */
+  public get minFov() { return this._minFov; }
+  /**
+   * Maximum vertical fov(field of view).
+   * You can get a smaller image with the bigger value of this.
+   * If `"auto"` is given, it will use Math.min(default fov + 45, 175).
+   * @type {"auto" | number}
+   * @default "auto"
+   */
+  public get maxFov() { return this._maxFov; }
+  /**
+   * Easing function of the animation
+   * @type {function}
+   * @default EASING.EASE_OUT_CUBIC
+   * @see EASING
+   */
+  public get easing() { return this._easing; }
 
   public set scale(val: number) { this._scale = val; }
 
   /**
    * Create new ZoomControl instance
    * @param {View3D} view3D An instance of View3D
-   * @param {object} options Options
-   * @param {HTMLElement | string | null} [options.element=null] Attaching element / selector of the element.
-   * @param {number} [options.scale=1] Motion's scale.
-   * @param {number} [options.duration=500] Motion's duration.
-   * @param {object} [options.range={min: 0, max: 0}] Motion's range.
-   * @param {function} [options.easing=(x: number) => 1 - Math.pow(1 - x, 3)] Motion's easing function.
+   * @param {ZoomControlOptions} options Options
    */
   public constructor(view3D: View3D, {
     scale = 1,
     duration = DEFAULT.ANIMATION_DURATION,
-    range = { min: -15, max: 45 },
+    minFov = 1,
+    maxFov = AUTO,
     easing = DEFAULT.EASING
-  } = {}) {
+  }: Partial<ZoomControlOptions> = {}) {
     this._view3D = view3D;
     this._scale = scale;
-    this._motion = new Motion({ duration, range, easing });
+    this._duration = duration;
+    this._minFov = minFov;
+    this._maxFov = maxFov;
+    this._easing = easing;
+
+    this._range = { min: minFov, max: maxFov === AUTO ? 180 : maxFov };
+    this._motion = new Motion({ duration, easing });
   }
 
   /**
@@ -83,10 +143,6 @@ class ZoomControl implements CameraControl {
     const motion = this._motion;
 
     camera.zoom -= motion.update(deltaTime);
-  }
-
-  public updateScaleModifier(defaultDist: number, minDist: number) {
-    this._scaleModifier = (defaultDist - minDist) / 500;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -137,6 +193,25 @@ class ZoomControl implements CameraControl {
     const camera = this._view3D.camera;
 
     this._motion.reset(camera.zoom);
+  }
+
+  /**
+   * Update fov range by the camera's current fov value
+   * @returns {void}
+   */
+  public updateRange(): void {
+    const max = this._maxFov;
+    const range = this._range;
+    const motion = this._motion;
+    const { camera } = this._view3D;
+    const baseFov = camera.baseFov;
+
+    if (max === AUTO) {
+      range.max = Math.min(baseFov + 45, 175);
+    }
+
+    motion.range.min = range.min - baseFov;
+    motion.range.max = range.max - baseFov;
   }
 
   private _onWheel = (evt: WheelEvent) => {

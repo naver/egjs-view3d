@@ -101,7 +101,7 @@ class GLTFLoader {
         const fileName = (fileNameResult && fileNameResult[0]) || "";
 
         if (filesMap.has(fileName)) {
-          const blob = filesMap.get(fileName);
+          const blob = filesMap.get(fileName)!;
           const blobURL = URL.createObjectURL(blob);
           objectURLs.push(blobURL);
 
