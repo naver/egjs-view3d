@@ -30,12 +30,12 @@ export interface LoadEvent {
 
 /**
  * An event that fires when the 3D Model is loaded and displayed on the canvas
- * @event View3D#display
+ * @event View3D#modelChange
  * @type {object}
  * @property {View3D} target A View3D instance that triggered this event
  * @property {Model} model A new model that displayed
  */
-export interface DisplayEvent {
+export interface ModelChangeEvent {
   target: View3D;
   model: Model;
 }

@@ -6,6 +6,7 @@
 import View3D from "../View3D";
 import { CURSOR } from "../const/css";
 import { CONTROL_EVENTS } from "../const/internal";
+import { getObjectOption } from "../utils";
 import { ValueOf } from "../type/utils";
 
 import RotateControl from "./RotateControl";
@@ -13,7 +14,7 @@ import TranslateControl from "./TranslateControl";
 import ZoomControl from "./ZoomControl";
 
 /**
- * Aggregation of {@link RotateControl}, {@link TranslateControl}, and {@link DistanceControl}.
+ * Aggregation of {@link RotateControl}, {@link TranslateControl}, and {@link ZoomControl}.
  */
 class OrbitControl {
   // Internal Values
@@ -44,9 +45,9 @@ class OrbitControl {
   public constructor(view3D: View3D) {
     this._view3D = view3D;
 
-    this._rotateControl = new RotateControl(view3D, view3D.rotate);
-    this._translateControl = new TranslateControl(view3D, view3D.translate);
-    this._zoomControl = new ZoomControl(view3D, view3D.zoom);
+    this._rotateControl = new RotateControl(view3D, getObjectOption(view3D.rotate));
+    this._translateControl = new TranslateControl(view3D, getObjectOption(view3D.translate));
+    this._zoomControl = new ZoomControl(view3D, getObjectOption(view3D.zoom));
 
     [this._rotateControl, this._translateControl].forEach(control => {
       control.on({
@@ -100,10 +101,15 @@ class OrbitControl {
   public enable(): void {
     const view3D = this._view3D;
 
-    this._rotateControl.enable();
-    this._translateControl.enable();
+    if (view3D.rotate) {
+      this._rotateControl.enable();
+    }
 
-    if (!view3D.scrollable) {
+    if (view3D.translate) {
+      this._translateControl.enable();
+    }
+
+    if (view3D.zoom && !view3D.scrollable) {
       this._zoomControl.enable();
     } else {
       const canvas = view3D.renderer.canvas;

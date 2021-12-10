@@ -5,14 +5,12 @@
 
 import View3D, { View3DOptions, View3DEvents } from "./View3D";
 
-export * from "./type/external";
 export * from "./core";
 export * from "./control";
 export * from "./loaders";
 export * from "./extra";
 export * from "./preset";
 export * from "./const/external";
-export * from "./type/external";
 
 export type {
   View3DOptions,

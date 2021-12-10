@@ -29,7 +29,7 @@ import { LiteralUnion, OptionGetters } from "./type/utils";
 export interface View3DEvents {
   [EVENTS.READY]: EVENT_TYPES.ReadyEvent;
   [EVENTS.LOAD]: EVENT_TYPES.LoadEvent;
-  [EVENTS.DISPLAY]: EVENT_TYPES.DisplayEvent;
+  [EVENTS.MODEL_CHANGE]: EVENT_TYPES.ModelChangeEvent;
   [EVENTS.RESIZE]: EVENT_TYPES.ResizeEvent;
   [EVENTS.PROGRESS]: EVENT_TYPES.LoadProgressEvent;
   [EVENTS.BEFORE_RENDER]: EVENT_TYPES.BeforeRenderEvent;
@@ -51,9 +51,9 @@ export interface View3DOptions {
   center: typeof AUTO | number[];
   yaw: number;
   pitch: number;
-  rotate: Partial<RotateControlOptions>;
-  translate: Partial<TranslateControlOptions>;
-  zoom: Partial<ZoomControlOptions>;
+  rotate: boolean | Partial<RotateControlOptions>;
+  translate: boolean | Partial<TranslateControlOptions>;
+  zoom: boolean | Partial<ZoomControlOptions>;
   autoplay: boolean | Partial<AutoplayOptions>;
   scrollable: boolean;
   useGrabCursor: boolean;
@@ -100,6 +100,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   // Options
   private _src: View3DOptions["src"];
   private _format: View3DOptions["format"];
+  private _fixSkinnedBbox: View3DOptions["fixSkinnedBbox"];
 
   private _fov: View3DOptions["fov"];
   private _center: View3DOptions["center"];
@@ -122,7 +123,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   private _autoInit: View3DOptions["autoInit"];
   private _autoResize: View3DOptions["autoResize"];
   private _useResizeObserver: View3DOptions["useResizeObserver"];
-  private _fixSkinnedBbox: View3DOptions["fixSkinnedBbox"];
 
   // Internal Components Getter
   /**
@@ -446,7 +446,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     renderer.stopAnimationLoop();
     renderer.setAnimationLoop(this.renderLoop);
 
-    this.trigger(EVENTS.DISPLAY, {
+    this.trigger(EVENTS.MODEL_CHANGE, {
       target: this,
       model
     });

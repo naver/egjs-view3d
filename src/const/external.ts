@@ -25,7 +25,7 @@ export const AUTO = "auto";
 export const EVENTS = {
   READY: "ready",
   LOAD: "load",
-  DISPLAY: "display",
+  MODEL_CHANGE: "modelChange",
   RESIZE: "resize",
   BEFORE_RENDER: "beforeRender",
   RENDER: "render",

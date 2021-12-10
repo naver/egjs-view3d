@@ -5,3 +5,5 @@
 - License: CC0 (public domain)
 
 [DragonAttenuation](https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/DragonAttenuation)
+
+"Tyrannosaurus Rex 2.0" (https://skfb.ly/o7NK9) by TStevenz is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
