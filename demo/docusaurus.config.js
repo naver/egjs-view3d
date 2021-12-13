@@ -73,8 +73,20 @@ const config = {
           },
           {
             type: "doc",
+            docId: "events/ready",
+            label: "Events",
+            position: "left"
+          },
+          {
+            type: "doc",
             docId: "advanced/Preset",
             label: "Advanced",
+            position: "left"
+          },
+          {
+            type: "doc",
+            docId: "ar/WebXR",
+            label: "AR",
             position: "left"
           },
           {
@@ -105,17 +117,30 @@ const config = {
               },
               {
                 label: "Options",
-                to: "Options/"
+                to: "docs/options/sources/src"
+              },
+              {
+                label: "Advanced",
+                to: "docs/advanced/Preset"
+              },
+              {
+                label: "Events",
+                to: "docs/events/ready"
+              }
+            ]
+          },
+          {
+            title: "AR",
+            items: [
+              {
+                label: "WebXR",
+                to: "docs/ar/WebXR"
               }
             ]
           },
           {
             title: "Demo",
             items: [
-              {
-                label: "Demos",
-                to: "Demos/"
-              },
               {
                 label: "Playground",
                 to: "Playground/"

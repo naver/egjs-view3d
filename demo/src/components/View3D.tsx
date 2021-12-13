@@ -1,13 +1,32 @@
 import React from "react";
 import * as THREE from "three";
 import VanillaView3D, { View3DOptions } from "../../../src";
+import ARButton from "./ARButton";
 
-class View3D extends React.Component<{ showBbox: boolean } & Partial<View3DOptions>> {
+interface DemoOptions extends Partial<View3DOptions> {
+  showARButton: boolean;
+  showBbox: boolean;
+}
+
+class View3D extends React.Component<DemoOptions, { arAvailable: boolean }> {
+  public static defaultProps: DemoOptions = {
+    showARButton: false,
+    showBbox: false,
+    dracoPath: "/lib/draco/"
+  };
+
   private _view3d: VanillaView3D;
   private _canvasRef = React.createRef<HTMLCanvasElement>();
+  private _arButtonRef = React.createRef<HTMLButtonElement>();
+
+  public constructor(props: DemoOptions) {
+    super(props);
+
+    this.state = { arAvailable: false };
+  }
 
   public componentDidMount() {
-    const { children, showBbox, ...restProps } = this.props;
+    const { children, showBbox, showARButton, ...restProps } = this.props;
     const view3d = new VanillaView3D(this._canvasRef.current, restProps);
 
     this._view3d = view3d;
@@ -18,6 +37,16 @@ class View3D extends React.Component<{ showBbox: boolean } & Partial<View3DOptio
         view3d.scene.add(new THREE.Box3Helper(modelBbox, new THREE.Color(0x00ffff)));
       });
     }
+
+    if (showARButton) {
+      void view3d.ar.isAvailable().then(available => {
+        this._arButtonRef.current.addEventListener("click", () => {
+          void view3d.ar.enter();
+        });
+
+        this.setState({ arAvailable: available });
+      });
+    }
   }
 
   public componentWillUnmount() {
@@ -25,9 +54,13 @@ class View3D extends React.Component<{ showBbox: boolean } & Partial<View3DOptio
   }
 
   public render() {
+    const { showARButton, children } = this.props;
+    const { arAvailable } = this.state;
+
     return <div className="view3d-canvas-wrapper image is-square mb-2">
       <canvas ref={this._canvasRef} className="view3d-canvas"></canvas>
-      { this.props.children }
+      { showARButton && <ARButton buttonRef={this._arButtonRef} disabled={!arAvailable} />}
+      { children }
     </div>;
   }
 }

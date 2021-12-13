@@ -3,16 +3,16 @@
  * egjs projects are licensed under the MIT license
  */
 
-import { IS_IOS, IS_SAFARI } from "../../src/consts/browser";
-import { QUICKLOOK_SUPPORTED } from "../../src/consts/xr";
+import { IS_IOS, IS_SAFARI } from "../const/browser";
+import { QUICKLOOK_SUPPORTED } from "../const/xr";
 
-import XRSession from "./XRSession";
+import ARSession from "./ARSession";
 
 /**
  * AR Session using Apple AR Quick Look Viewer
  * @see https://developer.apple.com/augmented-reality/quick-look/
  */
-class QuickLookSession implements XRSession {
+class QuickLookSession implements ARSession {
   /**
    * Whether it's webxr-based session or not
    * @type false

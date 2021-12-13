@@ -5,23 +5,23 @@
 
 import * as THREE from "three";
 
-import ARWallControl, { ARWallControlOption } from "../../src/controls/ar/wall/ARWallControl";
-import Animation from "../../src/core/Animation";
-import { merge } from "../../src/utils";
-import * as XR from "../../src/consts/xr";
-import { XRRenderContext, XRContext } from "../../src/type/internal";
+import ARWallControl, { ARWallControlOption } from "../control/ar/wall/ARWallControl";
+import Animation from "../core/Animation";
+import { merge } from "../utils";
+import * as XR from "../const/xr";
+import { XRRenderContext, XRContext } from "../type/xr";
 
-import WebARSession, { WebARSessionOption } from "./WebARSession";
+import WebARSession, { WebARSessionOptions } from "./WebARSession";
 import HitTest from "./features/HitTest";
 
 /**
  * Options for {@link WallARSession}.
- * This type is intersection of {@link WebARSessionOption} and {@link ARWallControlOption}
+ * This type is intersection of {@link WebARSessionOptions} and {@link ARWallControlOption}
  * @interface
- * @extends WebARSessionOption
+ * @extends WebARSessionOptions
  * @extends ARWallControlOption
  */
-interface WallARSessionOption extends WebARSessionOption, ARWallControlOption {}
+interface WallARSessionOption extends WebARSessionOptions, ARWallControlOption {}
 
 /**
  * AR session which places model on the wall
@@ -122,8 +122,11 @@ class WallARSession extends WebARSession {
     const modelRoot = model.scene;
     const hitRotation = new THREE.Quaternion().copy(hitPose.transform.orientation);
     const hitPosition = new THREE.Vector3().setFromMatrixPosition(hitMatrix);
-    const modelZOffset = -model.initialBbox.min.z * modelRoot.scale.z;
-    const modelPosition = hitPosition.clone().setZ(hitPosition.z + modelZOffset);
+
+    // FIXME:
+    // const modelZOffset = -model.initialBbox.min.z * modelRoot.scale.z;
+    // const modelPosition = hitPosition.clone().setZ(hitPosition.z + modelZOffset);
+    const modelPosition = new THREE.Vector3();
 
     const worldYAxis = new THREE.Vector3(0, 1, 0);
     /*
@@ -144,10 +147,11 @@ class WallARSession extends WebARSession {
 
     // Update rotation & position
     modelRoot.quaternion.copy(modelRotation);
-    modelRoot.position.copy(modelPosition);
+    // modelRoot.position.copy(modelPosition);
     modelRoot.updateMatrix();
 
-    view3d.scene.update(model);
+    // FIXME:
+    // view3d.scene.update(model);
     view3d.scene.show();
 
     // Don't need it

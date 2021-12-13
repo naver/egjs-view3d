@@ -11,6 +11,7 @@ import AutoResizer from "./core/AutoResizer";
 import ModelLoader from "./core/ModelLoader";
 import Model from "./core/Model";
 import ModelAnimator from "./core/ModelAnimator";
+import ARManager from "./core/ARManager";
 import Preset from "./preset/Preset";
 import OrbitControl from "./control/OrbitControl";
 import { RotateControlOptions } from "./control/RotateControl";
@@ -19,9 +20,11 @@ import { ZoomControlOptions } from "./control/ZoomControl";
 import AutoControl, { AutoplayOptions } from "./control/AutoControl";
 import { ShadowOptions } from "./core/ShadowPlane";
 import { EVENTS, AUTO } from "./const/external";
+import * as DEFAULT from "./const/default";
 import * as EVENT_TYPES from "./type/event";
 import { getCanvas, getObjectOption } from "./utils";
 import { LiteralUnion, OptionGetters } from "./type/utils";
+import { SceneViewerSessionOptions } from "./xr/SceneViewerSession";
 
 /**
  * @interface
@@ -44,6 +47,7 @@ export interface View3DOptions {
   // Model
   src: string | null;
   format: LiteralUnion<typeof AUTO, string>;
+  dracoPath: string;
   fixSkinnedBbox: boolean;
 
   // Control
@@ -65,6 +69,9 @@ export interface View3DOptions {
   exposure: number;
   preset: Preset | null;
   shadow: boolean | Partial<ShadowOptions>;
+
+  // AR
+  sceneViewer: boolean | Partial<SceneViewerSessionOptions>;
 
   // Others
   autoInit: boolean;
@@ -93,6 +100,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   private _model: Model | null;
   private _animator: ModelAnimator;
   private _autoResizer: AutoResizer;
+  private _arManager: ARManager;
 
   // Internal States
   private _initialized: boolean;
@@ -100,6 +108,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   // Options
   private _src: View3DOptions["src"];
   private _format: View3DOptions["format"];
+  private _dracoPath: View3DOptions["dracoPath"];
   private _fixSkinnedBbox: View3DOptions["fixSkinnedBbox"];
 
   private _fov: View3DOptions["fov"];
@@ -128,33 +137,45 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   /**
    * {@link Renderer} instance of the View3D
    * @type {Renderer}
+   * @readonly
    */
   public get renderer() { return this._renderer; }
   /**
    * {@link Scene} instance of the View3D
    * @type {Scene}
+   * @readonly
    */
   public get scene() { return this._scene; }
   /**
    * {@link Camera} instance of the View3D
    * @type {Camera}
+   * @readonly
    */
   public get camera() { return this._camera; }
   /**
    * {@link OrbitControl} instance of the View3D
    * @type {OrbitControl}
+   * @readonly
    */
   public get control() { return this._control; }
   /**
    * Current {@link Model} displaying. `null` if nothing is displayed on the canvas.
    * @type {Model | null}
+   * @readonly
    */
   public get model() { return this._model; }
   /**
    * {@link ModelAnimator} instance of the View3D
    * @type {ModelAnimator}
+   * @readonly
    */
   public get animator() { return this._animator; }
+  /**
+   * {@link ARManager} instance of the View3D
+   * @type {ARManager}
+   * @readonly
+   */
+  public get ar() { return this._arManager; }
 
   // Internal State Getter
   public get initialized() { return this._initialized; }
@@ -174,6 +195,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    * @default "auto"
    */
   public get format() { return this._format; }
+  public get dracoPath() { return this._dracoPath; }
   public get fixSkinnedBbox() { return this._fixSkinnedBbox; }
   public get fov() { return this._fov; }
   public get center() { return this._center; }
@@ -232,6 +254,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   public constructor(canvasEl: string | HTMLElement, {
     src = null,
     format = AUTO,
+    dracoPath = DEFAULT.DRACO_DECODER_URL,
     fixSkinnedBbox = false,
     skybox = null,
     envmap = null,
@@ -258,6 +281,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     // Bind options
     this._src = src;
     this._format = format;
+    this._dracoPath = dracoPath;
     this._fixSkinnedBbox = fixSkinnedBbox;
 
     this._fov = fov;
@@ -289,6 +313,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._animator = new ModelAnimator(this._scene.root);
     this._autoPlayer = new AutoControl(this, getObjectOption(autoplay));
     this._autoResizer = new AutoResizer(this);
+    this._arManager = new ARManager(this);
 
     if (src && autoInit) {
       void this.init();
@@ -428,7 +453,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     const animator = this._animator;
 
     scene.reset();
-    // scene.fit(model);
     scene.add(model.scene);
 
     camera.fit(model, this._center);

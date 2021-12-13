@@ -3,7 +3,7 @@
  * egjs projects are licensed under the MIT license
  */
 
-import XRSession from "./XRSession";
+import ARSession from "./ARSession";
 import WebARSession from "./WebARSession";
 import FloorARSession from "./FloorARSession";
 import WallARSession from "./WallARSession";
@@ -12,7 +12,7 @@ import SceneViewerSession from "./SceneViewerSession";
 import QuickLookSession from "./QuickLookSession";
 
 export {
-  XRSession,
+  ARSession,
   WebARSession,
   FloorARSession,
   WallARSession,

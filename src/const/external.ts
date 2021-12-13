@@ -84,4 +84,11 @@ export const EASING = {
       return n1 * (x -= 2.625 / d1) * x + 0.984375;
     }
   }
-};
+} as const;
+
+export const SCENE_VIEWER_MODE = {
+  PREFER_3D: "3d_preferred",
+  PREFER_AR: "ar_preferred",
+  ONLY_3D: "3d_only",
+  ONLY_AR: "ar_only"
+} as const;

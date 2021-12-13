@@ -5,24 +5,24 @@
 
 import * as THREE from "three";
 
-import Animation from "../../src/core/Animation";
-import ARFloorControl, { ARFloorControlOption } from "../../src/controls/ar/floor/ARFloorControl";
-import { merge } from "../../src/utils";
-import * as XR from "../../src/consts/xr";
-import { XRRenderContext, XRContext } from "../../src/type/internal";
+import Animation from "../core/Animation";
+import ARFloorControl, { ARFloorControlOption } from "../control/ar/floor/ARFloorControl";
+import { merge } from "../utils";
+import * as XR from "../const/xr";
+import { XRRenderContext, XRContext } from "../type/xr";
 
-import WebARSession, { WebARSessionOption } from "./WebARSession";
+import WebARSession, { WebARSessionOptions } from "./WebARSession";
 import HitTest from "./features/HitTest";
 
 
 /**
  * Options for {@link FloorARSession}.
- * This type is intersection of {@link WebARSessionOption} and {@link ARControlOption}
+ * This type is intersection of {@link WebARSessionOptions} and {@link ARControlOption}
  * @interface
- * @extends WebARSessionOption
+ * @extends WebARSessionOptions
  * @extends ARFloorControlOption
  */
-interface FloorARSessionOption extends WebARSessionOption, ARFloorControlOption {}
+interface FloorARSessionOption extends WebARSessionOptions, ARFloorControlOption {}
 
 /**
  * WebXR based AR session which puts model on the detected floor.
@@ -129,7 +129,8 @@ class FloorARSession extends WebARSession {
     modelRoot.position.setY(modelRoot.position.y - model.bbox.min.y);
     modelRoot.updateMatrix();
 
-    view3d.scene.update(model);
+    // FIXME:
+    // view3d.scene.update(model);
     view3d.scene.show();
     this.trigger("canPlace");
 

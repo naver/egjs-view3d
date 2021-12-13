@@ -6,13 +6,13 @@
 import * as THREE from "three";
 import Component from "@egjs/component";
 
-import View3D from "../../src/View3D";
-import { getElement, merge } from "../../src/utils";
-import * as DEFAULT from "../../src/consts/default";
-import * as XR from "../../src/consts/xr";
-import { XRContext, XRRenderContext } from "../../src/type/internal";
+import View3D from "../View3D";
+import { getElement, merge } from "../utils";
+import * as DEFAULT from "../const/default";
+import * as XR from "../const/xr";
+import { XRContext, XRRenderContext } from "../type/xr";
 
-import XRSession from "./XRSession";
+import ARSession from "./ARSession";
 import DOMOverlay from "./features/DOMOverlay";
 
 declare global {
@@ -28,7 +28,7 @@ declare global {
  * @property {HTMLElement|string|null} [loadingEl=null] This will be used for loading indicator element, which will automatically invisible after placing 3D model by setting `visibility: hidden`. This element must be placed under `overlayRoot`. You can set either HTMLElement or query selector for that element.
  * @property {boolean} [forceOverlay=false] Whether to apply `dom-overlay` feature as required. If set to false, `dom-overlay` will be optional feature.
  */
-export interface WebARSessionOption {
+export interface WebARSessionOptions {
   features: typeof XR.EMPTY_FEATURES;
   maxModelSize: number;
   overlayRoot: HTMLElement | string | null;
@@ -48,7 +48,7 @@ abstract class WebARSession extends Component<{
   end: void;
   canPlace: void;
   modelPlaced: void;
-}> implements XRSession {
+}> implements ARSession {
   /**
    * Whether it's webxr-based session or not
    * @type true
@@ -76,25 +76,25 @@ abstract class WebARSession extends Component<{
   /**
    * Emitted when session is started.
    * @event start
-     * @memberof WebARSession
+   * @memberof WebARSession
    * @type void
    */
   /**
    * Emitted when session is ended.
    * @event end
-     * @memberof WebARSession
+   * @memberof WebARSession
    * @type void
    */
   /**
    * Emitted when model can be placed on the space.
    * @event canPlace
-     * @memberof WebARSession
+   * @memberof WebARSession
    * @type void
    */
   /**
    * Emitted when model is placed.
    * @event modelPlaced
-     * @memberof WebARSession
+   * @memberof WebARSession
    * @type void
    */
 
@@ -113,7 +113,7 @@ abstract class WebARSession extends Component<{
     overlayRoot = DEFAULT.NULL_ELEMENT,
     loadingEl = DEFAULT.NULL_ELEMENT,
     forceOverlay = false
-  }: Partial<WebARSessionOption> = {}) {
+  }: Partial<WebARSessionOptions> = {}) {
     super();
     const overlayEl = getElement(overlayRoot);
 
@@ -171,17 +171,17 @@ abstract class WebARSession extends Component<{
 
         // Cache original values
         const originalMatrix = model.scene.matrix.clone();
-        const originalModelSize = model.size;
+        // const originalModelSize = model.size;
         const originalBackground = view3d.scene.root.background;
 
-        const arModelSize = Math.min(model.originalSize, this._maxModelSize);
-        model.size = arModelSize;
-        model.moveToOrigin();
-        view3d.scene.setBackground(null);
+        // const arModelSize = Math.min(model.originalSize, this._maxModelSize);
+        // model.size = arModelSize;
+        // model.moveToOrigin();
+        // view3d.scene.setBackground(null);
 
         // Cache original model rotation
         threeRenderer.xr.setReferenceSpaceType(XR.REFERENCE_SPACE.LOCAL);
-        threeRenderer.xr.setSession(session);
+        // threeRenderer.xr.setSession(session);
         threeRenderer.setPixelRatio(1);
 
         this.onStart(xrContext);
@@ -191,14 +191,14 @@ abstract class WebARSession extends Component<{
           // Restore original values
           model.scene.matrix.copy(originalMatrix);
           model.scene.matrix.decompose(model.scene.position, model.scene.quaternion, model.scene.scale);
-          model.size = originalModelSize;
-          model.moveToOrigin();
+          // model.size = originalModelSize;
+          // model.moveToOrigin();
 
-          view3d.scene.update(model);
-          view3d.scene.setBackground(originalBackground);
+          // view3d.scene.update(model);
+          // view3d.scene.setBackground(originalBackground);
 
           // Restore renderer values
-          threeRenderer.xr.setSession(null);
+          // threeRenderer.xr.setSession(null);
           threeRenderer.setPixelRatio(window.devicePixelRatio);
 
           // Restore render loop
@@ -210,7 +210,7 @@ abstract class WebARSession extends Component<{
         renderer.stopAnimationLoop();
         renderer.setAnimationLoop((delta, frame) => {
           const xrCam = threeRenderer.xr.getCamera(new THREE.PerspectiveCamera()) as THREE.PerspectiveCamera;
-          const referenceSpace = threeRenderer.xr.getReferenceSpace();
+          const referenceSpace = threeRenderer.xr.getReferenceSpace()!;
           const glLayer = session.renderState.baseLayer;
           const size = {
             width: glLayer.framebufferWidth,
@@ -237,7 +237,7 @@ abstract class WebARSession extends Component<{
    */
   public exit(view3d: View3D) {
     const session = view3d.renderer.threeRenderer.xr.getSession();
-    session.end();
+    // session.end();
   }
 
   public onStart(ctx: XRContext) {

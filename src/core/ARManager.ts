@@ -3,17 +3,17 @@
  * egjs projects are licensed under the MIT license
  */
 
-import View3D from "../../src/View3D/View3D";
-import XRSession from "../xr/XRSession";
+import View3D from "../View3D";
+import ARSession from "../xr/ARSession";
 import WebARSession from "../xr/WebARSession";
 
 /**
- * XRManager that manages XRSessions
+ * ARManager that manages AR sessions
  */
-class XRManager {
+class ARManager {
   private _view3d: View3D;
-  private _sessions: XRSession[];
-  private _currentSession: XRSession | null;
+  private _sessions: ARSession[];
+  private _currentSession: ARSession | null;
 
   /**
    * Array of {@link XRSession}s added
@@ -25,7 +25,7 @@ class XRManager {
   public get currentSession() { return this._currentSession; }
 
   /**
-   * Create a new instance of the XRManager
+   * Create a new instance of the ARManager
    * @param view3d Instance of the View3D
    */
   public constructor(view3d: View3D) {
@@ -48,7 +48,7 @@ class XRManager {
    * The XRSession's order added is the same as the order of entry.
    * @param xrSession XRSession to add
    */
-  public addSession(...xrSession: XRSession[]) {
+  public addSession(...xrSession: ARSession[]) {
     this._sessions.push(...xrSession);
   }
 
@@ -102,4 +102,4 @@ class XRManager {
   }
 }
 
-export default XRManager;
+export default ARManager;

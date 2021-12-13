@@ -7,7 +7,6 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 
 import View3D from "../View3D";
 import Model from "../core/Model";
-import * as DEFAULT from "../const/default";
 
 /**
  * DracoLoader
@@ -29,7 +28,7 @@ class DracoLoader {
   public load(url: string): Promise<Model> {
     const loader = new DRACOLoader();
     loader.setCrossOrigin("anonymous");
-    loader.setDecoderPath(DEFAULT.DRACO_DECODER_URL);
+    loader.setDecoderPath(this._view3D.dracoPath);
     loader.manager = new THREE.LoadingManager();
 
     return new Promise((resolve, reject) => {

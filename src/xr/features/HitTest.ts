@@ -3,7 +3,7 @@
  * egjs projects are licensed under the MIT license
  */
 
-import * as XR from "../../../src/consts/xr";
+import * as XR from "../../const/xr";
 
 /**
  * Manager for WebXR hit-test feature

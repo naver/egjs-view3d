@@ -10,7 +10,6 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 import View3D from "../View3D";
 import Model from "../core/Model";
 import { EVENTS } from "../const/external";
-import * as DEFAULT from "../const/default";
 
 /**
  * GLTFLoader
@@ -35,7 +34,7 @@ class GLTFLoader {
     loader.setCrossOrigin("anonymous");
 
     const dracoLoader = this._dracoLoader;
-    dracoLoader.setDecoderPath(DEFAULT.DRACO_DECODER_URL);
+    dracoLoader.setDecoderPath(view3D.dracoPath);
     loader.setDRACOLoader(dracoLoader);
   }
 

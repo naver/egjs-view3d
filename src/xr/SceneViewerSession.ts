@@ -3,17 +3,39 @@
  * egjs projects are licensed under the MIT license
  */
 
-import { IS_ANDROID } from "../../src/consts/browser";
-import * as XR from "../../src/consts/xr";
+import { IS_ANDROID } from "../const/browser";
+import { SCENE_VIEWER_MODE } from "../const/external";
+import * as XR from "../const/xr";
+import { LiteralUnion, ValueOf } from "../type/utils";
 
-import XRSession from "./XRSession";
+import ARSession from "./ARSession";
+
+export interface SceneViewerSessionOptions {
+  file: string | null;
+  fallbackURL: string | null;
+  mode: LiteralUnion<ValueOf<typeof SCENE_VIEWER_MODE>, string>;
+  title: string | null;
+  link: string | null;
+  sound: string | null;
+  resizable: boolean;
+  [key: string]: any;
+}
 
 /**
  * AR session using Google's scene-viewer
  * @see https://developers.google.com/ar/develop/java/scene-viewer
  */
-class SceneViewerSession implements XRSession {
+class SceneViewerSession implements ARSession {
   public readonly isWebXRSession = false;
+
+  private _file: SceneViewerSessionOptions["file"];
+  private _fallbackURL: SceneViewerSessionOptions["fallbackURL"];
+  private _mode: SceneViewerSessionOptions["mode"];
+  private _title: SceneViewerSessionOptions["title"];
+  private _link: SceneViewerSessionOptions["link"];
+  private _sound: SceneViewerSessionOptions["sound"];
+  private _resizable: SceneViewerSessionOptions["resizable"];
+  private _otherParams: Record<string, any>;
 
   /**
    * Create new instance of SceneViewerSession
@@ -27,21 +49,24 @@ class SceneViewerSession implements XRSession {
    * @param {string} [params.sound] A URL to a looping audio track that is synchronized with the first animation embedded in a glTF file. It should be provided alongside a glTF with an animation of matching length. If present, the sound is looped after the model is loaded. This should be URL-escaped.
    * @param {string} [params.resizable=true] When set to false, users will not be able to scale the model in the AR experience. Scaling works normally in the 3D experience.
    */
-  public constructor(public params: {
-    file: string;
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    browser_fallback_url?: string;
-    mode?: "3d_preferred" | "3d_only" | "ar_preferred" | "ar_only" | string;
-    title?: string;
-    link?: string;
-    sound?: string;
-    resizable?: "true" | "false" | boolean;
-    [key: string]: any;
-  }) {
-    if (!this.params.mode) {
-      // Default mode is "ar_only", which should use com.google.ar.core package
-      this.params.mode = "ar_only";
-    }
+  public constructor({
+    mode = SCENE_VIEWER_MODE.ONLY_AR,
+    file = null,
+    fallbackURL = null,
+    title = null,
+    link = null,
+    sound = null,
+    resizable = true,
+    ...otherParams
+  }: Partial<SceneViewerSessionOptions> = {}) {
+    this._file = file;
+    this._fallbackURL = fallbackURL;
+    this._mode = mode;
+    this._title = title;
+    this._link = link;
+    this._sound = sound;
+    this._resizable = resizable;
+    this._otherParams = otherParams;
   }
 
   /**
@@ -57,7 +82,13 @@ class SceneViewerSession implements XRSession {
    * Enter Scene-viewer AR session
    */
   public enter() {
-    const params = Object.assign({}, this.params);
+    const params: Record<string, string> = {};
+    const otherParams = this._otherParams;
+
+    for (const key in otherParams) {
+      params.append(key, otherParams[key]);
+    }
+
     const fallback = params.browser_fallback_url;
     delete params.browser_fallback_url;
 

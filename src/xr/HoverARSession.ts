@@ -5,22 +5,22 @@
 
 import * as THREE from "three";
 
-import ARHoverControl, { ARHoverControlOption } from "../../src/controls/ar/hover/ARHoverControl";
-import Animation from "../../src/core/Animation";
-import { clamp } from "../../src/utils";
-import * as XR from "../../src/consts/xr";
-import { XRRenderContext, XRContext } from "../../src/type/internal";
+import ARHoverControl, { ARHoverControlOption } from "../control/ar/hover/ARHoverControl";
+import Animation from "../core/Animation";
+import { clamp } from "../utils";
+import * as XR from "../const/xr";
+import { XRRenderContext, XRContext } from "../type/xr";
 
-import WebARSession, { WebARSessionOption } from "./WebARSession";
+import WebARSession, { WebARSessionOptions } from "./WebARSession";
 
 /**
  * Options for {@link HoverARSession}.
- * This type is intersection of {@link WebARSessionOption} and {@link ARHoverControlOption}
+ * This type is intersection of {@link WebARSessionOptions} and {@link ARHoverControlOption}
  * @interface
- * @extends WebARSessionOption
+ * @extends WebARSessionOptions
  * @extends ARHoverControlOption
  */
-interface HoverARSessionOption extends WebARSessionOption, ARHoverControlOption {
+interface HoverARSessionOption extends WebARSessionOptions, ARHoverControlOption {
   initialDistance: number;
 }
 
@@ -149,7 +149,8 @@ class HoverARSession extends WebARSession {
     modelRoot.lookAt(camPos.setY(modelRoot.position.y));
     modelRoot.updateMatrix();
 
-    view3d.scene.update(model);
+    // FIXME:
+    // view3d.scene.update(model);
 
     if (!view3d.scene.visible) {
       view3d.scene.show();
