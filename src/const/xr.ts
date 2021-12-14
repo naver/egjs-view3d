@@ -12,7 +12,7 @@ declare global {
 }
 /* eslint-enable */
 
-export const QUICKLOOK_SUPPORTED = () => {
+export const QUICK_LOOK_SUPPORTED = () => {
   const anchorEl = document.createElement("a");
   return anchorEl.relList && anchorEl.relList.supports && anchorEl.relList.supports("ar");
 };
@@ -22,7 +22,7 @@ export const DOM_OVERLAY_SUPPORTED = window.XRDOMOverlayState != null;
 
 export const SESSION = {
   AR: "immersive-ar",
-  VR: "immersive-ar"
+  VR: "immersive-vr"
 } as const;
 
 export const REFERENCE_SPACE = {
@@ -56,8 +56,14 @@ export const EMPTY_FEATURES: {
   [key: string]: any;
 } = {};
 
+export const AR_SESSION_TYPE = {
+  WEBXR: "WebXR",
+  SCENE_VIEWER: "SceneViewer",
+  QUICK_LOOK: "QuickLook"
+} as const;
+
 export const SCENE_VIEWER = {
-  INTENT_AR_CORE: (params: string, fallback?: string) => `intent://arvr.google.com/scene-viewer/1.1?${params}#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;${fallback ? `browser_fallback_url=${fallback};` : ""}end;`,
+  INTENT_AR_CORE: (params: string, fallback: string | null) => `intent://arvr.google.com/scene-viewer/1.1?${params}#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;${fallback ? `S.browser_fallback_url=${fallback};` : ""}end;`,
   INTENT_SEARCHBOX: (params: string, fallback: string) => `intent://arvr.google.com/scene-viewer/1.1?${params}#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;${fallback ? `S.browser_fallback_url=${fallback};` : ""}end;`,
   FALLBACK_DEFAULT: (params: string) => `https://arvr.google.com/scene-viewer?${params}`
 } as const;

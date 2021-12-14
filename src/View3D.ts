@@ -12,19 +12,20 @@ import ModelLoader from "./core/ModelLoader";
 import Model from "./core/Model";
 import ModelAnimator from "./core/ModelAnimator";
 import ARManager from "./core/ARManager";
+import { ShadowOptions } from "./core/ShadowPlane";
 import Preset from "./preset/Preset";
 import OrbitControl from "./control/OrbitControl";
 import { RotateControlOptions } from "./control/RotateControl";
 import { TranslateControlOptions } from "./control/TranslateControl";
 import { ZoomControlOptions } from "./control/ZoomControl";
 import AutoControl, { AutoplayOptions } from "./control/AutoControl";
-import { ShadowOptions } from "./core/ShadowPlane";
+import { SceneViewerSessionOptions } from "./xr/SceneViewerSession";
+import { QuickLookSessionOptions } from "./xr/QuickLookSession";
 import { EVENTS, AUTO } from "./const/external";
 import * as DEFAULT from "./const/default";
 import * as EVENT_TYPES from "./type/event";
 import { getCanvas, getObjectOption } from "./utils";
 import { LiteralUnion, OptionGetters } from "./type/utils";
-import { SceneViewerSessionOptions } from "./xr/SceneViewerSession";
 
 /**
  * @interface
@@ -72,6 +73,7 @@ export interface View3DOptions {
 
   // AR
   sceneViewer: boolean | Partial<SceneViewerSessionOptions>;
+  quickLook: boolean | Partial<QuickLookSessionOptions>;
 
   // Others
   autoInit: boolean;
@@ -128,6 +130,9 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   private _exposure: View3DOptions["exposure"];
   private _preset: View3DOptions["preset"];
   private _shadow: View3DOptions["shadow"];
+
+  private _sceneViewer: View3DOptions["sceneViewer"];
+  private _quickLook: View3DOptions["quickLook"];
 
   private _autoInit: View3DOptions["autoInit"];
   private _autoResize: View3DOptions["autoResize"];
@@ -213,6 +218,8 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   public get exposure() { return this._exposure; }
   public get preset() { return this._preset; }
   public get shadow() { return this._shadow; }
+  public get sceneViewer() { return this._sceneViewer; }
+  public get quickLook() { return this._quickLook; }
   /**
    * Call {@link View3D#init init()} automatically when creating View3D's instance
    * This option won't work if `src` is not given
@@ -272,8 +279,11 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     autoplay = false,
     scrollable = false,
     useGrabCursor = true,
+    sceneViewer = true,
+    quickLook = true,
     autoInit = true,
-    autoResize = true
+    autoResize = true,
+    useResizeObserver = true
   }: Partial<View3DOptions> = {}) {
     super();
     const canvas = getCanvas(canvasEl);
@@ -302,8 +312,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._preset = preset;
     this._shadow = shadow;
 
+    this._sceneViewer = sceneViewer;
+    this._quickLook = quickLook;
+
     this._autoInit = autoInit;
     this._autoResize = autoResize;
+    this._useResizeObserver = useResizeObserver;
 
     // Create internal components
     this._renderer = new Renderer(this, canvas);

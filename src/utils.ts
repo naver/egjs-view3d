@@ -160,3 +160,4 @@ export const getRotationAngle = (center: THREE.Vector2, v1: THREE.Vector2, v2: T
 };
 
 export const getObjectOption = <T extends boolean | Partial<object>>(val: T): NoBoolean<T> => typeof val === "object" ? val : {} as any;
+export const toBooleanString = (val: boolean) => val ? "true" : "false";

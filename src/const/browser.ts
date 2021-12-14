@@ -5,12 +5,10 @@
 
 // Browser related constants
 
-export const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+export const IS_IOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent)
   || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
-export const IS_ANDROID = /android/i.test(navigator.userAgent);
-
-export const IS_SAFARI = /safari/i.test(navigator.userAgent);
+export const IS_ANDROID = () => /android/i.test(navigator.userAgent);
 
 export const EVENTS = {
   MOUSE_DOWN: "mousedown",
@@ -26,11 +24,11 @@ export const EVENTS = {
   MOUSE_LEAVE: "mouseleave",
   LOAD: "load",
   ERROR: "error"
-};
+} as const;
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
 export enum MOUSE_BUTTON {
   LEFT,
   MIDDLE,
-  RIGHT,
+  RIGHT
 }

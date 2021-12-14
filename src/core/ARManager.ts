@@ -11,7 +11,7 @@ import WebARSession from "../xr/WebARSession";
  * ARManager that manages AR sessions
  */
 class ARManager {
-  private _view3d: View3D;
+  private _view3D: View3D;
   private _sessions: ARSession[];
   private _currentSession: ARSession | null;
 
@@ -29,7 +29,7 @@ class ARManager {
    * @param view3d Instance of the View3D
    */
   public constructor(view3d: View3D) {
-    this._view3d = view3d;
+    this._view3D = view3d;
     this._sessions = [];
     this._currentSession = null;
   }
@@ -56,6 +56,10 @@ class ARManager {
    * Enter XR Session.
    */
   public async enter(): Promise<void> {
+    const view3D = this._view3D;
+
+    if (!view3D.initialized) return;
+
     return this._enterSession(0, []);
   }
 
@@ -63,14 +67,16 @@ class ARManager {
    * Exit current XR Session.
    */
   public exit() {
-    if (this._currentSession) {
-      this._currentSession.exit(this._view3d);
+    const currentSession = this._currentSession;
+
+    if (currentSession) {
+      currentSession.exit(this._view3D);
       this._currentSession = null;
     }
   }
 
   private async _enterSession(sessionIdx: number, errors: any[]) {
-    const view3d = this._view3d;
+    const view3d = this._view3D;
     const sessions = this._sessions;
 
     if (sessionIdx >= sessions.length) {

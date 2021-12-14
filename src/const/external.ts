@@ -37,15 +37,20 @@ export const EVENTS = {
  * @property {"gltf"} GLTF
  * @property {"glb"} GLB
  * @property {"drc"} DRC
+ * @property {"usdz"} USDZ
  */
 export const MODEL_FORMAT = {
   GLTF: "gltf",
   GLB: "glb",
-  DRC: "drc"
+  DRC: "drc",
+  USDZ: "usdz"
 } as const;
 
 /**
+ * @type {object}
  * @see https://www.iana.org/assignments/media-types/media-types.xhtml#model
+ * @property {"gltf"} model/gltf+json
+ * @property {"glb"} model/gltf-binary
  */
 export const MODEL_MIME = {
   "model/gltf-binary": MODEL_FORMAT.GLB,
@@ -86,9 +91,50 @@ export const EASING = {
   }
 } as const;
 
+/**
+ * @type {object}
+ * @property {"ar_only"} ONLY_AR
+ * @property {"3d_only"} ONLY_3D
+ * @property {"ar_preferred"} PREFER_AR
+ * @property {"3d_preferred"} PREFER_3D
+ */
 export const SCENE_VIEWER_MODE = {
-  PREFER_3D: "3d_preferred",
-  PREFER_AR: "ar_preferred",
+  ONLY_AR: "ar_only",
   ONLY_3D: "3d_only",
-  ONLY_AR: "ar_only"
+  PREFER_AR: "ar_preferred",
+  PREFER_3D: "3d_preferred"
+} as const;
+
+/**
+ * ![https://docs-assets.developer.apple.com/published/b122cc68df/10cb0534-e1f6-42ed-aadb-5390c55ad3ff.png](button types)
+ * @see https://developer.apple.com/documentation/arkit/adding_an_apple_pay_button_or_a_custom_action_in_ar_quick_look
+ * @property {"plain"} PLAIN
+ * @property {"pay"} PAY
+ * @property {"buy"} BUY
+ * @property {"check-out"} CHECK_OUT
+ * @property {"book"} BOOK
+ * @property {"donate"} DONATE
+ * @property {"subscribe"} SUBSCRIBE
+ */
+export const QUICK_LOOK_APPLE_PAY_BUTTON_TYPE = {
+  PLAIN: "plain",
+  PAY: "pay",
+  BUY: "buy",
+  CHECK_OUT: "check-out",
+  BOOK: "book",
+  DONATE: "donate",
+  SUBSCRIBE: "subscribe"
+} as const;
+
+/**
+ * Available size of the custom banner
+ * @type {object}
+ * @property {"small"} SMALL 81pt
+ * @property {"medium"} MEDIUM 121pt
+ * @property {"large"} LARGE 161pt
+ */
+export const QUICK_LOOK_CUSTOM_BANNER_SIZE = {
+  SMALL: "small",
+  MEDIUM: "medium",
+  LARGE: "large"
 } as const;

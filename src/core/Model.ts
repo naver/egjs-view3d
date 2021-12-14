@@ -11,11 +11,25 @@ import { range } from "../utils";
  * Data class for loaded 3d model
  */
 class Model {
+  private _src: string;
+  private _format: string;
   private _scene: THREE.Group;
   private _bbox: THREE.Box3;
   private _animations: THREE.AnimationClip[];
-  private _fixSkinnedBbox: boolean;
 
+  /**
+   * Source URL of this model
+   * @type {string}
+   * @readonly
+   */
+  public get src() { return this._src; }
+  /**
+   * A format(extension) of this model
+   * @type {string}
+   * @readonly
+   * @see MODEL_FORMAT
+   */
+  public get format() { return this._format; }
   /**
    * Scene of the model, see {@link https://threejs.org/docs/#api/en/objects/Group THREE.Group}
    * @readonly
@@ -23,39 +37,21 @@ class Model {
   public get scene() { return this._scene; }
   /**
    * {@link https://threejs.org/docs/#api/en/animation/AnimationClip THREE.AnimationClip}s inside model
-   */
-  public get animations() { return this._animations; }
-  /** *
-   * {@link https://threejs.org/docs/#api/en/lights/Light THREE.Light}s inside model if there's any.
    * @readonly
    */
-  public get lights() {
-    return this._getAllLights();
-  }
-
+  public get animations() { return this._animations; }
   /**
    * {@link https://threejs.org/docs/#api/en/objects/Mesh THREE.Mesh}es inside model if there's any.
    * @readonly
    */
-  public get meshes() {
-    return this._getAllMeshes();
-  }
-
+  public get meshes() { return this._getAllMeshes(); }
   /**
    * Get a copy of model's current bounding box
    * @type THREE#Box3
+   * @readonly
    * @see https://threejs.org/docs/#api/en/math/Box3
    */
-  public get bbox() {
-    return this._bbox;
-  }
-
-  /**
-   * Whether to apply inference from skeleton when calculating bounding box
-   * This can fix some models with skinned mesh when it has wrong bounding box
-   * @type boolean
-   */
-  public get fixSkinnedBbox() { return this._fixSkinnedBbox; }
+  public get bbox() { return this._bbox; }
 
   /**
    * Whether the model's meshes gets rendered into shadow map
@@ -83,32 +79,36 @@ class Model {
     meshes.forEach(mesh => mesh.receiveShadow = val);
   }
 
-  public set fixSkinnedBbox(val: boolean) { this._fixSkinnedBbox = val; }
-
   /**
    * Create new Model instance
    */
   public constructor({
+    src,
+    format,
     scenes,
     animations = [],
     fixSkinnedBbox = false,
     castShadow = true,
     receiveShadow = false
   }: {
+    src: string;
+    format: string;
     scenes: THREE.Object3D[];
     animations?: THREE.AnimationClip[];
     fixSkinnedBbox?: boolean;
     castShadow?: boolean;
     receiveShadow?: boolean;
   }) {
+    this._src = src;
+    this._format = format;
+
     // This guarantees model's root has identity matrix at creation
     this._scene = new THREE.Group();
     this._scene.add(...scenes);
 
     this._animations = animations;
-    this._fixSkinnedBbox = fixSkinnedBbox;
 
-    this._bbox = this._getInitialBbox();
+    this._bbox = this._getInitialBbox(fixSkinnedBbox);
 
     // Move to position where bbox.min.y = 0
     const offset = this._bbox.min.y;
@@ -141,10 +141,10 @@ class Model {
     return result;
   }
 
-  private _getInitialBbox() {
+  private _getInitialBbox(fixSkinnedBbox: boolean) {
     this._scene.updateMatrixWorld();
 
-    if (this._fixSkinnedBbox && this._hasSkinnedMesh()) {
+    if (fixSkinnedBbox && this._hasSkinnedMesh()) {
       return this._getSkeletonBbox();
     } else {
       return new THREE.Box3().setFromObject(this._scene);
