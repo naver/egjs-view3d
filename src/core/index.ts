@@ -4,6 +4,8 @@
  */
 
 import Animation from "./Animation";
+import ARManager from "./ARManager";
+import AutoPlayer, { AutoplayOptions } from "./AutoPlayer";
 import AutoResizer from "./AutoResizer";
 import Camera from "./Camera";
 import Model from "./Model";
@@ -18,6 +20,8 @@ import View3DError from "./View3DError";
 
 export {
   Animation,
+  ARManager,
+  AutoPlayer,
   AutoResizer,
   Camera,
   Model,
@@ -29,4 +33,8 @@ export {
   Scene,
   ShadowPlane,
   View3DError
+};
+
+export type {
+  AutoplayOptions
 };

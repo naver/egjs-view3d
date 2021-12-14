@@ -1,5 +1,3 @@
-const babel = require("rollup-plugin-babel");
-
 const buildHelper = require("./config/build-helper");
 
 export const name = "View3D";
@@ -8,9 +6,7 @@ const external = {
   three: "THREE"
 };
 const tsconfig = "tsconfig.build.json";
-
-const plugins = [
-];
+const plugins = [];
 
 export default buildHelper([
   {
@@ -38,6 +34,7 @@ export default buildHelper([
     output: `./dist/${fileName}.pkgd.js`,
     format: "umd",
     tsconfig,
+    commonjs: true,
     resolve: true,
     plugins
   },
@@ -47,6 +44,7 @@ export default buildHelper([
     output: `./dist/${fileName}.pkgd.min.js`,
     format: "umd",
     tsconfig,
+    commonjs: true,
     resolve: true,
     uglify: true,
     plugins

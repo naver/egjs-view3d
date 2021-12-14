@@ -6,12 +6,12 @@
 import * as THREE from "three";
 
 import RotationIndicator from "../ui/RotationIndicator";
-import Motion from "../../../controls/Motion";
-import * as DEFAULT from "../../../consts/default";
-import * as TOUCH from "../../../consts/touch";
-import { XRRenderContext, XRContext, XRInputs } from "../../../type/internal";
+import Motion from "../../../core/Motion";
+import * as DEFAULT from "../../../const/default";
+import { GESTURE } from "../../../const/internal";
+import { XRRenderContext, XRContext, XRInputs } from "../../../type/xr";
 
-import ARControl from "./ARControl";
+import ARCameraControl from "./ARCameraControl";
 
 enum STATE {
   WAITING,
@@ -31,7 +31,7 @@ export interface ARSwipeControlOption {
 /**
  * Two finger swipe control
  */
-class ARSwipeControl implements ARControl {
+class ARSwipeControl implements ARCameraControl {
   /**
    * Current rotation value
    */
@@ -62,6 +62,8 @@ class ARSwipeControl implements ARControl {
   public get enabled() { return this._enabled; }
   /**
    * Scale(speed) factor of this control.
+   * @type {number}
+   * @default 1
    */
   public get scale() { return this._userScale; }
   public get horizontalAxis() { return this._horizontalAxis; }
@@ -72,6 +74,7 @@ class ARSwipeControl implements ARControl {
   /**
    * Create new ARSwipeControl
    * @param {ARSwipeControlOption} [options={}] Options
+   * @param {number} [options.scale=1] Scale(speed) factor of this control.
    */
   public constructor({
     scale = 1
@@ -83,7 +86,7 @@ class ARSwipeControl implements ARControl {
     this._userScale = scale;
   }
 
-  public init({ view3d }: XRRenderContext) {
+  public init({ view3D: view3d }: XRRenderContext) {
     const initialRotation = view3d.model!.scene.quaternion;
     this.updateRotation(initialRotation);
     view3d.scene.add(this._rotationIndicator.object);
@@ -118,7 +121,7 @@ class ARSwipeControl implements ARControl {
     this._verticalAxis.copy(vertical);
   }
 
-  public activate({ view3d }: XRRenderContext, gesture: TOUCH.GESTURE) {
+  public activate({ view3D: view3d }: XRRenderContext, gesture: GESTURE) {
     if (!this._enabled) return;
 
     const model = view3d.model!;
@@ -129,13 +132,13 @@ class ARSwipeControl implements ARControl {
     rotationIndicator.updatePosition(model.bbox.getCenter(new THREE.Vector3()));
     rotationIndicator.updateScale(model.size / 2);
 
-    if (gesture === TOUCH.GESTURE.TWO_FINGER_HORIZONTAL) {
+    if (gesture === GESTURE.TWO_FINGER_HORIZONTAL) {
       rotationIndicator.updateRotation(
         model.scene.quaternion.clone()
           .multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI / 2, 0, 0))),
       );
       this._state = STATE.ROTATE_HORIZONTAL;
-    } else if (gesture === TOUCH.GESTURE.TWO_FINGER_VERTICAL) {
+    } else if (gesture === GESTURE.TWO_FINGER_VERTICAL) {
       rotationIndicator.updateRotation(
         model.scene.quaternion.clone()
           .multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(0, Math.PI / 2, 0))),

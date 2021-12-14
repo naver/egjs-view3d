@@ -9,15 +9,17 @@ import View3DError from "./core/View3DError";
 import * as ERROR from "./const/error";
 import { NoBoolean } from "./type/utils";
 
-export const getElement = (el: HTMLElement | string | null, parent?: HTMLElement): HTMLElement | null => {
+export const getNullableElement = (el: HTMLElement | string | null, parent?: HTMLElement): HTMLElement | null => {
   let targetEl: HTMLElement | null = null;
 
   if (typeof el === "string") {
     const parentEl = parent ? parent : document;
     const queryResult = parentEl.querySelector(el);
+
     if (!queryResult) {
       throw new View3DError(ERROR.MESSAGES.ELEMENT_NOT_FOUND(el), ERROR.CODES.ELEMENT_NOT_FOUND);
     }
+
     targetEl = queryResult as HTMLElement;
   } else if (el && el.nodeType === Node.ELEMENT_NODE) {
     targetEl = el;
@@ -26,18 +28,24 @@ export const getElement = (el: HTMLElement | string | null, parent?: HTMLElement
   return targetEl;
 };
 
-export const getCanvas = (el: HTMLElement | string): HTMLCanvasElement => {
-  const targetEl = getElement(el);
+export const getElement = (el: HTMLElement | string, parent?: HTMLElement): HTMLElement => {
+  const targetEl = getNullableElement(el, parent);
 
   if (!targetEl) {
     throw new View3DError(ERROR.MESSAGES.WRONG_TYPE(el, ["HTMLElement", "string"]), ERROR.CODES.WRONG_TYPE);
   }
 
-  if (!/^canvas$/i.test(targetEl.tagName)) {
-    throw new View3DError(ERROR.MESSAGES.ELEMENT_NOT_CANVAS(targetEl), ERROR.CODES.ELEMENT_NOT_CANVAS);
+  return targetEl;
+};
+
+export const findCanvas = (root: HTMLElement, selector: string): HTMLCanvasElement => {
+  const canvas = root.querySelector(selector) as HTMLCanvasElement;
+
+  if (!canvas) {
+    throw new View3DError(ERROR.MESSAGES.CANVAS_NOT_FOUND, ERROR.CODES.CANVAS_NOT_FOUND);
   }
 
-  return targetEl as HTMLCanvasElement;
+  return canvas;
 };
 
 export const range = (end: number): number[] => {

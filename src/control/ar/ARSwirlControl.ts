@@ -5,30 +5,27 @@
 
 import * as THREE from "three";
 
-import RotationIndicator from "../ui/RotationIndicator";
-import Motion from "../../../controls/Motion";
-import * as DEFAULT from "../../../consts/default";
-import { getRotationAngle } from "../../../utils";
-import { XRRenderContext, XRContext, XRInputs } from "../../../type/internal";
+import Motion from "../../core/Motion";
+import * as DEFAULT from "../../const/default";
+import { getRotationAngle } from "../../utils";
+import { XRRenderContext, XRInputs } from "../../type/xr";
 
-import ARControl from "./ARControl";
+import ARCameraControl from "./common/ARCameraControl";
 
 
 /**
  * Options for {@link ARSwirlControl}
  * @interface
- * @property {number} [scale=1] Scale(speed) factor of the rotation
- * @property {boolean} [showIndicator=true] Whether to show rotation indicator or not.
+ * @param {number} [scale=1] Scale(speed) factor of the rotation
  */
-export interface ARSwirlControlOption {
+export interface ARSwirlControlOptions {
   scale: number;
-  showIndicator: boolean;
 }
 
 /**
  * One finger swirl control on single axis
  */
-class ARSwirlControl implements ARControl {
+class ARSwirlControl implements ARCameraControl {
   /**
    * Current rotation value
    */
@@ -47,7 +44,6 @@ class ARSwirlControl implements ARControl {
   private _toQuat = new THREE.Quaternion();
 
   private _motion: Motion;
-  private _rotationIndicator: RotationIndicator | null;
 
   /**
    * Whether this control is enabled or not.
@@ -63,33 +59,20 @@ class ARSwirlControl implements ARControl {
 
   /**
    * Create new ARSwirlControl
-   * @param {ARSwirlControlOption} [options={}] Options
+   * @param {ARSwirlControlOptions} [options={}] Options
+   * @param {number} [options.scale=1] Scale(speed) factor of the rotation
+   * @param {boolean} [options.showIndicator=true] Whether to show rotation indicator or not.
    */
   public constructor({
-    scale = 1,
-    showIndicator = true
-  }: Partial<ARSwirlControlOption> = {}) {
+    scale = 1
+  }: Partial<ARSwirlControlOptions> = {}) {
     this._motion = new Motion({ range: DEFAULT.INFINITE_RANGE });
     this._userScale = scale;
-
-    if (showIndicator) {
-      this._rotationIndicator = new RotationIndicator();
-    }
   }
 
-  public init({ view3d }: XRRenderContext) {
+  public init({ view3D: view3d }: XRRenderContext) {
     const initialRotation = view3d.model!.scene.quaternion;
     this.updateRotation(initialRotation);
-
-    if (this._rotationIndicator) {
-      view3d.scene.add(this._rotationIndicator.object);
-    }
-  }
-
-  public destroy({ view3d }: XRContext) {
-    if (this._rotationIndicator) {
-      view3d.scene.remove(this._rotationIndicator.object);
-    }
   }
 
   public updateRotation(rotation: THREE.Quaternion) {
@@ -112,28 +95,14 @@ class ARSwirlControl implements ARControl {
     this._enabled = false;
   }
 
-  public activate({ view3d }: XRRenderContext) {
+  public activate() {
     if (!this._enabled) return;
 
     this._active = true;
-
-    const model = view3d.model!;
-    const rotationIndicator = this._rotationIndicator;
-
-    if (rotationIndicator) {
-      rotationIndicator.show();
-      rotationIndicator.updatePosition(model.bbox.getCenter(new THREE.Vector3()));
-      rotationIndicator.updateScale(model.size / 2);
-      rotationIndicator.updateRotation(model.scene.quaternion);
-    }
   }
 
   public deactivate() {
     this._active = false;
-
-    if (this._rotationIndicator) {
-      this._rotationIndicator.hide();
-    }
   }
 
   public updateAxis(axis: THREE.Vector3) {
@@ -144,7 +113,7 @@ class ARSwirlControl implements ARControl {
     this._prevPos.copy(coords[0]);
   }
 
-  public process({ view3d, xrCam }: XRRenderContext, { coords }: XRInputs) {
+  public process({ view3D: view3d, xrCam }: XRRenderContext, { coords }: XRInputs) {
     if (!this._active || coords.length !== 1) return;
 
     const prevPos = this._prevPos;

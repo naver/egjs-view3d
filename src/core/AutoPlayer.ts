@@ -7,8 +7,6 @@ import View3D from "../View3D";
 import * as BROWSER from "../const/browser";
 import { OptionGetters } from "../type/utils";
 
-import CameraControl from "./CameraControl";
-
 export interface AutoplayOptions {
   delay: number;
   delayOnMouseLeave: number;
@@ -19,9 +17,9 @@ export interface AutoplayOptions {
 }
 
 /**
- * Control that animates model without user input
+ * Autoplayer that animates model without user input
  */
-class AutoControl implements CameraControl, OptionGetters<AutoplayOptions> {
+class AutoPlayer implements OptionGetters<AutoplayOptions> {
   // Options
   private _delay: number;
   private _delayOnMouseLeave: number;
@@ -38,7 +36,7 @@ class AutoControl implements CameraControl, OptionGetters<AutoplayOptions> {
   private _hovering: boolean = false;
 
   /**
-   * Whether this control is enabled or not
+   * Whether autoplay is enabled or not
    * @readonly
    */
   public get enabled() { return this._enabled; }
@@ -48,7 +46,7 @@ class AutoControl implements CameraControl, OptionGetters<AutoplayOptions> {
   public get delay() { return this._delay; }
   /**
    * Reactivation delay after mouse leave
-   * This option only works when {@link AutoControl#pauseOnHover pauseOnHover} is activated
+   * This option only works when {@link AutoPlayer#pauseOnHover pauseOnHover} is activated
    */
   public get delayOnMouseLeave() { return this._delayOnMouseLeave; }
   /**
@@ -67,7 +65,7 @@ class AutoControl implements CameraControl, OptionGetters<AutoplayOptions> {
    */
   public get canInterrupt() { return this._canInterrupt; }
   /**
-   * Whether to disable control on user interrupt
+   * Whether to disable autoplay on user interrupt
    * @default false
    */
   public get disableOnInterrupt() { return this._disableOnInterrupt; }
@@ -80,7 +78,7 @@ class AutoControl implements CameraControl, OptionGetters<AutoplayOptions> {
   public set disableOnInterrupt(val: boolean) { this._disableOnInterrupt = val; }
 
   /**
-   * Create new RotateControl instance
+   * Create new AutoPlayer instance
    * @param {View3D} view3D An instance of View3D
    * @param {object} options Options
    * @param {number} [options.delay=2000] Reactivation delay after mouse input in milisecond
@@ -88,7 +86,7 @@ class AutoControl implements CameraControl, OptionGetters<AutoplayOptions> {
    * @param {number} [options.speed=1] Y-axis(yaw) rotation speed
    * @param {boolean} [options.pauseOnHover=false] Whether to pause rotation on mouse hover
    * @param {boolean} [options.canInterrupt=true] Whether user can interrupt the rotation with click/wheel input
-   * @param {boolean} [options.disableOnInterrupt=false] Whether to disable control on user interrupt
+   * @param {boolean} [options.disableOnInterrupt=false] Whether to disable autoplay on user interrupt
    */
   public constructor(view3D: View3D, {
     delay = 2000,
@@ -117,7 +115,7 @@ class AutoControl implements CameraControl, OptionGetters<AutoplayOptions> {
   }
 
   /**
-   * Update control by given deltaTime
+   * Update camera by given deltaTime
    * @param camera Camera to update position
    * @param deltaTime Number of milisec to update
    * @returns {void}
@@ -135,11 +133,6 @@ class AutoControl implements CameraControl, OptionGetters<AutoplayOptions> {
     const camera = this._view3D.camera;
 
     camera.yaw += this._speed * deltaTime / 100;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public resize(size: { width: number; height: number }) {
-    // DO NOTHING
   }
 
   /**
@@ -189,10 +182,6 @@ class AutoControl implements CameraControl, OptionGetters<AutoplayOptions> {
     this._hovering = false;
 
     this._clearTimeout();
-  }
-
-  public sync(): void {
-    // Do nothing
   }
 
   private _onMouseDown = (evt: MouseEvent) => {
@@ -261,4 +250,4 @@ class AutoControl implements CameraControl, OptionGetters<AutoplayOptions> {
   }
 }
 
-export default AutoControl;
+export default AutoPlayer;

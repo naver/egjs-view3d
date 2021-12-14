@@ -5,7 +5,7 @@
 
 import * as THREE from "three";
 
-import * as TOUCH from "../../../consts/touch";
+import { GESTURE } from "../../../const/internal";
 
 enum STATE {
   WAITING,
@@ -18,7 +18,7 @@ enum STATE {
  * @interface
  * @property {number} size Size of the deadzone circle.
  */
-export interface DeadzoneCheckerOption {
+export interface DeadzoneCheckerOptions {
   size: number;
 }
 
@@ -31,8 +31,8 @@ class DeadzoneChecker {
 
   // Internal States
   private _state = STATE.WAITING;
-  private _detectedGesture = TOUCH.GESTURE.NONE;
-  private _testingGestures = TOUCH.GESTURE.NONE;
+  private _detectedGesture = GESTURE.NONE;
+  private _testingGestures = GESTURE.NONE;
   private _lastFingerCount = 0;
   private _aspect: number = 1;
 
@@ -45,20 +45,26 @@ class DeadzoneChecker {
 
   /**
    * Size of the deadzone.
-   * @type number
+   * @type {number}
    */
   public get size() { return this._size; }
+
+  /**
+   * Whether the input is in the deadzone
+   * @type {boolean}
+   */
   public get inDeadzone() { return this._state === STATE.IN_DEADZONE; }
 
   public set size(val: number) { this._size = val; }
 
   /**
    * Create new DeadzoneChecker
-   * @param {DeadzoneCheckerOption} [options={}] Options
+   * @param {DeadzoneCheckerOptions} [options={}] Options
+   * @param {number} [options.size=0.1] Size of the deadzone circle.
    */
   public constructor({
     size = 0.1
-  }: Partial<DeadzoneCheckerOption> = {}) {
+  }: Partial<DeadzoneCheckerOptions> = {}) {
     this._size = size;
   }
 
@@ -86,17 +92,17 @@ class DeadzoneChecker {
     this._state = STATE.IN_DEADZONE;
   }
 
-  public addTestingGestures(...gestures: TOUCH.GESTURE[]) {
-    this._testingGestures = this._testingGestures | gestures.reduce((gesture, accumulated) => gesture | accumulated, TOUCH.GESTURE.NONE);
+  public addTestingGestures(...gestures: GESTURE[]) {
+    this._testingGestures = this._testingGestures | gestures.reduce((gesture, accumulated) => gesture | accumulated, GESTURE.NONE);
   }
 
   public cleanup() {
-    this._testingGestures = TOUCH.GESTURE.NONE;
+    this._testingGestures = GESTURE.NONE;
     this._lastFingerCount = 0;
     this._prevOneFingerPosInitialized = false;
     this._prevTwoFingerPosInitialized = false;
     this._initialTwoFingerDistance = 0;
-    this._detectedGesture = TOUCH.GESTURE.NONE;
+    this._detectedGesture = GESTURE.NONE;
     this._state = STATE.WAITING;
   }
 
@@ -112,7 +118,7 @@ class DeadzoneChecker {
     });
   }
 
-  public check(inputs: THREE.Vector2[]): TOUCH.GESTURE {
+  public check(inputs: THREE.Vector2[]): GESTURE {
     const state = this._state;
     const deadzone = this._size;
     const testingGestures = this._testingGestures;
@@ -128,7 +134,7 @@ class DeadzoneChecker {
 
     if (fingerCount !== lastFingerCount) {
       this.setFirstInput(inputs);
-      return TOUCH.GESTURE.NONE;
+      return GESTURE.NONE;
     }
 
     if (fingerCount === 1) {
@@ -138,12 +144,12 @@ class DeadzoneChecker {
       const diff = new THREE.Vector2().subVectors(input, prevPos);
       if (diff.length() > deadzone) {
         if (Math.abs(diff.x) > Math.abs(diff.y)) {
-          if (TOUCH.GESTURE.ONE_FINGER_HORIZONTAL & testingGestures) {
-            this._detectedGesture = TOUCH.GESTURE.ONE_FINGER_HORIZONTAL;
+          if (GESTURE.ONE_FINGER_HORIZONTAL & testingGestures) {
+            this._detectedGesture = GESTURE.ONE_FINGER_HORIZONTAL;
           }
         } else {
-          if (TOUCH.GESTURE.ONE_FINGER_VERTICAL & testingGestures) {
-            this._detectedGesture = TOUCH.GESTURE.ONE_FINGER_VERTICAL;
+          if (GESTURE.ONE_FINGER_VERTICAL & testingGestures) {
+            this._detectedGesture = GESTURE.ONE_FINGER_VERTICAL;
           }
         }
       }
@@ -154,12 +160,12 @@ class DeadzoneChecker {
       const diff = new THREE.Vector2().subVectors(middle, prevPos);
       if (diff.length() > deadzone) {
         if (Math.abs(diff.x) > Math.abs(diff.y)) {
-          if (TOUCH.GESTURE.TWO_FINGER_HORIZONTAL & testingGestures) {
-            this._detectedGesture = TOUCH.GESTURE.TWO_FINGER_HORIZONTAL;
+          if (GESTURE.TWO_FINGER_HORIZONTAL & testingGestures) {
+            this._detectedGesture = GESTURE.TWO_FINGER_HORIZONTAL;
           }
         } else {
-          if (TOUCH.GESTURE.TWO_FINGER_VERTICAL & testingGestures) {
-            this._detectedGesture = TOUCH.GESTURE.TWO_FINGER_VERTICAL;
+          if (GESTURE.TWO_FINGER_VERTICAL & testingGestures) {
+            this._detectedGesture = GESTURE.TWO_FINGER_VERTICAL;
           }
         }
       }
@@ -167,13 +173,13 @@ class DeadzoneChecker {
       const distance = new THREE.Vector2().subVectors(inputs[1], inputs[0]).length();
 
       if (Math.abs(distance - this._initialTwoFingerDistance) > deadzone) {
-        if (TOUCH.GESTURE.PINCH & testingGestures) {
-          this._detectedGesture = TOUCH.GESTURE.PINCH;
+        if (GESTURE.PINCH & testingGestures) {
+          this._detectedGesture = GESTURE.PINCH;
         }
       }
     }
 
-    if (this._detectedGesture !== TOUCH.GESTURE.NONE) {
+    if (this._detectedGesture !== GESTURE.NONE) {
       this._state = STATE.OUT_OF_DEADZONE;
     }
 

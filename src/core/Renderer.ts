@@ -6,9 +6,8 @@
 import * as THREE from "three";
 
 import View3D from "../View3D";
-
-import Scene from "./Scene";
-import Camera from "./Camera";
+import { findCanvas } from "../utils";
+import { EVENTS } from "../const/external";
 
 /**
  * Renderer that renders View3D's Scene
@@ -38,10 +37,17 @@ class Renderer {
    */
   public get threeRenderer() { return this._renderer; }
   /**
+   * Default render loop of View3D
+   * @type {function}
+   * @readonly
+   */
+  public get defaultRenderLoop() { return this._defaultRenderLoop; }
+  /**
    * The width and height of the renderer's output canvas
    * @type {object}
    * @param {number} width Width of the canvas
    * @param {number} height Height of the canvas
+   * @readonly
    */
   public get size() {
     const canvasSize = this._renderer.getSize(new THREE.Vector2());
@@ -53,9 +59,9 @@ class Renderer {
    * Create new Renderer instance
    * @param canvas \<canvas\> element to render 3d model
    */
-  public constructor(view3D: View3D, canvas: HTMLCanvasElement) {
+  public constructor(view3D: View3D) {
     this._view3D = view3D;
-    this._canvas = canvas;
+    this._canvas = findCanvas(view3D.rootEl, view3D.canvasSelector);
 
     const renderer = new THREE.WebGLRenderer({
       canvas: this._canvas,
@@ -64,7 +70,6 @@ class Renderer {
       preserveDrawingBuffer: true
     });
 
-    renderer.xr.enabled = true;
     renderer.toneMapping = THREE.LinearToneMapping;
     renderer.toneMappingExposure = view3D.exposure;
     renderer.outputEncoding = THREE.sRGBEncoding;
@@ -88,19 +93,9 @@ class Renderer {
     renderer.setSize(canvas.offsetWidth, canvas.offsetHeight, false);
   }
 
-  /**
-   * Render a scene using a camera.
-   * @see https://threejs.org/docs/#api/en/renderers/WebGLRenderer.render
-   * @param scene {@link Scene} to render
-   * @param camera {@link Camera} to render
-   */
-  public render(scene: Scene, camera: Camera): void {
-    this._renderer.render(scene.root, camera.threeCamera);
-  }
-
-  public setAnimationLoop(callback: (delta: number, frame?: any) => void): void {
+  public setAnimationLoop(callback: (delta: number, frame?: THREE.XRFrame) => void): void {
     this._clock.start();
-    this._renderer.setAnimationLoop((timestamp: number, frame: any) => {
+    this._renderer.setAnimationLoop((timestamp: number, frame: THREE.XRFrame) => {
       const delta = this._clock.getDelta();
       callback(delta, frame);
     });
@@ -130,6 +125,34 @@ class Renderer {
 
     threeRenderer.shadowMap.enabled = false;
   }
+
+  private _defaultRenderLoop = (delta: number) => {
+    const view3D = this._view3D;
+    const {
+      scene,
+      camera,
+      control,
+      autoPlayer,
+      animator
+    } = view3D;
+
+    const deltaMiliSec = delta * 1000;
+
+    animator.update(delta);
+    control.update(deltaMiliSec);
+    autoPlayer.update(deltaMiliSec);
+
+    view3D.trigger(EVENTS.BEFORE_RENDER, {
+      target: view3D
+    });
+
+    camera.updatePosition();
+    this._renderer.render(scene.root, camera.threeCamera);
+
+    view3D.trigger(EVENTS.RENDER, {
+      target: view3D
+    });
+  };
 }
 
 export default Renderer;

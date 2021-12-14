@@ -7,7 +7,6 @@ import View3D from "../View3D";
 import Pose from "../core/Pose";
 import Motion from "../core/Motion";
 import * as DEFAULT from "../const/default";
-import { AnyFunction } from "../type/external";
 import { mix, circulate } from "../utils";
 
 import CameraControl from "./CameraControl";
@@ -24,7 +23,7 @@ class AnimationControl implements CameraControl {
   private _view3D: View3D;
   private _motion: Motion;
   private _enabled: boolean = false;
-  private _finishCallbacks: AnyFunction[] = [];
+  private _finishCallbacks: Array<(...args: any) => any> = [];
 
   public get element() { return null; }
   /**
@@ -141,7 +140,7 @@ class AnimationControl implements CameraControl {
    * @param callback Callback that will be called when animation finishes
    * @returns {void}
    */
-  public onFinished(callback: AnyFunction): void {
+  public onFinished(callback: (...args: any) => any): void {
     this._finishCallbacks.push(callback);
   }
 

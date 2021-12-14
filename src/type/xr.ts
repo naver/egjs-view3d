@@ -6,18 +6,17 @@ import * as THREE from "three";
 
 import View3D from "../View3D";
 import Model from "../core/Model";
+import ARScene from "../xr/ARScene";
 
-export interface XRContext {
-  view3d: View3D;
+export interface XRRenderContext {
+  view3D: View3D;
   model: Model;
-  session: Readonly<any>;
-}
-
-export interface XRRenderContext extends XRContext {
+  scene: ARScene;
+  session: THREE.XRSession;
   delta: number;
-  frame: Readonly<any>;
-  referenceSpace: Readonly<any>;
-  xrCam: Readonly<THREE.PerspectiveCamera>;
+  frame: THREE.XRFrame;
+  referenceSpace: THREE.XRReferenceSpace;
+  xrCam: THREE.PerspectiveCamera;
   size: {
     width: number;
     height: number;

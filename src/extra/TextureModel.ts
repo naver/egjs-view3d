@@ -65,7 +65,11 @@ class TextureModel extends Model {
     const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
     const mesh = new THREE.Mesh(geometry, material);
 
-    super({ scenes: [mesh] });
+    super({
+      src: texture.image.src as string,
+      format: "img",
+      scenes: [mesh]
+    });
 
     this._texture = texture;
     this._mesh = mesh;

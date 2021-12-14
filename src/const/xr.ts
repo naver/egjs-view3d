@@ -16,9 +16,9 @@ export const QUICK_LOOK_SUPPORTED = () => {
   const anchorEl = document.createElement("a");
   return anchorEl.relList && anchorEl.relList.supports && anchorEl.relList.supports("ar");
 };
-export const WEBXR_SUPPORTED = navigator.xr && navigator.xr.isSessionSupported;
-export const HIT_TEST_SUPPORTED = window.XRSession && window.XRSession.prototype.requestHitTestSource;
-export const DOM_OVERLAY_SUPPORTED = window.XRDOMOverlayState != null;
+export const WEBXR_SUPPORTED = (): boolean => navigator.xr && !!navigator.xr.isSessionSupported;
+export const HIT_TEST_SUPPORTED = (): boolean => window.XRSession && window.XRSession.prototype.requestHitTestSource;
+export const DOM_OVERLAY_SUPPORTED = (): boolean => window.XRDOMOverlayState != null;
 
 export const SESSION = {
   AR: "immersive-ar",
@@ -43,10 +43,10 @@ export const INPUT_PROFILE = {
 
 export const FEATURES = {
   HIT_TEST: { requiredFeatures: ["hit-test"] },
-  DOM_OVERLAY: (root: HTMLElement) => ({
-    optionalFeatures: ["dom-overlay"],
+  DOM_OVERLAY: (root: HTMLElement | null) => root ? ({
+    requiredFeatures: ["dom-overlay"],
     domOverlay: { root }
-  })
+  }) : {}
 } as const;
 
 // For type definition

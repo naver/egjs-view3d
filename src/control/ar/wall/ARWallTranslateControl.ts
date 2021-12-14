@@ -5,9 +5,9 @@
 
 import * as THREE from "three";
 
-import ARControl from "../common/ARControl";
+import ARCameraControl from "../common/ARCameraControl";
 import ArrowIndicator, { ArrowIndicatorOption } from "../ui/ArrowIndicator";
-import { XRRenderContext, XRContext, XRInputs } from "../../../type/internal";
+import { XRRenderContext, XRContext, XRInputs } from "../../../type/xr";
 /**
  * Options for {@link ARTranslateControl}
  * @interface
@@ -20,7 +20,7 @@ export interface ARWallTranslateControlOption {
 /**
  * Model's translation(position) control for {@link ARWallControl}
  */
-class ARWallTranslateControl implements ARControl {
+class ARWallTranslateControl implements ARCameraControl {
   public readonly position = new THREE.Vector3();
   public readonly wallPosition = new THREE.Vector3();
   public readonly hitRotation = new THREE.Quaternion();
@@ -66,7 +66,7 @@ class ARWallTranslateControl implements ARControl {
     this._dragPlane.set(wallNormal, -wallNormal.dot(modelPosition));
   }
 
-  public init({ view3d }: XRRenderContext) {
+  public init({ view3D: view3d }: XRRenderContext) {
     view3d.scene.add(this._arrowIndicator.object);
   }
 
@@ -120,7 +120,7 @@ class ARWallTranslateControl implements ARControl {
     this._initialPos.copy(coords[0]);
   }
 
-  public process({ view3d, model, frame, referenceSpace, xrCam }: XRRenderContext, { hitResults }: XRInputs) {
+  public process({ view3D: view3d, model, frame, referenceSpace, xrCam }: XRRenderContext, { hitResults }: XRInputs) {
     if (!hitResults || hitResults.length !== 1 || !this._active) return;
 
     const dragPlane = this._dragPlane;

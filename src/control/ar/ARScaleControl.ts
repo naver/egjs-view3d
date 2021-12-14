@@ -5,11 +5,11 @@
 
 import * as THREE from "three";
 
-import ScaleUI from "../ui/ScaleUI";
-import Motion from "../../../controls/Motion";
-import { XRRenderContext, XRContext, XRInputs } from "../../../type/internal";
+import Motion from "../../core/Motion";
+import { XRRenderContext, XRInputs } from "../../type/xr";
 
-import ARControl from "./ARControl";
+import ScaleUI from "./ui/ScaleUI";
+import ARCameraControl from "./common/ARCameraControl";
 
 /**
  * Options for {@link ARScaleControl}
@@ -17,7 +17,7 @@ import ARControl from "./ARControl";
  * @property {number} [min=0.05] Minimum scale, default is 0.05(5%)
  * @property {number} [max=2] Maximum scale, default is 2(200%)
  */
-export interface ARScaleControlOption {
+export interface ARScaleControlOptions {
   min: number;
   max: number;
 }
@@ -25,7 +25,7 @@ export interface ARScaleControlOption {
 /**
  * Model's scale controller which works on AR(WebXR) mode.
  */
-class ARScaleControl implements ARControl {
+class ARScaleControl implements ARCameraControl {
   // TODO: add option for "user scale"
 
   // Internal states
@@ -55,24 +55,23 @@ class ARScaleControl implements ARControl {
 
   /**
    * Create new instance of ARScaleControl
-   * @param {ARScaleControlOption} [options={}] Options
+   * @param {ARScaleControlOptions} [options={}] Options
+   * @param {number} [options.min=0.05] Minimum scale, default is 0.05(5%)
+   * @param {number} [options.max=2] Maximum scale, default is 2(200%)
    */
   public constructor({
     min = 0.05,
     max = 2
-  } = {}) {
+  }: Partial<ARScaleControlOptions> = {}) {
     this._motion = new Motion({ duration: 0, range: { min, max } });
     this._motion.reset(1); // default scale is 1(100%)
     this._ui = new ScaleUI();
   }
 
-  public init({ view3d }: XRRenderContext) {
+  public init({ view3D: view3d }: XRRenderContext) {
+    // FIXME: Copy ARScene scale
     this._initialScale.copy(view3d.model!.scene.scale);
     view3d.scene.add(this._ui.mesh);
-  }
-
-  public destroy({ view3d }: XRContext) {
-    view3d.scene.remove(this._ui.mesh);
   }
 
   public setInitialPos(coords: THREE.Vector2[]) {
@@ -106,15 +105,6 @@ class ARScaleControl implements ARControl {
     this._prevCoordDistance = -1;
   }
 
-  /**
-   * Update scale range
-   * @param min Minimum scale
-   * @param max Maximum scale
-   */
-  public setRange(min: number, max: number) {
-    this._motion.range = { min, max };
-  }
-
   public process(ctx: XRRenderContext, { coords }: XRInputs) {
     if (coords.length !== 2 || !this._enabled || !this._active) return;
 
@@ -140,7 +130,7 @@ class ARScaleControl implements ARControl {
     model.scene.scale.copy(this.scale);
   }
 
-  private _updateUIPosition({ view3d, xrCam }: XRRenderContext) {
+  private _updateUIPosition({ view3D: view3d, xrCam }: XRRenderContext) {
     // Update UI
     const model = view3d.model!;
     const camPos = new THREE.Vector3().setFromMatrixPosition(xrCam.matrixWorld);

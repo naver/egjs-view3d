@@ -6,23 +6,13 @@
 import * as THREE from "three";
 
 import Animation from "../core/Animation";
-import ARFloorControl, { ARFloorControlOption } from "../control/ar/floor/ARFloorControl";
+import ARFloorControl from "../control/ar/floor/ARFloorControl";
 import { merge } from "../utils";
 import * as XR from "../const/xr";
 import { XRRenderContext, XRContext } from "../type/xr";
 
 import WebARSession, { WebARSessionOptions } from "./WebARSession";
 import HitTest from "./features/HitTest";
-
-
-/**
- * Options for {@link FloorARSession}.
- * This type is intersection of {@link WebARSessionOptions} and {@link ARControlOption}
- * @interface
- * @extends WebARSessionOptions
- * @extends ARFloorControlOption
- */
-interface FloorARSessionOption extends WebARSessionOptions, ARFloorControlOption {}
 
 /**
  * WebXR based AR session which puts model on the detected floor.
@@ -32,7 +22,7 @@ interface FloorARSessionOption extends WebARSessionOptions, ARFloorControlOption
  * @fires WebARSession#modelPlaced
  */
 class FloorARSession extends WebARSession {
-  private _options: Partial<FloorARSessionOption>;
+  private _options: Partial<WebARSessionOptions>;
   private _control: ARFloorControl | null;
   private _renderContext: XRRenderContext | null;
   private _modelPlaced: boolean;
@@ -48,7 +38,7 @@ class FloorARSession extends WebARSession {
    * Create new instance of FloorARSession
    * @param {FloorARSessionOption} options Options
    */
-  public constructor(options: Partial<FloorARSessionOption> = {}) {
+  public constructor(options: Partial<WebARSessionOptions> = {}) {
     super(options);
 
     this._control = null;
@@ -100,7 +90,7 @@ class FloorARSession extends WebARSession {
   };
 
   private _initModelPosition(ctx: XRRenderContext) {
-    const {view3d, frame, session} = ctx;
+    const {view3D: view3d, frame, session} = ctx;
     const model = view3d.model;
     const hitTest = this._hitTest;
 
@@ -158,17 +148,6 @@ class FloorARSession extends WebARSession {
     });
     scaleUpAnimation.start();
   }
-
-  private _onSelectStart = (e) => {
-    this._control!.onSelectStart({
-      ...this._renderContext!,
-      frame: e.frame
-    });
-  };
-
-  private _onSelectEnd = () => {
-    this._control!.onSelectEnd();
-  };
 }
 
 export default FloorARSession;

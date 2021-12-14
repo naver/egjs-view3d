@@ -5,8 +5,8 @@
 
 import * as THREE from "three";
 
-import Motion from "../../Motion";
-import { Range } from "../../../type/internal";
+import Motion from "../../../core/Motion";
+import { Range } from "../../../type/utils";
 
 /**
  * Options for {@link FloorIndicator}
@@ -15,9 +15,9 @@ import { Range } from "../../../type/internal";
  * @property {number} [dirIndicatorOpacity=1] Direction indicator's opacity.
  * @property {number} [fadeoutDuration=1000] Fadeout animation's duration.
  */
-export interface FloorIndicatorOption {
-  opacityMin: number;
-  opacityMax: number;
+export interface FloorIndicatorOptions {
+  ringOpacity: number;
+  dirIndicatorOpacity: number;
   fadeoutDuration: number;
 }
 
@@ -36,56 +36,56 @@ class FloorIndicator {
 
   /**
    * Create new instance of FloorIndicator
-   * @param {FloorIndicatorOption} [options={}] Options
+   * @param {FloorIndicatorOptions} [options={}] Options
    */
   public constructor({
     ringOpacity = 0.3,
     dirIndicatorOpacity = 1,
     fadeoutDuration = 1000
-  } = {}) {
-    const deg10 = Math.PI / 18;
+  }: Partial<FloorIndicatorOptions> = {}) {
+    // const deg10 = Math.PI / 18;
 
-    const dimmedRingGeomtry = new THREE.RingGeometry(0.975, 1, 150, 1, -6 * deg10, 30 * deg10);
-    const reticle = new THREE.CircleGeometry(0.1, 30, 0, Math.PI * 2);
-    dimmedRingGeomtry.merge(reticle);
+    // const dimmedRingGeomtry = new THREE.RingGeometry(0.975, 1, 150, 1, -6 * deg10, 30 * deg10);
+    // const reticle = new THREE.CircleGeometry(0.1, 30, 0, Math.PI * 2);
+    // dimmedRingGeomtry.merge(reticle);
 
-    const highlightedRingGeometry = new THREE.RingGeometry(0.96, 1.015, 30, 1, 25 * deg10, 4 * deg10);
+    // const highlightedRingGeometry = new THREE.RingGeometry(0.96, 1.015, 30, 1, 25 * deg10, 4 * deg10);
 
-    // Create little triangle in ring
-    const ringVertices = highlightedRingGeometry.vertices;
-    const trianglePart = ringVertices.slice(Math.floor(11 * ringVertices.length / 16), Math.floor(13 * ringVertices.length / 16));
-    const firstY = trianglePart[0].y;
-    const midIndex = Math.floor(trianglePart.length / 2);
-    trianglePart.forEach((vec, vecIdx) => {
-      const offsetAmount = 0.025 * (midIndex - Math.abs(vecIdx - midIndex));
-      vec.setY(firstY - offsetAmount);
-    });
+    // // Create little triangle in ring
+    // const ringVertices = highlightedRingGeometry.vertices;
+    // const trianglePart = ringVertices.slice(Math.floor(11 * ringVertices.length / 16), Math.floor(13 * ringVertices.length / 16));
+    // const firstY = trianglePart[0].y;
+    // const midIndex = Math.floor(trianglePart.length / 2);
+    // trianglePart.forEach((vec, vecIdx) => {
+    //   const offsetAmount = 0.025 * (midIndex - Math.abs(vecIdx - midIndex));
+    //   vec.setY(firstY - offsetAmount);
+    // });
 
-    const indicatorMat = new THREE.Matrix4().makeRotationX(-Math.PI / 2);
-    const mergedGeometry = new THREE.Geometry();
+    // const indicatorMat = new THREE.Matrix4().makeRotationX(-Math.PI / 2);
+    // const mergedGeometry = new THREE.Geometry();
 
-    mergedGeometry.merge(dimmedRingGeomtry, indicatorMat, 0);
-    mergedGeometry.merge(highlightedRingGeometry, indicatorMat, 1);
+    // mergedGeometry.merge(dimmedRingGeomtry, indicatorMat, 0);
+    // mergedGeometry.merge(highlightedRingGeometry, indicatorMat, 1);
 
-    const dimmedMaterial = new THREE.MeshBasicMaterial({
-      transparent: true,
-      opacity: ringOpacity,
-      color: 0xffffff
-    });
-    const highlightMaterial = new THREE.MeshBasicMaterial({
-      transparent: true,
-      opacity: dirIndicatorOpacity,
-      color: 0xffffff
-    });
-    const materials = [dimmedMaterial, highlightMaterial];
+    // const dimmedMaterial = new THREE.MeshBasicMaterial({
+    //   transparent: true,
+    //   opacity: ringOpacity,
+    //   color: 0xffffff
+    // });
+    // const highlightMaterial = new THREE.MeshBasicMaterial({
+    //   transparent: true,
+    //   opacity: dirIndicatorOpacity,
+    //   color: 0xffffff
+    // });
+    // const materials = [dimmedMaterial, highlightMaterial];
 
-    this._mesh = new THREE.Mesh(mergedGeometry, materials);
-    this._mesh.matrixAutoUpdate = false;
-    this._animator = new Motion({ duration: fadeoutDuration });
-    this._opacityRange = {
-      min: ringOpacity,
-      max: dirIndicatorOpacity
-    };
+    // this._mesh = new THREE.Mesh(mergedGeometry, materials);
+    // this._mesh.matrixAutoUpdate = false;
+    // this._animator = new Motion({ duration: fadeoutDuration });
+    // this._opacityRange = {
+    //   min: ringOpacity,
+    //   max: dirIndicatorOpacity
+    // };
   }
 
   public update({

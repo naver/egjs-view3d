@@ -63,9 +63,9 @@ class HoverARSession extends WebARSession {
     const ctx = this._renderContext;
 
     // Not ready to place model yet
-    if (!ctx || !ctx.view3d.scene.visible || this._modelPlaced) return;
+    if (!ctx || !ctx.view3D.scene.visible || this._modelPlaced) return;
 
-    const { session, view3d } = ctx;
+    const { session, view3D: view3d } = ctx;
     const modelRoot = view3d.model!.scene;
     const control = this._control;
 
@@ -128,7 +128,7 @@ class HoverARSession extends WebARSession {
   };
 
   private _initModelPosition(ctx: XRRenderContext) {
-    const {view3d, xrCam} = ctx;
+    const {view3D: view3d, xrCam} = ctx;
     const model = view3d.model;
 
     // Make sure the model exist

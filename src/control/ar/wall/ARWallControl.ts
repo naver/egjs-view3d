@@ -5,10 +5,10 @@
 
 import * as THREE from "three";
 
-import ARScaleControl, { ARScaleControlOption } from "../common/ARScaleControl";
-import DeadzoneChecker, { DeadzoneCheckerOption } from "../common/DeadzoneChecker";
-import ARSwirlControl, { ARSwirlControlOption } from "../common/ARSwirlControl";
-import FloorIndicator, { FloorIndicatorOption } from "../ui/FloorIndicator";
+import ARScaleControl, { ARScaleControlOptions } from "../ARScaleControl";
+import DeadzoneChecker, { DeadzoneCheckerOptions } from "../common/DeadzoneChecker";
+import ARSwirlControl, { ARSwirlControlOptions } from "../ARSwirlControl";
+import FloorIndicator, { FloorIndicatorOptions } from "../ui/FloorIndicator";
 import * as XR from "../../../consts/xr";
 import * as TOUCH from "../../../consts/touch";
 import { XRRenderContext, XRContext, XRInputs } from "../../../type/internal";
@@ -25,11 +25,11 @@ import ARWallTranslateControl, { ARWallTranslateControlOption } from "./ARWallTr
  * @property {DeadzoneCheckerOption} deadzone Options for {@link DeadzoneChecker}
  */
 export interface ARWallControlOption {
-  rotate: Partial<ARSwirlControlOption>;
+  rotate: Partial<ARSwirlControlOptions>;
   translate: Partial<ARWallTranslateControlOption>;
-  scale: Partial<ARScaleControlOption>;
-  floorIndicator: Partial<FloorIndicatorOption>;
-  deadzone: Partial<DeadzoneCheckerOption>;
+  scale: Partial<ARScaleControlOptions>;
+  floorIndicator: Partial<FloorIndicatorOptions>;
+  deadzone: Partial<DeadzoneCheckerOptions>;
 }
 
 /**
@@ -182,13 +182,13 @@ class ARWallControl {
 
     // Update deadzone testing gestures
     if (rotateControl.enabled) {
-      deadzoneChecker.addTestingGestures(TOUCH.GESTURE.ONE_FINGER);
+      deadzoneChecker.addTestingGestures(GESTURE.ONE_FINGER);
     }
     if (translateControl.enabled) {
-      deadzoneChecker.addTestingGestures(TOUCH.GESTURE.ONE_FINGER);
+      deadzoneChecker.addTestingGestures(GESTURE.ONE_FINGER);
     }
     if (scaleControl.enabled) {
-      deadzoneChecker.addTestingGestures(TOUCH.GESTURE.PINCH);
+      deadzoneChecker.addTestingGestures(GESTURE.PINCH);
     }
 
     const hitResults = frame.getHitTestResultsForTransientInput(hitTestSource);
@@ -228,11 +228,11 @@ class ARWallControl {
     const translateControl = this._translateControl;
     const scaleControl = this._scaleControl;
 
-    if (gesture === TOUCH.GESTURE.NONE) return;
+    if (gesture === GESTURE.NONE) return;
 
     switch (gesture) {
-      case TOUCH.GESTURE.ONE_FINGER_HORIZONTAL:
-      case TOUCH.GESTURE.ONE_FINGER_VERTICAL:
+      case GESTURE.ONE_FINGER_HORIZONTAL:
+      case GESTURE.ONE_FINGER_VERTICAL:
         if (this._modelHit) {
           translateControl.activate(ctx);
           translateControl.setInitialPos(coords);
@@ -243,7 +243,7 @@ class ARWallControl {
           rotateControl.setInitialPos(coords);
         }
         break;
-      case TOUCH.GESTURE.PINCH:
+      case GESTURE.PINCH:
         scaleControl.activate(ctx);
         scaleControl.setInitialPos(coords);
         break;

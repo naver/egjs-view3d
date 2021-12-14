@@ -26,3 +26,14 @@ export const CONTROL_EVENTS = {
   ENABLE: "enable",
   DISABLE: "disable"
 } as const;
+
+export enum GESTURE {
+  NONE = 0,
+  ONE_FINGER_HORIZONTAL = 1,
+  ONE_FINGER_VERTICAL = 2,
+  ONE_FINGER = 1 | 2,
+  TWO_FINGER_HORIZONTAL = 4,
+  TWO_FINGER_VERTICAL = 8,
+  TWO_FINGER = 4 | 8,
+  PINCH = 16,
+}

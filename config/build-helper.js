@@ -22,7 +22,7 @@ version: ${pkg.version}
 const commonjsPlugin = require("@rollup/plugin-commonjs")();
 const typescriptPlugin = require("rollup-plugin-typescript2");
 const minifyPlugin = require("rollup-plugin-prototype-minify")({ sourcemap: true })
-const resolvePlugin = require("@rollup/plugin-node-resolve")();
+const resolvePlugin = require("@rollup/plugin-node-resolve")({ include: "node_modules/**" });
 const uglifyPlugin = require("rollup-plugin-uglify").uglify;
 const visualizerPlugin = require("rollup-plugin-visualizer");
 

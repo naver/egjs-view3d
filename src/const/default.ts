@@ -31,7 +31,7 @@ export const NULL_ELEMENT: HTMLElement | string | null = null;
 export const DRACO_DECODER_URL = "https://www.gstatic.com/draco/v1/decoders/";
 
 export const AR_PRIORITY = [
-  // AR_SESSION_TYPE.WEBXR,
+  AR_SESSION_TYPE.WEBXR,
   AR_SESSION_TYPE.SCENE_VIEWER,
   AR_SESSION_TYPE.QUICK_LOOK
 ];

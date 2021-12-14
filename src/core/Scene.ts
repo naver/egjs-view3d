@@ -10,7 +10,6 @@ import TextureLoader from "../loaders/TextureLoader";
 import { STANDARD_MAPS } from "../const/internal";
 import { getObjectOption } from "../utils";
 
-import Model from "./Model";
 import ShadowPlane from "./ShadowPlane";
 
 /**
@@ -36,11 +35,6 @@ class Scene {
   public get shadowPlane() { return this._shadowPlane; }
 
   /**
-   * Return the visibility of the root scene
-   */
-  public get visible() { return this._root.visible; }
-
-  /**
    * Create new Scene instance
    */
   public constructor(view3D: View3D) {
@@ -64,10 +58,6 @@ class Scene {
     if (view3D.shadow) {
       root.add(shadowPlane.mesh, shadowPlane.light);
     }
-  }
-
-  public fit(model: Model) {
-    // TODO:
   }
 
   /**
@@ -156,22 +146,6 @@ class Scene {
     const renderTarget = await textureLoader.loadHDRTexture(url);
 
     this._root.environment = renderTarget.texture;
-  }
-
-  /**
-   * Make this scene visible
-   * @returns {void}
-   */
-  public show(): void {
-    this._root.visible = true;
-  }
-
-  /**
-   * Make this scene invisible
-   * @returns {void}
-   */
-  public hide(): void {
-    this._root.visible = false;
   }
 
   private _removeChildsOf(obj: THREE.Object3D) {

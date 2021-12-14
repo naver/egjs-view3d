@@ -99,7 +99,7 @@ class WallARSession extends WebARSession {
   };
 
   private _initModelPosition(ctx: XRRenderContext) {
-    const {view3d, frame, session} = ctx;
+    const {view3D: view3d, frame, session} = ctx;
     const model = view3d.model;
     const hitTest = this._hitTest;
 

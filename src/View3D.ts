@@ -18,15 +18,17 @@ import OrbitControl from "./control/OrbitControl";
 import { RotateControlOptions } from "./control/RotateControl";
 import { TranslateControlOptions } from "./control/TranslateControl";
 import { ZoomControlOptions } from "./control/ZoomControl";
-import AutoControl, { AutoplayOptions } from "./control/AutoControl";
+import AutoPlayer, { AutoplayOptions } from "./core/AutoPlayer";
 import { WebARSessionOptions } from "./xr/WebARSession";
 import { SceneViewerSessionOptions } from "./xr/SceneViewerSession";
 import { QuickLookSessionOptions } from "./xr/QuickLookSession";
 import { EVENTS, AUTO, AR_SESSION_TYPE } from "./const/external";
 import * as DEFAULT from "./const/default";
+import * as ERROR from "./const/error";
 import * as EVENT_TYPES from "./type/event";
-import { getCanvas, getObjectOption } from "./utils";
+import { getElement, getObjectOption } from "./utils";
 import { LiteralUnion, OptionGetters, ValueOf } from "./type/utils";
+import { View3DError } from "./core";
 
 /**
  * @interface
@@ -80,6 +82,7 @@ export interface View3DOptions {
   arPriority: Array<ValueOf<typeof AR_SESSION_TYPE>>;
 
   // Others
+  canvasSelector: string;
   autoInit: boolean;
   autoResize: boolean;
   useResizeObserver: boolean;
@@ -102,13 +105,14 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   private _scene: Scene;
   private _camera: Camera;
   private _control: OrbitControl;
-  private _autoPlayer: AutoControl;
+  private _autoPlayer: AutoPlayer;
   private _model: Model | null;
   private _animator: ModelAnimator;
   private _autoResizer: AutoResizer;
   private _arManager: ARManager;
 
   // Internal States
+  private _rootEl: HTMLElement;
   private _initialized: boolean;
 
   // Options
@@ -140,6 +144,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   private _quickLook: View3DOptions["quickLook"];
   private _arPriority: View3DOptions["arPriority"];
 
+  private _canvasSelector: View3DOptions["canvasSelector"];
   private _autoInit: View3DOptions["autoInit"];
   private _autoResize: View3DOptions["autoResize"];
   private _useResizeObserver: View3DOptions["useResizeObserver"];
@@ -170,6 +175,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    */
   public get control() { return this._control; }
   /**
+   * {@link AutoPlayer} instance of the View3D
+   * @type {AutoPlayer}
+   * @readonly
+   */
+  public get autoPlayer() { return this._autoPlayer; }
+  /**
    * Current {@link Model} displaying. `null` if nothing is displayed on the canvas.
    * @type {Model | null}
    * @readonly
@@ -189,6 +200,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   public get ar() { return this._arManager; }
 
   // Internal State Getter
+  public get rootEl() { return this._rootEl; }
   public get initialized() { return this._initialized; }
 
   // Options Getter
@@ -228,6 +240,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   public get sceneViewer() { return this._sceneViewer; }
   public get quickLook() { return this._quickLook; }
   public get arPriority() { return this._arPriority; }
+  public get canvasSelector() { return this._canvasSelector; }
   /**
    * Call {@link View3D#init init()} automatically when creating View3D's instance
    * This option won't work if `src` is not given
@@ -256,7 +269,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
 
   /**
    * Creates new View3D instance.
-   * @param canvasEl A canvas element or selector of it to initialize View3D
+   * @param root A root element or selector of it to initialize View3D
    * @param {View3DOptions} [options={}] An options object for View3D
    * @throws {View3DError}
    * |code|condition|
@@ -266,7 +279,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    * |{@link ERROR_CODE ELEMENT_NOT_CANVAS}|When the element given is not a \<canvas\> element|
    * |{@link ERROR_CODE WEBGL_NOT_SUPPORTED}|When the browser does not support WebGL|
    */
-  public constructor(canvasEl: string | HTMLElement, {
+  public constructor(root: string | HTMLElement, {
     src = null,
     format = AUTO,
     dracoPath = DEFAULT.DRACO_DECODER_URL,
@@ -291,12 +304,14 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     sceneViewer = true,
     quickLook = true,
     arPriority = DEFAULT.AR_PRIORITY,
+    canvasSelector = "canvas",
     autoInit = true,
     autoResize = true,
     useResizeObserver = true
   }: Partial<View3DOptions> = {}) {
     super();
-    const canvas = getCanvas(canvasEl);
+
+    this._rootEl = getElement(root);
 
     // Bind options
     this._src = src;
@@ -327,17 +342,18 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._quickLook = quickLook;
     this._arPriority = arPriority;
 
+    this._canvasSelector = canvasSelector;
     this._autoInit = autoInit;
     this._autoResize = autoResize;
     this._useResizeObserver = useResizeObserver;
 
     // Create internal components
-    this._renderer = new Renderer(this, canvas);
+    this._renderer = new Renderer(this);
     this._camera = new Camera(this);
     this._control = new OrbitControl(this);
     this._scene = new Scene(this);
     this._animator = new ModelAnimator(this._scene.root);
-    this._autoPlayer = new AutoControl(this, getObjectOption(autoplay));
+    this._autoPlayer = new AutoPlayer(this, getObjectOption(autoplay));
     this._autoResizer = new AutoResizer(this);
     this._arManager = new ARManager(this);
 
@@ -363,6 +379,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    * @returns {Promise<void>}
    */
   public async init() {
+    if (!this._src) {
+      throw new View3DError(ERROR.MESSAGES.PROVIDE_SRC_FIRST, ERROR.CODES.PROVIDE_SRC_FIRST);
+    }
+
     if (this._autoResize) {
       this._autoResizer.enable();
     }
@@ -373,7 +393,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     const background = this._background;
 
     const tasks: [Promise<Model>, ...Array<Promise<any>>] = [
-      this._loadModel(this._src!, this._format)
+      this._loadModel(this._src, this._format)
     ];
 
     // Load & set skybox / envmap before displaying model
@@ -421,7 +441,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    * @param {string} [format="auto"] File extension format of the 3D model (glTF, glb, ...)
    * If `"auto"` is given, View3D will try to detect the format of the 3D model with the name of `src` URL
    */
-  public async load(src: string, format: View3DOptions["format"] = "auto") {
+  public async load(src: string, format: View3DOptions["format"] = AUTO) {
     const model = await this._loadModel(src, format);
 
     this._src = src;
@@ -429,36 +449,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
 
     this._display(model);
   }
-
-  /**
-   * View3D's basic render loop function
-   * @param delta Number of seconds passed since last frame
-   */
-  public renderLoop = (delta: number) => {
-    const renderer = this._renderer;
-    const scene = this._scene;
-    const camera = this._camera;
-    const control = this._control;
-    const autoPlayer = this._autoPlayer;
-    const animator = this._animator;
-
-    const deltaMiliSec = delta * 1000;
-
-    animator.update(delta);
-    control.update(deltaMiliSec);
-    autoPlayer.update(deltaMiliSec);
-
-    this.trigger(EVENTS.BEFORE_RENDER, {
-      target: this
-    });
-
-    camera.updatePosition();
-    renderer.render(scene, camera);
-
-    this.trigger(EVENTS.RENDER, {
-      target: this
-    });
-  };
 
   private async _loadModel(src: string, format: View3DOptions["format"]) {
     const loader = new ModelLoader(this);
@@ -494,7 +484,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._model = model;
 
     renderer.stopAnimationLoop();
-    renderer.setAnimationLoop(this.renderLoop);
+    renderer.setAnimationLoop(renderer.defaultRenderLoop);
 
     this.trigger(EVENTS.MODEL_CHANGE, {
       target: this,

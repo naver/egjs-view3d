@@ -16,7 +16,7 @@ class View3D extends React.Component<DemoOptions, { arAvailable: boolean }> {
   };
 
   private _view3d: VanillaView3D;
-  private _canvasRef = React.createRef<HTMLCanvasElement>();
+  private _rootRef = React.createRef<HTMLDivElement>();
   private _arButtonRef = React.createRef<HTMLButtonElement>();
 
   public constructor(props: DemoOptions) {
@@ -27,7 +27,7 @@ class View3D extends React.Component<DemoOptions, { arAvailable: boolean }> {
 
   public componentDidMount() {
     const { children, showBbox, showARButton, ...restProps } = this.props;
-    const view3d = new VanillaView3D(this._canvasRef.current, restProps);
+    const view3d = new VanillaView3D(this._rootRef.current, restProps);
 
     this._view3d = view3d;
 
@@ -57,8 +57,8 @@ class View3D extends React.Component<DemoOptions, { arAvailable: boolean }> {
     const { showARButton, children } = this.props;
     const { arAvailable } = this.state;
 
-    return <div className="view3d-canvas-wrapper image is-square mb-2">
-      <canvas ref={this._canvasRef} className="view3d-canvas"></canvas>
+    return <div ref={this._rootRef} className="view3d-canvas-wrapper image is-square mb-2">
+      <canvas className="view3d-canvas"></canvas>
       { showARButton && <ARButton buttonRef={this._arButtonRef} disabled={!arAvailable} />}
       { children }
     </div>;

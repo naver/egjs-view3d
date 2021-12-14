@@ -5,11 +5,12 @@
 
 import * as THREE from "three";
 
-import Motion from "../../../../src/controls/Motion";
-import ARControl from "../common/ARControl";
-import * as DEFAULT from "../../../../src/consts/default";
-import * as EASING from "../../../../src/consts/easing";
-import { XRRenderContext, XRContext, XRInputs } from "../../../../src/type/internal";
+import Motion from "../../core/Motion";
+import * as DEFAULT from "../../const/default";
+import { EASING } from "../../const/external";
+import { XRRenderContext, XRInputs } from "../../type/xr";
+
+import ARCameraControl from "./common/ARCameraControl";
 
 enum STATE {
   WAITING,
@@ -28,7 +29,7 @@ enum STATE {
  * @property {number} [bounceDuration=1000] Bounce-to-floor animation's duration, in milisecond.
  * @property {number} [bounceEasing=EASING.EASE_OUT_BOUNCE] Bounce-to-floor animation's easing function.
  */
-export interface ARFloorTranslateControlOption {
+export interface ARTranslateControlOptions {
   threshold: number;
   hoverAmplitude: number;
   hoverHeight: number;
@@ -41,7 +42,7 @@ export interface ARFloorTranslateControlOption {
 /**
  * Model's translation(position) control for {@link ARFloorControl}
  */
-class ARFloorTranslateControl implements ARControl {
+class ARTranslateControl implements ARCameraControl {
   // Options
   private _hoverAmplitude: number;
   private _hoverHeight: number;
@@ -95,7 +96,7 @@ class ARFloorTranslateControl implements ARControl {
     hoverEasing = EASING.SINE_WAVE,
     bounceDuration = 1000,
     bounceEasing = EASING.EASE_OUT_BOUNCE
-  }: Partial<ARFloorTranslateControlOption> = {}) {
+  }: Partial<ARTranslateControlOptions> = {}) {
     this._hoverAmplitude = hoverAmplitude;
     this._hoverHeight = hoverHeight;
     this._hoverMotion = new Motion({
@@ -118,10 +119,7 @@ class ARFloorTranslateControl implements ARControl {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  public init(ctx: XRRenderContext) {}
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  public destroy(ctx: XRContext) {}
+  public init() {}
 
   /**
    * Enable this control
@@ -176,7 +174,7 @@ class ARFloorTranslateControl implements ARControl {
     this._initialPos.copy(coords[0]);
   }
 
-  public process({ view3d, model, frame, referenceSpace, xrCam }: XRRenderContext, { hitResults }: XRInputs) {
+  public process({ view3D: view3d, model, frame, referenceSpace, xrCam }: XRRenderContext, { hitResults }: XRInputs) {
     const state = this._state;
     const notActive = state === STATE.WAITING || state === STATE.BOUNCING;
     if (!hitResults || hitResults.length !== 1 || notActive) return;
@@ -271,4 +269,4 @@ class ARFloorTranslateControl implements ARControl {
   }
 }
 
-export default ARFloorTranslateControl;
+export default ARTranslateControl;

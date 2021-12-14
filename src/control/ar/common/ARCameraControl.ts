@@ -3,23 +3,22 @@
  * egjs projects are licensed under the MIT license
  */
 
-import * as TOUCH from "../../../../src/consts/touch";
-import { XRRenderContext, XRContext, XRInputs } from "../../../../src/type/internal";
+import { GESTURE } from "../../../const/internal";
+import { XRRenderContext, XRInputs } from "../../../type/xr";
 
 /**
  * @interface
  */
-interface ARControl {
+interface ARCameraControl {
   readonly enabled: boolean;
   enable(): void;
   disable(): void;
   init(ctx: XRRenderContext): void;
-  destroy(ctx: XRContext): void;
-  activate(ctx: XRRenderContext, gesture: TOUCH.GESTURE): void;
-  deactivate(ctx: XRContext): void;
+  activate(ctx: XRRenderContext, gesture: GESTURE): void;
+  deactivate(): void;
   setInitialPos(coords: THREE.Vector2[]): void;
   process(ctx: XRRenderContext, inputs: XRInputs): void;
   update(ctx: XRRenderContext, deltaMilisec: number): void;
 }
 
-export default ARControl;
+export default ARCameraControl;

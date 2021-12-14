@@ -73,11 +73,11 @@ describe("DeadzoneChecker", () => {
 
   describe("Detecting a gesture", () => {
     describe("One finger horizontal", () => {
-      const correctTestingGestures = [TOUCH.GESTURE.ONE_FINGER_HORIZONTAL, TOUCH.GESTURE.ONE_FINGER];
-      const inCorrectTestingGestures = [TOUCH.GESTURE.NONE, TOUCH.GESTURE.ONE_FINGER_VERTICAL, TOUCH.GESTURE.TWO_FINGER, TOUCH.GESTURE.PINCH];
+      const correctTestingGestures = [GESTURE.ONE_FINGER_HORIZONTAL, GESTURE.ONE_FINGER];
+      const inCorrectTestingGestures = [GESTURE.NONE, GESTURE.ONE_FINGER_VERTICAL, GESTURE.TWO_FINGER, GESTURE.PINCH];
 
       correctTestingGestures.forEach(gesture => {
-        it(`should return TOUCH.GESTURE.ONE_FINGER_HORIZONTAL if testing gesture ${TOUCH.GESTURE[gesture]} is added before`, () => {
+        it(`should return GESTURE.ONE_FINGER_HORIZONTAL if testing gesture ${GESTURE[gesture]} is added before`, () => {
           // Given
           const deadzoneChecker = new DeadzoneChecker({ size: 0.1 });
 
@@ -87,10 +87,10 @@ describe("DeadzoneChecker", () => {
           const result = deadzoneChecker.check([new THREE.Vector2(1, 0)]);
 
           // Then
-          expect(result).to.equal(TOUCH.GESTURE.ONE_FINGER_HORIZONTAL);
+          expect(result).to.equal(GESTURE.ONE_FINGER_HORIZONTAL);
         });
 
-        it(`should return TOUCH.GESTURE.NONE if testing gesture ${TOUCH.GESTURE[gesture]} is added before and it's in deadzone`, () => {
+        it(`should return GESTURE.NONE if testing gesture ${GESTURE[gesture]} is added before and it's in deadzone`, () => {
           // Given
           const deadzoneChecker = new DeadzoneChecker({ size: 1 });
 
@@ -100,12 +100,12 @@ describe("DeadzoneChecker", () => {
           const result = deadzoneChecker.check([new THREE.Vector2(1, 0)]);
 
           // Then
-          expect(result).to.equal(TOUCH.GESTURE.NONE);
+          expect(result).to.equal(GESTURE.NONE);
         });
       });
 
       inCorrectTestingGestures.forEach(gesture => {
-        it(`should return TOUCH.GESTURE.NONE if testing gesture ${TOUCH.GESTURE[gesture]} is added before`, () => {
+        it(`should return GESTURE.NONE if testing gesture ${GESTURE[gesture]} is added before`, () => {
           // Given
           const deadzoneChecker = new DeadzoneChecker({ size: 0.1 });
 
@@ -115,17 +115,17 @@ describe("DeadzoneChecker", () => {
           const result = deadzoneChecker.check([new THREE.Vector2(1, 0)]);
 
           // Then
-          expect(result).to.equal(TOUCH.GESTURE.NONE);
+          expect(result).to.equal(GESTURE.NONE);
         });
       });
     });
 
     describe("One finger vertical", () => {
-      const correctTestingGestures = [TOUCH.GESTURE.ONE_FINGER_VERTICAL, TOUCH.GESTURE.ONE_FINGER];
-      const inCorrectTestingGestures = [TOUCH.GESTURE.NONE, TOUCH.GESTURE.ONE_FINGER_HORIZONTAL, TOUCH.GESTURE.TWO_FINGER, TOUCH.GESTURE.PINCH];
+      const correctTestingGestures = [GESTURE.ONE_FINGER_VERTICAL, GESTURE.ONE_FINGER];
+      const inCorrectTestingGestures = [GESTURE.NONE, GESTURE.ONE_FINGER_HORIZONTAL, GESTURE.TWO_FINGER, GESTURE.PINCH];
 
       correctTestingGestures.forEach(gesture => {
-        it(`should return TOUCH.GESTURE.ONE_FINGER_VERTICAL if testing gesture ${TOUCH.GESTURE[gesture]} is added before`, () => {
+        it(`should return GESTURE.ONE_FINGER_VERTICAL if testing gesture ${GESTURE[gesture]} is added before`, () => {
           // Given
           const deadzoneChecker = new DeadzoneChecker({ size: 0.1 });
 
@@ -135,10 +135,10 @@ describe("DeadzoneChecker", () => {
           const result = deadzoneChecker.check([new THREE.Vector2(0, 1)]);
 
           // Then
-          expect(result).to.equal(TOUCH.GESTURE.ONE_FINGER_VERTICAL);
+          expect(result).to.equal(GESTURE.ONE_FINGER_VERTICAL);
         });
 
-        it(`should return TOUCH.GESTURE.NONE if testing gesture ${TOUCH.GESTURE[gesture]} is added before and it's in deadzone`, () => {
+        it(`should return GESTURE.NONE if testing gesture ${GESTURE[gesture]} is added before and it's in deadzone`, () => {
           // Given
           const deadzoneChecker = new DeadzoneChecker({ size: 1 });
 
@@ -148,12 +148,12 @@ describe("DeadzoneChecker", () => {
           const result = deadzoneChecker.check([new THREE.Vector2(0, 1)]);
 
           // Then
-          expect(result).to.equal(TOUCH.GESTURE.NONE);
+          expect(result).to.equal(GESTURE.NONE);
         });
       });
 
       inCorrectTestingGestures.forEach(gesture => {
-        it(`should return TOUCH.GESTURE.NONE if testing gesture ${TOUCH.GESTURE[gesture]} is added before`, () => {
+        it(`should return GESTURE.NONE if testing gesture ${GESTURE[gesture]} is added before`, () => {
           // Given
           const deadzoneChecker = new DeadzoneChecker({ size: 0.1 });
 
@@ -163,17 +163,17 @@ describe("DeadzoneChecker", () => {
           const result = deadzoneChecker.check([new THREE.Vector2(0, 1)]);
 
           // Then
-          expect(result).to.equal(TOUCH.GESTURE.NONE);
+          expect(result).to.equal(GESTURE.NONE);
         });
       });
     });
 
     describe("Two finger horizontal", () => {
-      const correctTestingGestures = [TOUCH.GESTURE.TWO_FINGER_HORIZONTAL, TOUCH.GESTURE.TWO_FINGER];
-      const inCorrectTestingGestures = [TOUCH.GESTURE.NONE, TOUCH.GESTURE.TWO_FINGER_VERTICAL, TOUCH.GESTURE.ONE_FINGER, TOUCH.GESTURE.PINCH];
+      const correctTestingGestures = [GESTURE.TWO_FINGER_HORIZONTAL, GESTURE.TWO_FINGER];
+      const inCorrectTestingGestures = [GESTURE.NONE, GESTURE.TWO_FINGER_VERTICAL, GESTURE.ONE_FINGER, GESTURE.PINCH];
 
       correctTestingGestures.forEach(gesture => {
-        it(`should return TOUCH.GESTURE.TWO_FINGER_HORIZONTAL if testing gesture ${TOUCH.GESTURE[gesture]} is added before`, () => {
+        it(`should return GESTURE.TWO_FINGER_HORIZONTAL if testing gesture ${GESTURE[gesture]} is added before`, () => {
           // Given
           const deadzoneChecker = new DeadzoneChecker({ size: 0.1 });
 
@@ -183,10 +183,10 @@ describe("DeadzoneChecker", () => {
           const result = deadzoneChecker.check([new THREE.Vector2(1, 1), new THREE.Vector2(1, -1)]);
 
           // Then
-          expect(result).to.equal(TOUCH.GESTURE.TWO_FINGER_HORIZONTAL);
+          expect(result).to.equal(GESTURE.TWO_FINGER_HORIZONTAL);
         });
 
-        it(`should return TOUCH.GESTURE.NONE if testing gesture ${TOUCH.GESTURE[gesture]} is added before and it's in deadzone`, () => {
+        it(`should return GESTURE.NONE if testing gesture ${GESTURE[gesture]} is added before and it's in deadzone`, () => {
           // Given
           const deadzoneChecker = new DeadzoneChecker({ size: 1 });
 
@@ -196,12 +196,12 @@ describe("DeadzoneChecker", () => {
           const result = deadzoneChecker.check([new THREE.Vector2(1, 1), new THREE.Vector2(1, -1)]);
 
           // Then
-          expect(result).to.equal(TOUCH.GESTURE.NONE);
+          expect(result).to.equal(GESTURE.NONE);
         });
       });
 
       inCorrectTestingGestures.forEach(gesture => {
-        it(`should return TOUCH.GESTURE.NONE if testing gesture ${TOUCH.GESTURE[gesture]} is added before`, () => {
+        it(`should return GESTURE.NONE if testing gesture ${GESTURE[gesture]} is added before`, () => {
           // Given
           const deadzoneChecker = new DeadzoneChecker({ size: 0.1 });
 
@@ -211,17 +211,17 @@ describe("DeadzoneChecker", () => {
           const result = deadzoneChecker.check([new THREE.Vector2(1, 1), new THREE.Vector2(1, -1)]);
 
           // Then
-          expect(result).to.equal(TOUCH.GESTURE.NONE);
+          expect(result).to.equal(GESTURE.NONE);
         });
       });
     });
 
     describe("Two finger vertical", () => {
-      const correctTestingGestures = [TOUCH.GESTURE.TWO_FINGER_VERTICAL, TOUCH.GESTURE.TWO_FINGER];
-      const inCorrectTestingGestures = [TOUCH.GESTURE.NONE, TOUCH.GESTURE.TWO_FINGER_HORIZONTAL, TOUCH.GESTURE.ONE_FINGER, TOUCH.GESTURE.PINCH];
+      const correctTestingGestures = [GESTURE.TWO_FINGER_VERTICAL, GESTURE.TWO_FINGER];
+      const inCorrectTestingGestures = [GESTURE.NONE, GESTURE.TWO_FINGER_HORIZONTAL, GESTURE.ONE_FINGER, GESTURE.PINCH];
 
       correctTestingGestures.forEach(gesture => {
-        it(`should return TOUCH.GESTURE.TWO_FINGER_VERTICAL if testing gesture ${TOUCH.GESTURE[gesture]} is added before`, () => {
+        it(`should return GESTURE.TWO_FINGER_VERTICAL if testing gesture ${GESTURE[gesture]} is added before`, () => {
           // Given
           const deadzoneChecker = new DeadzoneChecker({ size: 0.1 });
 
@@ -231,10 +231,10 @@ describe("DeadzoneChecker", () => {
           const result = deadzoneChecker.check([new THREE.Vector2(1, 1), new THREE.Vector2(-1, 1)]);
 
           // Then
-          expect(result).to.equal(TOUCH.GESTURE.TWO_FINGER_VERTICAL);
+          expect(result).to.equal(GESTURE.TWO_FINGER_VERTICAL);
         });
 
-        it(`should return TOUCH.GESTURE.NONE if testing gesture ${TOUCH.GESTURE[gesture]} is added before and it's in deadzone`, () => {
+        it(`should return GESTURE.NONE if testing gesture ${GESTURE[gesture]} is added before and it's in deadzone`, () => {
           // Given
           const deadzoneChecker = new DeadzoneChecker({ size: 1 });
 
@@ -244,12 +244,12 @@ describe("DeadzoneChecker", () => {
           const result = deadzoneChecker.check([new THREE.Vector2(1, 1), new THREE.Vector2(-1, 1)]);
 
           // Then
-          expect(result).to.equal(TOUCH.GESTURE.NONE);
+          expect(result).to.equal(GESTURE.NONE);
         });
       });
 
       inCorrectTestingGestures.forEach(gesture => {
-        it(`should return TOUCH.GESTURE.NONE if testing gesture ${TOUCH.GESTURE[gesture]} is added before`, () => {
+        it(`should return GESTURE.NONE if testing gesture ${GESTURE[gesture]} is added before`, () => {
           // Given
           const deadzoneChecker = new DeadzoneChecker({ size: 0.1 });
 
@@ -259,17 +259,17 @@ describe("DeadzoneChecker", () => {
           const result = deadzoneChecker.check([new THREE.Vector2(1, 1), new THREE.Vector2(-1, 1)]);
 
           // Then
-          expect(result).to.equal(TOUCH.GESTURE.NONE);
+          expect(result).to.equal(GESTURE.NONE);
         });
       });
     });
 
     describe("Pinch", () => {
-      const correctTestingGestures = [TOUCH.GESTURE.PINCH];
-      const inCorrectTestingGestures = [TOUCH.GESTURE.NONE, TOUCH.GESTURE.ONE_FINGER, TOUCH.GESTURE.TWO_FINGER];
+      const correctTestingGestures = [GESTURE.PINCH];
+      const inCorrectTestingGestures = [GESTURE.NONE, GESTURE.ONE_FINGER, GESTURE.TWO_FINGER];
 
       correctTestingGestures.forEach(gesture => {
-        it(`should return TOUCH.GESTURE.PINCH if testing gesture ${TOUCH.GESTURE[gesture]} is added before`, () => {
+        it(`should return GESTURE.PINCH if testing gesture ${GESTURE[gesture]} is added before`, () => {
           // Given
           const deadzoneChecker = new DeadzoneChecker({ size: 0.1 });
 
@@ -279,10 +279,10 @@ describe("DeadzoneChecker", () => {
           const result = deadzoneChecker.check([new THREE.Vector2(-1, -1), new THREE.Vector2(1, 1)]);
 
           // Then
-          expect(result).to.equal(TOUCH.GESTURE.PINCH);
+          expect(result).to.equal(GESTURE.PINCH);
         });
 
-        it(`should return TOUCH.GESTURE.NONE if testing gesture ${TOUCH.GESTURE[gesture]} is added before and it's in deadzone`, () => {
+        it(`should return GESTURE.NONE if testing gesture ${GESTURE[gesture]} is added before and it's in deadzone`, () => {
           // Given
           const deadzoneChecker = new DeadzoneChecker({ size: 5 });
 
@@ -292,12 +292,12 @@ describe("DeadzoneChecker", () => {
           const result = deadzoneChecker.check([new THREE.Vector2(-1, -1), new THREE.Vector2(1, 1)]);
 
           // Then
-          expect(result).to.equal(TOUCH.GESTURE.NONE);
+          expect(result).to.equal(GESTURE.NONE);
         });
       });
 
       inCorrectTestingGestures.forEach(gesture => {
-        it(`should return TOUCH.GESTURE.NONE if testing gesture ${TOUCH.GESTURE[gesture]} is added before`, () => {
+        it(`should return GESTURE.NONE if testing gesture ${GESTURE[gesture]} is added before`, () => {
           // Given
           const deadzoneChecker = new DeadzoneChecker({ size: 0.1 });
 
@@ -307,7 +307,7 @@ describe("DeadzoneChecker", () => {
           const result = deadzoneChecker.check([new THREE.Vector2(-1, -1), new THREE.Vector2(1, 1)]);
 
           // Then
-          expect(result).to.equal(TOUCH.GESTURE.NONE);
+          expect(result).to.equal(GESTURE.NONE);
         });
       });
     });

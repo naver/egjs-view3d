@@ -15,10 +15,6 @@ class HitTest {
    * Return whether hit-test is ready
    */
   public get ready() { return this._source != null; }
-  /**
-   * {@link https://developer.mozilla.org/en-US/docs/Web/API/XRSessionInit XRSessionInit} object for hit-test feature
-   */
-  public get features() { return XR.FEATURES.HIT_TEST; }
 
   /**
    * Destroy instance
@@ -46,7 +42,14 @@ class HitTest {
    * Return whether hit-test feature is available
    */
   public isAvailable() {
-    return XR.HIT_TEST_SUPPORTED;
+    return XR.HIT_TEST_SUPPORTED();
+  }
+
+  /**
+   * {@link https://developer.mozilla.org/en-US/docs/Web/API/XRSessionInit XRSessionInit} object for hit-test feature
+   */
+  public getFeatures() {
+    return XR.FEATURES.HIT_TEST;
   }
 
   /**

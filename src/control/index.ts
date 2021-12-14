@@ -4,7 +4,6 @@
  */
 
 import AnimationControl from "./AnimationControl";
-import AutoControl from "./AutoControl";
 import CameraControl from "./CameraControl";
 import OrbitControl from "./OrbitControl";
 import RotateControl, { RotateControlOptions } from "./RotateControl";
@@ -13,7 +12,6 @@ import ZoomControl, { ZoomControlOptions } from "./ZoomControl";
 
 export {
   AnimationControl,
-  AutoControl,
   OrbitControl,
   RotateControl,
   TranslateControl,

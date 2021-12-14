@@ -34,13 +34,6 @@ export interface QuickLookSessionOptions {
  * @see https://developer.apple.com/augmented-reality/quick-look/
  */
 class QuickLookSession implements ARSession, OptionGetters<QuickLookSessionOptions> {
-  /**
-   * Whether it's webxr-based session or not
-   * @type {boolean}
-   * @readonly
-   */
-  public readonly isWebXRSession = false;
-
   // Options
   // As those values are referenced only while entering the session, so I'm leaving this values public
   public file: QuickLookSessionOptions["file"];
@@ -54,8 +47,11 @@ class QuickLookSession implements ARSession, OptionGetters<QuickLookSessionOptio
   public custom: QuickLookSessionOptions["custom"];
   public customHeight: QuickLookSessionOptions["customHeight"];
 
+  private _view3D: View3D;
+
   /**
    * Create new instance of QuickLookSession
+   * @param {View3D} view3D Instance of the View3D
    * @param {object} [options={}] Quick Look options
    * @param {string | null} [options.file=null] USDZ file's location URL. If `null` is given, it will try to use current model shown on the canvas. This behavior only works when the format of the model shown is "usdz".
    * @param {boolean} [options.allowsContentScaling=true] Whether to allow content scaling.
@@ -68,7 +64,7 @@ class QuickLookSession implements ARSession, OptionGetters<QuickLookSessionOptio
    * @param {string | null} [options.custom=null] Custom URL to the banner HTML. See {@link https://developer.apple.com/documentation/arkit/adding_an_apple_pay_button_or_a_custom_action_in_ar_quick_look#3402837 Official Guide Page}
    * @param {string | null} [options.customHeight=null] Height of the custom banner. See {@link QUICK_LOOK_CUSTOM_BANNER_SIZE}
    */
-  public constructor({
+  public constructor(view3D: View3D, {
     file = null,
     allowsContentScaling = true,
     canonicalWebPageURL = null,
@@ -80,6 +76,8 @@ class QuickLookSession implements ARSession, OptionGetters<QuickLookSessionOptio
     custom = null,
     customHeight = null
   }: Partial<QuickLookSessionOptions> = {}) {
+    this._view3D = view3D;
+
     this.file = file;
     this.allowsContentScaling = allowsContentScaling;
     this.canonicalWebPageURL = canonicalWebPageURL;
@@ -105,7 +103,8 @@ class QuickLookSession implements ARSession, OptionGetters<QuickLookSessionOptio
   /**
    * Enter QuickLook AR Session
    */
-  public enter(view3D: View3D) {
+  public enter() {
+    const view3D = this._view3D;
     const model = view3D.model!;
     const file = this.file ?? this._getModelSrc(model);
 
@@ -168,7 +167,7 @@ class QuickLookSession implements ARSession, OptionGetters<QuickLookSessionOptio
   }
 
   public exit() {
-    // DO NOTHING
+    return Promise.resolve();
   }
 
   private _getModelSrc(model: Model) {
