@@ -5,8 +5,6 @@
 
 import * as THREE from "three";
 
-import { range } from "../utils";
-
 /**
  * Data class for loaded 3d model
  */
@@ -130,12 +128,12 @@ class Model {
 
       mesh.updateMatrixWorld();
 
-      range(position.count).forEach(idx => {
+      for (let idx = 0; idx < position.count; idx++) {
         const vertex = new THREE.Vector3().fromBufferAttribute(position, idx);
 
         vertex.applyMatrix4(mesh.matrixWorld);
         result = callbackfn(result, vertex);
-      });
+      }
     });
 
     return result;

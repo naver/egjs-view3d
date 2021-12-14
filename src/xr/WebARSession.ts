@@ -5,6 +5,7 @@
 
 import * as THREE from "three";
 import Component from "@egjs/component";
+import type { XRSystem } from "webxr";
 
 import View3D from "../View3D";
 import { getElement, merge } from "../utils";
@@ -16,21 +17,19 @@ import ARSession from "./ARSession";
 import DOMOverlay from "./features/DOMOverlay";
 
 declare global {
-  interface Navigator { xr: any }
+  interface Navigator { xr: XRSystem }
 }
 
 /**
  * Options for WebARSession
  * @interface
  * @property {object} [features={}] You can set additional features(see {@link https://developer.mozilla.org/en-US/docs/Web/API/XRSessionInit XRSessionInit}) with this option.
- * @property {number} [maxModelSize=Infinity] If model's size is too big to show on AR, you can restrict it's size with this option. Model with size bigger than this value will clamped to this value.
  * @property {HTMLElement|string|null} [overlayRoot=null] If this value is set, dom-overlay feature will be automatically added for this session. And this value will be used as dom-overlay's root element. You can set either HTMLElement or query selector for that element.
  * @property {HTMLElement|string|null} [loadingEl=null] This will be used for loading indicator element, which will automatically invisible after placing 3D model by setting `visibility: hidden`. This element must be placed under `overlayRoot`. You can set either HTMLElement or query selector for that element.
  * @property {boolean} [forceOverlay=false] Whether to apply `dom-overlay` feature as required. If set to false, `dom-overlay` will be optional feature.
  */
 export interface WebARSessionOptions {
   features: typeof XR.EMPTY_FEATURES;
-  maxModelSize: number;
   overlayRoot: HTMLElement | string | null;
   loadingEl: HTMLElement | string | null;
   forceOverlay: boolean;
@@ -43,7 +42,7 @@ export interface WebARSessionOptions {
  * @fires WebARSession#canPlace
  * @fires WebARSession#modelPlaced
  */
-abstract class WebARSession extends Component<{
+class WebARSession extends Component<{
   start: void;
   end: void;
   canPlace: void;
@@ -102,14 +101,12 @@ abstract class WebARSession extends Component<{
    * Create new instance of WebARSession
    * @param {object} [options={}] Options
    * @param {object} [options.features={}] You can set additional features(see {@link https://developer.mozilla.org/en-US/docs/Web/API/XRSessionInit XRSessionInit}) with this option.
-   * @param {number} [options.maxModelSize=Infinity] If model's size is too big to show on AR, you can restrict it's size with this option. Model with size bigger than this value will clamped to this value.
    * @param {HTMLElement|string|null} [options.overlayRoot=null] If this value is set, dom-overlay feature will be automatically added for this session. And this value will be used as dom-overlay's root element. You can set either HTMLElement or query selector for that element.
    * @param {HTMLElement|string|null} [options.loadingEl=null] This will be used for loading indicator element, which will automatically invisible after placing 3D model by setting `visibility: hidden`. This element must be placed under `overlayRoot`. You can set either HTMLElement or query selector for that element.
    * @param {boolean} [options.forceOverlay=false] Whether to apply `dom-overlay` feature as required. If set to false, `dom-overlay` will be optional feature.
    */
   public constructor({
-    features: userFeatures = XR.EMPTY_FEATURES, // https://developer.mozilla.org/en-US/docs/Web/API/XRSessionInit
-    maxModelSize = Infinity,
+    features: userFeatures = XR.EMPTY_FEATURES,
     overlayRoot = DEFAULT.NULL_ELEMENT,
     loadingEl = DEFAULT.NULL_ELEMENT,
     forceOverlay = false
@@ -127,11 +124,8 @@ abstract class WebARSession extends Component<{
     }
 
     this._features = merge({}, ...features, userFeatures);
-    this._maxModelSize = maxModelSize;
     this._forceOverlay = forceOverlay;
   }
-
-  protected abstract _beforeRender(ctx: XRRenderContext): void;
 
   /**
    * Return availability of this session
@@ -211,7 +205,7 @@ abstract class WebARSession extends Component<{
         renderer.setAnimationLoop((delta, frame) => {
           const xrCam = threeRenderer.xr.getCamera(new THREE.PerspectiveCamera()) as THREE.PerspectiveCamera;
           const referenceSpace = threeRenderer.xr.getReferenceSpace()!;
-          const glLayer = session.renderState.baseLayer;
+          const glLayer = session.renderState.baseLayer!;
           const size = {
             width: glLayer.framebufferWidth,
             height: glLayer.framebufferHeight
@@ -235,9 +229,10 @@ abstract class WebARSession extends Component<{
    * Exit this session
    * @param view3d Instance of the View3D
    */
-  public exit(view3d: View3D) {
+  public async exit(view3d: View3D) {
     const session = view3d.renderer.threeRenderer.xr.getSession();
-    // session.end();
+
+    return session?.end();
   }
 
   public onStart(ctx: XRContext) {
@@ -251,6 +246,10 @@ abstract class WebARSession extends Component<{
     this._session = null;
     this._domOverlay?.hideLoading();
     this.trigger("end");
+  }
+
+  protected _beforeRender(ctx: XRRenderContext): void {
+
   }
 }
 

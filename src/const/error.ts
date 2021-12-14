@@ -6,7 +6,6 @@
 /**
  * Error codes of {@link View3DError}
  * @name ERROR_CODES
- * @memberof Constants
  * @type object
  * @property {number} WRONG_TYPE 0
  * @property {number} ELEMENT_NOT_FOUND 1
@@ -15,6 +14,7 @@
  * @property {number} PROVIDE_WIDTH_OR_HEIGHT 4
  * @property {number} FORMAT_NOT_SUPPORTED 5
  * @property {number} FILE_NOT_SUPPORTED 6
+ * @property {number} NOT_INITIALIZED 7
  */
 export const CODES: {
   [key in keyof typeof MESSAGES]: number;
@@ -25,7 +25,8 @@ export const CODES: {
   WEBGL_NOT_SUPPORTED: 3,
   PROVIDE_WIDTH_OR_HEIGHT: 4,
   FORMAT_NOT_SUPPORTED: 5,
-  FILE_NOT_SUPPORTED: 6
+  FILE_NOT_SUPPORTED: 6,
+  NOT_INITIALIZED: 7
 };
 
 export const MESSAGES = {
@@ -35,5 +36,6 @@ export const MESSAGES = {
   WEBGL_NOT_SUPPORTED: "WebGL is not supported on this browser.",
   PROVIDE_WIDTH_OR_HEIGHT: "Either width or height should be given.",
   FORMAT_NOT_SUPPORTED: (format: string) => `Given format "${format}" is not supported or invalid`,
-  FILE_NOT_SUPPORTED: (src: string) => `Given file "${src}" is not supported.`
+  FILE_NOT_SUPPORTED: (src: string) => `Given file "${src}" is not supported.`,
+  NOT_INITIALIZED: "View3D is not initialized yet"
 };

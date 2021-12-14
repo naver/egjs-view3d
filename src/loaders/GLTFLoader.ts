@@ -9,7 +9,7 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 
 import View3D from "../View3D";
 import Model from "../core/Model";
-import { EVENTS } from "../const/external";
+import { EVENTS, MODEL_FORMAT } from "../const/external";
 
 /**
  * GLTFLoader
@@ -49,7 +49,7 @@ class GLTFLoader {
 
     return new Promise((resolve, reject) => {
       loader.load(url, gltf => {
-        const model = this._parseToModel(gltf);
+        const model = this._parseToModel(gltf, url);
         resolve(model);
       }, evt => {
         const view3D = this._view3D;
@@ -113,7 +113,7 @@ class GLTFLoader {
       const loader = this._loader;
       loader.manager = manager;
       loader.load(gltfURL, gltf => {
-        const model = this._parseToModel(gltf);
+        const model = this._parseToModel(gltf, gltfURL);
         resolve(model);
         revokeURLs();
       }, undefined, err => {
@@ -123,30 +123,12 @@ class GLTFLoader {
     });
   }
 
-  /**
-   * Parse from array buffer
-   * @param data glTF asset to parse, as an ArrayBuffer or JSON string.
-   * @param path The base path from which to find subsequent glTF resources such as textures and .bin data files.
-   * @returns Promise that resolves {@link Model}
-   */
-  public parse(data: ArrayBuffer, path: string): Promise<Model> {
-    const loader = this._loader;
-    loader.manager = new THREE.LoadingManager();
-
-    return new Promise((resolve, reject) => {
-      loader.parse(data, path, gltf => {
-        const model = this._parseToModel(gltf);
-        resolve(model);
-      }, err => {
-        reject(err);
-      });
-    });
-  }
-
-  private _parseToModel(gltf: GLTF): Model {
+  private _parseToModel(gltf: GLTF, src: string): Model {
     const fixSkinnedBbox = this._view3D.fixSkinnedBbox;
 
     const model = new Model({
+      src,
+      format: MODEL_FORMAT.GLTF,
       scenes: gltf.scenes,
       animations: gltf.animations,
       fixSkinnedBbox

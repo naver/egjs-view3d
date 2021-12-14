@@ -10,12 +10,13 @@ export const AUTO = "auto";
 /**
  * Event type object with event name strings of {@link View3D}
  * @type {object}
- * @property {"ready"} READY ready event
- * @property {"load"} LOAD load event
- * @property {"resize"} RESIZE resize event
- * @property {"beforeRender"} BEFORE_RENDER beforeRender event
- * @property {"render"} RENDER render event
- * @property {"progress"} PROGRESS progress event
+ * @property {"ready"} READY {@link ReadyEvent}
+ * @property {"load"} LOAD {@link LoadEvent}
+ * @property {"resize"} RESIZE {@link ResizeEvent}
+ * @property {"beforeRender"} BEFORE_RENDER {@link BeforeRenderEvent}
+ * @property {"render"} RENDER {@link RenderEvent}
+ * @property {"progress"} PROGRESS {@link LoadProgressEvent}
+ * @property {"quickLookTap"} QUICK_LOOK_TAP {@link QuickLookTapEvent}
  * @example
  * ```ts
  * import { EVENTS } from "@egjs/view3d";
@@ -29,7 +30,8 @@ export const EVENTS = {
   RESIZE: "resize",
   BEFORE_RENDER: "beforeRender",
   RENDER: "render",
-  PROGRESS: "progress"
+  PROGRESS: "progress",
+  QUICK_LOOK_TAP: "quickLookTap"
 } as const;
 
 /**
@@ -89,6 +91,19 @@ export const EASING = {
       return n1 * (x -= 2.625 / d1) * x + 0.984375;
     }
   }
+} as const;
+
+/**
+ * Available AR session types
+ * @type {object}
+ * @property {"WebXR"} WEBXR An AR session based on {@link https://developer.mozilla.org/en-US/docs/Web/API/WebXR_Device_API WebXR Device API}
+ * @property {"SceneViewer"} SCENE_VIEWER An AR session based on {@link https://developers.google.com/ar/develop/java/scene-viewer Google SceneViewer}, which is only available in Android
+ * @property {"QuickLook"} QUICK_LOOK An AR session based on Apple {@link https://developer.apple.com/augmented-reality/quick-look/ AR Quick Look}, which is only available in iOS
+ */
+export const AR_SESSION_TYPE = {
+  WEBXR: "webAR",
+  SCENE_VIEWER: "sceneViewer",
+  QUICK_LOOK: "quickLook"
 } as const;
 
 /**

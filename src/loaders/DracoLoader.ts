@@ -7,6 +7,7 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 
 import View3D from "../View3D";
 import Model from "../core/Model";
+import { MODEL_FORMAT } from "../const/external";
 
 /**
  * DracoLoader
@@ -33,7 +34,7 @@ class DracoLoader {
 
     return new Promise((resolve, reject) => {
       loader.load(url, geometry => {
-        const model = this._parseToModel(geometry);
+        const model = this._parseToModel(geometry, url);
         loader.dispose();
         resolve(model);
       }, undefined, err => {
@@ -43,21 +44,15 @@ class DracoLoader {
     });
   }
 
-  private _parseToModel(geometry: THREE.BufferGeometry, {
-    color = 0xffffff,
-    point = false,
-    pointOptions = {}
-  } = {}): Model {
+  private _parseToModel(geometry: THREE.BufferGeometry, src: string): Model {
     geometry.computeVertexNormals();
 
-    const material = point
-      ? new THREE.PointsMaterial({ color, ...pointOptions })
-      : new THREE.MeshStandardMaterial({ color });
-    const mesh = point
-      ? new THREE.Points(geometry, material)
-      : new THREE.Mesh(geometry, material);
+    const material = new THREE.MeshStandardMaterial();
+    const mesh = new THREE.Mesh(geometry, material);
 
     const model = new Model({
+      src,
+      format: MODEL_FORMAT.DRC,
       scenes: [mesh]
     });
 

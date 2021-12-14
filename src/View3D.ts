@@ -19,13 +19,14 @@ import { RotateControlOptions } from "./control/RotateControl";
 import { TranslateControlOptions } from "./control/TranslateControl";
 import { ZoomControlOptions } from "./control/ZoomControl";
 import AutoControl, { AutoplayOptions } from "./control/AutoControl";
+import { WebARSessionOptions } from "./xr/WebARSession";
 import { SceneViewerSessionOptions } from "./xr/SceneViewerSession";
 import { QuickLookSessionOptions } from "./xr/QuickLookSession";
-import { EVENTS, AUTO } from "./const/external";
+import { EVENTS, AUTO, AR_SESSION_TYPE } from "./const/external";
 import * as DEFAULT from "./const/default";
 import * as EVENT_TYPES from "./type/event";
 import { getCanvas, getObjectOption } from "./utils";
-import { LiteralUnion, OptionGetters } from "./type/utils";
+import { LiteralUnion, OptionGetters, ValueOf } from "./type/utils";
 
 /**
  * @interface
@@ -35,9 +36,10 @@ export interface View3DEvents {
   [EVENTS.LOAD]: EVENT_TYPES.LoadEvent;
   [EVENTS.MODEL_CHANGE]: EVENT_TYPES.ModelChangeEvent;
   [EVENTS.RESIZE]: EVENT_TYPES.ResizeEvent;
-  [EVENTS.PROGRESS]: EVENT_TYPES.LoadProgressEvent;
   [EVENTS.BEFORE_RENDER]: EVENT_TYPES.BeforeRenderEvent;
   [EVENTS.RENDER]: EVENT_TYPES.RenderEvent;
+  [EVENTS.PROGRESS]: EVENT_TYPES.LoadProgressEvent;
+  [EVENTS.QUICK_LOOK_TAP]: EVENT_TYPES.QuickLookTapEvent;
 }
 
 /**
@@ -72,8 +74,10 @@ export interface View3DOptions {
   shadow: boolean | Partial<ShadowOptions>;
 
   // AR
+  webAR: boolean | Partial<WebARSessionOptions>;
   sceneViewer: boolean | Partial<SceneViewerSessionOptions>;
   quickLook: boolean | Partial<QuickLookSessionOptions>;
+  arPriority: Array<ValueOf<typeof AR_SESSION_TYPE>>;
 
   // Others
   autoInit: boolean;
@@ -131,8 +135,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   private _preset: View3DOptions["preset"];
   private _shadow: View3DOptions["shadow"];
 
+  private _webAR: View3DOptions["webAR"];
   private _sceneViewer: View3DOptions["sceneViewer"];
   private _quickLook: View3DOptions["quickLook"];
+  private _arPriority: View3DOptions["arPriority"];
 
   private _autoInit: View3DOptions["autoInit"];
   private _autoResize: View3DOptions["autoResize"];
@@ -218,8 +224,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   public get exposure() { return this._exposure; }
   public get preset() { return this._preset; }
   public get shadow() { return this._shadow; }
+  public get webAR() { return this._webAR; }
   public get sceneViewer() { return this._sceneViewer; }
   public get quickLook() { return this._quickLook; }
+  public get arPriority() { return this._arPriority; }
   /**
    * Call {@link View3D#init init()} automatically when creating View3D's instance
    * This option won't work if `src` is not given
@@ -279,8 +287,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     autoplay = false,
     scrollable = false,
     useGrabCursor = true,
+    webAR = true,
     sceneViewer = true,
     quickLook = true,
+    arPriority = DEFAULT.AR_PRIORITY,
     autoInit = true,
     autoResize = true,
     useResizeObserver = true
@@ -312,8 +322,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._preset = preset;
     this._shadow = shadow;
 
+    this._webAR = webAR;
     this._sceneViewer = sceneViewer;
     this._quickLook = quickLook;
+    this._arPriority = arPriority;
 
     this._autoInit = autoInit;
     this._autoResize = autoResize;

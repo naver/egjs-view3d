@@ -6,7 +6,7 @@
 import Pose from "../core/Pose";
 import { Range } from "../type/utils";
 
-import { EASING as EASING_CONST } from "./external";
+import { AR_SESSION_TYPE, EASING as EASING_CONST } from "./external";
 
 export const FOV = 45;
 
@@ -29,3 +29,9 @@ export const PITCH_RANGE: Readonly<Range> = {
 
 export const NULL_ELEMENT: HTMLElement | string | null = null;
 export const DRACO_DECODER_URL = "https://www.gstatic.com/draco/v1/decoders/";
+
+export const AR_PRIORITY = [
+  // AR_SESSION_TYPE.WEBXR,
+  AR_SESSION_TYPE.SCENE_VIEWER,
+  AR_SESSION_TYPE.QUICK_LOOK
+];

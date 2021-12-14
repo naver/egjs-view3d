@@ -2,14 +2,12 @@
  * Copyright (c) 2020 NAVER Corp.
  * egjs projects are licensed under the MIT license
  */
-import Component from "@egjs/component";
-
 import View3D from "../View3D";
 import Model from "../core/Model";
 import View3DError from "../core/View3DError";
 import { IS_IOS } from "../const/browser";
 import { QUICK_LOOK_SUPPORTED } from "../const/xr";
-import { MODEL_FORMAT, QUICK_LOOK_APPLE_PAY_BUTTON_TYPE, QUICK_LOOK_CUSTOM_BANNER_SIZE } from "../const/external";
+import { EVENTS, MODEL_FORMAT, QUICK_LOOK_APPLE_PAY_BUTTON_TYPE, QUICK_LOOK_CUSTOM_BANNER_SIZE } from "../const/external";
 import * as ERROR from "../const/error";
 import { LiteralUnion, OptionGetters, ValueOf } from "../type/utils";
 
@@ -32,17 +30,10 @@ export interface QuickLookSessionOptions {
 }
 
 /**
- * An event that fires when user clicked the Apple pay button or custom action button
- * @see https://developer.apple.com/documentation/arkit/adding_an_apple_pay_button_or_a_custom_action_in_ar_quick_look#3405186
- * @event QuickLookSession#message
- * @type {Event}
- */
-
-/**
  * AR Session using Apple AR Quick Look Viewer
  * @see https://developer.apple.com/augmented-reality/quick-look/
  */
-class QuickLookSession extends Component<{ message: Event }> implements ARSession, OptionGetters<QuickLookSessionOptions> {
+class QuickLookSession implements ARSession, OptionGetters<QuickLookSessionOptions> {
   /**
    * Whether it's webxr-based session or not
    * @type {boolean}
@@ -89,8 +80,6 @@ class QuickLookSession extends Component<{ message: Event }> implements ARSessio
     custom = null,
     customHeight = null
   }: Partial<QuickLookSessionOptions> = {}) {
-    super();
-
     this.file = file;
     this.allowsContentScaling = allowsContentScaling;
     this.canonicalWebPageURL = canonicalWebPageURL;
@@ -166,7 +155,10 @@ class QuickLookSession extends Component<{ message: Event }> implements ARSessio
     anchor.addEventListener("message", evt => {
       if ((evt as any).data === "_apple_ar_quicklook_button_tapped") {
         // User tapped either Apple pay button / Custom action button
-        this.trigger("message", evt);
+        view3D.trigger(EVENTS.QUICK_LOOK_TAP, {
+          ...evt,
+          target: view3D
+        });
       }
     }, false);
 

@@ -92,3 +92,13 @@ export interface LoadProgressEvent extends Omit<ProgressEvent, "target"> {
   loaded: number;
   total: number;
 }
+
+/**
+ * An event that fires when user clicked the Apple pay button or custom action button
+ * @see https://developer.apple.com/documentation/arkit/adding_an_apple_pay_button_or_a_custom_action_in_ar_quick_look#3405186
+ * @event View3D#quickLookTap
+ * @type {Event}
+ */
+export interface QuickLookTapEvent extends Omit<Event, "target"> {
+  target: View3D;
+}
