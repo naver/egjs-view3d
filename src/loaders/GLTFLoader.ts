@@ -6,10 +6,18 @@
 import * as THREE from "three";
 import { GLTFLoader as ThreeGLTFLoader, GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
+import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader";
+import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 
 import View3D from "../View3D";
 import Model from "../core/Model";
+import * as DEFAULT from "../const/default";
 import { EVENTS, MODEL_FORMAT } from "../const/external";
+
+const dracoLoader = new DRACOLoader();
+
+const ktx2Loader = new KTX2Loader()
+  .setTranscoderPath(DEFAULT.KTX_TRANSCODER_URL);
 
 /**
  * GLTFLoader
@@ -17,10 +25,9 @@ import { EVENTS, MODEL_FORMAT } from "../const/external";
 class GLTFLoader {
   private _view3D: View3D;
   private _loader: ThreeGLTFLoader;
-  private _dracoLoader: DRACOLoader;
 
   public get loader() { return this._loader; }
-  public get dracoLoader() { return this._dracoLoader; }
+  public get dracoLoader() { return dracoLoader; }
 
   /**
    * Create a new instance of GLTFLoader
@@ -28,14 +35,13 @@ class GLTFLoader {
   public constructor(view3D: View3D) {
     this._view3D = view3D;
     this._loader = new ThreeGLTFLoader();
-    this._dracoLoader = new DRACOLoader();
 
     const loader = this._loader;
-    loader.setCrossOrigin("anonymous");
 
-    const dracoLoader = this._dracoLoader;
-    dracoLoader.setDecoderPath(view3D.dracoPath);
+    loader.setCrossOrigin("anonymous");
     loader.setDRACOLoader(dracoLoader);
+    loader.setKTX2Loader(ktx2Loader.detectSupport(view3D.renderer.threeRenderer));
+    loader.setMeshoptDecoder(MeshoptDecoder);
   }
 
   /**
@@ -44,15 +50,17 @@ class GLTFLoader {
    * @returns Promise that resolves {@link Model}
    */
   public load(url: string): Promise<Model> {
+    const view3D = this._view3D;
     const loader = this._loader;
+
     loader.manager = new THREE.LoadingManager();
+    dracoLoader.setDecoderPath(view3D.dracoPath);
 
     return new Promise((resolve, reject) => {
       loader.load(url, gltf => {
         const model = this._parseToModel(gltf, url);
         resolve(model);
       }, evt => {
-        const view3D = this._view3D;
         view3D.trigger(EVENTS.PROGRESS, { ...evt, target: view3D });
       }, err => {
         reject(err);

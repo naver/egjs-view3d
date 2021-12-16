@@ -29,6 +29,7 @@ export const PITCH_RANGE: Readonly<Range> = {
 
 export const NULL_ELEMENT: HTMLElement | string | null = null;
 export const DRACO_DECODER_URL = "https://www.gstatic.com/draco/v1/decoders/";
+export const KTX_TRANSCODER_URL = "https://unpkg.com/three@0.134.x/examples/js/libs/basis/";
 
 export const AR_PRIORITY = [
   AR_SESSION_TYPE.WEBXR,
