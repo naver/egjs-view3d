@@ -99,39 +99,39 @@ class FloorIndicator {
     position: THREE.Vector3;
     rotation: THREE.Quaternion;
   }) {
-    const mesh = this._mesh;
-    const animator = this._animator;
+    // const mesh = this._mesh;
+    // const animator = this._animator;
 
-    if (!this._mesh.visible) return;
+    // if (!this._mesh.visible) return;
 
-    animator.update(delta);
+    // animator.update(delta);
 
-    const materials = this._mesh.material as THREE.Material[];
-    const minOpacityMat = materials[0];
-    const maxOpacityMat = materials[1];
-    const opacityRange = this._opacityRange;
+    // const materials = this._mesh.material as THREE.Material[];
+    // const minOpacityMat = materials[0];
+    // const maxOpacityMat = materials[1];
+    // const opacityRange = this._opacityRange;
 
-    minOpacityMat.opacity = animator.val * opacityRange.min;
-    maxOpacityMat.opacity = animator.val * opacityRange.max;
+    // minOpacityMat.opacity = animator.val * opacityRange.min;
+    // maxOpacityMat.opacity = animator.val * opacityRange.max;
 
-    if (animator.val <= 0) {
-      mesh.visible = false;
-    }
+    // if (animator.val <= 0) {
+    //   mesh.visible = false;
+    // }
 
-    // Update mesh
-    mesh.scale.setScalar(scale);
-    mesh.position.copy(position);
-    mesh.quaternion.copy(rotation);
-    mesh.updateMatrix();
+    // // Update mesh
+    // mesh.scale.setScalar(scale);
+    // mesh.position.copy(position);
+    // mesh.quaternion.copy(rotation);
+    // mesh.updateMatrix();
   }
 
   public show() {
-    this._mesh.visible = true;
-    this._animator.reset(1);
+    // this._mesh.visible = true;
+    // this._animator.reset(1);
   }
 
   public fadeout() {
-    this._animator.setEndDelta(-1);
+    // this._animator.setEndDelta(-1);
   }
 }
 

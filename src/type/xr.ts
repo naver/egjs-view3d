@@ -14,7 +14,7 @@ export interface XRRenderContext {
   scene: ARScene;
   session: THREE.XRSession;
   delta: number;
-  frame: THREE.XRFrame;
+  frame?: THREE.XRFrame;
   referenceSpace: THREE.XRReferenceSpace;
   xrCam: THREE.PerspectiveCamera;
   size: {

@@ -9,7 +9,7 @@ import Motion from "../../core/Motion";
 import { XRRenderContext, XRInputs } from "../../type/xr";
 
 import ScaleUI from "./ui/ScaleUI";
-import ARCameraControl from "./common/ARCameraControl";
+import ARControl from "./ARControl";
 
 /**
  * Options for {@link ARScaleControl}
@@ -25,7 +25,7 @@ export interface ARScaleControlOptions {
 /**
  * Model's scale controller which works on AR(WebXR) mode.
  */
-class ARScaleControl implements ARCameraControl {
+class ARScaleControl implements ARControl {
   // TODO: add option for "user scale"
 
   // Internal states
@@ -42,9 +42,7 @@ class ARScaleControl implements ARCameraControl {
    * @readonly
    */
   public get enabled() { return this._enabled; }
-  public get scale() {
-    return this._initialScale.clone().multiplyScalar(this._scaleMultiplier);
-  }
+  public get scale() { return this._scaleMultiplier; }
 
   public get scaleMultiplier() { return this._scaleMultiplier; }
   /**
@@ -118,7 +116,7 @@ class ARScaleControl implements ARCameraControl {
     this._updateUIPosition(ctx);
   }
 
-  public update({ model }: XRRenderContext, deltaTime: number) {
+  public update({ scene }: XRRenderContext, deltaTime: number) {
     if (!this._enabled || !this._active) return;
 
     const motion = this._motion;
@@ -127,7 +125,7 @@ class ARScaleControl implements ARCameraControl {
     this._scaleMultiplier = motion.val;
     this._ui.updateScale(this._scaleMultiplier);
 
-    model.scene.scale.copy(this.scale);
+    scene.modelRoot.scale.setScalar(this._scaleMultiplier);
   }
 
   private _updateUIPosition({ view3D: view3d, xrCam }: XRRenderContext) {

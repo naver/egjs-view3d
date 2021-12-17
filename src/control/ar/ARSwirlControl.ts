@@ -10,7 +10,7 @@ import * as DEFAULT from "../../const/default";
 import { getRotationAngle } from "../../utils";
 import { XRRenderContext, XRInputs } from "../../type/xr";
 
-import ARCameraControl from "./common/ARCameraControl";
+import ARControl from "./ARControl";
 
 
 /**
@@ -25,7 +25,7 @@ export interface ARSwirlControlOptions {
 /**
  * One finger swirl control on single axis
  */
-class ARSwirlControl implements ARCameraControl {
+class ARSwirlControl implements ARControl {
   /**
    * Current rotation value
    */
@@ -68,11 +68,6 @@ class ARSwirlControl implements ARCameraControl {
   }: Partial<ARSwirlControlOptions> = {}) {
     this._motion = new Motion({ range: DEFAULT.INFINITE_RANGE });
     this._userScale = scale;
-  }
-
-  public init({ view3D: view3d }: XRRenderContext) {
-    const initialRotation = view3d.model!.scene.quaternion;
-    this.updateRotation(initialRotation);
   }
 
   public updateRotation(rotation: THREE.Quaternion) {

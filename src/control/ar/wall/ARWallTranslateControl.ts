@@ -5,9 +5,9 @@
 
 import * as THREE from "three";
 
-import ARCameraControl from "../common/ARCameraControl";
+import ARControl from "../ARControl";
 import ArrowIndicator, { ArrowIndicatorOption } from "../ui/ArrowIndicator";
-import { XRRenderContext, XRContext, XRInputs } from "../../../type/xr";
+import { XRRenderContext, XRInputs } from "../../../type/xr";
 /**
  * Options for {@link ARTranslateControl}
  * @interface
@@ -20,7 +20,7 @@ export interface ARWallTranslateControlOption {
 /**
  * Model's translation(position) control for {@link ARWallControl}
  */
-class ARWallTranslateControl implements ARCameraControl {
+class ARWallTranslateControl implements ARControl {
   public readonly position = new THREE.Vector3();
   public readonly wallPosition = new THREE.Vector3();
   public readonly hitRotation = new THREE.Quaternion();

@@ -10,7 +10,7 @@ import * as DEFAULT from "../../const/default";
 import { EASING } from "../../const/external";
 import { XRRenderContext, XRInputs } from "../../type/xr";
 
-import ARCameraControl from "./common/ARCameraControl";
+import ARControl from "./ARControl";
 
 enum STATE {
   WAITING,
@@ -42,7 +42,7 @@ export interface ARTranslateControlOptions {
 /**
  * Model's translation(position) control for {@link ARFloorControl}
  */
-class ARTranslateControl implements ARCameraControl {
+class ARTranslateControl implements ARControl {
   // Options
   private _hoverAmplitude: number;
   private _hoverHeight: number;
@@ -117,9 +117,6 @@ class ARTranslateControl implements ARCameraControl {
     this._hoverPosition.copy(position);
     this._hoverPosition.setY(position.y + this._hoverHeight);
   }
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  public init() {}
 
   /**
    * Enable this control

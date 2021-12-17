@@ -29,10 +29,9 @@ class ModelAnimator {
 
   /**
    * Create new ModelAnimator instance
-   * @param scene {@link https://threejs.org/docs/index.html#api/en/scenes/Scene THREE.Scene} instance that is root of all 3d objects
    */
-  public constructor(scene: THREE.Scene) {
-    this._mixer = new THREE.AnimationMixer(scene);
+  public constructor(root: THREE.Object3D) {
+    this._mixer = new THREE.AnimationMixer(root);
     this._clips = [];
     this._actions = [];
   }

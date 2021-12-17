@@ -95,7 +95,7 @@ class Renderer {
 
   public setAnimationLoop(callback: (delta: number, frame?: THREE.XRFrame) => void): void {
     this._clock.start();
-    this._renderer.setAnimationLoop((timestamp: number, frame: THREE.XRFrame) => {
+    this._renderer.setAnimationLoop((timestamp: number, frame?: THREE.XRFrame) => {
       const delta = this._clock.getDelta();
       callback(delta, frame);
     });

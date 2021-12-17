@@ -56,8 +56,8 @@ class HitTest {
    * Get hit-test results
    * @param {XRFrame} frame XRFrame instance
    */
-  public getResults(frame: any) {
-    return frame.getHitTestResults(this._source);
+  public getResults(frame?: THREE.XRFrame) {
+    return frame?.getHitTestResults(this._source) ?? [];
   }
 }
 

@@ -115,6 +115,8 @@ class Model {
 
     this.castShadow = castShadow;
     this.receiveShadow = receiveShadow;
+
+    console.log(this.meshes);
   }
 
   public reduceVertices<T>(callbackfn: (previousVal: T, currentVal: THREE.Vector3) => T, initialVal: T) {
@@ -210,18 +212,6 @@ class Model {
     return bbox;
   }
 
-  private _getAllLights(): THREE.Light[] {
-    const lights: THREE.Light[] = [];
-
-    this._scene.traverse(obj => {
-      if ((obj as any).isLight) {
-        lights.push(obj as THREE.Light);
-      }
-    });
-
-    return lights;
-  }
-
   /**
    * Get all {@link https://threejs.org/docs/#api/en/objects/Mesh THREE.Mesh}es inside model if there's any.
    * @private
@@ -240,7 +230,7 @@ class Model {
   }
 
   private _hasSkinnedMesh(): boolean {
-    return this.meshes.some(mesh => (mesh as THREE.SkinnedMesh).isSkinnedMesh);
+    return this._getAllMeshes().some(mesh => (mesh as THREE.SkinnedMesh).isSkinnedMesh);
   }
 }
 

@@ -9,7 +9,7 @@ import type { XRSystem } from "webxr";
 
 import View3D from "../View3D";
 import Animation from "../core/Animation";
-import ARControl from "../control/ar/ARControl";
+import WebARControl from "../control/ar/WebARControl";
 import { ARSwirlControlOptions } from "../control/ar/ARSwirlControl";
 import { ARTranslateControlOptions } from "../control/ar/ARTranslateControl";
 import { ARScaleControlOptions } from "../control/ar/ARScaleControl";
@@ -66,12 +66,6 @@ export interface WebARSessionEvents {
    */
   end: void;
   /**
-   * Emitted when model can be placed on the space.
-   * @event WebARSession#canPlace
-   * @type {void}
-   */
-  canPlace: void;
-  /**
    * Emitted when model is placed.
    * @event WebARSession#modelPlaced
    * @type {void}
@@ -83,13 +77,11 @@ export interface WebARSessionEvents {
  * WebXR based abstract AR session class
  * @fires WebARSession#start
  * @fires WebARSession#end
- * @fires WebARSession#canPlace
  * @fires WebARSession#modelPlaced
  */
 class WebARSession extends Component<{
   start: void;
   end: void;
-  canPlace: void;
   modelPlaced: void;
 }> implements ARSession {
   // Options
@@ -100,7 +92,7 @@ class WebARSession extends Component<{
 
   // Internal Components
   private _view3D: View3D;
-  private _control: ARControl;
+  private _control: WebARControl;
   private _hitTest: HitTest;
   private _domOverlay: DOMOverlay;
 
@@ -109,7 +101,7 @@ class WebARSession extends Component<{
 
   /**
    * {@link ARControl} instance of this session
-   * @type ARFloorControl | null
+   * @type ARFloorControl
    */
   public get control() { return this._control; }
 
@@ -144,7 +136,7 @@ class WebARSession extends Component<{
     this.overlayRoot = overlayRoot;
 
     // Create internal components
-    this._control = new ARControl(view3D, { rotate, translate, scale });
+    this._control = new WebARControl(view3D, { rotate, translate, scale });
     this._hitTest = new HitTest();
     this._domOverlay = new DOMOverlay();
   }
@@ -212,13 +204,19 @@ class WebARSession extends Component<{
 
     // Set XR session render loop
     renderer.stopAnimationLoop();
-    renderer.setAnimationLoop((delta, frame: THREE.XRFrame) => {
-      const xrCam = threeRenderer.xr.getCamera(new THREE.PerspectiveCamera()) as THREE.PerspectiveCamera;
+    threeRenderer.xr.setAnimationLoop((delta, frame?: THREE.XRFrame) => {
+      const xrCamArray = (threeRenderer.xr.getCamera(new THREE.PerspectiveCamera()) as THREE.ArrayCamera);
+
+      if (xrCamArray.cameras.length <= 0) return;
+
+      const xrCam = xrCamArray.cameras[0];
+
       const referenceSpace = threeRenderer.xr.getReferenceSpace()!;
-      const glLayer = session.renderState.baseLayer!;
+      const glLayer = session.renderState.baseLayer;
+
       const size = {
-        width: glLayer.framebufferWidth,
-        height: glLayer.framebufferHeight
+        width: glLayer?.framebufferWidth ?? 1,
+        height: glLayer?.framebufferHeight ?? 1
       };
       const ctx: XRRenderContext = {
         view3D: view3D,
@@ -237,11 +235,10 @@ class WebARSession extends Component<{
       if (!this._modelPlaced) {
         this._initModelPosition(ctx);
       } else {
-        this._control.update(ctx);
+        // this._control.update(ctx);
+        // view3D.animator.update(delta);
+        threeRenderer.render(arScene.root, xrCam);
       }
-
-      view3D.animator.update(delta);
-      threeRenderer.render(arScene.root, xrCam);
     });
 
     this.trigger("start");
@@ -287,24 +284,23 @@ class WebARSession extends Component<{
     if (hitTestResults.length <= 0) return;
 
     const hit = hitTestResults[0];
-    const hitMatrix = new THREE.Matrix4().fromArray(hit.getPose(referenceSpace).transform.matrix);
+    const hitPose = hit.getPose(referenceSpace);
+
+    if (!hitPose) return;
+
+    const hitMatrix = new THREE.Matrix4().fromArray(hitPose.transform.matrix);
 
     // If transformed coords space's y axis is not facing up, don't use it.
     if (hitMatrix.elements[5] < 0.75) return;
 
-    const modelRoot = model.scene;
     const hitPosition = new THREE.Vector3().setFromMatrixPosition(hitMatrix);
 
     // Reset rotation & update position
-    modelRoot.quaternion.set(0, 0, 0, 1);
-    modelRoot.position.copy(hitPosition);
-    modelRoot.position.setY(modelRoot.position.y - model.bbox.min.y);
-    modelRoot.updateMatrix();
+    scene.setModelPosition(hitPosition);
 
     // FIXME:
     // view3d.scene.update(model);
-    scene.show();
-    this.trigger("canPlace");
+    scene.showModel();
 
     // Don't need it anymore
     hitTest.destroy();
@@ -314,21 +310,19 @@ class WebARSession extends Component<{
     this.trigger("modelPlaced");
 
     // Show scale up animation
-    const originalModelScale = modelRoot.scale.clone();
     const scaleUpAnimation = new Animation({ context: session });
 
     scaleUpAnimation.on("progress", evt => {
-      const newScale = originalModelScale.clone().multiplyScalar(evt.easedProgress);
-      modelRoot.scale.copy(newScale);
+      scene.setModelScale(evt.easedProgress);
     });
     scaleUpAnimation.on("finish", () => {
-      modelRoot.scale.copy(originalModelScale);
-      void control.init({
-        scene,
-        session,
-        size,
-        initialFloorPos: hitPosition
-      });
+      scene.setModelScale(1);
+      // void control.init({
+      //   scene,
+      //   session,
+      //   size,
+      //   initialFloorPos: hitPosition
+      // });
     });
     scaleUpAnimation.start();
   }

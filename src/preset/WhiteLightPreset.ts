@@ -20,7 +20,7 @@ class WhiteLightPreset {
   public constructor({
     sunColor = 0xffffff,
     sunIntensity = 0.9,
-    sunPosition = [0, 1, 0],
+    sunPosition = [0, 100, 0],
     ambientColor = 0xffffff,
     ambientIntensity = 0.1
   }: Partial<WhiteLightPresetOptions> = {}) {

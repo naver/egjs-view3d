@@ -35,6 +35,16 @@ class Scene {
   public get shadowPlane() { return this._shadowPlane; }
 
   /**
+   *
+   */
+  public get userObjects() { return this._userObjects; }
+
+  /**
+   *
+   */
+  public get envObjects() { return this._envObjects; }
+
+  /**
    * Create new Scene instance
    */
   public constructor(view3D: View3D) {
@@ -52,8 +62,7 @@ class Scene {
     userObjects.name = "userObjects";
     envObjects.name = "envObjects";
 
-    root.add(userObjects);
-    root.add(envObjects);
+    root.add(userObjects, envObjects);
 
     if (view3D.shadow) {
       root.add(shadowPlane.mesh, shadowPlane.light);

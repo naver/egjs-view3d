@@ -10,8 +10,7 @@ import Motion from "../../../core/Motion";
 import * as DEFAULT from "../../../const/default";
 import { GESTURE } from "../../../const/internal";
 import { XRRenderContext, XRContext, XRInputs } from "../../../type/xr";
-
-import ARCameraControl from "./ARCameraControl";
+import ARControl from "../ARControl";
 
 enum STATE {
   WAITING,
@@ -31,7 +30,7 @@ export interface ARSwipeControlOption {
 /**
  * Two finger swipe control
  */
-class ARSwipeControl implements ARCameraControl {
+class ARSwipeControl implements ARControl {
   /**
    * Current rotation value
    */

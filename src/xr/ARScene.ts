@@ -6,46 +6,55 @@
 import * as THREE from "three";
 
 import View3D from "../View3D";
+import * as DEFAULT from "../const/default";
 
+import ARPlaneVisualizer from "./ARPlaneVisualizer";
 class ARScene {
   private _root: THREE.Scene;
-  private _modelObjects: THREE.Group;
-  private _arObjects: THREE.Group;
+  private _modelRoot: THREE.Group;
+  private _arUIRoot: THREE.Group;
+  private _planeVisualizer: ARPlaneVisualizer;
 
   public get root() { return this._root; }
+  public get modelRoot() { return this._modelRoot; }
+  public get arUIRoot() { return this._arUIRoot; }
 
   public constructor(view3D: View3D) {
     this._root = new THREE.Scene();
 
-    this._modelObjects = new THREE.Group();
-    this._arObjects = new THREE.Group();
+    this._modelRoot = new THREE.Group();
+    this._arUIRoot = new THREE.Group();
+    this._planeVisualizer = new ARPlaneVisualizer();
 
     const root = this._root;
-    const modelObjects = this._modelObjects;
-    const arObjects = this._arObjects;
+    const modelRoot = this._modelRoot;
+    const arUIRoot = this._arUIRoot;
+    const planeVisualizer = this._planeVisualizer;
 
     // Copy all scene objects into model objects
-    const modelScene = view3D.scene;
+    const originalScene = view3D.scene;
 
-    modelScene.root.children.forEach(child => {
-      this._modelObjects.add(child);
+    [...originalScene.root.children].forEach(child => {
+      modelRoot.add(child);
     });
 
     // Copy environment
-    this._root.environment = modelScene.root.environment?.clone() ?? null;
+    root.environment = originalScene.root.environment?.clone() ?? null;
 
-    root.add(modelObjects);
-    root.add(arObjects);
+    root.add(modelRoot);
+    root.add(arUIRoot);
+    root.add(planeVisualizer.mesh);
 
     // Start with root hidden, as floor should be detected first
-    this.hide();
+    this.hideModel();
   }
 
   public destroy(view3D: View3D) {
-    const modelScene = view3D.scene;
+    const modelRoot = this._modelRoot;
+    const originalScene = view3D.scene;
 
-    this._modelObjects.children.forEach(child => {
-      modelScene.root.add(child);
+    [...modelRoot.children].forEach(child => {
+      originalScene.root.add(child);
     });
   }
 
@@ -53,23 +62,47 @@ class ARScene {
    * Make this scene visible
    * @returns {void}
    */
-  public show(): void {
-    this._root.visible = true;
+  public showModel(): void {
+    // this._modelRoot.visible = true;
   }
 
   /**
    * Make this scene invisible
    * @returns {void}
    */
-  public hide(): void {
-    this._root.visible = false;
+  public hideModel(): void {
+    // this._modelRoot.visible = false;
   }
 
   /**
    * Add AR-exclusive object
    */
   public add(...objects: THREE.Object3D[]) {
-    this._arObjects.add(...objects);
+    this._arUIRoot.add(...objects);
+  }
+
+  public setModelPosition(pos: THREE.Vector3) {
+    const modelRoot = this._modelRoot;
+
+    modelRoot.position.copy(pos);
+    modelRoot.matrixWorldNeedsUpdate = true;
+
+    this._planeVisualizer.mesh.position.copy(pos);
+    this._planeVisualizer.mesh.updateMatrixWorld();
+  }
+
+  public setModelScale(scalar: number) {
+    const modelRoot = this._modelRoot;
+
+    modelRoot.scale.setScalar(scalar);
+    modelRoot.matrixWorldNeedsUpdate = true;
+  }
+
+  public setFloorLevel(y: number) {
+    const modelRoot = this._modelRoot;
+
+    modelRoot.position.setY(y + DEFAULT.SHADOW_Y_OFFSET);
+    modelRoot.matrixWorldNeedsUpdate = true;
   }
 }
 

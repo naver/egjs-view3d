@@ -352,7 +352,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._camera = new Camera(this);
     this._control = new OrbitControl(this);
     this._scene = new Scene(this);
-    this._animator = new ModelAnimator(this._scene.root);
+    this._animator = new ModelAnimator(this._scene.userObjects);
     this._autoPlayer = new AutoPlayer(this, getObjectOption(autoplay));
     this._autoResizer = new AutoResizer(this);
     this._arManager = new ARManager(this);
