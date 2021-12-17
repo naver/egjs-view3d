@@ -92,6 +92,7 @@ class WebARSession extends Component<{
 
   // Internal Components
   private _view3D: View3D;
+  private _arScene: ARScene;
   private _control: WebARControl;
   private _hitTest: HitTest;
   private _domOverlay: DOMOverlay;
@@ -136,7 +137,8 @@ class WebARSession extends Component<{
     this.overlayRoot = overlayRoot;
 
     // Create internal components
-    this._control = new WebARControl(view3D, { rotate, translate, scale });
+    this._arScene = new ARScene();
+    this._control = new WebARControl(view3D, this._arScene, { rotate, translate, scale });
     this._hitTest = new HitTest();
     this._domOverlay = new DOMOverlay();
   }
@@ -162,13 +164,16 @@ class WebARSession extends Component<{
    */
   public async enter() {
     const view3D = this._view3D;
+    const arScene = this._arScene;
     const renderer = view3D.renderer;
+    const threeRenderer = renderer.threeRenderer;
     const model = view3D.model!;
+    const control = this._control;
+    const hitTest = this._hitTest;
     const features = this._getAllXRFeatures();
 
     // Enable xr
-    const threeRenderer = renderer.threeRenderer;
-    renderer.threeRenderer.xr.enabled = true;
+    threeRenderer.xr.enabled = true;
 
     const session = await navigator.xr.requestSession(XR.SESSION.AR, features) as unknown as THREE.XRSession;
 
@@ -179,15 +184,14 @@ class WebARSession extends Component<{
     threeRenderer.xr.setReferenceSpaceType(XR.REFERENCE_SPACE.LOCAL);
     await threeRenderer.xr.setSession(session);
 
-    const arScene = new ARScene(view3D);
+    arScene.init(view3D);
 
     // this._domOverlay?.showLoading();
-    this._hitTest.init(session);
+    hitTest.init(session);
 
     const onSessionEnd = async () => {
       // this._domOverlay?.hideLoading();
-      this._control.destroy(session);
-
+      control.destroy(session);
       arScene.destroy(view3D);
 
       // Restore original values
@@ -219,9 +223,9 @@ class WebARSession extends Component<{
         height: glLayer?.framebufferHeight ?? 1
       };
       const ctx: XRRenderContext = {
-        view3D: view3D,
-        model,
+        view3D,
         scene: arScene,
+        model,
         session,
         delta,
         frame,
@@ -235,8 +239,8 @@ class WebARSession extends Component<{
       if (!this._modelPlaced) {
         this._initModelPosition(ctx);
       } else {
-        // this._control.update(ctx);
-        // view3D.animator.update(delta);
+        control.update(ctx);
+        view3D.animator.update(delta);
         threeRenderer.render(arScene.root, xrCam);
       }
     });
@@ -269,10 +273,10 @@ class WebARSession extends Component<{
       model,
       frame,
       session,
-      scene,
       size,
       referenceSpace
     } = ctx;
+    const arScene = this._arScene;
     const hitTest = this._hitTest;
 
     // Make sure the model is loaded
@@ -296,13 +300,10 @@ class WebARSession extends Component<{
     const hitPosition = new THREE.Vector3().setFromMatrixPosition(hitMatrix);
 
     // Reset rotation & update position
-    scene.setModelPosition(hitPosition);
+    arScene.setRootPosition(hitPosition);
+    arScene.showModel();
 
-    // FIXME:
-    // view3d.scene.update(model);
-    scene.showModel();
-
-    // Don't need it anymore
+    // Don't need hit-test anymore
     hitTest.destroy();
 
     // this._domOverlay?.hideLoading();
@@ -313,16 +314,15 @@ class WebARSession extends Component<{
     const scaleUpAnimation = new Animation({ context: session });
 
     scaleUpAnimation.on("progress", evt => {
-      scene.setModelScale(evt.easedProgress);
+      arScene.setModelScale(evt.easedProgress);
     });
     scaleUpAnimation.on("finish", () => {
-      scene.setModelScale(1);
-      // void control.init({
-      //   scene,
-      //   session,
-      //   size,
-      //   initialFloorPos: hitPosition
-      // });
+      arScene.setModelScale(1);
+      void control.init({
+        session,
+        size,
+        initialFloorPos: hitPosition
+      });
     });
     scaleUpAnimation.start();
   }

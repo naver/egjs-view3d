@@ -25,7 +25,10 @@ export interface FloorIndicatorOptions {
  * Ring type indicator for showing where the model's at.
  */
 class FloorIndicator {
-  private _mesh: THREE.Mesh;
+  private _mesh: THREE.Group;
+  private _ring: THREE.Mesh;
+  private _arrow: THREE.Mesh;
+  private _reticle: THREE.Mesh;
   private _animator: Motion;
   private _opacityRange: Range;
 
@@ -43,95 +46,102 @@ class FloorIndicator {
     dirIndicatorOpacity = 1,
     fadeoutDuration = 1000
   }: Partial<FloorIndicatorOptions> = {}) {
-    // const deg10 = Math.PI / 18;
+    const deg10 = Math.PI / 18;
 
-    // const dimmedRingGeomtry = new THREE.RingGeometry(0.975, 1, 150, 1, -6 * deg10, 30 * deg10);
-    // const reticle = new THREE.CircleGeometry(0.1, 30, 0, Math.PI * 2);
-    // dimmedRingGeomtry.merge(reticle);
+    const ringGeomtry = new THREE.RingGeometry(0.975, 1, 150, 1, -6 * deg10, 30 * deg10);
+    const reticleGeometry = new THREE.CircleGeometry(0.1, 30, 0, Math.PI * 2);
 
-    // const highlightedRingGeometry = new THREE.RingGeometry(0.96, 1.015, 30, 1, 25 * deg10, 4 * deg10);
+    ringGeomtry.rotateX(-Math.PI / 2);
+    reticleGeometry.rotateX(-Math.PI / 2);
 
-    // // Create little triangle in ring
-    // const ringVertices = highlightedRingGeometry.vertices;
-    // const trianglePart = ringVertices.slice(Math.floor(11 * ringVertices.length / 16), Math.floor(13 * ringVertices.length / 16));
-    // const firstY = trianglePart[0].y;
-    // const midIndex = Math.floor(trianglePart.length / 2);
-    // trianglePart.forEach((vec, vecIdx) => {
-    //   const offsetAmount = 0.025 * (midIndex - Math.abs(vecIdx - midIndex));
-    //   vec.setY(firstY - offsetAmount);
-    // });
+    const arrowGeometry = new THREE.RingGeometry(0.96, 1.015, 30, 1, 25 * deg10, 4 * deg10);
 
-    // const indicatorMat = new THREE.Matrix4().makeRotationX(-Math.PI / 2);
-    // const mergedGeometry = new THREE.Geometry();
+    // Create little triangle in ring
+    const { position: arrowGeometryPosition } = arrowGeometry.attributes;
 
-    // mergedGeometry.merge(dimmedRingGeomtry, indicatorMat, 0);
-    // mergedGeometry.merge(highlightedRingGeometry, indicatorMat, 1);
+    const triangleStartIdx = Math.floor(11 * arrowGeometryPosition.count / 16);
+    const triangleEndIdx = Math.floor(13 * arrowGeometryPosition.count / 16);
+    const midIndex = Math.floor((triangleEndIdx - triangleStartIdx + 1) / 2);
+    const firstY = new THREE.Vector3().fromBufferAttribute(arrowGeometryPosition, triangleStartIdx).y;
 
-    // const dimmedMaterial = new THREE.MeshBasicMaterial({
-    //   transparent: true,
-    //   opacity: ringOpacity,
-    //   color: 0xffffff
-    // });
-    // const highlightMaterial = new THREE.MeshBasicMaterial({
-    //   transparent: true,
-    //   opacity: dirIndicatorOpacity,
-    //   color: 0xffffff
-    // });
-    // const materials = [dimmedMaterial, highlightMaterial];
+    for (let idx = triangleStartIdx; idx < triangleEndIdx; idx++) {
+      const vecIndex = idx - triangleStartIdx;
+      const offsetAmount = 0.025 * (midIndex - Math.abs(vecIndex - midIndex));
 
-    // this._mesh = new THREE.Mesh(mergedGeometry, materials);
-    // this._mesh.matrixAutoUpdate = false;
-    // this._animator = new Motion({ duration: fadeoutDuration });
-    // this._opacityRange = {
-    //   min: ringOpacity,
-    //   max: dirIndicatorOpacity
-    // };
+      arrowGeometryPosition.setY(idx, firstY - offsetAmount);
+    }
+
+    arrowGeometry.rotateX(-Math.PI / 2);
+
+    const dimmedMaterial = new THREE.MeshBasicMaterial({
+      transparent: true,
+      opacity: ringOpacity,
+      color: 0xffffff
+    });
+    const highlightMaterial = new THREE.MeshBasicMaterial({
+      transparent: true,
+      opacity: dirIndicatorOpacity,
+      color: 0xffffff
+    });
+
+    const ring = new THREE.Mesh(ringGeomtry, dimmedMaterial);
+    const reticle = new THREE.Mesh(reticleGeometry, dimmedMaterial);
+    const arrow = new THREE.Mesh(arrowGeometry, highlightMaterial);
+    const merged = new THREE.Group();
+
+    merged.add(ring, reticle, arrow);
+
+    this._mesh = merged;
+    this._ring = ring;
+    this._reticle = reticle;
+    this._arrow = arrow;
+    this._animator = new Motion({ duration: fadeoutDuration });
+    this._opacityRange = {
+      min: ringOpacity,
+      max: dirIndicatorOpacity
+    };
   }
 
   public update({
     delta,
     scale,
-    position,
     rotation
   }: {
     delta: number;
     scale: number;
-    position: THREE.Vector3;
     rotation: THREE.Quaternion;
   }) {
-    // const mesh = this._mesh;
-    // const animator = this._animator;
+    const mesh = this._mesh;
+    const animator = this._animator;
 
-    // if (!this._mesh.visible) return;
+    if (!mesh.visible) return;
 
-    // animator.update(delta);
+    animator.update(delta);
 
-    // const materials = this._mesh.material as THREE.Material[];
-    // const minOpacityMat = materials[0];
-    // const maxOpacityMat = materials[1];
-    // const opacityRange = this._opacityRange;
+    const minOpacityMat = this._ring.material as THREE.Material;
+    const maxOpacityMat = this._arrow.material as THREE.Material;
+    const opacityRange = this._opacityRange;
 
-    // minOpacityMat.opacity = animator.val * opacityRange.min;
-    // maxOpacityMat.opacity = animator.val * opacityRange.max;
+    minOpacityMat.opacity = animator.val * opacityRange.min;
+    maxOpacityMat.opacity = animator.val * opacityRange.max;
 
-    // if (animator.val <= 0) {
-    //   mesh.visible = false;
-    // }
+    if (animator.val <= 0) {
+      mesh.visible = false;
+    }
 
-    // // Update mesh
-    // mesh.scale.setScalar(scale);
-    // mesh.position.copy(position);
-    // mesh.quaternion.copy(rotation);
-    // mesh.updateMatrix();
+    // Update mesh
+    mesh.scale.setScalar(scale);
+    mesh.quaternion.copy(rotation);
+    mesh.updateMatrix();
   }
 
   public show() {
-    // this._mesh.visible = true;
-    // this._animator.reset(1);
+    this._mesh.visible = true;
+    this._animator.reset(1);
   }
 
   public fadeout() {
-    // this._animator.setEndDelta(-1);
+    this._animator.setEndDelta(-1);
   }
 }
 

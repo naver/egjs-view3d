@@ -22,6 +22,7 @@ class Scene {
   private _shadowPlane: ShadowPlane;
   private _userObjects: THREE.Group;
   private _envObjects: THREE.Group;
+  private _fixedObjects: THREE.Group;
 
   /**
    * Root {@link https://threejs.org/docs/#api/en/scenes/Scene THREE.Scene} object
@@ -45,6 +46,11 @@ class Scene {
   public get envObjects() { return this._envObjects; }
 
   /**
+   *
+   */
+  public get fixedObjects() { return this._envObjects; }
+
+  /**
    * Create new Scene instance
    */
   public constructor(view3D: View3D) {
@@ -52,20 +58,23 @@ class Scene {
     this._root = new THREE.Scene();
     this._userObjects = new THREE.Group();
     this._envObjects = new THREE.Group();
+    this._fixedObjects = new THREE.Group();
     this._shadowPlane = new ShadowPlane(view3D, getObjectOption(view3D.shadow));
 
     const root = this._root;
     const userObjects = this._userObjects;
     const envObjects = this._envObjects;
+    const fixedObjects = this._fixedObjects;
     const shadowPlane = this._shadowPlane;
 
     userObjects.name = "userObjects";
     envObjects.name = "envObjects";
+    fixedObjects.name = "fixedObjects";
 
-    root.add(userObjects, envObjects);
+    root.add(userObjects, envObjects, fixedObjects);
 
     if (view3D.shadow) {
-      root.add(shadowPlane.mesh, shadowPlane.light);
+      fixedObjects.add(shadowPlane.mesh, shadowPlane.light);
     }
   }
 

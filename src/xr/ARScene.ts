@@ -12,48 +12,57 @@ import ARPlaneVisualizer from "./ARPlaneVisualizer";
 class ARScene {
   private _root: THREE.Scene;
   private _modelRoot: THREE.Group;
-  private _arUIRoot: THREE.Group;
+  private _modelMovable: THREE.Group;
+  private _modelFixed: THREE.Group;
+  private _arRoot: THREE.Group;
   private _planeVisualizer: ARPlaneVisualizer;
 
   public get root() { return this._root; }
-  public get modelRoot() { return this._modelRoot; }
-  public get arUIRoot() { return this._arUIRoot; }
+  public get modelMovable() { return this._modelMovable; }
+  public get arRoot() { return this._arRoot; }
 
-  public constructor(view3D: View3D) {
+  public constructor() {
     this._root = new THREE.Scene();
 
     this._modelRoot = new THREE.Group();
-    this._arUIRoot = new THREE.Group();
+    this._modelMovable = new THREE.Group();
+    this._modelFixed = new THREE.Group();
+    this._arRoot = new THREE.Group();
     this._planeVisualizer = new ARPlaneVisualizer();
 
     const root = this._root;
-    const modelRoot = this._modelRoot;
-    const arUIRoot = this._arUIRoot;
+    const modelMovable = this._modelMovable;
+    const modelFixed = this._modelFixed;
+    const arRoot = this._arRoot;
     const planeVisualizer = this._planeVisualizer;
 
-    // Copy all scene objects into model objects
-    const originalScene = view3D.scene;
-
-    [...originalScene.root.children].forEach(child => {
-      modelRoot.add(child);
-    });
-
-    // Copy environment
-    root.environment = originalScene.root.environment?.clone() ?? null;
-
-    root.add(modelRoot);
-    root.add(arUIRoot);
-    root.add(planeVisualizer.mesh);
+    root.add(modelMovable, modelFixed, arRoot, planeVisualizer.mesh);
 
     // Start with root hidden, as floor should be detected first
     this.hideModel();
   }
 
-  public destroy(view3D: View3D) {
-    const modelRoot = this._modelRoot;
+  public init(view3D: View3D) {
+    const root = this._root;
+    const modelMovable = this._modelMovable;
+    const modelFixed = this._modelFixed;
+
+    // Copy all scene objects into model objects
     const originalScene = view3D.scene;
 
-    [...modelRoot.children].forEach(child => {
+    modelMovable.add(originalScene.userObjects, originalScene.envObjects);
+    modelFixed.add(originalScene.fixedObjects);
+
+    // Copy environment
+    root.environment = originalScene.root.environment?.clone() ?? null;
+  }
+
+  public destroy(view3D: View3D) {
+    const modelMovable = this._modelMovable;
+    const modelFixed = this._modelFixed;
+    const originalScene = view3D.scene;
+
+    [...modelMovable.children, ...modelFixed.children].forEach(child => {
       originalScene.root.add(child);
     });
   }
@@ -63,7 +72,7 @@ class ARScene {
    * @returns {void}
    */
   public showModel(): void {
-    // this._modelRoot.visible = true;
+    this._modelRoot.visible = true;
   }
 
   /**
@@ -71,38 +80,38 @@ class ARScene {
    * @returns {void}
    */
   public hideModel(): void {
-    // this._modelRoot.visible = false;
+    this._modelRoot.visible = false;
   }
 
   /**
    * Add AR-exclusive object
    */
   public add(...objects: THREE.Object3D[]) {
-    this._arUIRoot.add(...objects);
+    this._arRoot.add(...objects);
   }
 
-  public setModelPosition(pos: THREE.Vector3) {
-    const modelRoot = this._modelRoot;
+  public setRootPosition(pos: THREE.Vector3) {
+    const root = this._root;
 
-    modelRoot.position.copy(pos);
-    modelRoot.matrixWorldNeedsUpdate = true;
+    root.position.copy(pos);
+  }
 
-    this._planeVisualizer.mesh.position.copy(pos);
-    this._planeVisualizer.mesh.updateMatrixWorld();
+  public setModelHovering(hoverAmount: number) {
+    const modelMovable = this._modelMovable;
+
+    modelMovable.position.setY(hoverAmount);
+  }
+
+  public setModelRotation(quat: THREE.Quaternion) {
+    const modelMovable = this._modelMovable;
+
+    modelMovable.quaternion.copy(quat);
   }
 
   public setModelScale(scalar: number) {
-    const modelRoot = this._modelRoot;
+    const modelMovable = this._modelMovable;
 
-    modelRoot.scale.setScalar(scalar);
-    modelRoot.matrixWorldNeedsUpdate = true;
-  }
-
-  public setFloorLevel(y: number) {
-    const modelRoot = this._modelRoot;
-
-    modelRoot.position.setY(y + DEFAULT.SHADOW_Y_OFFSET);
-    modelRoot.matrixWorldNeedsUpdate = true;
+    modelMovable.scale.setScalar(scalar);
   }
 }
 

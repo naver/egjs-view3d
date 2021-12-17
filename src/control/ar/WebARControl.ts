@@ -40,6 +40,8 @@ export interface WebARControlOptions {
  */
 class WebARControl {
   private _view3D: View3D;
+  private _arScene: ARScene;
+
   private _initialized: boolean;
   private _modelHit: boolean;
   private _hitTestSource: THREE.XRTransientInputHitTestSource | null;
@@ -66,8 +68,9 @@ class WebARControl {
    * Create new instance of ARControl
    * @param {WebARControlOptions} options Options
    */
-  public constructor(view3D: View3D, options: Partial<WebARControlOptions> = {}) {
+  public constructor(view3D: View3D, arScene: ARScene, options: Partial<WebARControlOptions> = {}) {
     this._view3D = view3D;
+    this._arScene = arScene;
     this._initialized = false;
     this._modelHit = false;
     this._hitTestSource = null;
@@ -80,7 +83,6 @@ class WebARControl {
   }
 
   public async init(ctx: {
-    scene: ARScene;
     session: THREE.XRSession;
     size: {
       width: number;
@@ -88,13 +90,14 @@ class WebARControl {
     };
     initialFloorPos: THREE.Vector3;
   }) {
-    const { session, scene, size, initialFloorPos } = ctx;
+    const arScene = this._arScene;
+    const { session, size, initialFloorPos } = ctx;
 
     this._translateControl.initFloorPosition(initialFloorPos);
     this._deadzoneChecker.setAspect(size.height / size.width);
 
-    // FIXME:
-    // scene.add(this._floorIndicator.mesh);
+    arScene.add(this._floorIndicator.mesh);
+    arScene.add(this._scaleControl.ui.mesh);
 
     const transientHitTestSource = await session.requestHitTestSourceForTransientInput({ profile: XR.INPUT_PROFILE.TOUCH });
 
@@ -126,10 +129,10 @@ class WebARControl {
   }
 
   public update(ctx: XRRenderContext) {
-    const { view3D: view3d, session, frame } = ctx;
+    const { view3D, session, frame } = ctx;
     const hitTestSource = this._hitTestSource;
 
-    if (!hitTestSource || !view3d.model) return;
+    if (!hitTestSource || !view3D.model) return;
 
     const deadzoneChecker = this._deadzoneChecker;
     const inputSources = session.inputSources;
@@ -152,7 +155,6 @@ class WebARControl {
   private _deactivate() {
     this._modelHit = false;
     this._deadzoneChecker.cleanup();
-
     this._rotateControl.deactivate();
     this._translateControl.deactivate();
     this._scaleControl.deactivate();
@@ -161,17 +163,21 @@ class WebARControl {
   private _onSelectStart = (evt: THREE.XRInputSourceEvent) => {
     const frame = evt.frame;
     const view3D = this._view3D;
+    const arScene = this._arScene;
     const hitTestSource = this._hitTestSource;
-    const threeRenderer = view3D.renderer.threeRenderer;
-    const xrCam = threeRenderer.xr.getCamera(new THREE.PerspectiveCamera()) as THREE.PerspectiveCamera;
-    const referenceSpace = threeRenderer.xr.getReferenceSpace()!;
-
-    if (!hitTestSource) return;
-
     const deadzoneChecker = this._deadzoneChecker;
     const rotateControl = this._rotateControl;
     const translateControl = this._translateControl;
     const scaleControl = this._scaleControl;
+
+    const threeRenderer = view3D.renderer.threeRenderer;
+    const xrCamArray = (threeRenderer.xr.getCamera(new THREE.PerspectiveCamera()) as THREE.ArrayCamera);
+    const referenceSpace = threeRenderer.xr.getReferenceSpace()!;
+
+    if (!hitTestSource || xrCamArray.cameras.length <= 0) return;
+
+    const xrCam = xrCamArray.cameras[0];
+    const model = view3D.model!;
 
     // Update deadzone testing gestures
     if (rotateControl.enabled) {
@@ -186,13 +192,12 @@ class WebARControl {
 
     const hitResults = frame.getHitTestResultsForTransientInput(hitTestSource);
     const coords = this._hitResultToVector(hitResults);
+
     deadzoneChecker.applyScreenAspect(coords);
     deadzoneChecker.setFirstInput(coords);
 
     if (coords.length === 1) {
       // Check finger is on the model
-      const modelBbox = view3D.model!.bbox;
-
       const targetRayPose = frame.getPose(hitResults[0].inputSource.targetRaySpace, referenceSpace);
 
       if (targetRayPose) {
@@ -201,7 +206,11 @@ class WebARControl {
 
         const fingerDir = new THREE.Vector3(rayPose.x, rayPose.y, rayPose.z).sub(camPos).normalize();
         const fingerRay = new THREE.Ray(camPos, fingerDir);
-        const intersection = fingerRay.intersectBox(modelBbox, new THREE.Vector3());
+
+        const modelBoundingSphere = model.bbox.getBoundingSphere(new THREE.Sphere());
+        modelBoundingSphere.applyMatrix4(arScene.modelMovable.matrixWorld);
+
+        const intersection = fingerRay.intersectSphere(modelBoundingSphere, new THREE.Vector3());
 
         if (intersection) {
           // Touch point intersected with model
@@ -219,10 +228,11 @@ class WebARControl {
   };
 
   private _checkDeadzone(ctx: XRRenderContext, { coords }: XRInputs) {
-    const gesture = this._deadzoneChecker.check(coords.map(coord => coord.clone()));
+    const arScene = this._arScene;
     const rotateControl = this._rotateControl;
     const translateControl = this._translateControl;
     const scaleControl = this._scaleControl;
+    const gesture = this._deadzoneChecker.check(coords.map(coord => coord.clone()));
 
     if (gesture === GESTURE.NONE) return;
 
@@ -234,6 +244,7 @@ class WebARControl {
           translateControl.setInitialPos(coords);
         } else {
           rotateControl.activate();
+          rotateControl.updateRotation(arScene.modelMovable.quaternion);
           rotateControl.setInitialPos(coords);
         }
         break;
@@ -251,37 +262,29 @@ class WebARControl {
   }
 
   private _updateControls(ctx: XRRenderContext) {
-    const { scene, delta } = ctx;
+    const { model, delta } = ctx;
+    const arScene = this._arScene;
+    const rotateControl = this._rotateControl;
+    const translateControl = this._translateControl;
+    const scaleControl = this._scaleControl;
+    const floorIndicator = this._floorIndicator;
     const deltaMilisec = delta * 1000;
 
-    this._rotateControl.update(ctx, deltaMilisec);
-    this._translateControl.update(ctx, deltaMilisec);
-    this._scaleControl.update(ctx, deltaMilisec);
+    rotateControl.update(ctx, deltaMilisec);
+    translateControl.update(ctx, deltaMilisec);
+    scaleControl.update(ctx, deltaMilisec);
 
-    scene.root.updateMatrix();
+    const modelRotation = rotateControl.rotation;
+    const floorPosition = translateControl.floorPosition;
+    const modelBoundingSphere = model.bbox.getBoundingSphere(new THREE.Sphere());
 
-    const modelRotation = this._rotateControl.rotation;
-    const floorPosition = this._translateControl.floorPosition;
+    arScene.setRootPosition(floorPosition);
 
-    scene.setFloorLevel(floorPosition.y);
-
-    // Get a scaled bbox, which only has scale applied on it.
-    // TODO: apply scale to floor indicator
-    // const scaleControl = this._scaleControl;
-    // const scaledBbox = model.bbox;
-
-    // scaledBbox.min.multiply(scaleControl.scale);
-    // scaledBbox.max.multiply(scaleControl.scale);
-
-    // const floorIndicator = this._floorIndicator;
-    // const boundingSphere = scaledBbox.getBoundingSphere(new THREE.Sphere());
-
-    // floorIndicator.update({
-    //   delta: deltaMilisec,
-    //   scale: boundingSphere.radius,
-    //   position: floorPosition,
-    //   rotation: modelRotation
-    // });
+    floorIndicator.update({
+      delta: deltaMilisec,
+      scale: modelBoundingSphere.radius * scaleControl.scale,
+      rotation: modelRotation
+    });
   }
 
   private _hitResultToVector(hitResults: any[]) {

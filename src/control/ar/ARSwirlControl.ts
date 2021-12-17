@@ -108,16 +108,15 @@ class ARSwirlControl implements ARControl {
     this._prevPos.copy(coords[0]);
   }
 
-  public process({ view3D: view3d, xrCam }: XRRenderContext, { coords }: XRInputs) {
+  public process({ scene, xrCam }: XRRenderContext, { coords }: XRInputs) {
     if (!this._active || coords.length !== 1) return;
 
     const prevPos = this._prevPos;
     const motion = this._motion;
 
-    const model = view3d.model!;
     const coord = coords[0];
 
-    const modelPos = model.scene.position.clone();
+    const modelPos = scene.modelMovable.getWorldPosition(new THREE.Vector3());
     const ndcModelPos = new THREE.Vector2().fromArray(modelPos.project(xrCam).toArray());
 
     // Get the rotation angle with the model's NDC coordinates as the center.
@@ -134,7 +133,7 @@ class ARSwirlControl implements ARControl {
     prevPos.copy(coord);
   }
 
-  public update({ model }: XRRenderContext, deltaTime: number) {
+  public update({ scene }: XRRenderContext, deltaTime: number) {
     if (!this._active) return;
 
     const motion = this._motion;
@@ -143,7 +142,7 @@ class ARSwirlControl implements ARControl {
     const interpolated = this._getInterpolatedQuaternion();
 
     this.rotation.copy(interpolated);
-    model.scene.quaternion.copy(interpolated);
+    scene.setModelRotation(interpolated);
   }
 
   private _getInterpolatedQuaternion(): THREE.Quaternion {

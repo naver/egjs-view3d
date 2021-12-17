@@ -12,15 +12,12 @@ class ARPlaneVisualizer{
   public get mesh() { return this._mesh; }
 
   public constructor() {
-    this._geometry = new THREE.PlaneBufferGeometry(1000, 1000);
-    this._material = new THREE.MeshBasicMaterial();
+    this._geometry = new THREE.PlaneBufferGeometry(1, 1);
+    this._material = new THREE.MeshBasicMaterial({ transparent: true, color: 0xffff00, opacity: 0.3 });
 
     this._geometry.rotateX(-Math.PI / 2);
 
     this._mesh = new THREE.Mesh(this._geometry, this._material);
-
-    // FIXME:
-    this._mesh.visible = false;
   }
 }
 

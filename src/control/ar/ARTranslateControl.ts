@@ -171,7 +171,7 @@ class ARTranslateControl implements ARControl {
     this._initialPos.copy(coords[0]);
   }
 
-  public process({ view3D: view3d, model, frame, referenceSpace, xrCam }: XRRenderContext, { hitResults }: XRInputs) {
+  public process({ model, frame, referenceSpace, xrCam }: XRRenderContext, { hitResults }: XRInputs) {
     const state = this._state;
     const notActive = state === STATE.WAITING || state === STATE.BOUNCING;
     if (!hitResults || hitResults.length !== 1 || notActive) return;
@@ -191,10 +191,14 @@ class ARTranslateControl implements ARControl {
     const isFloorHit = hitPose && hitPose.transform.matrix[5] >= 0.75;
     const camPos = new THREE.Vector3().setFromMatrixPosition(xrCam.matrixWorld);
 
-    if (!hitPose || !isFloorHit) {
+    if (frame && (!hitPose || !isFloorHit)) {
       // Use previous drag plane if no hit plane is found
-      const targetRayPose = frame.getPose(hitResult.inputSource.targetRaySpace, view3d.renderer.threeRenderer.xr.getReferenceSpace());
-      const fingerDir = new THREE.Vector3().copy(targetRayPose.transform.position).sub(camPos).normalize();
+      const targetRayPose = frame.getPose(hitResult.inputSource.targetRaySpace, referenceSpace);
+      if (!targetRayPose) return;
+
+      const rayPos = targetRayPose.transform.position;
+      const fingerPos = new THREE.Vector3(rayPos.x, rayPos.y, rayPos.z);
+      const fingerDir = fingerPos.sub(camPos).normalize();
 
       const fingerRay = new THREE.Ray(camPos, fingerDir);
       const intersection = fingerRay.intersectPlane(dragPlane, new THREE.Vector3());
@@ -231,10 +235,12 @@ class ARTranslateControl implements ARControl {
     hoverPosition.setY(hitOnDragPlane.y - modelBboxYOffset);
   }
 
-  public update({ model }: XRRenderContext, delta: number) {
+  public update({ scene }: XRRenderContext, delta: number) {
     const state = this._state;
+    const floorPosition = this._floorPosition;
     const modelPosition = this._modelPosition;
     const hoverPosition = this._hoverPosition;
+
     if (state === STATE.WAITING) return;
 
     if (state !== STATE.BOUNCING) {
@@ -258,11 +264,9 @@ class ARTranslateControl implements ARControl {
       }
     }
 
-    const modelBbox = model.bbox;
-    const modelYOffset = modelBbox.getCenter(new THREE.Vector3()).y - modelBbox.min.y;
-
-    // modelPosition = where model.bbox.min.y should be
-    model.scene.position.copy(modelPosition.clone().setY(modelPosition.y + modelYOffset));
+    // FIXME:
+    scene.setModelHovering(hoverPosition.y - floorPosition.y);
+    scene.setRootPosition(floorPosition);
   }
 }
 

@@ -115,8 +115,6 @@ class Model {
 
     this.castShadow = castShadow;
     this.receiveShadow = receiveShadow;
-
-    console.log(this.meshes);
   }
 
   public reduceVertices<T>(callbackfn: (previousVal: T, currentVal: THREE.Vector3) => T, initialVal: T) {

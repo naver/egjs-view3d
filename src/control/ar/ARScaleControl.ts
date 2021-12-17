@@ -34,7 +34,6 @@ class ARScaleControl implements ARControl {
   private _active = false;
   private _prevCoordDistance = -1;
   private _scaleMultiplier = 1;
-  private _initialScale = new THREE.Vector3();
   private _ui = new ScaleUI();
 
   /**
@@ -43,6 +42,7 @@ class ARScaleControl implements ARControl {
    */
   public get enabled() { return this._enabled; }
   public get scale() { return this._scaleMultiplier; }
+  public get ui() { return this._ui; }
 
   public get scaleMultiplier() { return this._scaleMultiplier; }
   /**
@@ -64,12 +64,6 @@ class ARScaleControl implements ARControl {
     this._motion = new Motion({ duration: 0, range: { min, max } });
     this._motion.reset(1); // default scale is 1(100%)
     this._ui = new ScaleUI();
-  }
-
-  public init({ view3D: view3d }: XRRenderContext) {
-    // FIXME: Copy ARScene scale
-    this._initialScale.copy(view3d.model!.scene.scale);
-    view3d.scene.add(this._ui.mesh);
   }
 
   public setInitialPos(coords: THREE.Vector2[]) {
@@ -125,14 +119,16 @@ class ARScaleControl implements ARControl {
     this._scaleMultiplier = motion.val;
     this._ui.updateScale(this._scaleMultiplier);
 
-    scene.modelRoot.scale.setScalar(this._scaleMultiplier);
+    scene.setModelScale(this._scaleMultiplier);
   }
 
-  private _updateUIPosition({ view3D: view3d, xrCam }: XRRenderContext) {
+  private _updateUIPosition({ scene, model, xrCam }: XRRenderContext) {
     // Update UI
-    const model = view3d.model!;
     const camPos = new THREE.Vector3().setFromMatrixPosition(xrCam.matrixWorld);
-    const uiPos = model.scene.position.clone().setY(model.bbox.max.y);
+    const modelHeight = (model.bbox.max.y - model.bbox.min.y) * this._scaleMultiplier;
+
+    const uiPos = scene.modelMovable.position.clone();
+    uiPos.setY(uiPos.y + modelHeight);
 
     this._ui.updatePosition(uiPos, camPos);
   }
