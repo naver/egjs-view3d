@@ -99,8 +99,7 @@ class WebARControl {
 
     arScene.add(
       this._floorIndicator.mesh,
-      this._scaleControl.ui.mesh,
-      this._translateControl.visualizer.mesh
+      this._scaleControl.ui.mesh
     );
 
     const transientHitTestSource = await session.requestHitTestSourceForTransientInput({ profile: XR.INPUT_PROFILE.TOUCH });

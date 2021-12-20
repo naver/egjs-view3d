@@ -11,7 +11,6 @@ import { EASING } from "../../const/external";
 import { XRRenderContext, XRInputs } from "../../type/xr";
 
 import ARControl from "./ARControl";
-import PlaneVisualizer from "./PlaneVisualizer";
 
 enum STATE {
   WAITING,
@@ -55,9 +54,6 @@ class ARTranslateControl implements ARControl {
   private _state = STATE.WAITING;
   private _initialPos = new THREE.Vector2();
   private _bounceMotion: Motion;
-  private _planeVisualizer: PlaneVisualizer;
-
-  public get visualizer() { return this._planeVisualizer; }
 
   /**
    * Whether this control is enabled or not
@@ -91,7 +87,6 @@ class ARTranslateControl implements ARControl {
       easing: bounceEasing,
       range: DEFAULT.INFINITE_RANGE
     });
-    this._planeVisualizer = new PlaneVisualizer();
   }
 
   public initFloorPosition(position: THREE.Vector3) {
@@ -121,8 +116,6 @@ class ARTranslateControl implements ARControl {
 
     this._dragPlane.set(new THREE.Vector3(0, 1, 0), dragPlaneConstant);
     this._state = STATE.TRANSLATING;
-
-    this._planeVisualizer.show();
   }
 
   public deactivate() {
@@ -140,8 +133,6 @@ class ARTranslateControl implements ARControl {
 
     bounceMotion.reset(hoveringAmount);
     bounceMotion.setEndDelta(-hoveringAmount);
-
-    this._planeVisualizer.hide();
   }
 
   public setInitialPos(coords: THREE.Vector2[]) {
