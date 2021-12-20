@@ -240,7 +240,7 @@ class WebARControl {
       case GESTURE.ONE_FINGER_HORIZONTAL:
       case GESTURE.ONE_FINGER_VERTICAL:
         if (this._modelHit) {
-          translateControl.activate(ctx);
+          translateControl.activate();
           translateControl.setInitialPos(coords);
         } else {
           rotateControl.activate();

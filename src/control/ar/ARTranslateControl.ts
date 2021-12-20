@@ -48,14 +48,12 @@ class ARTranslateControl implements ARControl {
   private _hoverHeight: number;
 
   // Internal states
-  private _modelPosition = new THREE.Vector3();
   private _hoverPosition = new THREE.Vector3();
   private _floorPosition = new THREE.Vector3();
   private _dragPlane = new THREE.Plane();
   private _enabled = true;
   private _state = STATE.WAITING;
   private _initialPos = new THREE.Vector2();
-  private _hoverMotion: Motion;
   private _bounceMotion: Motion;
 
   /**
@@ -63,11 +61,6 @@ class ARTranslateControl implements ARControl {
    * @readonly
    */
   public get enabled() { return this._enabled; }
-  /**
-   * Position including hover/bounce animation offset from the floor.
-   * @readonly
-   */
-  public get modelPosition() { return this._modelPosition.clone(); }
   /**
    * Last detected floor position
    * @readonly
@@ -92,18 +85,11 @@ class ARTranslateControl implements ARControl {
   public constructor({
     hoverAmplitude = 0.01,
     hoverHeight = 0.1,
-    hoverPeriod = 1000,
-    hoverEasing = EASING.SINE_WAVE,
     bounceDuration = 1000,
     bounceEasing = EASING.EASE_OUT_BOUNCE
   }: Partial<ARTranslateControlOptions> = {}) {
     this._hoverAmplitude = hoverAmplitude;
     this._hoverHeight = hoverHeight;
-    this._hoverMotion = new Motion({
-      loop: true,
-      duration: hoverPeriod,
-      easing: hoverEasing
-    });
     this._bounceMotion = new Motion({
       duration: bounceDuration,
       easing: bounceEasing,
@@ -112,7 +98,6 @@ class ARTranslateControl implements ARControl {
   }
 
   public initFloorPosition(position: THREE.Vector3) {
-    this._modelPosition.copy(position);
     this._floorPosition.copy(position);
     this._hoverPosition.copy(position);
     this._hoverPosition.setY(position.y + this._hoverHeight);
@@ -129,19 +114,14 @@ class ARTranslateControl implements ARControl {
    * Disable this control
    */
   public disable() {
-    this._enabled = false;
     this.deactivate();
+    this._enabled = false;
   }
 
-  public activate({ model }: XRRenderContext) {
+  public activate() {
     if (!this._enabled) return;
 
-    const modelBbox = model.bbox;
-    const modelBboxYOffset = modelBbox.getCenter(new THREE.Vector3()).y - modelBbox.min.y;
-    this._dragPlane.set(new THREE.Vector3(0, 1, 0), -(this._floorPosition.y + this._hoverHeight + modelBboxYOffset));
-
-    this._hoverMotion.reset(0);
-    this._hoverMotion.setEndDelta(1);
+    this._dragPlane.set(new THREE.Vector3(0, 1, 0), -(this._floorPosition.y + this._hoverHeight));
     this._state = STATE.TRANSLATING;
   }
 
@@ -154,24 +134,19 @@ class ARTranslateControl implements ARControl {
     this._state = STATE.BOUNCING;
 
     const floorPosition = this._floorPosition;
-    const modelPosition = this._modelPosition;
     const hoverPosition = this._hoverPosition;
     const bounceMotion = this._bounceMotion;
 
-    const hoveringAmount = modelPosition.y - floorPosition.y;
-    bounceMotion.reset(modelPosition.y);
+    const hoveringAmount = hoverPosition.y - floorPosition.y;
+    bounceMotion.reset(hoveringAmount);
     bounceMotion.setEndDelta(-hoveringAmount);
-
-    // Restore hover pos
-    hoverPosition.copy(floorPosition);
-    hoverPosition.setY(floorPosition.y + this._hoverHeight);
   }
 
   public setInitialPos(coords: THREE.Vector2[]) {
     this._initialPos.copy(coords[0]);
   }
 
-  public process({ model, frame, referenceSpace, xrCam }: XRRenderContext, { hitResults }: XRInputs) {
+  public process({ frame, referenceSpace, xrCam }: XRRenderContext, { hitResults }: XRInputs) {
     const state = this._state;
     const notActive = state === STATE.WAITING || state === STATE.BOUNCING;
     if (!hitResults || hitResults.length !== 1 || notActive) return;
@@ -183,9 +158,6 @@ class ARTranslateControl implements ARControl {
     const hoverPosition = this._hoverPosition;
     const hoverHeight = this._hoverHeight;
     const dragPlane = this._dragPlane;
-
-    const modelBbox = model.bbox;
-    const modelBboxYOffset = modelBbox.getCenter(new THREE.Vector3()).y - modelBbox.min.y;
 
     const hitPose = hitResult.results[0] && hitResult.results[0].getPose(referenceSpace);
     const isFloorHit = hitPose && hitPose.transform.matrix[5] >= 0.75;
@@ -207,7 +179,6 @@ class ARTranslateControl implements ARControl {
         floorPosition.copy(intersection);
         floorPosition.setY(prevFloorPosition.y);
         hoverPosition.copy(intersection);
-        hoverPosition.setY(intersection.y - modelBboxYOffset);
       }
       return;
     }
@@ -217,7 +188,7 @@ class ARTranslateControl implements ARControl {
 
     // Set new floor level when it's increased at least 10cm
     const currentDragPlaneHeight = -dragPlane.constant;
-    const hitDragPlaneHeight = hitPosition.y + hoverHeight + modelBboxYOffset;
+    const hitDragPlaneHeight = hitPosition.y + hoverHeight;
 
     if (hitDragPlaneHeight - currentDragPlaneHeight > 0.1) {
       dragPlane.constant = -hitDragPlaneHeight;
@@ -232,41 +203,26 @@ class ARTranslateControl implements ARControl {
     floorPosition.copy(hitOnDragPlane);
     floorPosition.setY(hitPosition.y);
     hoverPosition.copy(hitOnDragPlane);
-    hoverPosition.setY(hitOnDragPlane.y - modelBboxYOffset);
   }
 
   public update({ scene }: XRRenderContext, delta: number) {
     const state = this._state;
     const floorPosition = this._floorPosition;
-    const modelPosition = this._modelPosition;
     const hoverPosition = this._hoverPosition;
 
-    if (state === STATE.WAITING) return;
-
-    if (state !== STATE.BOUNCING) {
-      // Hover
-      const hoverMotion = this._hoverMotion;
-      hoverMotion.update(delta);
-
-      // Change only x, y component of position
-      const hoverOffset = hoverMotion.val * this._hoverAmplitude;
-      modelPosition.copy(hoverPosition);
-      modelPosition.setY(hoverPosition.y + hoverOffset);
-    } else {
-      // Bounce
+    if (state === STATE.BOUNCING) {
       const bounceMotion = this._bounceMotion;
-      bounceMotion.update(delta);
 
-      modelPosition.setY(bounceMotion.val);
+      bounceMotion.update(delta);
+      hoverPosition.setY(floorPosition.y + bounceMotion.val);
 
       if (bounceMotion.progress >= 1) {
         this._state = STATE.WAITING;
       }
     }
 
-    // FIXME:
-    scene.setModelHovering(hoverPosition.y - floorPosition.y);
     scene.setRootPosition(floorPosition);
+    scene.setModelHovering(hoverPosition.y - floorPosition.y);
   }
 }
 

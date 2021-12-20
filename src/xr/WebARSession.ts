@@ -207,9 +207,13 @@ class WebARSession extends Component<{
     session.addEventListener("end", onSessionEnd, { once: true });
 
     // Set XR session render loop
+    const arClock = new THREE.Clock();
+    arClock.start();
+
     renderer.stopAnimationLoop();
-    threeRenderer.xr.setAnimationLoop((delta, frame?: THREE.XRFrame) => {
+    threeRenderer.xr.setAnimationLoop((_, frame?: THREE.XRFrame) => {
       const xrCamArray = (threeRenderer.xr.getCamera(new THREE.PerspectiveCamera()) as THREE.ArrayCamera);
+      const delta = arClock.getDelta();
 
       if (xrCamArray.cameras.length <= 0) return;
 
