@@ -14,8 +14,8 @@ import { XRRenderContext, XRInputs } from "../../type/xr";
 import ARSwirlControl, { ARSwirlControlOptions } from "./ARSwirlControl";
 import ARTranslateControl, { ARTranslateControlOptions } from "./ARTranslateControl";
 import ARScaleControl, { ARScaleControlOptions } from "./ARScaleControl";
-import FloorIndicator, { FloorIndicatorOptions } from "./ui/FloorIndicator";
-import DeadzoneChecker, { DeadzoneCheckerOptions } from "./common/DeadzoneChecker";
+import FloorIndicator, { FloorIndicatorOptions } from "./FloorIndicator";
+import DeadzoneChecker, { DeadzoneCheckerOptions } from "./DeadzoneChecker";
 
 
 /**
@@ -71,6 +71,7 @@ class WebARControl {
   public constructor(view3D: View3D, arScene: ARScene, options: Partial<WebARControlOptions> = {}) {
     this._view3D = view3D;
     this._arScene = arScene;
+
     this._initialized = false;
     this._modelHit = false;
     this._hitTestSource = null;
@@ -96,8 +97,11 @@ class WebARControl {
     this._translateControl.initFloorPosition(initialFloorPos);
     this._deadzoneChecker.setAspect(size.height / size.width);
 
-    arScene.add(this._floorIndicator.mesh);
-    arScene.add(this._scaleControl.ui.mesh);
+    arScene.add(
+      this._floorIndicator.mesh,
+      this._scaleControl.ui.mesh,
+      this._translateControl.visualizer.mesh
+    );
 
     const transientHitTestSource = await session.requestHitTestSourceForTransientInput({ profile: XR.INPUT_PROFILE.TOUCH });
 

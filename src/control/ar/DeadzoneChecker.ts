@@ -5,7 +5,7 @@
 
 import * as THREE from "three";
 
-import { GESTURE } from "../../../const/internal";
+import { GESTURE } from "../../const/internal";
 
 enum STATE {
   WAITING,

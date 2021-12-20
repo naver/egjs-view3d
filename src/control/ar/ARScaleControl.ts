@@ -8,8 +8,8 @@ import * as THREE from "three";
 import Motion from "../../core/Motion";
 import { XRRenderContext, XRInputs } from "../../type/xr";
 
-import ScaleUI from "./ui/ScaleUI";
 import ARControl from "./ARControl";
+import ScaleUI from "./ScaleUI";
 
 /**
  * Options for {@link ARScaleControl}

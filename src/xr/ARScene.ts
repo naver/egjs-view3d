@@ -6,16 +6,12 @@
 import * as THREE from "three";
 
 import View3D from "../View3D";
-import * as DEFAULT from "../const/default";
-
-import ARPlaneVisualizer from "./ARPlaneVisualizer";
 class ARScene {
   private _root: THREE.Scene;
   private _modelRoot: THREE.Group;
   private _modelMovable: THREE.Group;
   private _modelFixed: THREE.Group;
   private _arRoot: THREE.Group;
-  private _planeVisualizer: ARPlaneVisualizer;
 
   public get root() { return this._root; }
   public get modelMovable() { return this._modelMovable; }
@@ -28,15 +24,13 @@ class ARScene {
     this._modelMovable = new THREE.Group();
     this._modelFixed = new THREE.Group();
     this._arRoot = new THREE.Group();
-    this._planeVisualizer = new ARPlaneVisualizer();
 
     const root = this._root;
     const modelMovable = this._modelMovable;
     const modelFixed = this._modelFixed;
     const arRoot = this._arRoot;
-    const planeVisualizer = this._planeVisualizer;
 
-    root.add(modelMovable, modelFixed, arRoot, planeVisualizer.mesh);
+    root.add(modelMovable, modelFixed, arRoot);
 
     // Start with root hidden, as floor should be detected first
     this.hideModel();

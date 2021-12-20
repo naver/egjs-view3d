@@ -47,7 +47,8 @@ class ZoomControl implements CameraControl, OptionGetters<ZoomControlOptions> {
   // Internal values
   private _view3D: View3D;
   private _range: Range;
-  private _scaleModifier: number = 0.02;
+  private _wheelModifier: number = 0.02;
+  private _touchModifier: number = 0.05;
   private _motion: Motion;
   private _prevTouchDistance: number = -1;
   private _enabled: boolean = false;
@@ -221,7 +222,7 @@ class ZoomControl implements CameraControl, OptionGetters<ZoomControlOptions> {
     evt.stopPropagation();
 
     const animation = this._motion;
-    const delta = -this._scale * this._scaleModifier * evt.deltaY;
+    const delta = -this._scale * this._wheelModifier * evt.deltaY;
 
     animation.setEndDelta(delta);
   };
@@ -241,7 +242,7 @@ class ZoomControl implements CameraControl, OptionGetters<ZoomControlOptions> {
     const touchPoint1 = new THREE.Vector2(touches[0].pageX, touches[0].pageY);
     const touchPoint2 = new THREE.Vector2(touches[1].pageX, touches[1].pageY);
     const touchDiff = touchPoint1.sub(touchPoint2);
-    const touchDistance = touchDiff.length() * this._scale * this._scaleModifier;
+    const touchDistance = touchDiff.length() * this._scale * this._touchModifier;
     const delta = touchDistance - prevTouchDistance;
 
     this._prevTouchDistance = touchDistance;

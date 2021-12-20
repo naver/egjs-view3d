@@ -1,3 +1,5 @@
+/* eslint-disable import/order */
+const glslify = require("rollup-plugin-glslify");
 const buildHelper = require("./config/build-helper");
 
 export const name = "View3D";
@@ -6,7 +8,7 @@ const external = {
   three: "THREE"
 };
 const tsconfig = "tsconfig.build.json";
-const plugins = [];
+const plugins = [glslify()];
 
 export default buildHelper([
   {

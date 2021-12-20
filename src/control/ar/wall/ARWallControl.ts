@@ -6,9 +6,9 @@
 import * as THREE from "three";
 
 import ARScaleControl, { ARScaleControlOptions } from "../ARScaleControl";
-import DeadzoneChecker, { DeadzoneCheckerOptions } from "../common/DeadzoneChecker";
+import DeadzoneChecker, { DeadzoneCheckerOptions } from "../DeadzoneChecker";
 import ARSwirlControl, { ARSwirlControlOptions } from "../ARSwirlControl";
-import FloorIndicator, { FloorIndicatorOptions } from "../ui/FloorIndicator";
+import FloorIndicator, { FloorIndicatorOptions } from "../FloorIndicator";
 import * as XR from "../../../consts/xr";
 import * as TOUCH from "../../../consts/touch";
 import { XRRenderContext, XRContext, XRInputs } from "../../../type/internal";

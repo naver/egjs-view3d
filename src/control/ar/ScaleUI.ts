@@ -5,7 +5,7 @@
 
 import * as THREE from "three";
 
-import { toPowerOfTwo } from "../../../utils";
+import { toPowerOfTwo } from "../../utils";
 
 /**
  * Options for {@link ScaleUI}
@@ -105,6 +105,8 @@ class ScaleUI {
     this._color = color;
     this._padding = padding;
     this._offset = offset;
+
+    this.hide();
   }
 
   public updatePosition(position: THREE.Vector3, focus: THREE.Vector3) {

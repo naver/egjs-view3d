@@ -3,6 +3,7 @@
 
 const lightCodeTheme = require("prism-react-renderer/themes/oceanicNext");
 const darkCodeTheme = require("prism-react-renderer/themes/palenight");
+const glslify = require("./plugin/glslify");
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -17,7 +18,7 @@ const config = {
   favicon: "img/favicon.png",
   organizationName: "naver",
   projectName: "naver.github.io",
-  plugins: ["docusaurus-plugin-sass"],
+  plugins: ["docusaurus-plugin-sass", glslify],
   presets: [
     [
       "@docusaurus/preset-classic",

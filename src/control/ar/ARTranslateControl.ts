@@ -11,6 +11,7 @@ import { EASING } from "../../const/external";
 import { XRRenderContext, XRInputs } from "../../type/xr";
 
 import ARControl from "./ARControl";
+import PlaneVisualizer from "./PlaneVisualizer";
 
 enum STATE {
   WAITING,
@@ -44,7 +45,6 @@ export interface ARTranslateControlOptions {
  */
 class ARTranslateControl implements ARControl {
   // Options
-  private _hoverAmplitude: number;
   private _hoverHeight: number;
 
   // Internal states
@@ -55,6 +55,9 @@ class ARTranslateControl implements ARControl {
   private _state = STATE.WAITING;
   private _initialPos = new THREE.Vector2();
   private _bounceMotion: Motion;
+  private _planeVisualizer: PlaneVisualizer;
+
+  public get visualizer() { return this._planeVisualizer; }
 
   /**
    * Whether this control is enabled or not
@@ -67,15 +70,10 @@ class ARTranslateControl implements ARControl {
    */
   public get floorPosition() { return this._floorPosition.clone(); }
   /**
-   * How much model will hover up and down, in meter.
-   */
-  public get hoverAmplitude() { return this._hoverAmplitude; }
-  /**
    * How much model will float from the floor, in meter.
    */
   public get hoverHeight() { return this._hoverHeight; }
 
-  public set hoverAmplitude(val: number) { this._hoverAmplitude = val; }
   public set hoverHeight(val: number) { this._hoverHeight = val; }
 
   /**
@@ -83,24 +81,22 @@ class ARTranslateControl implements ARControl {
    * @param {ARFloorTranslateControlOption} [options={}] Options
    */
   public constructor({
-    hoverAmplitude = 0.01,
     hoverHeight = 0.1,
     bounceDuration = 1000,
     bounceEasing = EASING.EASE_OUT_BOUNCE
   }: Partial<ARTranslateControlOptions> = {}) {
-    this._hoverAmplitude = hoverAmplitude;
     this._hoverHeight = hoverHeight;
     this._bounceMotion = new Motion({
       duration: bounceDuration,
       easing: bounceEasing,
       range: DEFAULT.INFINITE_RANGE
     });
+    this._planeVisualizer = new PlaneVisualizer();
   }
 
   public initFloorPosition(position: THREE.Vector3) {
     this._floorPosition.copy(position);
     this._hoverPosition.copy(position);
-    this._hoverPosition.setY(position.y + this._hoverHeight);
   }
 
   /**
@@ -121,8 +117,12 @@ class ARTranslateControl implements ARControl {
   public activate() {
     if (!this._enabled) return;
 
-    this._dragPlane.set(new THREE.Vector3(0, 1, 0), -(this._floorPosition.y + this._hoverHeight));
+    const dragPlaneConstant = -(this._floorPosition.y + this._hoverHeight);
+
+    this._dragPlane.set(new THREE.Vector3(0, 1, 0), dragPlaneConstant);
     this._state = STATE.TRANSLATING;
+
+    this._planeVisualizer.show();
   }
 
   public deactivate() {
@@ -136,10 +136,12 @@ class ARTranslateControl implements ARControl {
     const floorPosition = this._floorPosition;
     const hoverPosition = this._hoverPosition;
     const bounceMotion = this._bounceMotion;
-
     const hoveringAmount = hoverPosition.y - floorPosition.y;
+
     bounceMotion.reset(hoveringAmount);
     bounceMotion.setEndDelta(-hoveringAmount);
+
+    this._planeVisualizer.hide();
   }
 
   public setInitialPos(coords: THREE.Vector2[]) {

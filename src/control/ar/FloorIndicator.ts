@@ -5,8 +5,8 @@
 
 import * as THREE from "three";
 
-import Motion from "../../../core/Motion";
-import { Range } from "../../../type/utils";
+import Motion from "../../core/Motion";
+import { Range } from "../../type/utils";
 
 /**
  * Options for {@link FloorIndicator}
@@ -100,6 +100,8 @@ class FloorIndicator {
       min: ringOpacity,
       max: dirIndicatorOpacity
     };
+
+    this._mesh.visible = false;
   }
 
   public update({
