@@ -109,12 +109,18 @@ class ScaleUI {
     this.hide();
   }
 
-  public updatePosition(position: THREE.Vector3, focus: THREE.Vector3) {
-    // Update mesh
+  public updatePosition(worldRotation: THREE.Quaternion, focus: THREE.Vector3, modelHeight: number) {
     const mesh = this._mesh;
+    const offset = this._height / 2 + this._offset + modelHeight;
+    const offsetVec = new THREE.Vector3(0, 1, 0)
+      .multiplyScalar(offset)
+      .applyQuaternion(worldRotation.clone().invert());
+
+    console.log(offsetVec);
+
+    // Update mesh
+    mesh.position.copy(offsetVec);
     mesh.lookAt(focus);
-    mesh.position.copy(position);
-    mesh.position.setY(position.y + this._height / 2 + this._offset);
     mesh.updateMatrix();
   }
 

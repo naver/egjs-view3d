@@ -6,6 +6,7 @@
 import * as THREE from "three";
 
 import View3D from "../View3D";
+import Model from "../core/Model";
 class ARScene {
   private _root: THREE.Scene;
   private _modelRoot: THREE.Group;
@@ -14,6 +15,7 @@ class ARScene {
   private _arRoot: THREE.Group;
 
   public get root() { return this._root; }
+  public get modelRoot() { return this._modelRoot; }
   public get modelMovable() { return this._modelMovable; }
   public get arRoot() { return this._arRoot; }
 
@@ -26,14 +28,14 @@ class ARScene {
     this._arRoot = new THREE.Group();
 
     const root = this._root;
+    const modelRoot = this._modelRoot;
     const modelMovable = this._modelMovable;
     const modelFixed = this._modelFixed;
     const arRoot = this._arRoot;
 
-    root.add(modelMovable, modelFixed, arRoot);
+    modelRoot.add(modelMovable);
 
-    // Start with root hidden, as floor should be detected first
-    this.hideModel();
+    root.add(modelRoot, modelFixed, arRoot);
   }
 
   public init(view3D: View3D) {
@@ -49,16 +51,35 @@ class ARScene {
 
     // Copy environment
     root.environment = originalScene.root.environment?.clone() ?? null;
+
+    // Start with root hidden, as floor should be detected first
+    this.hideModel();
   }
 
   public destroy(view3D: View3D) {
+    const root = this._root;
+    const modelRoot = this._modelRoot;
     const modelMovable = this._modelMovable;
     const modelFixed = this._modelFixed;
+    const arRoot = this._arRoot;
     const originalScene = view3D.scene;
 
     [...modelMovable.children, ...modelFixed.children].forEach(child => {
       originalScene.root.add(child);
     });
+
+    // Reset matrix
+    root.matrix.identity();
+    root.matrix.decompose(root.position, root.quaternion, root.scale);
+    root.environment = null;
+    modelRoot.matrix.identity();
+    modelRoot.matrix.decompose(root.position, root.quaternion, root.scale);
+    modelMovable.matrix.identity();
+    modelMovable.matrix.decompose(root.position, root.quaternion, root.scale);
+    modelFixed.matrix.identity();
+    modelFixed.matrix.decompose(root.position, root.quaternion, root.scale);
+    arRoot.matrix.identity();
+    arRoot.matrix.decompose(root.position, root.quaternion, root.scale);
   }
 
   /**
@@ -90,6 +111,25 @@ class ARScene {
     root.position.copy(pos);
   }
 
+  public setWallRotation(quat: THREE.Quaternion) {
+    const root = this._root;
+
+    root.quaternion.copy(quat);
+  }
+
+  public updateModelRootPosition(model: Model, vertical: boolean) {
+    const modelRoot = this._modelRoot;
+
+    if (!vertical) return;
+
+    const modelHeight = model.bbox.max.y - model.bbox.min.y;
+
+    modelRoot.position.setZ(modelHeight / 2);
+    modelRoot.position.setY(-model.bbox.min.z);
+    modelRoot.rotateX(-Math.PI / 2);
+    modelRoot.updateMatrix();
+  }
+
   public setModelHovering(hoverAmount: number) {
     const modelMovable = this._modelMovable;
 
@@ -103,9 +143,9 @@ class ARScene {
   }
 
   public setModelScale(scalar: number) {
-    const modelMovable = this._modelMovable;
+    const root = this._root;
 
-    modelMovable.scale.setScalar(scalar);
+    root.scale.setScalar(scalar);
   }
 }
 

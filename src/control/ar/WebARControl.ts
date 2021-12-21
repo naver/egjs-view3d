@@ -6,6 +6,7 @@
 import * as THREE from "three";
 
 import View3D from "../../View3D";
+import Model from "../../core/Model";
 import ARScene from "../../xr/ARScene";
 import * as XR from "../../const/xr";
 import { GESTURE } from "../../const/internal";
@@ -44,6 +45,7 @@ class WebARControl {
 
   private _initialized: boolean;
   private _modelHit: boolean;
+  private _vertical: boolean;
   private _hitTestSource: THREE.XRTransientInputHitTestSource | null;
   private _deadzoneChecker: DeadzoneChecker;
   private _rotateControl: ARSwirlControl;
@@ -72,6 +74,7 @@ class WebARControl {
     this._view3D = view3D;
     this._arScene = arScene;
 
+    this._vertical = false;
     this._initialized = false;
     this._modelHit = false;
     this._hitTestSource = null;
@@ -83,18 +86,22 @@ class WebARControl {
     this._deadzoneChecker = new DeadzoneChecker(options.deadzone);
   }
 
-  public async init(ctx: {
+  public async init({ model, session, size, vertical, hitPosition, hitRotation }: {
+    model: Model;
     session: THREE.XRSession;
+    vertical: boolean;
     size: {
       width: number;
       height: number;
     };
-    initialFloorPos: THREE.Vector3;
+    hitPosition: THREE.Vector3;
+    hitRotation: THREE.Quaternion;
   }) {
     const arScene = this._arScene;
-    const { session, size, initialFloorPos } = ctx;
 
-    this._translateControl.initFloorPosition(initialFloorPos);
+    this._vertical = vertical;
+    this._translateControl.init(hitPosition, hitRotation, vertical);
+    this._floorIndicator.init(model);
     this._deadzoneChecker.setAspect(size.height / size.width);
 
     arScene.add(
@@ -108,6 +115,10 @@ class WebARControl {
 
     session.addEventListener(XR.EVENTS.SELECT_START, this._onSelectStart);
     session.addEventListener(XR.EVENTS.SELECT_END, this._onSelectEnd);
+
+    if (vertical) {
+      this._rotateControl.disable();
+    }
 
     this._initialized = true;
   }
@@ -124,6 +135,9 @@ class WebARControl {
     }
 
     this._deactivate();
+
+    this._floorIndicator.hide();
+    this._scaleControl.ui.hide();
 
     session.removeEventListener(XR.EVENTS.SELECT_START, this._onSelectStart);
     session.removeEventListener(XR.EVENTS.SELECT_END, this._onSelectEnd);
@@ -222,7 +236,9 @@ class WebARControl {
       }
     }
 
-    this._floorIndicator.show();
+    if (!this._vertical || this._modelHit) {
+      this._floorIndicator.show();
+    }
   };
 
   private _onSelectEnd = () => {
@@ -265,7 +281,7 @@ class WebARControl {
   }
 
   private _updateControls(ctx: XRRenderContext) {
-    const { model, delta } = ctx;
+    const { delta } = ctx;
     const arScene = this._arScene;
     const rotateControl = this._rotateControl;
     const translateControl = this._translateControl;
@@ -279,13 +295,11 @@ class WebARControl {
 
     const modelRotation = rotateControl.rotation;
     const floorPosition = translateControl.floorPosition;
-    const modelBoundingSphere = model.bbox.getBoundingSphere(new THREE.Sphere());
 
     arScene.setRootPosition(floorPosition);
 
     floorIndicator.update({
       delta: deltaMilisec,
-      scale: modelBoundingSphere.radius * scaleControl.scale,
       rotation: modelRotation
     });
   }

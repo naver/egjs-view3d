@@ -243,7 +243,7 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
   };
 
   private _onTouchStart = (evt: TouchEvent) => {
-    if (!this._view3D.scrollable) {
+    if (!this._view3D.scrollable && evt.cancelable !== false) {
       evt.preventDefault();
     }
 

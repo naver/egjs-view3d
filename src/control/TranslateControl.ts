@@ -253,7 +253,10 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
   private _onTouchStart = (evt: TouchEvent) => {
     // Only the two finger motion should be considered
     if (evt.touches.length !== 2) return;
-    evt.preventDefault();
+
+    if (evt.cancelable !== false) {
+      evt.preventDefault();
+    }
 
     this._prevPos.copy(this._getTouchesMiddle(evt.touches));
     this._touchInitialized = true;

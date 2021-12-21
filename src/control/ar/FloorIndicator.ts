@@ -5,6 +5,7 @@
 
 import * as THREE from "three";
 
+import Model from "../../core/Model";
 import Motion from "../../core/Motion";
 import { Range } from "../../type/utils";
 
@@ -101,16 +102,18 @@ class FloorIndicator {
       max: dirIndicatorOpacity
     };
 
-    this._mesh.visible = false;
+    this.hide();
+  }
+
+  public init(model: Model) {
+    this._mesh.scale.setScalar(model.bbox.getBoundingSphere(new THREE.Sphere()).radius);
   }
 
   public update({
     delta,
-    scale,
     rotation
   }: {
     delta: number;
-    scale: number;
     rotation: THREE.Quaternion;
   }) {
     const mesh = this._mesh;
@@ -132,7 +135,6 @@ class FloorIndicator {
     }
 
     // Update mesh
-    mesh.scale.setScalar(scale);
     mesh.quaternion.copy(rotation);
     mesh.updateMatrix();
   }
@@ -140,6 +142,10 @@ class FloorIndicator {
   public show() {
     this._mesh.visible = true;
     this._animator.reset(1);
+  }
+
+  public hide() {
+    this._mesh.visible = false;
   }
 
   public fadeout() {

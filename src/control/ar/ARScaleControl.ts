@@ -122,15 +122,14 @@ class ARScaleControl implements ARControl {
     scene.setModelScale(this._scaleMultiplier);
   }
 
-  private _updateUIPosition({ scene, model, xrCam }: XRRenderContext) {
+  private _updateUIPosition({ model, scene, xrCam, vertical }: XRRenderContext) {
     // Update UI
     const camPos = new THREE.Vector3().setFromMatrixPosition(xrCam.matrixWorld);
-    const modelHeight = (model.bbox.max.y - model.bbox.min.y) * this._scaleMultiplier;
+    const modelHeight = vertical
+      ? model.bbox.getBoundingSphere(new THREE.Sphere()).radius
+      : model.bbox.max.y - model.bbox.min.y;
 
-    const uiPos = scene.modelMovable.position.clone();
-    uiPos.setY(uiPos.y + modelHeight);
-
-    this._ui.updatePosition(uiPos, camPos);
+    this._ui.updatePosition(scene.root.quaternion, camPos, modelHeight);
   }
 }
 

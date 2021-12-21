@@ -22,19 +22,13 @@ enum STATE {
  * Options for {@link ARFloorTranslateControl}
  * @interface
  * @property {number} [threshold=0.05] Threshold until translation works, this value is relative to screen size.
- * @property {number} [hoverAmplitude=0.01] How much model will hover up and down, in meter. Default value is 0.01(1cm).
  * @property {number} [hoverHeight=0.1] How much model will float from the floor, in meter. Default value is 0.1(10cm).
- * @property {number} [hoverPeriod=1000] Hover cycle's period, in milisecond.
- * @property {function} [hoverEasing=EASING.SINE_WAVE] Hover animation's easing function.
  * @property {number} [bounceDuration=1000] Bounce-to-floor animation's duration, in milisecond.
  * @property {number} [bounceEasing=EASING.EASE_OUT_BOUNCE] Bounce-to-floor animation's easing function.
  */
 export interface ARTranslateControlOptions {
   threshold: number;
-  hoverAmplitude: number;
   hoverHeight: number;
-  hoverPeriod: number;
-  hoverEasing: (x: number) => number;
   bounceDuration: number;
   bounceEasing: (x: number) => number;
 }
@@ -49,8 +43,10 @@ class ARTranslateControl implements ARControl {
   // Internal states
   private _hoverPosition = new THREE.Vector3();
   private _floorPosition = new THREE.Vector3();
+  private _wallRotation = new THREE.Quaternion();
   private _dragPlane = new THREE.Plane();
   private _enabled = true;
+  private _vertical = false;
   private _state = STATE.WAITING;
   private _initialPos = new THREE.Vector2();
   private _bounceMotion: Motion;
@@ -89,11 +85,6 @@ class ARTranslateControl implements ARControl {
     });
   }
 
-  public initFloorPosition(position: THREE.Vector3) {
-    this._floorPosition.copy(position);
-    this._hoverPosition.copy(position);
-  }
-
   /**
    * Enable this control
    */
@@ -112,14 +103,14 @@ class ARTranslateControl implements ARControl {
   public activate() {
     if (!this._enabled) return;
 
-    const dragPlaneConstant = -(this._floorPosition.y + this._hoverHeight);
+    const dragPlane = this._dragPlane;
+    dragPlane.constant = this._calcDragPlaneConstant(this._floorPosition);
 
-    this._dragPlane.set(new THREE.Vector3(0, 1, 0), dragPlaneConstant);
     this._state = STATE.TRANSLATING;
   }
 
   public deactivate() {
-    if (!this._enabled || this._state === STATE.WAITING) {
+    if (!this._enabled || this._vertical || this._state === STATE.WAITING) {
       this._state = STATE.WAITING;
       return;
     }
@@ -133,6 +124,19 @@ class ARTranslateControl implements ARControl {
 
     bounceMotion.reset(hoveringAmount);
     bounceMotion.setEndDelta(-hoveringAmount);
+  }
+
+  public init(position: THREE.Vector3, rotation: THREE.Quaternion, vertical: boolean) {
+    this._floorPosition.copy(position);
+    this._hoverPosition.copy(position);
+
+    const planeNormal = vertical
+      ? new THREE.Vector3(0, 1, 0).applyQuaternion(rotation)
+      : new THREE.Vector3(0, 1, 0);
+
+    this._dragPlane.normal.copy(planeNormal);
+    this._wallRotation.copy(rotation);
+    this._vertical = vertical;
   }
 
   public setInitialPos(coords: THREE.Vector2[]) {
@@ -151,61 +155,112 @@ class ARTranslateControl implements ARControl {
     const hoverPosition = this._hoverPosition;
     const hoverHeight = this._hoverHeight;
     const dragPlane = this._dragPlane;
+    const vertical = this._vertical;
 
     const hitPose = hitResult.results[0] && hitResult.results[0].getPose(referenceSpace);
-    const isFloorHit = hitPose && hitPose.transform.matrix[5] >= 0.75;
+    const hitMatrix = hitPose && new THREE.Matrix4().fromArray(hitPose.transform.matrix);
+    const isFloorHit = hitPose && hitMatrix.elements[5] > 0.75;
+    const isWallHit = hitPose && hitMatrix.elements[5] < 0.25;
     const camPos = new THREE.Vector3().setFromMatrixPosition(xrCam.matrixWorld);
+    const hitPosition = hitPose && new THREE.Vector3().setFromMatrixPosition(hitMatrix);
 
-    if (frame && (!hitPose || !isFloorHit)) {
-      // Use previous drag plane if no hit plane is found
-      const targetRayPose = frame.getPose(hitResult.inputSource.targetRaySpace, referenceSpace);
-      if (!targetRayPose) return;
+    if (!vertical) {
+      if (frame && (!hitPose || !isFloorHit)) {
+        // Use previous drag plane if no hit plane is found
+        const targetRayPose = frame.getPose(hitResult.inputSource.targetRaySpace, referenceSpace);
+        if (!targetRayPose) return;
 
-      const rayPos = targetRayPose.transform.position;
-      const fingerPos = new THREE.Vector3(rayPos.x, rayPos.y, rayPos.z);
-      const fingerDir = fingerPos.sub(camPos).normalize();
+        const rayPos = targetRayPose.transform.position;
+        const fingerPos = new THREE.Vector3(rayPos.x, rayPos.y, rayPos.z);
+        const fingerDir = fingerPos.sub(camPos).normalize();
 
-      const fingerRay = new THREE.Ray(camPos, fingerDir);
-      const intersection = fingerRay.intersectPlane(dragPlane, new THREE.Vector3());
+        const fingerRay = new THREE.Ray(camPos, fingerDir);
+        const intersection = fingerRay.intersectPlane(dragPlane, new THREE.Vector3());
 
-      if (intersection) {
-        floorPosition.copy(intersection);
-        floorPosition.setY(prevFloorPosition.y);
-        hoverPosition.copy(intersection);
+        if (intersection) {
+          floorPosition.copy(intersection);
+          floorPosition.setY(prevFloorPosition.y);
+          hoverPosition.copy(intersection);
+        }
+        return;
       }
-      return;
+
+      // Set new floor level when it's increased at least 10cm
+      const currentDragPlaneHeight = -dragPlane.constant;
+      const hitDragPlaneHeight = hitPosition.y + hoverHeight;
+
+      if (hitDragPlaneHeight - currentDragPlaneHeight > 0.1) {
+        dragPlane.constant = -hitDragPlaneHeight;
+      }
+
+      const camToHitDir = new THREE.Vector3().subVectors(hitPosition, camPos).normalize();
+      const camToHitRay = new THREE.Ray(camPos, camToHitDir);
+      const hitOnDragPlane = camToHitRay.intersectPlane(dragPlane, new THREE.Vector3());
+
+      if (!hitOnDragPlane) return;
+
+      floorPosition.copy(hitOnDragPlane);
+      floorPosition.setY(hitPosition.y);
+      hoverPosition.copy(hitOnDragPlane);
+    } else {
+      if (frame && (!hitPose || !isWallHit)) {
+        // Use previous drag plane if no hit plane is found
+        const targetRayPose = frame.getPose(hitResult.inputSource.targetRaySpace, referenceSpace);
+        if (!targetRayPose) return;
+
+        const rayPos = targetRayPose.transform.position;
+        const fingerPos = new THREE.Vector3(rayPos.x, rayPos.y, rayPos.z);
+        const fingerDir = fingerPos.sub(camPos).normalize();
+
+        const fingerRay = new THREE.Ray(camPos, fingerDir);
+        const intersection = fingerRay.intersectPlane(dragPlane, new THREE.Vector3());
+
+        if (intersection) {
+          floorPosition.copy(intersection);
+        }
+        return;
+      }
+
+      const globalUp = new THREE.Vector3(0, 1, 0);
+      const hitOrientation = hitPose.transform.orientation;
+      const wallNormal = globalUp.clone()
+        .applyQuaternion(new THREE.Quaternion(hitOrientation.x, hitOrientation.y, hitOrientation.z, hitOrientation.w))
+        .normalize();
+      const wallX = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), wallNormal);
+
+      // Update rotation if it differs more than 10deg
+      const prevWallNormal = new THREE.Vector3(0, 1, 0).applyQuaternion(this._wallRotation).normalize();
+      if (Math.acos(Math.abs(prevWallNormal.dot(wallNormal))) >= Math.PI / 18) {
+        const wallMatrix = new THREE.Matrix4().makeBasis(wallX, globalUp, wallNormal);
+        const wallEuler = new THREE.Euler(0, 0, 0, "YXZ").setFromRotationMatrix(wallMatrix);
+
+        wallEuler.z = 0;
+        wallEuler.x = Math.PI / 2;
+
+        this._wallRotation.setFromEuler(wallEuler);
+
+        dragPlane.normal.copy(new THREE.Vector3(0, 1, 0).applyQuaternion(this._wallRotation));
+        dragPlane.constant = this._calcDragPlaneConstant(hitPosition);
+      }
+
+      const camToHitDir = new THREE.Vector3().subVectors(hitPosition, camPos).normalize();
+      const camToHitRay = new THREE.Ray(camPos, camToHitDir);
+      const hitOnDragPlane = camToHitRay.intersectPlane(dragPlane, new THREE.Vector3());
+
+      if (!hitOnDragPlane) return;
+
+      floorPosition.copy(hitOnDragPlane);
     }
-
-    const hitMatrix = new THREE.Matrix4().fromArray(hitPose.transform.matrix);
-    const hitPosition = new THREE.Vector3().setFromMatrixPosition(hitMatrix);
-
-    // Set new floor level when it's increased at least 10cm
-    const currentDragPlaneHeight = -dragPlane.constant;
-    const hitDragPlaneHeight = hitPosition.y + hoverHeight;
-
-    if (hitDragPlaneHeight - currentDragPlaneHeight > 0.1) {
-      dragPlane.constant = -hitDragPlaneHeight;
-    }
-
-    const camToHitDir = new THREE.Vector3().subVectors(hitPosition, camPos).normalize();
-    const camToHitRay = new THREE.Ray(camPos, camToHitDir);
-    const hitOnDragPlane = camToHitRay.intersectPlane(dragPlane, new THREE.Vector3());
-
-    if (!hitOnDragPlane) return;
-
-    floorPosition.copy(hitOnDragPlane);
-    floorPosition.setY(hitPosition.y);
-    hoverPosition.copy(hitOnDragPlane);
   }
 
   public update({ scene }: XRRenderContext, delta: number) {
     const state = this._state;
     const floorPosition = this._floorPosition;
     const hoverPosition = this._hoverPosition;
+    const bounceMotion = this._bounceMotion;
+    const vertical = this._vertical;
 
     if (state === STATE.BOUNCING) {
-      const bounceMotion = this._bounceMotion;
-
       bounceMotion.update(delta);
       hoverPosition.setY(floorPosition.y + bounceMotion.val);
 
@@ -215,7 +270,24 @@ class ARTranslateControl implements ARControl {
     }
 
     scene.setRootPosition(floorPosition);
-    scene.setModelHovering(hoverPosition.y - floorPosition.y);
+
+    if (!vertical) {
+      scene.setModelHovering(hoverPosition.y - floorPosition.y);
+    } else {
+      scene.setWallRotation(this._wallRotation);
+    }
+  }
+
+  private _calcDragPlaneConstant(floor: THREE.Vector3) {
+    const vertical = this._vertical;
+    const dragPlaneNormal = this._dragPlane.normal.clone();
+    const dragPlaneAtZero = new THREE.Plane(dragPlaneNormal, 0);
+    const hoverHeight = vertical
+      ? 0
+      : this._hoverHeight;
+    const dragPlaneConstant = -(dragPlaneAtZero.distanceToPoint(floor) + hoverHeight);
+
+    return dragPlaneConstant;
   }
 }
 

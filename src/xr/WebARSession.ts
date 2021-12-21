@@ -170,6 +170,7 @@ class WebARSession extends Component<{
     const model = view3D.model!;
     const control = this._control;
     const hitTest = this._hitTest;
+    const vertical = this.vertical;
     const features = this._getAllXRFeatures();
 
     // Enable xr
@@ -233,6 +234,7 @@ class WebARSession extends Component<{
         session,
         delta,
         frame,
+        vertical,
         referenceSpace,
         xrCam,
         size
@@ -278,6 +280,7 @@ class WebARSession extends Component<{
       frame,
       session,
       size,
+      vertical,
       referenceSpace
     } = ctx;
     const arScene = this._arScene;
@@ -298,16 +301,39 @@ class WebARSession extends Component<{
 
     const hitMatrix = new THREE.Matrix4().fromArray(hitPose.transform.matrix);
 
-    // If transformed coords space's y axis is not facing up, don't use it.
-    if (hitMatrix.elements[5] < 0.75) return;
+    // If transformed coords space's y axis is not facing the correct direction, don't use it.
+    if (
+      (!vertical && hitMatrix.elements[5] < 0.75)
+      || (vertical && (hitMatrix.elements[5] >= 0.25 || hitMatrix.elements[5] <= -0.25))
+    ) return;
 
     const hitPosition = new THREE.Vector3().setFromMatrixPosition(hitMatrix);
+    const hitRotation = new THREE.Quaternion();
+
+    if (vertical) {
+      const globalUp = new THREE.Vector3(0, 1, 0);
+      const hitOrientation = hitPose.transform.orientation;
+      const wallNormal = globalUp.clone()
+        .applyQuaternion(new THREE.Quaternion(hitOrientation.x, hitOrientation.y, hitOrientation.z, hitOrientation.w))
+        .normalize();
+      const wallX = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), wallNormal);
+
+      const wallMatrix = new THREE.Matrix4().makeBasis(wallX, globalUp, wallNormal);
+      const wallEuler = new THREE.Euler(0, 0, 0, "YXZ").setFromRotationMatrix(wallMatrix);
+
+      wallEuler.z = 0;
+      wallEuler.x = Math.PI / 2;
+
+      hitRotation.setFromEuler(wallEuler);
+      arScene.setWallRotation(hitRotation);
+    }
 
     // Reset rotation & update position
+    arScene.updateModelRootPosition(model, vertical);
     arScene.setRootPosition(hitPosition);
     arScene.showModel();
 
-    // Don't need hit-test anymore
+    // Don't need hit-test anymore, as we're having new one in WebARControl
     hitTest.destroy();
 
     // this._domOverlay?.hideLoading();
@@ -315,19 +341,24 @@ class WebARSession extends Component<{
     this.trigger("modelPlaced");
 
     // Show scale up animation
-    const scaleUpAnimation = new Animation({ context: session });
+    const scaleUpAnimation = new Animation({ context: session, duration: 1000 });
 
     scaleUpAnimation.on("progress", evt => {
       arScene.setModelScale(evt.easedProgress);
     });
+
     scaleUpAnimation.on("finish", () => {
       arScene.setModelScale(1);
       void control.init({
+        model,
+        vertical,
         session,
         size,
-        initialFloorPos: hitPosition
+        hitPosition,
+        hitRotation
       });
     });
+
     scaleUpAnimation.start();
   }
 }
