@@ -1,14 +1,14 @@
 import React from "react";
 import * as THREE from "three";
 import VanillaView3D, { View3DOptions } from "../../../src";
-import ARButton from "./ARButton";
+import { ARButton } from "../../../src/plugin";
 
 interface DemoOptions extends Partial<View3DOptions> {
   showARButton: boolean;
   showBbox: boolean;
 }
 
-class View3D extends React.Component<DemoOptions, { arAvailable: boolean }> {
+class View3D extends React.Component<DemoOptions> {
   public static defaultProps: DemoOptions = {
     showARButton: false,
     showBbox: false,
@@ -17,7 +17,6 @@ class View3D extends React.Component<DemoOptions, { arAvailable: boolean }> {
 
   private _view3d: VanillaView3D;
   private _rootRef = React.createRef<HTMLDivElement>();
-  private _arButtonRef = React.createRef<HTMLButtonElement>();
 
   public constructor(props: DemoOptions) {
     super(props);
@@ -39,13 +38,7 @@ class View3D extends React.Component<DemoOptions, { arAvailable: boolean }> {
     }
 
     if (showARButton) {
-      void view3d.ar.isAvailable().then(available => {
-        this._arButtonRef.current.addEventListener("click", () => {
-          void view3d.ar.enter();
-        });
-
-        this.setState({ arAvailable: available });
-      });
+      void view3d.loadPlugins(new ARButton());
     }
   }
 
@@ -54,12 +47,10 @@ class View3D extends React.Component<DemoOptions, { arAvailable: boolean }> {
   }
 
   public render() {
-    const { showARButton, children } = this.props;
-    const { arAvailable } = this.state;
+    const { children } = this.props;
 
-    return <div ref={this._rootRef} className="view3d-canvas-wrapper image is-square mb-2">
+    return <div ref={this._rootRef} className="view3d-wrapper view3d-square mb-2">
       <canvas className="view3d-canvas"></canvas>
-      { showARButton && <ARButton buttonRef={this._arButtonRef} disabled={!arAvailable} />}
       { children }
     </div>;
   }

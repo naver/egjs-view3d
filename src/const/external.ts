@@ -17,6 +17,9 @@ export const AUTO = "auto";
  * @property {"render"} RENDER {@link RenderEvent}
  * @property {"progress"} PROGRESS {@link LoadProgressEvent}
  * @property {"quickLookTap"} QUICK_LOOK_TAP {@link QuickLookTapEvent}
+ * @property {"arStart"} AR_START {@link ARStartEvent}
+ * @property {"arEnd"} AR_END {@link AREndEvent}
+ * @property {"arModelPlaced"} AR_MODEL_PLACED {@link ARModelPlacedEvent}
  * @example
  * ```ts
  * import { EVENTS } from "@egjs/view3d";
@@ -31,7 +34,10 @@ export const EVENTS = {
   BEFORE_RENDER: "beforeRender",
   RENDER: "render",
   PROGRESS: "progress",
-  QUICK_LOOK_TAP: "quickLookTap"
+  QUICK_LOOK_TAP: "quickLookTap",
+  AR_START: "arStart",
+  AR_END: "arEnd",
+  AR_MODEL_PLACED: "arModelPlaced"
 } as const;
 
 /**
@@ -39,13 +45,11 @@ export const EVENTS = {
  * @property {"gltf"} GLTF
  * @property {"glb"} GLB
  * @property {"drc"} DRC
- * @property {"usdz"} USDZ
  */
 export const MODEL_FORMAT = {
   GLTF: "gltf",
   GLB: "glb",
-  DRC: "drc",
-  USDZ: "usdz"
+  DRC: "drc"
 } as const;
 
 /**

@@ -30,7 +30,7 @@ class ARScaleControl implements ARControl {
 
   // Internal states
   private _motion: Motion;
-  private _enabled = true;
+  private _enabled = false;
   private _active = false;
   private _prevCoordDistance = -1;
   private _scaleMultiplier = 1;

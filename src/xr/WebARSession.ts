@@ -4,17 +4,11 @@
  */
 
 import * as THREE from "three";
-import Component from "@egjs/component";
 import type { XRSystem } from "webxr";
 
 import View3D from "../View3D";
 import Animation from "../core/Animation";
-import WebARControl from "../control/ar/WebARControl";
-import { ARSwirlControlOptions } from "../control/ar/ARSwirlControl";
-import { ARTranslateControlOptions } from "../control/ar/ARTranslateControl";
-import { ARScaleControlOptions } from "../control/ar/ARScaleControl";
-import { FloorIndicatorOptions } from "../control/ar/FloorIndicator";
-import { DeadzoneCheckerOptions } from "../control/ar/DeadzoneChecker";
+import WebARControl, { WebARControlOptions } from "../control/ar/WebARControl";
 import * as DEFAULT from "../const/default";
 import * as XR from "../const/xr";
 import { EVENTS } from "../const/external";
@@ -33,57 +27,20 @@ declare global {
 /**
  * Options for WebARSession
  * @interface
- * @property {object} [features={}] You can set additional features(see {@link https://developer.mozilla.org/en-US/docs/Web/API/XRSessionInit XRSessionInit}) with this option. "hit-test" and "dom-overlay" will always be used.
- * @property {HTMLElement|string|null} [overlayRoot=null] If this value is set, dom-overlay feature will be automatically added for this session. And this value will be used as dom-overlay's root element. You can set either HTMLElement or query selector for that element.
- * @property {HTMLElement|string|null} [loadingEl=null] This will be used for loading indicator element, which will automatically invisible after placing 3D model by setting `visibility: hidden`. This element must be placed under `overlayRoot`. You can set either HTMLElement or query selector for that element.
+ * @property {object} [features={}] You can set additional features(see {@link https://developer.mozilla.org/en-US/docs/Web/API/XRSessionInit XRSessionInit}) with this option. `hit-test` and `dom-overlay` will always be used.
+ * @property {boolean} [vertical=false] If set to true, model will be placed at the wall instead of floor. (※ This will disable the rotate control)
+ * @property {HTMLElement|string|null} [overlayRoot=null] If this value is set, that element will be used as a root element for WebXR session using the `dom-overlay` feature. If set to `null`, new element will be created and appended to `.view3d-wrapper` element and will be used as a root.
  */
-export interface WebARSessionOptions {
+export interface WebARSessionOptions extends WebARControlOptions {
   features: typeof XR.EMPTY_FEATURES;
   vertical: boolean;
   overlayRoot: HTMLElement | string | null;
-  loadingEl: HTMLElement | string | null;
-  rotate: Partial<ARSwirlControlOptions>;
-  translate: Partial<ARTranslateControlOptions>;
-  scale: Partial<ARScaleControlOptions>;
-  floorIndicator: Partial<FloorIndicatorOptions>;
-  deadzone: Partial<DeadzoneCheckerOptions>;
-}
-
-/**
- * @interface
- */
-export interface WebARSessionEvents {
-  /**
-   * Emitted when session is started.
-   * @event WebARSession#start
-   * @type {void}
-   */
-  start: void;
-  /**
-   * Emitted when session is ended.
-   * @event WebARSession#end
-   * @type {void}
-   */
-  end: void;
-  /**
-   * Emitted when model is placed.
-   * @event WebARSession#modelPlaced
-   * @type {void}
-   */
-  modelPlaced: void;
 }
 
 /**
  * WebXR based abstract AR session class
- * @fires WebARSession#start
- * @fires WebARSession#end
- * @fires WebARSession#modelPlaced
  */
-class WebARSession extends Component<{
-  start: void;
-  end: void;
-  modelPlaced: void;
-}> implements ARSession {
+class WebARSession implements ARSession {
   // Options
   // As those values are referenced only while entering the session, so I'm leaving this values public
   public features: WebARSessionOptions["features"];
@@ -106,6 +63,10 @@ class WebARSession extends Component<{
    */
   public get control() { return this._control; }
 
+  public get arScene() { return this._arScene; }
+  public get hitTest() { return this._hitTest; }
+  public get domOverlay() { return this._domOverlay; }
+
   /**
    * Create new instance of WebARSession
    * @param {View3D} view3D Instance of the View3D
@@ -118,14 +79,13 @@ class WebARSession extends Component<{
   public constructor(view3D: View3D, {
     features = XR.EMPTY_FEATURES,
     vertical = false,
-    overlayRoot = DEFAULT.NULL_ELEMENT,
-    loadingEl = DEFAULT.NULL_ELEMENT,
-    rotate = {},
-    translate = {},
-    scale = {}
+    overlayRoot = null,
+    rotate = true,
+    translate = true,
+    scale = true,
+    ring = {},
+    deadzone = {}
   }: Partial<WebARSessionOptions> = {}) {
-    super();
-
     this._view3D = view3D;
 
     // Init internal states
@@ -138,7 +98,13 @@ class WebARSession extends Component<{
 
     // Create internal components
     this._arScene = new ARScene();
-    this._control = new WebARControl(view3D, this._arScene, { rotate, translate, scale });
+    this._control = new WebARControl(view3D, this._arScene, {
+      rotate,
+      translate,
+      scale,
+      ring,
+      deadzone
+    });
     this._hitTest = new HitTest();
     this._domOverlay = new DOMOverlay();
   }
@@ -170,6 +136,7 @@ class WebARSession extends Component<{
     const model = view3D.model!;
     const control = this._control;
     const hitTest = this._hitTest;
+    const domOverlay = this._domOverlay;
     const vertical = this.vertical;
     const features = this._getAllXRFeatures();
 
@@ -186,14 +153,18 @@ class WebARSession extends Component<{
     await threeRenderer.xr.setSession(session);
 
     arScene.init(view3D);
-
-    // this._domOverlay?.showLoading();
     hitTest.init(session);
 
     const onSessionEnd = async () => {
-      // this._domOverlay?.hideLoading();
+      const overlayEl = domOverlay.root;
+
       control.destroy(session);
       arScene.destroy(view3D);
+
+      if (!this.overlayRoot && overlayEl) {
+        view3D.rootEl.removeChild(overlayEl);
+      }
+      domOverlay.destroy();
 
       // Restore original values
       threeRenderer.setPixelRatio(originalPixelRatio);
@@ -202,7 +173,7 @@ class WebARSession extends Component<{
       renderer.stopAnimationLoop();
       renderer.setAnimationLoop(renderer.defaultRenderLoop);
 
-      this.trigger("end");
+      view3D.trigger(EVENTS.AR_END, { target: view3D, session: this });
     };
 
     session.addEventListener("end", onSessionEnd, { once: true });
@@ -251,7 +222,7 @@ class WebARSession extends Component<{
       }
     });
 
-    this.trigger("start");
+    view3D.trigger(EVENTS.AR_START, { target: view3D, session: this });
   }
 
   /**
@@ -265,10 +236,11 @@ class WebARSession extends Component<{
 
   private _getAllXRFeatures() {
     const userFeatures = this.features;
+    const overlayRoot = getNullableElement(this.overlayRoot) ?? this._createARRootElement();
 
     return merge(
       {},
-      this._domOverlay.getFeatures(getNullableElement(this.overlayRoot)),
+      this._domOverlay.getFeatures(overlayRoot),
       this._hitTest.getFeatures(),
       userFeatures
     );
@@ -283,6 +255,7 @@ class WebARSession extends Component<{
       vertical,
       referenceSpace
     } = ctx;
+    const view3D = this._view3D;
     const arScene = this._arScene;
     const hitTest = this._hitTest;
 
@@ -338,7 +311,7 @@ class WebARSession extends Component<{
 
     // this._domOverlay?.hideLoading();
     this._modelPlaced = true;
-    this.trigger("modelPlaced");
+    view3D.trigger(EVENTS.AR_MODEL_PLACED, { target: view3D, session: this, model });
 
     // Show scale up animation
     const scaleUpAnimation = new Animation({ context: session, duration: 1000 });
@@ -360,6 +333,16 @@ class WebARSession extends Component<{
     });
 
     scaleUpAnimation.start();
+  }
+
+  private _createARRootElement(): HTMLElement {
+    const view3D = this._view3D;
+    const root = document.createElement("div");
+
+    root.classList.add(DEFAULT.AR_OVERLAY_CLASS);
+    view3D.rootEl.appendChild(root);
+
+    return root;
   }
 }
 

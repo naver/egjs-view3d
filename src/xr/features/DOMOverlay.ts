@@ -9,6 +9,14 @@ import * as XR from "../../const/xr";
  * Manager for WebXR dom-overlay feature
  */
 class DOMOverlay {
+  private _root: HTMLElement | null = null;
+
+  public get root() { return this._root; }
+
+  public destroy() {
+    this._root = null;
+  }
+
   /**
    * Return whether dom-overlay feature is available
    */
@@ -16,27 +24,11 @@ class DOMOverlay {
     return XR.DOM_OVERLAY_SUPPORTED();
   }
 
-  public getFeatures(rootEl: HTMLElement | null) {
-    return XR.FEATURES.DOM_OVERLAY(rootEl);
+  public getFeatures(root: HTMLElement) {
+    this._root = root;
+
+    return XR.FEATURES.DOM_OVERLAY(root);
   }
-
-  // /**
-  //  * Show loading indicator, if there's any
-  //  */
-  // public showLoading() {
-  //   if (!this._loadingEl) return;
-
-  //   this._loadingEl.style.visibility = "visible";
-  // }
-
-  // /**
-  //  * Hide loading indicator, if there's any
-  //  */
-  // public hideLoading() {
-  //   if (!this._loadingEl) return;
-
-  //   this._loadingEl.style.visibility = "hidden";
-  // }
 }
 
 export default DOMOverlay;

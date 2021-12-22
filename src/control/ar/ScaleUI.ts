@@ -116,8 +116,6 @@ class ScaleUI {
       .multiplyScalar(offset)
       .applyQuaternion(worldRotation.clone().invert());
 
-    console.log(offsetVec);
-
     // Update mesh
     mesh.position.copy(offsetVec);
     mesh.lookAt(focus);

@@ -37,6 +37,7 @@ const config = {
           customCss: [
             require.resolve("./src/css/custom.css"),
             require.resolve("./src/css/global.css"),
+            require.resolve("../sass/view3d-bundle.sass"),
             require.resolve("./src/css/bulma-override.sass")
           ]
         }
@@ -49,10 +50,11 @@ const config = {
     ({
       navbar: {
         title: "View3D",
-        // logo: {
-        //   alt: "egjs",
-        //   src: "img/view3d.gif"
-        // },
+        logo: {
+          alt: "egjs",
+          src: "img/cube.svg",
+          srcDark: "img/cube_white.svg"
+        },
         items: [
           {
             type: "doc",

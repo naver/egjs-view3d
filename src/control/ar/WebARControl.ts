@@ -10,6 +10,7 @@ import Model from "../../core/Model";
 import ARScene from "../../xr/ARScene";
 import * as XR from "../../const/xr";
 import { GESTURE } from "../../const/internal";
+import { getObjectOption } from "../../utils";
 import { XRRenderContext, XRInputs } from "../../type/xr";
 
 import ARSwirlControl, { ARSwirlControlOptions } from "./ARSwirlControl";
@@ -29,10 +30,10 @@ import DeadzoneChecker, { DeadzoneCheckerOptions } from "./DeadzoneChecker";
  * @property {DeadzoneCheckerOption} deadzone Options for {@link DeadzoneChecker}
  */
 export interface WebARControlOptions {
-  rotate: Partial<ARSwirlControlOptions>;
-  translate: Partial<ARTranslateControlOptions>;
-  scale: Partial<ARScaleControlOptions>;
-  floorIndicator: Partial<FloorIndicatorOptions>;
+  rotate: boolean | Partial<ARSwirlControlOptions>;
+  translate: boolean | Partial<ARTranslateControlOptions>;
+  scale: boolean | Partial<ARScaleControlOptions>;
+  ring: Partial<FloorIndicatorOptions>;
   deadzone: Partial<DeadzoneCheckerOptions>;
 }
 
@@ -40,6 +41,13 @@ export interface WebARControlOptions {
  * AR control for {@link FloorARSession}
  */
 class WebARControl {
+  // Options
+  private _rotate: WebARControlOptions["rotate"];
+  private _translate: WebARControlOptions["translate"];
+  private _scale: WebARControlOptions["scale"];
+  private _ring: WebARControlOptions["ring"];
+  private _deadzone: WebARControlOptions["deadzone"];
+
   private _view3D: View3D;
   private _arScene: ARScene;
 
@@ -70,7 +78,13 @@ class WebARControl {
    * Create new instance of ARControl
    * @param {WebARControlOptions} options Options
    */
-  public constructor(view3D: View3D, arScene: ARScene, options: Partial<WebARControlOptions> = {}) {
+  public constructor(view3D: View3D, arScene: ARScene, {
+    rotate,
+    translate,
+    scale,
+    ring,
+    deadzone
+  }: WebARControlOptions) {
     this._view3D = view3D;
     this._arScene = arScene;
 
@@ -79,11 +93,17 @@ class WebARControl {
     this._modelHit = false;
     this._hitTestSource = null;
 
-    this._rotateControl = new ARSwirlControl(options.rotate);
-    this._translateControl = new ARTranslateControl(options.translate);
-    this._scaleControl = new ARScaleControl(options.scale);
-    this._floorIndicator = new FloorIndicator(options.floorIndicator);
-    this._deadzoneChecker = new DeadzoneChecker(options.deadzone);
+    this._rotate = rotate;
+    this._translate = translate;
+    this._scale = scale;
+    this._ring = ring;
+    this._deadzone = deadzone;
+
+    this._rotateControl = new ARSwirlControl(getObjectOption(rotate));
+    this._translateControl = new ARTranslateControl(getObjectOption(translate));
+    this._scaleControl = new ARScaleControl(getObjectOption(scale));
+    this._floorIndicator = new FloorIndicator(ring);
+    this._deadzoneChecker = new DeadzoneChecker(deadzone);
   }
 
   public async init({ model, session, size, vertical, hitPosition, hitRotation }: {
@@ -98,15 +118,25 @@ class WebARControl {
     hitRotation: THREE.Quaternion;
   }) {
     const arScene = this._arScene;
+    const rotate = this._rotate;
+    const translate = this._translate;
+    const scale = this._scale;
+
+    const rotateControl = this._rotateControl;
+    const translateControl = this._translateControl;
+    const scaleControl = this._scaleControl;
+    const floorIndicator = this._floorIndicator;
+    const deadzoneChecker = this._deadzoneChecker;
 
     this._vertical = vertical;
-    this._translateControl.init(hitPosition, hitRotation, vertical);
-    this._floorIndicator.init(model);
-    this._deadzoneChecker.setAspect(size.height / size.width);
+
+    translateControl.init(hitPosition, hitRotation, vertical);
+    floorIndicator.init(model);
+    deadzoneChecker.setAspect(size.height / size.width);
 
     arScene.add(
-      this._floorIndicator.mesh,
-      this._scaleControl.ui.mesh
+      floorIndicator.mesh,
+      scaleControl.ui.mesh
     );
 
     const transientHitTestSource = await session.requestHitTestSourceForTransientInput({ profile: XR.INPUT_PROFILE.TOUCH });
@@ -116,8 +146,14 @@ class WebARControl {
     session.addEventListener(XR.EVENTS.SELECT_START, this._onSelectStart);
     session.addEventListener(XR.EVENTS.SELECT_END, this._onSelectEnd);
 
-    if (vertical) {
-      this._rotateControl.disable();
+    if (rotate && !vertical) {
+      rotateControl.enable();
+    }
+    if (translate) {
+      translateControl.enable();
+    }
+    if (scale) {
+      scaleControl.enable();
     }
 
     this._initialized = true;

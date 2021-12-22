@@ -13,6 +13,7 @@ import Model from "./core/Model";
 import ModelAnimator from "./core/ModelAnimator";
 import ARManager from "./core/ARManager";
 import { ShadowOptions } from "./core/ShadowPlane";
+import View3DError from "./core/View3DError";
 import Preset from "./preset/Preset";
 import OrbitControl from "./control/OrbitControl";
 import { RotateControlOptions } from "./control/RotateControl";
@@ -26,9 +27,9 @@ import { EVENTS, AUTO, AR_SESSION_TYPE } from "./const/external";
 import * as DEFAULT from "./const/default";
 import * as ERROR from "./const/error";
 import * as EVENT_TYPES from "./type/event";
+import { View3DPlugin } from "./plugin";
 import { getElement, getObjectOption } from "./utils";
 import { LiteralUnion, OptionGetters, ValueOf } from "./type/utils";
-import { View3DError } from "./core";
 
 /**
  * @interface
@@ -42,6 +43,9 @@ export interface View3DEvents {
   [EVENTS.RENDER]: EVENT_TYPES.RenderEvent;
   [EVENTS.PROGRESS]: EVENT_TYPES.LoadProgressEvent;
   [EVENTS.QUICK_LOOK_TAP]: EVENT_TYPES.QuickLookTapEvent;
+  [EVENTS.AR_START]: EVENT_TYPES.ARStartEvent;
+  [EVENTS.AR_END]: EVENT_TYPES.ARStartEvent;
+  [EVENTS.AR_MODEL_PLACED]: EVENT_TYPES.ARModelPlacedEvent;
 }
 
 /**
@@ -448,6 +452,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._format = format;
 
     this._display(model);
+  }
+
+  public async loadPlugins(...plugins: View3DPlugin[]) {
+    return Promise.all(plugins.map(plugin => plugin.init(this)));
   }
 
   private async _loadModel(src: string, format: View3DOptions["format"]) {

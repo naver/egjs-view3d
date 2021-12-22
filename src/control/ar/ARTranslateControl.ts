@@ -45,7 +45,7 @@ class ARTranslateControl implements ARControl {
   private _floorPosition = new THREE.Vector3();
   private _wallRotation = new THREE.Quaternion();
   private _dragPlane = new THREE.Plane();
-  private _enabled = true;
+  private _enabled = false;
   private _vertical = false;
   private _state = STATE.WAITING;
   private _initialPos = new THREE.Vector2();

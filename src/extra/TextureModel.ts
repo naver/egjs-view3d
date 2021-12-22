@@ -2,12 +2,11 @@
  * Copyright (c) 2020 NAVER Corp.
  * egjs projects are licensed under the MIT license
  */
-
 import * as THREE from "three";
 
 import Model from "../core/Model";
 import View3DError from "../core/View3DError";
-import * as ERR from "../const/error";
+import * as ERROR from "../const/error";
 
 /**
  * Texture(image) model
@@ -53,7 +52,7 @@ class TextureModel extends Model {
       : new THREE.Texture(image as HTMLImageElement);
     const aspect = texture.image.width / texture.image.height;
     if (width == null && height == null) {
-      throw new View3DError(ERR.MESSAGES.PROVIDE_WIDTH_OR_HEIGHT, ERR.CODES.PROVIDE_WIDTH_OR_HEIGHT);
+      throw new View3DError(ERROR.MESSAGES.PROVIDE_WIDTH_OR_HEIGHT, ERROR.CODES.PROVIDE_WIDTH_OR_HEIGHT);
     }
     if (width == null) {
       width = height! * aspect;

@@ -1,0 +1,45 @@
+.view3d-ar-button
+  position: absolute
+  right: 10px
+  bottom: 10px
+  fill: rgba(0, 0, 0, 0.7)
+  border-radius: 9999px
+  padding: 12px
+  border: 1px #dbdbdb solid
+  background-color: white
+  &::before
+    display: block
+    width: 32px
+    height: 32px
+  &:disabled
+    cursor: not-allowed
+    pointer-events: all
+    opacity: 0.5
+    box-shadow: none
+  .view3d-tooltip
+    visibility: hidden
+    background-color: black
+    color: #fff
+    text-align: center
+    padding: 12px
+    border-radius: 6px
+    position: absolute
+    bottom: 100%
+    right: 0%
+    z-index: 1
+    white-space: nowrap
+    font-size: 1rem
+    font-weight: 700
+    line-height: 1.5
+    &::after
+      content: " "
+      position: absolute
+      top: 100%
+      right: 23px
+      margin-left: -5px
+      border-width: 5px
+      border-style: solid
+      border-color: black transparent transparent transparent
+  &:hover
+    .view3d-tooltip
+      visibility: visible

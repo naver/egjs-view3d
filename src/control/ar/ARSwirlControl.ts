@@ -36,7 +36,7 @@ class ARSwirlControl implements ARControl {
 
   // Internal States
   private _axis = new THREE.Vector3(0, 1, 0);
-  private _enabled = true;
+  private _enabled = false;
   private _active = false;
 
   private _prevPos = new THREE.Vector2();
