@@ -48,7 +48,7 @@ class Scene {
   /**
    *
    */
-  public get fixedObjects() { return this._envObjects; }
+  public get fixedObjects() { return this._fixedObjects; }
 
   /**
    * Create new Scene instance

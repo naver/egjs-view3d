@@ -21,7 +21,7 @@ export interface ShadowOptions {
  */
 class ShadowPlane implements OptionGetters<ShadowOptions> {
   private _geometry: THREE.PlaneGeometry;
-  private _material: THREE.ShadowMaterial;
+  private _material: THREE.Material;
   private _mesh: THREE.Mesh;
   private _light: THREE.DirectionalLight;
 
@@ -65,6 +65,7 @@ class ShadowPlane implements OptionGetters<ShadowOptions> {
     const shadowSize = Math.min(1024, maxTexSize);
 
     light.position.set(0, 1, 0);
+    light.target = mesh;
     light.castShadow = true;
     light.shadow.mapSize.set(shadowSize, shadowSize);
     light.name = "ShadowPlane-Light";
