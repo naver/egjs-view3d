@@ -5,35 +5,41 @@
 
 import View3D from "../View3D";
 import View3DError from "../core/View3DError";
-import ARSession from "../xr/ARSession";
 import WebARSession from "../xr/WebARSession";
 import SceneViewerSession from "../xr/SceneViewerSession";
 import QuickLookSession from "../xr/QuickLookSession";
 import { getObjectOption } from "../utils";
-import { AR_SESSION_TYPE } from "../const/external";
+import { AR_SESSION_TYPE, EVENTS } from "../const/external";
 import * as ERROR from "../const/error";
+
+const sessionCtors = {
+  [AR_SESSION_TYPE.WEBXR]: WebARSession,
+  [AR_SESSION_TYPE.SCENE_VIEWER]: SceneViewerSession,
+  [AR_SESSION_TYPE.QUICK_LOOK]: QuickLookSession
+};
 
 /**
  * ARManager that manages AR sessions
  */
 class ARManager {
   private _view3D: View3D;
-  private _sessions: ARSession[];
-
-  /**
-   * An array of AR sessions that currently in use
-   * @type {ARSession[]}
-   */
-  public get sessions() { return this._sessions; }
+  private _activeSession: WebARSession | null;
 
   /**
    * Create a new instance of the ARManager
-   * @param {View3D} view3d An instance of the View3D
+   * @param {View3D} view3D An instance of the View3D
    */
-  public constructor(view3d: View3D) {
-    this._view3D = view3d;
+  public constructor(view3D: View3D) {
+    this._view3D = view3D;
+    this._activeSession = null;
 
-    this._sessions = this._getSessionsArray();
+    view3D.on(EVENTS.AR_START, ({ session }) => {
+      this._activeSession = session;
+    });
+
+    view3D.on(EVENTS.AR_END, () => {
+      this._activeSession = null;
+    });
   }
 
   /**
@@ -42,7 +48,9 @@ class ARManager {
    * @returns {Promise<boolean>} Availability of the AR session
    */
   public async isAvailable(): Promise<boolean> {
-    const results = await Promise.all(this._sessions.map(session => session.isAvailable()));
+    const sessions = this._getSesssionClasses();
+
+    const results = await Promise.all(sessions.map(session => session.isAvailable()));
 
     return results.some(result => result === true);
   }
@@ -58,12 +66,14 @@ class ARManager {
       throw new View3DError(ERROR.MESSAGES.NOT_INITIALIZED, ERROR.CODES.NOT_INITIALIZED);
     }
 
-    const sessions = this._sessions;
+    const sessions = this._getSesssionClasses();
 
     for (const session of sessions) {
       try {
         if (await session.isAvailable()) {
-          await session.enter();
+          const sessionInstance = new session(view3D, getObjectOption(view3D[session.type]));
+
+          await sessionInstance.enter();
 
           return Promise.resolve();
         }
@@ -78,28 +88,21 @@ class ARManager {
    * Exit current XR Session.
    */
   public async exit() {
-    const sessions = this._sessions;
+    const activeSession = this._activeSession;
 
-    await Promise.all(sessions.map(session => session.exit()));
+    activeSession?.exit();
   }
 
-  private _getSessionsArray(): ARSession[] {
+  private _getSesssionClasses() {
+    return this._getUsingSessionTypes()
+      .map(sessionType => sessionCtors[sessionType]);
+  }
+
+  private _getUsingSessionTypes() {
     const view3D = this._view3D;
-    const options = {
-      [AR_SESSION_TYPE.WEBXR]: view3D.webAR,
-      [AR_SESSION_TYPE.SCENE_VIEWER]: view3D.sceneViewer,
-      [AR_SESSION_TYPE.QUICK_LOOK]: view3D.quickLook
-    };
-    const constructors = {
-      [AR_SESSION_TYPE.WEBXR]: WebARSession,
-      [AR_SESSION_TYPE.SCENE_VIEWER]: SceneViewerSession,
-      [AR_SESSION_TYPE.QUICK_LOOK]: QuickLookSession
-    };
     const priority = view3D.arPriority;
 
-    return priority
-      .filter(sessionType => !!options[sessionType])
-      .map(sessionType => new constructors[sessionType](view3D, getObjectOption(options[sessionType])));
+    return priority.filter(sessionType => !!view3D[sessionType]);
   }
 }
 

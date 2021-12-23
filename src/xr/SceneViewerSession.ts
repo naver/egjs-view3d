@@ -7,7 +7,7 @@ import View3D from "../View3D";
 import Model from "../core/Model";
 import View3DError from "../core/View3DError";
 import { IS_ANDROID } from "../const/browser";
-import { AUTO } from "../const/external";
+import { AR_SESSION_TYPE, AUTO } from "../const/external";
 import { MODEL_FORMAT, SCENE_VIEWER_MODE } from "../const/external";
 import * as ERROR from "../const/error";
 import * as XR from "../const/xr";
@@ -52,6 +52,17 @@ export interface SceneViewerSessionOptions {
  * @see https://developers.google.com/ar/develop/java/scene-viewer
  */
 class SceneViewerSession implements ARSession, OptionGetters<SceneViewerSessionOptions> {
+  /**
+   * Return the availability of SceneViewerSession.
+   * Scene-viewer is available on all android devices with google ARCore installed.
+   * @returns {Promise} A Promise that resolves availability of this session(boolean).
+   */
+  public static isAvailable() {
+    return Promise.resolve(IS_ANDROID());
+  }
+
+  public static readonly type = AR_SESSION_TYPE.SCENE_VIEWER;
+
   // Options
   // As those values are referenced only while entering the session, so I'm leaving this values public
   public file: SceneViewerSessionOptions["file"];
@@ -114,15 +125,6 @@ class SceneViewerSession implements ARSession, OptionGetters<SceneViewerSessionO
     this.initialScale = initialScale;
     this.shareText = shareText;
     this.otherParams = otherParams;
-  }
-
-  /**
-   * Return the availability of SceneViewerSession.
-   * Scene-viewer is available on all android devices with google ARCore installed.
-   * @returns {Promise} A Promise that resolves availability of this session(boolean).
-   */
-  public isAvailable() {
-    return Promise.resolve(IS_ANDROID());
   }
 
   /**

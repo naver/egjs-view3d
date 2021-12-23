@@ -44,7 +44,7 @@ export interface View3DEvents {
   [EVENTS.PROGRESS]: EVENT_TYPES.LoadProgressEvent;
   [EVENTS.QUICK_LOOK_TAP]: EVENT_TYPES.QuickLookTapEvent;
   [EVENTS.AR_START]: EVENT_TYPES.ARStartEvent;
-  [EVENTS.AR_END]: EVENT_TYPES.ARStartEvent;
+  [EVENTS.AR_END]: EVENT_TYPES.AREndEvent;
   [EVENTS.AR_MODEL_PLACED]: EVENT_TYPES.ARModelPlacedEvent;
 }
 

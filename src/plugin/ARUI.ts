@@ -8,22 +8,59 @@ import { EVENTS } from "../const/external";
 
 import View3DPlugin from "./View3DPlugin";
 
-class ARUI implements View3DPlugin {
+export interface ARUIOptions {
+
+}
+
+class ARUI extends View3DPlugin {
+  private _options: Partial<ARUIOptions>;
+  private _cachedElements: {
+    closeButton: HTMLElement;
+  } | null;
+
+  public constructor(options: Partial<ARUIOptions> = {}) {
+    super();
+
+    this._options = options;
+  }
+
   public async init(view3D: View3D) {
-    view3D.once(EVENTS.AR_START, ({ session }) => {
+    view3D.on(EVENTS.AR_START, ({ session }) => {
       const overlayRoot = session.domOverlay.root;
 
       if (!overlayRoot) return;
 
-      const closeButton = document.createElement("div");
+      if (this._cachedElements) {
+        Object.values(this._cachedElements).map(el => {
+          if (!overlayRoot.contains(el)) {
+            overlayRoot.appendChild(el);
+          }
+        });
+      } else {
+        const closeButton = document.createElement("div");
 
-      closeButton.innerHTML = CloseIcon;
-      closeButton.classList.add("view3d-ar-close");
-      closeButton.addEventListener("click", () => {
+        closeButton.innerHTML = CloseIcon;
+        closeButton.classList.add("view3d-ar-close");
+
+        overlayRoot.appendChild(closeButton);
+
+        this._cachedElements = {
+          closeButton
+        };
+      }
+
+      const {
+        closeButton
+      } = this._cachedElements;
+
+      const closeButtonHandler = () => {
         void session.exit();
-      });
+      };
 
-      overlayRoot.appendChild(closeButton);
+      closeButton.addEventListener("click", closeButtonHandler);
+      view3D.once(EVENTS.AR_END, () => {
+        closeButton.removeEventListener("click", closeButtonHandler);
+      });
     });
   }
 }

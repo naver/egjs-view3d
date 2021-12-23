@@ -4,9 +4,11 @@
  */
 import View3DPlugin from "./View3DPlugin";
 import ARButton from "./ARButton";
+import ARUI from "./ARUI";
 
 export {
-  ARButton
+  ARButton,
+  ARUI
 };
 
 export type {

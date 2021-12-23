@@ -7,7 +7,7 @@ import Model from "../core/Model";
 import View3DError from "../core/View3DError";
 import { IS_IOS } from "../const/browser";
 import { QUICK_LOOK_SUPPORTED } from "../const/xr";
-import { EVENTS, MODEL_FORMAT, QUICK_LOOK_APPLE_PAY_BUTTON_TYPE, QUICK_LOOK_CUSTOM_BANNER_SIZE } from "../const/external";
+import { AR_SESSION_TYPE, EVENTS, MODEL_FORMAT, QUICK_LOOK_APPLE_PAY_BUTTON_TYPE, QUICK_LOOK_CUSTOM_BANNER_SIZE } from "../const/external";
 import * as ERROR from "../const/error";
 import { LiteralUnion, OptionGetters, ValueOf } from "../type/utils";
 
@@ -34,6 +34,17 @@ export interface QuickLookSessionOptions {
  * @see https://developer.apple.com/augmented-reality/quick-look/
  */
 class QuickLookSession implements ARSession, OptionGetters<QuickLookSessionOptions> {
+  /**
+   * Return the availability of QuickLookSession.
+   * QuickLook AR is available on iOS12+
+   * @returns {Promise} A Promise that resolves availability of this session(boolean).
+   */
+  public static isAvailable() {
+    return Promise.resolve(QUICK_LOOK_SUPPORTED() && IS_IOS());
+  }
+
+  public static readonly type = AR_SESSION_TYPE.QUICK_LOOK;
+
   // Options
   // As those values are referenced only while entering the session, so I'm leaving this values public
   public file: QuickLookSessionOptions["file"];
@@ -88,16 +99,6 @@ class QuickLookSession implements ARSession, OptionGetters<QuickLookSessionOptio
     this.price = price;
     this.custom = custom;
     this.customHeight = customHeight;
-  }
-
-  /**
-   * Return the availability of QuickLookSession.
-   * QuickLook AR is available on iOS12+
-   * Note that iOS Chrome won't show up QuickLook AR when it's local dev environment
-   * @returns {Promise} A Promise that resolves availability of this session(boolean).
-   */
-  public isAvailable() {
-    return Promise.resolve(QUICK_LOOK_SUPPORTED() && IS_IOS());
   }
 
   /**

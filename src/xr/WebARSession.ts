@@ -11,7 +11,7 @@ import Animation from "../core/Animation";
 import WebARControl, { WebARControlOptions } from "../control/ar/WebARControl";
 import * as DEFAULT from "../const/default";
 import * as XR from "../const/xr";
-import { EVENTS } from "../const/external";
+import { AR_SESSION_TYPE, EVENTS } from "../const/external";
 import { getNullableElement, merge } from "../utils";
 import { XRRenderContext } from "../type/xr";
 
@@ -41,6 +41,22 @@ export interface WebARSessionOptions extends WebARControlOptions {
  * WebXR based abstract AR session class
  */
 class WebARSession implements ARSession {
+  /**
+   * Return availability of this session
+   * @returns {Promise<boolean>} A Promise that resolves availability of this session(boolean).
+   */
+  public static isAvailable() {
+    if (
+      !XR.WEBXR_SUPPORTED()
+      || !HitTest.isAvailable()
+      || !DOMOverlay.isAvailable()
+    ) return Promise.resolve(false);
+
+    return navigator.xr.isSessionSupported(XR.SESSION.AR);
+  }
+
+  public static readonly type = AR_SESSION_TYPE.WEBXR;
+
   // Options
   // As those values are referenced only while entering the session, so I'm leaving this values public
   public features: WebARSessionOptions["features"];
@@ -107,20 +123,6 @@ class WebARSession implements ARSession {
     });
     this._hitTest = new HitTest();
     this._domOverlay = new DOMOverlay();
-  }
-
-  /**
-   * Return availability of this session
-   * @returns {Promise<boolean>} A Promise that resolves availability of this session(boolean).
-   */
-  public isAvailable() {
-    if (
-      !XR.WEBXR_SUPPORTED()
-      || !this._hitTest.isAvailable()
-      || !this._domOverlay.isAvailable()
-    ) return Promise.resolve(false);
-
-    return navigator.xr.isSessionSupported(XR.SESSION.AR);
   }
 
   /**
@@ -341,6 +343,9 @@ class WebARSession implements ARSession {
 
     root.classList.add(DEFAULT.AR_OVERLAY_CLASS);
     view3D.rootEl.appendChild(root);
+    view3D.once(EVENTS.AR_END, () => {
+      view3D.rootEl.removeChild(root);
+    });
 
     return root;
   }

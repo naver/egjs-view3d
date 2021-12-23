@@ -13,21 +13,17 @@ export interface ARButtonOptions {
   unavailableText: string;
 }
 
-class ARButton implements View3DPlugin {
+class ARButton extends View3DPlugin {
   private _options: Partial<ARButtonOptions>;
 
   public constructor(options: Partial<ARButtonOptions> = {}) {
+    super();
+
     this._options = options;
   }
 
   public async init(view3D: View3D) {
-    if (view3D.initialized) {
-      await this._addButton(view3D);
-    } else {
-      view3D.once(EVENTS.READY, () => {
-        void this._addButton(view3D);
-      });
-    }
+    await this._addButton(view3D);
   }
 
   private async _addButton(view3D: View3D) {
@@ -44,18 +40,31 @@ class ARButton implements View3DPlugin {
     button.classList.add("view3d-ar-button");
     tooltip.classList.add("view3d-tooltip");
 
-    if (!arAvailable) {
-      button.disabled = true;
-    } else {
-      button.addEventListener("click", () => {
-        void view3D.ar.enter();
-      });
-    }
-
+    button.disabled = true;
     button.innerHTML = ARIcon;
     button.appendChild(tooltip);
     tooltip.appendChild(tooltipText);
     view3D.rootEl.appendChild(button);
+
+    if (view3D.initialized) {
+      await this._setAvailable(view3D, button, arAvailable);
+    } else {
+      view3D.once(EVENTS.MODEL_CHANGE, () => {
+        void this._setAvailable(view3D, button, arAvailable);
+      });
+    }
+  }
+
+  private async _setAvailable(view3D: View3D, button: HTMLButtonElement, arAvailable: boolean) {
+    if (!arAvailable) {
+      button.disabled = true;
+    } else {
+      button.disabled = false;
+
+      button.addEventListener("click", () => {
+        void view3D.ar.enter();
+      });
+    }
   }
 }
 

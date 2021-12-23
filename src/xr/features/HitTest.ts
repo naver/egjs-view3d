@@ -9,6 +9,13 @@ import * as XR from "../../const/xr";
  * Manager for WebXR hit-test feature
  */
 class HitTest {
+  /**
+   * Return whether hit-test feature is available
+   */
+  public static isAvailable() {
+    return XR.HIT_TEST_SUPPORTED();
+  }
+
   private _source: any = null;
 
   /**
@@ -36,13 +43,6 @@ class HitTest {
         this._source = source;
       });
     });
-  }
-
-  /**
-   * Return whether hit-test feature is available
-   */
-  public isAvailable() {
-    return XR.HIT_TEST_SUPPORTED();
   }
 
   /**

@@ -1,7 +1,7 @@
 import React from "react";
 import * as THREE from "three";
 import VanillaView3D, { View3DOptions } from "../../../src";
-import { ARButton } from "../../../src/plugin";
+import { ARButton, ARUI } from "../../../src/plugin";
 
 interface DemoOptions extends Partial<View3DOptions> {
   showARButton: boolean;
@@ -38,7 +38,7 @@ class View3D extends React.Component<DemoOptions> {
     }
 
     if (showARButton) {
-      void view3d.loadPlugins(new ARButton());
+      void view3d.loadPlugins(new ARButton(), new ARUI());
     }
   }
 

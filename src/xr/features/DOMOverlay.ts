@@ -9,19 +9,19 @@ import * as XR from "../../const/xr";
  * Manager for WebXR dom-overlay feature
  */
 class DOMOverlay {
+  /**
+   * Return whether dom-overlay feature is available
+   */
+  public static isAvailable() {
+    return XR.DOM_OVERLAY_SUPPORTED();
+  }
+
   private _root: HTMLElement | null = null;
 
   public get root() { return this._root; }
 
   public destroy() {
     this._root = null;
-  }
-
-  /**
-   * Return whether dom-overlay feature is available
-   */
-  public isAvailable() {
-    return XR.DOM_OVERLAY_SUPPORTED();
   }
 
   public getFeatures(root: HTMLElement) {
