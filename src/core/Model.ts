@@ -10,7 +10,6 @@ import * as THREE from "three";
  */
 class Model {
   private _src: string;
-  private _format: string;
   private _scene: THREE.Group;
   private _bbox: THREE.Box3;
   private _animations: THREE.AnimationClip[];
@@ -21,13 +20,6 @@ class Model {
    * @readonly
    */
   public get src() { return this._src; }
-  /**
-   * A format(extension) of this model
-   * @type {string}
-   * @readonly
-   * @see MODEL_FORMAT
-   */
-  public get format() { return this._format; }
   /**
    * Scene of the model, see {@link https://threejs.org/docs/#api/en/objects/Group THREE.Group}
    * @readonly
@@ -82,7 +74,6 @@ class Model {
    */
   public constructor({
     src,
-    format,
     scenes,
     animations = [],
     fixSkinnedBbox = false,
@@ -90,7 +81,6 @@ class Model {
     receiveShadow = false
   }: {
     src: string;
-    format: string;
     scenes: THREE.Object3D[];
     animations?: THREE.AnimationClip[];
     fixSkinnedBbox?: boolean;
@@ -98,7 +88,6 @@ class Model {
     receiveShadow?: boolean;
   }) {
     this._src = src;
-    this._format = format;
 
     // This guarantees model's root has identity matrix at creation
     this._scene = new THREE.Group();

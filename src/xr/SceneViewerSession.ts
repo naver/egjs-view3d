@@ -4,11 +4,10 @@
  */
 
 import View3D from "../View3D";
-import Model from "../core/Model";
 import View3DError from "../core/View3DError";
 import { IS_ANDROID } from "../const/browser";
 import { AR_SESSION_TYPE, AUTO } from "../const/external";
-import { MODEL_FORMAT, SCENE_VIEWER_MODE } from "../const/external";
+import { SCENE_VIEWER_MODE } from "../const/external";
 import * as ERROR from "../const/error";
 import * as XR from "../const/xr";
 import { toBooleanString } from "../utils";
@@ -146,7 +145,7 @@ class SceneViewerSession implements ARSession, OptionGetters<SceneViewerSessionO
     params.disable_occlusion = toBooleanString(this.disableOcclusion);
     params.share_text = this.shareText ? encodeURIComponent(this.shareText) : null;
 
-    const file = this.file ?? this._getModelSrc(model);
+    const file = this.file ?? model.src;
 
     if (!file) {
       return Promise.reject(new View3DError(ERROR.MESSAGES.FILE_NOT_SUPPORTED(this.file ?? model.src), ERROR.CODES.FILE_NOT_SUPPORTED));
@@ -170,13 +169,6 @@ class SceneViewerSession implements ARSession, OptionGetters<SceneViewerSessionO
 
   public exit() {
     return Promise.resolve();
-  }
-
-  private _getModelSrc(model: Model) {
-    // SceneViewer only supports glTF / glb
-    return (model.format === MODEL_FORMAT.GLTF || model.format === MODEL_FORMAT.GLB)
-      ? model.src
-      : null;
   }
 }
 

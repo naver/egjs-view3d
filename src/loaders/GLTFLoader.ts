@@ -11,13 +11,10 @@ import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.j
 
 import View3D from "../View3D";
 import Model from "../core/Model";
-import * as DEFAULT from "../const/default";
-import { EVENTS, MODEL_FORMAT } from "../const/external";
+import { EVENTS } from "../const/external";
 
 const dracoLoader = new DRACOLoader();
-
-const ktx2Loader = new KTX2Loader()
-  .setTranscoderPath(DEFAULT.KTX_TRANSCODER_URL);
+const ktx2Loader = new KTX2Loader();
 
 /**
  * GLTFLoader
@@ -28,6 +25,7 @@ class GLTFLoader {
 
   public get loader() { return this._loader; }
   public get dracoLoader() { return dracoLoader; }
+  public get ktx2Loader() { return ktx2Loader; }
 
   /**
    * Create a new instance of GLTFLoader
@@ -55,6 +53,7 @@ class GLTFLoader {
 
     loader.manager = new THREE.LoadingManager();
     dracoLoader.setDecoderPath(view3D.dracoPath);
+    ktx2Loader.setTranscoderPath(view3D.ktxPath);
 
     return new Promise((resolve, reject) => {
       loader.load(url, gltf => {
@@ -136,7 +135,6 @@ class GLTFLoader {
 
     const model = new Model({
       src,
-      format: MODEL_FORMAT.GLTF,
       scenes: gltf.scenes,
       animations: gltf.animations,
       fixSkinnedBbox

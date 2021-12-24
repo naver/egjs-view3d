@@ -41,32 +41,6 @@ export const EVENTS = {
 } as const;
 
 /**
- * Supported model formats
- * @property {"gltf"} GLTF
- * @property {"glb"} GLB
- * @property {"drc"} DRC
- * @property {"fbx"} FBX
- */
-export const MODEL_FORMAT = {
-  GLTF: "gltf",
-  GLB: "glb",
-  DRC: "drc",
-  FBX: "fbx",
-  OBJ: "obj"
-} as const;
-
-/**
- * @type {object}
- * @see https://www.iana.org/assignments/media-types/media-types.xhtml#model
- * @property {"gltf"} model/gltf+json
- * @property {"glb"} model/gltf-binary
- */
-export const MODEL_MIME = {
-  "model/gltf-binary": MODEL_FORMAT.GLB,
-  "model/gltf+json": MODEL_FORMAT.GLTF
-} as const;
-
-/**
  * Collection of predefined easing functions
  * @type {object}
  * @property {function} SINE_WAVE

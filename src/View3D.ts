@@ -56,6 +56,7 @@ export interface View3DOptions {
   // Model
   src: string | null;
   dracoPath: string;
+  ktxPath: string;
   fixSkinnedBbox: boolean;
 
   // Control
@@ -121,6 +122,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   // Options
   private _src: View3DOptions["src"];
   private _dracoPath: View3DOptions["dracoPath"];
+  private _ktxPath: View3DOptions["ktxPath"];
   private _fixSkinnedBbox: View3DOptions["fixSkinnedBbox"];
 
   private _fov: View3DOptions["fov"];
@@ -214,6 +216,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    */
   public get src() { return this._src; }
   public get dracoPath() { return this._dracoPath; }
+  public get ktxPath() { return this._ktxPath; }
   public get fixSkinnedBbox() { return this._fixSkinnedBbox; }
   public get fov() { return this._fov; }
   public get center() { return this._center; }
@@ -277,6 +280,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   public constructor(root: string | HTMLElement, {
     src = null,
     dracoPath = DEFAULT.DRACO_DECODER_URL,
+    ktxPath = DEFAULT.KTX_TRANSCODER_URL,
     fixSkinnedBbox = false,
     skybox = null,
     envmap = null,
@@ -310,6 +314,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     // Bind options
     this._src = src;
     this._dracoPath = dracoPath;
+    this._ktxPath = ktxPath;
     this._fixSkinnedBbox = fixSkinnedBbox;
 
     this._fov = fov;

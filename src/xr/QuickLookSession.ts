@@ -3,11 +3,10 @@
  * egjs projects are licensed under the MIT license
  */
 import View3D from "../View3D";
-import Model from "../core/Model";
 import View3DError from "../core/View3DError";
 import { IS_IOS } from "../const/browser";
 import { QUICK_LOOK_SUPPORTED } from "../const/xr";
-import { AR_SESSION_TYPE, EVENTS, MODEL_FORMAT, QUICK_LOOK_APPLE_PAY_BUTTON_TYPE, QUICK_LOOK_CUSTOM_BANNER_SIZE } from "../const/external";
+import { AR_SESSION_TYPE, EVENTS, QUICK_LOOK_APPLE_PAY_BUTTON_TYPE, QUICK_LOOK_CUSTOM_BANNER_SIZE } from "../const/external";
 import * as ERROR from "../const/error";
 import { LiteralUnion, OptionGetters, ValueOf } from "../type/utils";
 
@@ -107,7 +106,7 @@ class QuickLookSession implements ARSession, OptionGetters<QuickLookSessionOptio
   public enter() {
     const view3D = this._view3D;
     const model = view3D.model!;
-    const file = this.file ?? this._getModelSrc(model);
+    const file = this.file;
 
     if (!file) {
       return Promise.reject(new View3DError(ERROR.MESSAGES.FILE_NOT_SUPPORTED(this.file ?? model.src), ERROR.CODES.FILE_NOT_SUPPORTED));
@@ -169,13 +168,6 @@ class QuickLookSession implements ARSession, OptionGetters<QuickLookSessionOptio
 
   public exit() {
     return Promise.resolve();
-  }
-
-  private _getModelSrc(model: Model) {
-    // SceneViewer only supports glTF / glb
-    return (model.format === MODEL_FORMAT.GLTF || model.format === MODEL_FORMAT.GLB)
-      ? model.src
-      : null;
   }
 }
 
