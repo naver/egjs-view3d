@@ -2,4 +2,8 @@
 
 import View3D from "@site/src/components/View3D";
 
-<View3D src="/model/bunny.drc" envmap="/texture/artist_workshop_1k.hdr" />
+<View3D src="/model/bunny.drc" shadow={{
+  hardness: 5,
+  pitch: 85,
+  yaw: 60
+}} envmap="/texture/artist_workshop_1k.hdr" />

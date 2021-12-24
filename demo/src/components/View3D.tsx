@@ -3,15 +3,19 @@ import * as THREE from "three";
 import VanillaView3D, { View3DOptions } from "../../../src";
 import { ARButton, ARUI } from "../../../src/plugin";
 
+import OptionExample from "./OptionExample";
+
 interface DemoOptions extends Partial<View3DOptions> {
   showARButton: boolean;
   showBbox: boolean;
+  showExampleCode: boolean;
 }
 
 class View3D extends React.Component<DemoOptions> {
   public static defaultProps: DemoOptions = {
     showARButton: false,
     showBbox: false,
+    showExampleCode: false,
     dracoPath: "/lib/draco/"
   };
 
@@ -27,7 +31,7 @@ class View3D extends React.Component<DemoOptions> {
   }
 
   public componentDidMount() {
-    const { children, showBbox, showARButton, ...restProps } = this.props;
+    const { children, showBbox, showARButton, showExampleCode, ...restProps } = this.props;
     const view3d = new VanillaView3D(this._rootRef.current, restProps);
 
     this._view3D = view3d;
@@ -49,12 +53,22 @@ class View3D extends React.Component<DemoOptions> {
   }
 
   public render() {
-    const { children } = this.props;
+    const { children, showExampleCode, ...restProps } = this.props;
+    const view3DOptions = Object.keys(restProps)
+      .filter(key => {
+        return key in VanillaView3D.prototype && restProps[key] !== View3D.defaultProps[key];
+      })
+      .reduce((options, key) => {
+        return { ...options, [key]: restProps[key] };
+      }, {});
 
-    return <div ref={this._rootRef} className="view3d-wrapper view3d-square mb-2">
-      <canvas className="view3d-canvas"></canvas>
-      { children }
-    </div>;
+    return <>
+      <div ref={this._rootRef} className="view3d-wrapper view3d-square mb-2">
+        <canvas className="view3d-canvas"></canvas>
+        { children }
+      </div>
+      { showExampleCode && <OptionExample options={view3DOptions} />}
+    </>;
   }
 }
 

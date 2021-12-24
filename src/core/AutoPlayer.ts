@@ -146,13 +146,13 @@ class AutoPlayer implements OptionGetters<AutoplayOptions> {
 
     targetEl.addEventListener(BROWSER.EVENTS.MOUSE_DOWN, this._onMouseDown, false);
 
-    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_START, this._onTouchStart, false);
-    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, false);
+    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_START, this._onTouchStart, { passive: false, capture: false });
+    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, { passive: false, capture: false });
 
     targetEl.addEventListener(BROWSER.EVENTS.MOUSE_ENTER, this._onMouseEnter, false);
     targetEl.addEventListener(BROWSER.EVENTS.MOUSE_LEAVE, this._onMouseLeave, false);
 
-    targetEl.addEventListener(BROWSER.EVENTS.WHEEL, this._onWheel, false);
+    targetEl.addEventListener(BROWSER.EVENTS.WHEEL, this._onWheel, { passive: false, capture: false });
 
     this._enabled = true;
   }

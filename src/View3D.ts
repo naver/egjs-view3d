@@ -479,6 +479,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
 
     scene.reset();
     scene.add(model.scene);
+    scene.shadowPlane.updateLightPosition(model);
 
     camera.fit(model, this._center);
     void camera.reset(0);

@@ -7,7 +7,7 @@ import * as THREE from "three";
 
 import View3D from "../View3D";
 import AnimationControl from "../control/AnimationControl";
-import { toRadian, clamp, circulate, toDegree } from "../utils";
+import { toRadian, clamp, circulate, toDegree, getRotatedPosition } from "../utils";
 import * as DEFAULT from "../const/default";
 import { AUTO } from "../const/external";
 
@@ -274,16 +274,8 @@ class Camera {
     currentPose.pitch = clamp(currentPose.pitch, DEFAULT.PITCH_RANGE.min, DEFAULT.PITCH_RANGE.max);
     currentPose.zoom = clamp(baseFov + currentPose.zoom, zoomRange.min, zoomRange.max) - baseFov;
 
-    const yaw = toRadian(currentPose.yaw);
-    const pitch = toRadian(currentPose.pitch);
+    const newCamPos = getRotatedPosition(distance, currentPose.yaw, currentPose.pitch);
     const fov = currentPose.zoom + baseFov;
-    const newCamPos = new THREE.Vector3(0, 0, 0);
-
-    newCamPos.y = distance * Math.sin(pitch);
-    newCamPos.z = distance * Math.cos(pitch);
-
-    newCamPos.x = newCamPos.z * Math.sin(-yaw);
-    newCamPos.z = newCamPos.z * Math.cos(-yaw);
 
     newCamPos.add(currentPose.pivot);
 

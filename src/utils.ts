@@ -169,3 +169,17 @@ export const getRotationAngle = (center: THREE.Vector2, v1: THREE.Vector2, v2: T
 
 export const getObjectOption = <T extends boolean | Partial<object>>(val: T): NoBoolean<T> => typeof val === "object" ? val : {} as any;
 export const toBooleanString = (val: boolean) => val ? "true" : "false";
+
+export const getRotatedPosition = (distance: number, yawDeg: number, pitchDeg: number) => {
+  const yaw = toRadian(yawDeg);
+  const pitch = toRadian(pitchDeg);
+  const newPos = new THREE.Vector3(0, 0, 0);
+
+  newPos.y = distance * Math.sin(pitch);
+  newPos.z = distance * Math.cos(pitch);
+
+  newPos.x = newPos.z * Math.sin(-yaw);
+  newPos.z = newPos.z * Math.cos(-yaw);
+
+  return newPos;
+};
