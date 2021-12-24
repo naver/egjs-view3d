@@ -10,7 +10,6 @@ import AutoResizer from "./AutoResizer";
 import Camera from "./Camera";
 import Model from "./Model";
 import ModelAnimator from "./ModelAnimator";
-import ModelLoader from "./ModelLoader";
 import Motion from "./Motion";
 import Pose from "./Pose";
 import Renderer from "./Renderer";
@@ -26,7 +25,6 @@ export {
   Camera,
   Model,
   ModelAnimator,
-  ModelLoader,
   Motion,
   Pose,
   Renderer,

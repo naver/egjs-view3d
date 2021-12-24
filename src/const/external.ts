@@ -45,11 +45,14 @@ export const EVENTS = {
  * @property {"gltf"} GLTF
  * @property {"glb"} GLB
  * @property {"drc"} DRC
+ * @property {"fbx"} FBX
  */
 export const MODEL_FORMAT = {
   GLTF: "gltf",
   GLB: "glb",
-  DRC: "drc"
+  DRC: "drc",
+  FBX: "fbx",
+  OBJ: "obj"
 } as const;
 
 /**

@@ -8,7 +8,6 @@ import Renderer from "./core/Renderer";
 import Scene from "./core/Scene";
 import Camera from "./core/Camera";
 import AutoResizer from "./core/AutoResizer";
-import ModelLoader from "./core/ModelLoader";
 import Model from "./core/Model";
 import ModelAnimator from "./core/ModelAnimator";
 import ARManager from "./core/ARManager";
@@ -29,7 +28,8 @@ import * as ERROR from "./const/error";
 import * as EVENT_TYPES from "./type/event";
 import { View3DPlugin } from "./plugin";
 import { getElement, getObjectOption } from "./utils";
-import { LiteralUnion, OptionGetters, ValueOf } from "./type/utils";
+import { OptionGetters, ValueOf } from "./type/utils";
+import { GLTFLoader } from "./loaders";
 
 /**
  * @interface
@@ -55,7 +55,6 @@ export interface View3DEvents {
 export interface View3DOptions {
   // Model
   src: string | null;
-  format: LiteralUnion<typeof AUTO, string>;
   dracoPath: string;
   fixSkinnedBbox: boolean;
 
@@ -121,7 +120,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
 
   // Options
   private _src: View3DOptions["src"];
-  private _format: View3DOptions["format"];
   private _dracoPath: View3DOptions["dracoPath"];
   private _fixSkinnedBbox: View3DOptions["fixSkinnedBbox"];
 
@@ -215,13 +213,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    * @default null
    */
   public get src() { return this._src; }
-  /**
-   * File extension format of the 3D model (glTF, glb, ...)
-   * If `"auto"` is given, View3D will try to detect the format of the 3D model with the name of `src` URL
-   * @type {string}
-   * @default "auto"
-   */
-  public get format() { return this._format; }
   public get dracoPath() { return this._dracoPath; }
   public get fixSkinnedBbox() { return this._fixSkinnedBbox; }
   public get fov() { return this._fov; }
@@ -285,7 +276,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    */
   public constructor(root: string | HTMLElement, {
     src = null,
-    format = AUTO,
     dracoPath = DEFAULT.DRACO_DECODER_URL,
     fixSkinnedBbox = false,
     skybox = null,
@@ -319,7 +309,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
 
     // Bind options
     this._src = src;
-    this._format = format;
     this._dracoPath = dracoPath;
     this._fixSkinnedBbox = fixSkinnedBbox;
 
@@ -397,7 +386,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     const background = this._background;
 
     const tasks: [Promise<Model>, ...Array<Promise<any>>] = [
-      this._loadModel(this._src, this._format)
+      this._loadModel(this._src)
     ];
 
     // Load & set skybox / envmap before displaying model
@@ -442,25 +431,28 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   /**
    * Load a new 3D model and replace it with the current one
    * @param {string} src Source URL to fetch 3D model from
-   * @param {string} [format="auto"] File extension format of the 3D model (glTF, glb, ...)
-   * If `"auto"` is given, View3D will try to detect the format of the 3D model with the name of `src` URL
    */
-  public async load(src: string, format: View3DOptions["format"] = AUTO) {
-    const model = await this._loadModel(src, format);
+  public async load(src: string) {
+    if (this._initialized) {
+      const model = await this._loadModel(src);
 
-    this._src = src;
-    this._format = format;
+      this._src = src;
 
-    this._display(model);
+      this._display(model);
+    } else {
+      this._src = src;
+
+      await this.init();
+    }
   }
 
   public async loadPlugins(...plugins: View3DPlugin[]) {
     return Promise.all(plugins.map(plugin => plugin.init(this)));
   }
 
-  private async _loadModel(src: string, format: View3DOptions["format"]) {
-    const loader = new ModelLoader(this);
-    const model = await loader.load(src, format);
+  private async _loadModel(src: string) {
+    const loader = new GLTFLoader(this);
+    const model = await loader.load(src);
 
     this.trigger(EVENTS.LOAD, {
       target: this,
