@@ -15,8 +15,10 @@ class View3D extends React.Component<DemoOptions> {
     dracoPath: "/lib/draco/"
   };
 
-  private _view3d: VanillaView3D;
+  private _view3D: VanillaView3D;
   private _rootRef = React.createRef<HTMLDivElement>();
+
+  public get view3D() { return this._view3D; }
 
   public constructor(props: DemoOptions) {
     super(props);
@@ -28,7 +30,7 @@ class View3D extends React.Component<DemoOptions> {
     const { children, showBbox, showARButton, ...restProps } = this.props;
     const view3d = new VanillaView3D(this._rootRef.current, restProps);
 
-    this._view3d = view3d;
+    this._view3D = view3d;
 
     if (showBbox) {
       view3d.once("modelChange", ({ model }) => {
@@ -43,7 +45,7 @@ class View3D extends React.Component<DemoOptions> {
   }
 
   public componentWillUnmount() {
-    this._view3d.destroy();
+    this._view3D.destroy();
   }
 
   public render() {

@@ -475,6 +475,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     const scene = this._scene;
     const camera = this._camera;
     const animator = this._animator;
+    const inXR = renderer.threeRenderer.xr.isPresenting;
 
     scene.reset();
     scene.add(model.scene);
@@ -491,8 +492,16 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
 
     this._model = model;
 
-    renderer.stopAnimationLoop();
-    renderer.setAnimationLoop(renderer.defaultRenderLoop);
+    if (!inXR) {
+      renderer.stopAnimationLoop();
+      renderer.setAnimationLoop(renderer.defaultRenderLoop);
+    } else {
+      const activeSession = this._arManager.activeSession;
+
+      if (activeSession) {
+        activeSession.control.syncTargetModel(model);
+      }
+    }
 
     this.trigger(EVENTS.MODEL_CHANGE, {
       target: this,

@@ -105,7 +105,7 @@ class FloorIndicator {
     this.hide();
   }
 
-  public init(model: Model) {
+  public updateSize(model: Model) {
     this._mesh.scale.setScalar(model.bbox.getBoundingSphere(new THREE.Sphere()).radius);
   }
 

@@ -5,12 +5,10 @@
 import * as THREE from "three";
 
 import View3D from "../View3D";
-import Model from "../core/Model";
 import ARScene from "../xr/ARScene";
 
 export interface XRRenderContext {
   view3D: View3D;
-  model: Model;
   scene: ARScene;
   session: THREE.XRSession;
   delta: number;

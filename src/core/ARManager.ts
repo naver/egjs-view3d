@@ -25,6 +25,8 @@ class ARManager {
   private _view3D: View3D;
   private _activeSession: WebARSession | null;
 
+  public get activeSession() { return this._activeSession; }
+
   /**
    * Create a new instance of the ARManager
    * @param {View3D} view3D An instance of the View3D

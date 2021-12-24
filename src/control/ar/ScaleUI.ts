@@ -98,7 +98,6 @@ class ScaleUI {
         transparent: true
       }),
     );
-    mesh.matrixAutoUpdate = false;
 
     this._mesh = mesh;
     this._font = font;
@@ -112,14 +111,12 @@ class ScaleUI {
   public updatePosition(worldRotation: THREE.Quaternion, focus: THREE.Vector3, modelHeight: number) {
     const mesh = this._mesh;
     const offset = this._height / 2 + this._offset + modelHeight;
-    const offsetVec = new THREE.Vector3(0, 1, 0)
-      .multiplyScalar(offset)
+    const offsetVec = new THREE.Vector3(0, offset, 0)
       .applyQuaternion(worldRotation.clone().invert());
 
     // Update mesh
     mesh.position.copy(offsetVec);
     mesh.lookAt(focus);
-    mesh.updateMatrix();
   }
 
   public updateScale(scale: number) {
@@ -167,6 +164,8 @@ class ScaleUI {
     ctx.fillText(`${scalePercentage}%`, centerX, centerY);
 
     this._texture.needsUpdate = true;
+
+    this._mesh.scale.setScalar(1 / scale);
   }
 
   /**

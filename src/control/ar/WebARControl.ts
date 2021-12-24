@@ -10,6 +10,7 @@ import Model from "../../core/Model";
 import ARScene from "../../xr/ARScene";
 import * as XR from "../../const/xr";
 import { GESTURE } from "../../const/internal";
+import { AUTO } from "../../const/external";
 import { getObjectOption } from "../../utils";
 import { XRRenderContext, XRInputs } from "../../type/xr";
 
@@ -28,6 +29,7 @@ import DeadzoneChecker, { DeadzoneCheckerOptions } from "./DeadzoneChecker";
  * @property {ARScaleControlOption} scale Options for {@link ARScaleControl}
  * @property {FloorIndicatorOption} floorIndicator Options for {@link FloorIndicator}
  * @property {DeadzoneCheckerOption} deadzone Options for {@link DeadzoneChecker}
+ * @property {"auto" | number} initialScale Initial scale of the model. If set to "auto", it will modify big overflowing 3D model's scale to fit the screen when it's initially displayed. This won't increase the 3D model's scale more than 1.
  */
 export interface WebARControlOptions {
   rotate: boolean | Partial<ARSwirlControlOptions>;
@@ -35,6 +37,7 @@ export interface WebARControlOptions {
   scale: boolean | Partial<ARScaleControlOptions>;
   ring: Partial<FloorIndicatorOptions>;
   deadzone: Partial<DeadzoneCheckerOptions>;
+  initialScale: typeof AUTO | number;
 }
 
 /**
@@ -45,8 +48,7 @@ class WebARControl {
   private _rotate: WebARControlOptions["rotate"];
   private _translate: WebARControlOptions["translate"];
   private _scale: WebARControlOptions["scale"];
-  private _ring: WebARControlOptions["ring"];
-  private _deadzone: WebARControlOptions["deadzone"];
+  private _initialScale: WebARControlOptions["initialScale"];
 
   private _view3D: View3D;
   private _arScene: ARScene;
@@ -73,7 +75,6 @@ class WebARControl {
    * {@link ARScaleControl} in this control
    */
   public get scale() { return this._scaleControl; }
-
   /**
    * Create new instance of ARControl
    * @param {WebARControlOptions} options Options
@@ -83,7 +84,8 @@ class WebARControl {
     translate,
     scale,
     ring,
-    deadzone
+    deadzone,
+    initialScale
   }: WebARControlOptions) {
     this._view3D = view3D;
     this._arScene = arScene;
@@ -96,8 +98,7 @@ class WebARControl {
     this._rotate = rotate;
     this._translate = translate;
     this._scale = scale;
-    this._ring = ring;
-    this._deadzone = deadzone;
+    this._initialScale = initialScale;
 
     this._rotateControl = new ARSwirlControl(getObjectOption(rotate));
     this._translateControl = new ARTranslateControl(getObjectOption(translate));
@@ -118,11 +119,6 @@ class WebARControl {
     hitRotation: THREE.Quaternion;
   }) {
     const arScene = this._arScene;
-    const rotate = this._rotate;
-    const translate = this._translate;
-    const scale = this._scale;
-
-    const rotateControl = this._rotateControl;
     const translateControl = this._translateControl;
     const scaleControl = this._scaleControl;
     const floorIndicator = this._floorIndicator;
@@ -131,7 +127,6 @@ class WebARControl {
     this._vertical = vertical;
 
     translateControl.init(hitPosition, hitRotation, vertical);
-    floorIndicator.init(model);
     deadzoneChecker.setAspect(size.height / size.width);
 
     arScene.add(
@@ -139,23 +134,11 @@ class WebARControl {
       scaleControl.ui.mesh
     );
 
+    this.syncTargetModel(model);
+
     const transientHitTestSource = await session.requestHitTestSourceForTransientInput({ profile: XR.INPUT_PROFILE.TOUCH });
 
     this._hitTestSource = transientHitTestSource;
-
-    session.addEventListener(XR.EVENTS.SELECT_START, this._onSelectStart);
-    session.addEventListener(XR.EVENTS.SELECT_END, this._onSelectEnd);
-
-    if (rotate && !vertical) {
-      rotateControl.enable();
-    }
-    if (translate) {
-      translateControl.enable();
-    }
-    if (scale) {
-      scaleControl.enable();
-    }
-
     this._initialized = true;
   }
 
@@ -170,7 +153,7 @@ class WebARControl {
       this._hitTestSource = null;
     }
 
-    this._deactivate();
+    this.disable(session);
 
     this._floorIndicator.hide();
     this._scaleControl.ui.hide();
@@ -179,6 +162,46 @@ class WebARControl {
     session.removeEventListener(XR.EVENTS.SELECT_END, this._onSelectEnd);
 
     this._initialized = false;
+  }
+
+  public enable(session: THREE.XRSession) {
+    const rotate = this._rotate;
+    const translate = this._translate;
+    const scale = this._scale;
+
+    const rotateControl = this._rotateControl;
+    const translateControl = this._translateControl;
+    const scaleControl = this._scaleControl;
+
+    const vertical = this._vertical;
+
+    session.addEventListener(XR.EVENTS.SELECT_START, this._onSelectStart);
+    session.addEventListener(XR.EVENTS.SELECT_END, this._onSelectEnd);
+
+    if (rotate && !vertical) {
+      rotateControl.enable();
+    }
+    if (translate) {
+      translateControl.enable();
+    }
+    if (scale) {
+      scaleControl.enable();
+    }
+  }
+
+  public disable(session: THREE.XRSession) {
+    const rotateControl = this._rotateControl;
+    const translateControl = this._translateControl;
+    const scaleControl = this._scaleControl;
+
+    session.removeEventListener(XR.EVENTS.SELECT_START, this._onSelectStart);
+    session.removeEventListener(XR.EVENTS.SELECT_END, this._onSelectEnd);
+
+    this._deactivate();
+
+    rotateControl.disable();
+    translateControl.disable();
+    scaleControl.disable();
   }
 
   public update(ctx: XRRenderContext) {
@@ -203,6 +226,21 @@ class WebARControl {
       this._processInput(ctx, xrInputs);
     }
     this._updateControls(ctx);
+  }
+
+  public syncTargetModel(model: Model) {
+    const initialScale = this._initialScale;
+    const floorPosition = this._translateControl.floorPosition;
+    const xrCam = (this._view3D.renderer.threeRenderer.xr.getCamera(new THREE.PerspectiveCamera()) as THREE.ArrayCamera).cameras[0];
+
+    this._floorIndicator.updateSize(model);
+    this._scaleControl.setInitialScale({
+      scene: this._arScene,
+      model,
+      floorPosition,
+      xrCam,
+      initialScale
+    });
   }
 
   private _deactivate() {

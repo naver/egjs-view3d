@@ -11,7 +11,7 @@ import Animation from "../core/Animation";
 import WebARControl, { WebARControlOptions } from "../control/ar/WebARControl";
 import * as DEFAULT from "../const/default";
 import * as XR from "../const/xr";
-import { AR_SESSION_TYPE, EVENTS } from "../const/external";
+import { AR_SESSION_TYPE, AUTO, EVENTS } from "../const/external";
 import { getNullableElement, merge } from "../utils";
 import { XRRenderContext } from "../type/xr";
 
@@ -100,7 +100,8 @@ class WebARSession implements ARSession {
     translate = true,
     scale = true,
     ring = {},
-    deadzone = {}
+    deadzone = {},
+    initialScale = AUTO
   }: Partial<WebARSessionOptions> = {}) {
     this._view3D = view3D;
 
@@ -119,7 +120,8 @@ class WebARSession implements ARSession {
       translate,
       scale,
       ring,
-      deadzone
+      deadzone,
+      initialScale
     });
     this._hitTest = new HitTest();
     this._domOverlay = new DOMOverlay();
@@ -135,7 +137,6 @@ class WebARSession implements ARSession {
     const arScene = this._arScene;
     const renderer = view3D.renderer;
     const threeRenderer = renderer.threeRenderer;
-    const model = view3D.model!;
     const control = this._control;
     const hitTest = this._hitTest;
     const domOverlay = this._domOverlay;
@@ -203,7 +204,6 @@ class WebARSession implements ARSession {
       const ctx: XRRenderContext = {
         view3D,
         scene: arScene,
-        model,
         session,
         delta,
         frame,
@@ -250,7 +250,6 @@ class WebARSession implements ARSession {
 
   private _initModelPosition(ctx: XRRenderContext) {
     const {
-      model,
       frame,
       session,
       size,
@@ -258,6 +257,7 @@ class WebARSession implements ARSession {
       referenceSpace
     } = ctx;
     const view3D = this._view3D;
+    const model = view3D.model;
     const arScene = this._arScene;
     const hitTest = this._hitTest;
 
@@ -315,23 +315,30 @@ class WebARSession implements ARSession {
     this._modelPlaced = true;
     view3D.trigger(EVENTS.AR_MODEL_PLACED, { target: view3D, session: this, model });
 
+    void control.init({
+      model,
+      vertical,
+      session,
+      size,
+      hitPosition,
+      hitRotation
+    });
+
+    const initialScale = control.scale.scale;
+
     // Show scale up animation
-    const scaleUpAnimation = new Animation({ context: session, duration: 1000 });
+    const scaleUpAnimation = new Animation({
+      context: session,
+      duration: 1000
+    });
 
     scaleUpAnimation.on("progress", evt => {
-      arScene.setModelScale(evt.easedProgress);
+      arScene.setModelScale(evt.easedProgress * initialScale);
     });
 
     scaleUpAnimation.on("finish", () => {
-      arScene.setModelScale(1);
-      void control.init({
-        model,
-        vertical,
-        session,
-        size,
-        hitPosition,
-        hitRotation
-      });
+      arScene.setModelScale(initialScale);
+      control.enable(session);
     });
 
     scaleUpAnimation.start();

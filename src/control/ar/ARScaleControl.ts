@@ -5,11 +5,16 @@
 
 import * as THREE from "three";
 
+import Model from "../../core/Model";
 import Motion from "../../core/Motion";
+import ARScene from "../../xr/ARScene";
+import { AUTO } from "../../const/external";
+import { clamp } from "../../utils";
 import { XRRenderContext, XRInputs } from "../../type/xr";
 
 import ARControl from "./ARControl";
 import ScaleUI from "./ScaleUI";
+import { WebARControlOptions } from "./WebARControl";
 
 /**
  * Options for {@link ARScaleControl}
@@ -64,6 +69,49 @@ class ARScaleControl implements ARControl {
     this._motion = new Motion({ duration: 0, range: { min, max } });
     this._motion.reset(1); // default scale is 1(100%)
     this._ui = new ScaleUI();
+  }
+
+  public setInitialScale({
+    scene,
+    model,
+    floorPosition,
+    xrCam,
+    initialScale
+  }: {
+    scene: ARScene;
+    model: Model;
+    floorPosition: THREE.Vector3;
+    xrCam: THREE.PerspectiveCamera;
+    initialScale: WebARControlOptions["initialScale"];
+  }) {
+    const motion = this._motion;
+    const scaleRange = motion.range;
+
+    if (initialScale === AUTO) {
+      const camFov = 2 * Math.atan(1 / xrCam.projectionMatrix.elements[5]); // in radians
+      const aspectInv = xrCam.projectionMatrix.elements[0] / xrCam.projectionMatrix.elements[5]; // x/y
+      const camPos = xrCam.position;
+      const modelHeight = model.bbox.max.y - model.bbox.min.y;
+
+      const camToFloorDist = camPos.distanceTo(new THREE.Vector3().addVectors(floorPosition, new THREE.Vector3(0, modelHeight / 2, 0)));
+      const viewY = camToFloorDist * Math.tan(camFov / 2);
+      const viewX = viewY * aspectInv;
+
+      const modelBoundingSphere = model.bbox.getBoundingSphere(new THREE.Sphere());
+      const scaleY = viewY / modelBoundingSphere.radius;
+      const scaleX = viewX / modelBoundingSphere.radius;
+
+      const scale = clamp(Math.min(scaleX, scaleY), scaleRange.min, 1);
+
+      motion.reset(scale);
+    } else {
+      motion.reset(clamp(initialScale, scaleRange.min, scaleRange.max));
+    }
+
+    const scale = this._motion.val;
+
+    this._scaleMultiplier = scale;
+    scene.setModelScale(scale);
   }
 
   public setInitialPos(coords: THREE.Vector2[]) {
@@ -122,8 +170,9 @@ class ARScaleControl implements ARControl {
     scene.setModelScale(this._scaleMultiplier);
   }
 
-  private _updateUIPosition({ model, scene, xrCam, vertical }: XRRenderContext) {
+  private _updateUIPosition({ view3D, scene, xrCam, vertical }: XRRenderContext) {
     // Update UI
+    const model = view3D.model!;
     const camPos = new THREE.Vector3().setFromMatrixPosition(xrCam.matrixWorld);
     const modelHeight = vertical
       ? model.bbox.getBoundingSphere(new THREE.Sphere()).radius

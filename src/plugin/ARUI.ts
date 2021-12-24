@@ -59,6 +59,9 @@ class ARUI extends View3DPlugin {
 
       closeButton.addEventListener("click", closeButtonHandler);
       view3D.once(EVENTS.AR_END, () => {
+        if (closeButton.parentElement) {
+          closeButton.parentElement.removeChild(closeButton);
+        }
         closeButton.removeEventListener("click", closeButtonHandler);
       });
     });

@@ -1,0 +1,7 @@
+.ar-model-swapper {
+  display: flex;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
