@@ -216,7 +216,9 @@ class ZoomControl implements CameraControl, OptionGetters<ZoomControlOptions> {
   }
 
   private _onWheel = (evt: WheelEvent) => {
-    if (evt.deltaY === 0) return;
+    const wheelScrollable = this._view3D.wheelScrollable;
+
+    if (evt.deltaY === 0 || wheelScrollable) return;
 
     evt.preventDefault();
     evt.stopPropagation();

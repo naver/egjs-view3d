@@ -192,6 +192,10 @@ class Model {
         const transformed = new THREE.Vector3().fromArray(skinned.applyMatrix4(mesh.bindMatrixInverse).toArray());
         transformed.applyMatrix4(mesh.matrixWorld);
 
+        // if (Math.abs(transformed.x) > 10000) {
+        //   console.log(transformed, mesh.bindMatrixInverse, skinned);
+        // }
+
         bbox.expandByPoint(transformed);
       }
     });

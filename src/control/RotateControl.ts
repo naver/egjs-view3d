@@ -42,6 +42,8 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
   private _yMotion: Motion;
   private _screenScale: THREE.Vector2 = new THREE.Vector2(0, 0);
   private _prevPos: THREE.Vector2 = new THREE.Vector2(0, 0);
+  private _isFirstTouch: boolean;
+  private _isScrolling: boolean;
   private _enabled: boolean = false;
 
   /**
@@ -104,6 +106,8 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
     this._duration = duration;
     this._easing = easing;
 
+    this._isFirstTouch = false;
+    this._isScrolling = false;
     this._xMotion = new Motion({ duration, range: DEFAULT.INFINITE_RANGE, easing });
     this._yMotion = new Motion({ duration, range: DEFAULT.PITCH_RANGE, easing });
   }
@@ -154,11 +158,11 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
 
     const targetEl = this._view3D.renderer.canvas;
 
-    targetEl.addEventListener(BROWSER.EVENTS.MOUSE_DOWN, this._onMouseDown, false);
+    targetEl.addEventListener(BROWSER.EVENTS.MOUSE_DOWN, this._onMouseDown);
 
-    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_START, this._onTouchStart, { passive: false, capture: false });
-    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove, { passive: false, capture: false });
-    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, { passive: false, capture: false });
+    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_START, this._onTouchStart, { passive: true });
+    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove, { passive: this._view3D.scrollable });
+    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd);
 
     this._enabled = true;
     this.sync();
@@ -175,13 +179,13 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
 
     const targetEl = this._view3D.renderer.canvas;
 
-    targetEl.removeEventListener(BROWSER.EVENTS.MOUSE_DOWN, this._onMouseDown, false);
-    window.removeEventListener(BROWSER.EVENTS.MOUSE_MOVE, this._onMouseMove, false);
-    window.removeEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
+    targetEl.removeEventListener(BROWSER.EVENTS.MOUSE_DOWN, this._onMouseDown);
+    window.removeEventListener(BROWSER.EVENTS.MOUSE_MOVE, this._onMouseMove);
+    window.removeEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp);
 
-    targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_START, this._onTouchStart, false);
-    targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove, false);
-    targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, false);
+    targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_START, this._onTouchStart);
+    targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove);
+    targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd);
 
     this._enabled = false;
 
@@ -243,31 +247,43 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
   };
 
   private _onTouchStart = (evt: TouchEvent) => {
-    if (!this._view3D.scrollable && evt.cancelable !== false) {
-      evt.preventDefault();
-    }
-
     const touch = evt.touches[0];
+
+    this._isFirstTouch = true;
     this._prevPos.set(touch.clientX, touch.clientY);
   };
 
   private _onTouchMove = (evt: TouchEvent) => {
     // Only the one finger motion should be considered
-    if (evt.touches.length > 1) return;
+    if (evt.touches.length > 1 || this._isScrolling) return;
 
+    const touch = evt.touches[0];
     const scrollable = this._view3D.scrollable;
-
-    if (!scrollable && evt.cancelable !== false) {
-      evt.preventDefault();
-    }
 
     if (scrollable && !evt.cancelable) {
       return;
     }
 
-    evt.stopPropagation();
+    if (this._isFirstTouch) {
+      if (scrollable) {
+        const delta = new THREE.Vector2(touch.clientX, touch.clientY)
+          .sub(this._prevPos);
 
-    const touch = evt.touches[0];
+        if (Math.abs(delta.y) > Math.abs(delta.x)) {
+          // Assume Scrolling
+          this._isScrolling = true;
+          return;
+        }
+      }
+
+      this._isFirstTouch = false;
+    }
+
+    if (!scrollable && evt.cancelable) {
+      evt.preventDefault();
+    }
+
+    evt.stopPropagation();
 
     const prevPos = this._prevPos;
     const rotateDelta = new THREE.Vector2(touch.clientX, touch.clientY)
@@ -289,6 +305,8 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
     } else {
       this._prevPos.set(0, 0);
     }
+
+    this._isScrolling = false;
   };
 }
 

@@ -91,6 +91,8 @@ class Camera {
    */
   public get fov() { return this._threeCamera.fov; }
 
+  public get pose() { return this._currentPose; }
+
   /**
    * Camera's frustum width
    * @type number
@@ -224,7 +226,8 @@ class Camera {
     defaultPose.pivot = modelCenter.clone();
     this._distance = effectiveCamDist;
 
-    camera.far = Math.max(2000, effectiveCamDist + maxDistToCenter);
+    camera.near = Math.max(effectiveCamDist - maxDistToCenter);
+    camera.far = effectiveCamDist + maxDistToCenter;
     control.zoom.updateRange();
   }
 

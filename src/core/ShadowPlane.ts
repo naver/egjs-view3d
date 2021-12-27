@@ -7,6 +7,7 @@ import * as THREE from "three";
 
 import View3D from "../View3D";
 import * as DEFAULT from "../const/default";
+import { MAX_SAFE_INTEGER } from "../const/browser";
 import { clamp, getRotatedPosition } from "../utils";
 import { OptionGetters } from "../type/utils";
 
@@ -96,7 +97,7 @@ class ShadowPlane implements OptionGetters<ShadowOptions> {
     this._yaw = yaw;
     this._pitch = pitch;
 
-    this._geometry = new THREE.PlaneBufferGeometry();
+    this._geometry = new THREE.PlaneBufferGeometry(2, 2);
     this._material = new THREE.ShadowMaterial({ opacity, fog: false });
     this._mesh = new THREE.Mesh(this._geometry, this._material);
     this._light = new THREE.DirectionalLight();
@@ -104,7 +105,7 @@ class ShadowPlane implements OptionGetters<ShadowOptions> {
     const mesh = this._mesh;
     mesh.rotateX(-Math.PI / 2);
     mesh.position.setY(DEFAULT.SHADOW_Y_OFFSET); // Move slightly below model, to prevent z-fighting
-    mesh.scale.setScalar(100);
+    mesh.scale.setScalar(2 ** 32 - 1);
     mesh.receiveShadow = true;
     mesh.castShadow = false;
     mesh.name = "ShadowPlane-Mesh";
@@ -122,7 +123,32 @@ class ShadowPlane implements OptionGetters<ShadowOptions> {
     this._updateSoftnessLevel();
   }
 
-  public updateLightPosition(model: Model) {
+  public update(model: Model) {
+    this._updatePlaneScale(model);
+    this._updateLightPosition(model);
+  }
+
+  private _updateSoftnessLevel() {
+    const light = this._light;
+
+    const hardness = clamp(Math.floor(this._hardness), 1, this._maxHardness);
+    const shadowSize = Math.pow(2, hardness);
+
+    light.shadow.mapSize.set(shadowSize, shadowSize);
+  }
+
+  private _updatePlaneScale(model: Model) {
+    const mesh = this._mesh;
+    const modelBbox = model.bbox;
+    const boxPoints = [modelBbox.min.x, modelBbox.min.z, modelBbox.max.x, modelBbox.max.z]
+      .map(val => Math.abs(val));
+
+    const maxVal = Math.max(...boxPoints);
+
+    mesh.scale.setScalar(100 * maxVal);
+  }
+
+  private _updateLightPosition(model: Model) {
     const light = this._light;
     const scale = 1.5;
     const shadowCam = light.shadow.camera;
@@ -136,19 +162,11 @@ class ShadowPlane implements OptionGetters<ShadowOptions> {
     light.position.copy(newPosition);
 
     shadowCam.near = 0;
+    shadowCam.far = MAX_SAFE_INTEGER;
     shadowCam.left = -scale * radius;
     shadowCam.right = scale * radius;
     shadowCam.top = scale * radius;
     shadowCam.bottom = -scale * radius;
-  }
-
-  private _updateSoftnessLevel() {
-    const light = this._light;
-
-    const hardness = clamp(Math.floor(this._hardness), 1, this._maxHardness);
-    const shadowSize = Math.pow(2, hardness);
-
-    light.shadow.mapSize.set(shadowSize, shadowSize);
   }
 }
 

@@ -1,34 +1,15 @@
----
-sidebar_position: 2
----
-
-import View3D, { WhiteLightPreset } from "@site/src/components/View3D";
+import View3D from "@site/src/components/View3D";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
 
-<OptionDescriptor type={`"auto" | number[]`} defaultVal={"auto"} />
+<OptionDescriptor type={`"auto" | number[]`} defaultVal={`"auto"`} />
+
+Center of the camera rotation.
+If `"auto"` is given, it will use the center of the model's bounding box as the pivot.
+Else, you can use any world position as the pivot.
 
 ## Example
 ### center: "auto"
-<View3D src="/model/bunny.glb" center="auto" preset={new WhiteLightPreset()} />
-
-```ts
-import View3D, { WhiteLightPreset } from "@egjs/view3d";
-
-new View3D("#view3d-canvas", {
-  src: "/model/bunny.glb",
-  center: "auto",
-  preset: new WhiteLightPreset()
-})
-```
+<View3D src="/model/meshopt/alarm.glb" center="auto" envmap="/texture/artist_workshop_1k.hdr" showExampleCode />
 
 ### center: [0.03, 0, 0]
-<View3D src="/model/bunny.glb" center={[0.03, 0, 0]} preset={new WhiteLightPreset()} />
-
-```ts
-import View3D, { WhiteLightPreset } from "@egjs/view3d";
-
-new View3D("#view3d-canvas", {
-  src: "/model/bunny.glb",
-  preset: new WhiteLightPreset()
-})
-```
+<View3D src="/model/meshopt/alarm.glb" center={[0.03, 0, 0]} envmap="/texture/artist_workshop_1k.hdr" showExampleCode />

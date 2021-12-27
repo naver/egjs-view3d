@@ -7,6 +7,15 @@ import View3D from "../View3D";
 import * as BROWSER from "../const/browser";
 import { OptionGetters } from "../type/utils";
 
+/**
+ * @interface
+ * @param {number} [options.delay=2000] Reactivation delay after mouse input in milisecond
+ * @param {number} [options.delayOnMouseLeave=0] Reactivation delay after mouse leave
+ * @param {number} [options.speed=1] Y-axis(yaw) rotation speed
+ * @param {boolean} [options.pauseOnHover=false] Whether to pause rotation on mouse hover
+ * @param {boolean} [options.canInterrupt=true] Whether user can interrupt the rotation with click/wheel input
+ * @param {boolean} [options.disableOnInterrupt=false] Whether to disable autoplay on user interrupt
+ */
 export interface AutoplayOptions {
   delay: number;
   delayOnMouseLeave: number;

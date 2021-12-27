@@ -70,6 +70,7 @@ export interface View3DOptions {
   zoom: boolean | Partial<ZoomControlOptions>;
   autoplay: boolean | Partial<AutoplayOptions>;
   scrollable: boolean;
+  wheelScrollable: boolean;
   useGrabCursor: boolean;
 
   // Environment
@@ -135,6 +136,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   private _zoom: View3DOptions["zoom"];
   private _autoplay: View3DOptions["autoplay"];
   private _scrollable: View3DOptions["scrollable"];
+  private _wheelScrollable: View3DOptions["scrollable"];
   private _useGrabCursor: View3DOptions["useGrabCursor"];
 
   private _skybox: View3DOptions["skybox"];
@@ -214,19 +216,107 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    * @default null
    */
   public get src() { return this._src; }
+  /**
+   * URL to {@link https://github.com/google/draco Draco} decoder location.
+   * @type {string}
+   * @default https://www.gstatic.com/draco/versioned/decoders/1.4.1/
+   */
   public get dracoPath() { return this._dracoPath; }
+  /**
+   * URL to {@link http://github.khronos.org/KTX-Specification/#basisu_gd KTX2 texture} transcoder location.
+   * @type {string}
+   * @default https://unpkg.com/three@0.134.0/examples/js/libs/basis/
+   */
   public get ktxPath() { return this._ktxPath; }
+  /**
+   * URL to {@link https://github.com/zeux/meshoptimizer Meshoptimizer} decoder js path.
+   * @type {string | null}
+   * @default null
+   */
   public get meshoptPath() { return this._meshoptPath; }
+  /**
+   * Sometimes, some rigged model has the wrong bounding box that when displaying on three.js (usually converted glTF model from Sketchfab)
+   * Enabling this option can resolve that issue by recalculating bounding box size with the influence of the skeleton weight.
+   * @type {boolean}
+   * @default false
+   */
   public get fixSkinnedBbox() { return this._fixSkinnedBbox; }
+  /**
+   * A vertical FOV(Field of View) value of the camera frustum, in degrees.
+   * If `"auto"` is used, View3D will try to find the appropriate FOV value that model is not clipped at any angle.
+   * @type {"auto" | number}
+   * @default "auto"
+   */
   public get fov() { return this._fov; }
+  /**
+   * Center of the camera rotation.
+   * If `"auto"` is given, it will use the center of the model's bounding box as the pivot.
+   * Else, you can use any world position as the pivot.
+   * @type {"auto" | number[]}
+   * @default "auto"
+   */
   public get center() { return this._center; }
+  /**
+   * Initial Y-axis rotation of the camera, in degrees.
+   * @type {number}
+   * @default 0
+   */
   public get yaw() { return this._yaw; }
+  /**
+   * Initial X-axis rotation of the camera, in degrees.
+   * Should be a value from -90 to 90.
+   * @type {number}
+   * @default 0
+   */
   public get pitch() { return this._pitch; }
+  /**
+   * Options for the {@link RotateControl}.
+   * If `false` is given, it will disable the rotate control.
+   * @type {boolean | RotateControlOptions}
+   * @default true
+   */
   public get rotate() { return this._rotate; }
+  /**
+   * Options for the {@link TranslateControl}.
+   * If `false` is given, it will disable the translate control.
+   * @type {boolean | TranslateControlOptions}
+   * @default true
+   */
   public get translate() { return this._translate; }
+  /**
+   * Options for the {@link ZoomControl}.
+   * If `false` is given, it will disable the zoom control.
+   * @type {boolean | ZoomControlOptions}
+   * @default true
+   */
   public get zoom() { return this._zoom; }
+  /**
+   * Enable Y-axis rotation autoplay.
+   * If `true` is given, it will enable autoplay with default values.
+   * @type {boolean | AutoplayOptions}
+   * @default true
+   */
   public get autoplay() { return this._autoplay; }
+  /**
+   * Enable browser scrolling with touch on the canvas area.
+   * This will block the rotate(pitch) control if the user is currently scrolling.
+   * @type {boolean}
+   * @default true
+   */
   public get scrollable() { return this._scrollable; }
+  /**
+   * Enable browser scrolling with mouse wheel on the canvas area.
+   * This will block the zoom control with mouse wheel.
+   * @type {boolean}
+   * @default false
+   */
+  public get wheelScrollable() { return this._wheelScrollable; }
+  /**
+   * Enable CSS `cursor: grab` on the canvas element.
+   * `cursor: grabbing` will be used on mouse click.
+   * @type {boolean}
+   * @default true
+   */
   public get useGrabCursor() { return this._useGrabCursor; }
   public get skybox() { return this._skybox; }
   public get envmap() { return this._envmap; }
@@ -289,13 +379,14 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     center = AUTO,
     yaw = 0,
     pitch = 0,
-    rotate = {},
-    translate = {},
-    zoom = {},
+    rotate = true,
+    translate = true,
+    zoom = true,
     exposure = 1,
     shadow = true,
     autoplay = false,
-    scrollable = false,
+    scrollable = true,
+    wheelScrollable = false,
     useGrabCursor = true,
     webAR = true,
     sceneViewer = true,
@@ -326,6 +417,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._zoom = zoom;
     this._autoplay = autoplay;
     this._scrollable = scrollable;
+    this._wheelScrollable = wheelScrollable;
     this._useGrabCursor = useGrabCursor;
 
     this._skybox = skybox;
@@ -479,7 +571,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
 
     scene.reset();
     scene.add(model.scene);
-    scene.shadowPlane.updateLightPosition(model);
+    scene.shadowPlane.update(model);
 
     camera.fit(model, this._center);
     void camera.reset(0);

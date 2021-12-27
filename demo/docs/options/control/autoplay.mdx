@@ -1,49 +1,37 @@
 ---
-sidebar_position: 1
+sidebar_position: 2
 ---
 
-import View3D, { WhiteLightPreset } from "@site/src/components/View3D";
+import View3D from "@site/src/components/View3D";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
 
-<OptionDescriptor type={`boolean | AutoplayOptions`} defaultVal={"auto"} />
+<OptionDescriptor type={`boolean | AutoplayOptions`} defaultVal="true" />
 
-- See: [AutoplayOptions](/docs/api/AutoplayOptions)
-
-Autoplay Parameters
+Enable Y-axis rotation autoplay.
+If `true` is given, it will enable autoplay with default values.
+You can also customize the autoplay with the following properties.
 
 |Name|Type|Default|Description|
-|---|---|---|---|
-|delay|number|2000||
+|:---:|:---:|:---:|---|
+|delay|number|2000|Reactivation delay after mouse input in milisecond|
+|delayOnMouseLeave|number|0|Reactivation delay after mouse leave|
+|speed|number|1|Y-axis(yaw) rotation speed|
+|pauseOnHover|boolean|false|Whether to pause rotation on mouse hover|
+|canInterrupt|boolean|true|Whether user can interrupt the rotation with click/wheel input|
+|disableOnInterrupt|boolean|false|Whether to disable autoplay on user interrupt|
 
 ## Example
 ### autoplay: true
-<View3D src="/model/bunny.glb" autoplay={true} preset={new WhiteLightPreset()} />
+<View3D src="/model/meshopt/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" showExampleCode autoplay={true} />
 
-```ts
-import View3D, { WhiteLightPreset } from "@egjs/view3d";
+### delay: 5000
+<View3D src="/model/meshopt/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" showExampleCode autoplay={{ delay: 5000 }} />
 
-new View3D("#view3d-canvas", {
-  src: "/model/bunny.glb",
-  preset: new WhiteLightPreset(),
-  autoplay: true
-})
-```
+### pauseOnHover: true & delayOnMouseLeave: 2000
+<View3D src="/model/meshopt/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" showExampleCode autoplay={{ delayOnMouseLeave: 2000, pauseOnHover: true }} />
 
-### Detailed
-<View3D src="/model/bunny.glb" preset={new WhiteLightPreset()} autoplay={{
-  delay: 1000,
-  delayOnMouseLeave: 2000,
-  speed: -2,
-  pauseOnHover: true,
-  canInterrupt: false
-}} />
+### speed: -5 & canInterrupt: false
+<View3D src="/model/meshopt/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" showExampleCode autoplay={{ speed: -5, canInterrupt: false }} />
 
-```ts
-import View3D, { WhiteLightPreset } from "@egjs/view3d";
-
-new View3D("#view3d-canvas", {
-  src: "/model/bunny.glb",
-  preset: new WhiteLightPreset(),
-  autoplay: true
-})
-```
+### disableOnInterrupt: true
+<View3D src="/model/meshopt/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" showExampleCode autoplay={{ disableOnInterrupt: true }} />

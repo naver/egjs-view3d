@@ -41,7 +41,9 @@ class View3D extends React.Component<DemoOptions> {
     if (showBbox) {
       view3d.once("modelChange", ({ model }) => {
         const modelBbox = model.bbox.clone().applyMatrix4(model.scene.matrixWorld);
-        view3d.scene.add(new THREE.Box3Helper(modelBbox, new THREE.Color(0x00ffff)));
+        const boxHelper = new THREE.Box3Helper(modelBbox, new THREE.Color(0x00ffff));
+
+        view3d.scene.add(boxHelper);
       });
     }
 

@@ -5,31 +5,14 @@ sidebar_position: 1
 import View3D from "@site/src/components/View3D";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
 
-<OptionDescriptor type={`"auto" | null`} defaultVal={"auto"} />
+<OptionDescriptor type={`"auto" | number`} defaultVal={`"auto"`} />
+
+A vertical FOV(Field of View) value of the camera frustum, in degrees.
+If `"auto"` is used, View3D will try to find the appropriate FOV value that model is not clipped at any angle.
 
 ## Example
 ### fov: "auto"
-<View3D src="/model/DragonAttenuation.glb" fov="auto" envmap="/texture/spruit_sunrise_1k.hdr" />
-
-```ts
-import View3D from "@egjs/view3d";
-
-new View3D("#view3d-canvas", {
-  fov: "auto",
-  src: "/model/DragonAttenuation.glb",
-  envmap: "/texture/spruit_sunrise_1k.hdr"
-})
-```
+<View3D src="/model/meshopt/alarm.glb" fov="auto" envmap="/texture/artist_workshop_1k.hdr" showExampleCode />
 
 ### fov: 120
-<View3D src="/model/DragonAttenuation.glb" fov={120} envmap="/texture/spruit_sunrise_1k.hdr" />
-
-```ts
-import View3D from "@egjs/view3d";
-
-new View3D("#view3d-canvas", {
-  fov: 120,
-  src: "/model/DragonAttenuation.glb",
-  envmap: "/texture/spruit_sunrise_1k.hdr"
-})
-```
+<View3D src="/model/meshopt/alarm.glb" fov={120} envmap="/texture/artist_workshop_1k.hdr" showExampleCode />

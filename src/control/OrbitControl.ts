@@ -109,11 +109,8 @@ class OrbitControl {
       this._translateControl.enable();
     }
 
-    if (view3D.zoom && !view3D.scrollable) {
+    if (view3D.zoom) {
       this._zoomControl.enable();
-    } else {
-      const canvas = view3D.renderer.canvas;
-      canvas.style.touchAction = "pan-y";
     }
   }
 

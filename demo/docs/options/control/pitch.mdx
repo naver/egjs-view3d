@@ -2,20 +2,17 @@
 sidebar_position: 4
 ---
 
-import View3D, { WhiteLightPreset } from "@site/src/components/View3D";
+import View3D from "@site/src/components/View3D";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
 
 <OptionDescriptor type="number" defaultVal="0" />
 
+Initial X-axis rotation of the camera, in degrees.
+Should be a value from -90 to 90.
+
 ## Example
-<View3D src="/model/bunny.glb" pitch={45} preset={new WhiteLightPreset()} />
+### pitch: -45
+<View3D src="/model/meshopt/alarm.glb" pitch={-45} envmap="/texture/artist_workshop_1k.hdr" showExampleCode />
 
-```ts
-import View3D, { WhiteLightPreset } from "@egjs/view3d";
-
-new View3D("#view3d-canvas", {
-  src: "/model/bunny.glb",
-  pitch: 45,
-  preset: new WhiteLightPreset()
-})
-```
+### pitch: 45
+<View3D src="/model/meshopt/alarm.glb" pitch={45} envmap="/texture/artist_workshop_1k.hdr" showExampleCode />

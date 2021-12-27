@@ -2,20 +2,22 @@
 sidebar_position: 3
 ---
 
-import View3D, { WhiteLightPreset } from "@site/src/components/View3D";
+import View3D from "@site/src/components/View3D";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
 
 <OptionDescriptor type="number" defaultVal="0" />
 
+Initial Y-axis rotation of the camera, in degrees.
+
 ## Example
-<View3D src="/model/bunny.glb" yaw={180} preset={new WhiteLightPreset()} />
+### yaw: 0
+<View3D src="/model/meshopt/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" yaw={0} showExampleCode />
 
-```ts
-import View3D, { WhiteLightPreset } from "@egjs/view3d";
+### yaw: 90
+<View3D src="/model/meshopt/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" yaw={90} showExampleCode />
 
-new View3D("#view3d-canvas", {
-  src: "/model/bunny.glb",
-  yaw: 180,
-  preset: new WhiteLightPreset()
-})
-```
+### yaw: 180
+<View3D src="/model/meshopt/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" yaw={180} showExampleCode />
+
+### yaw: -90
+<View3D src="/model/meshopt/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" yaw={-90} showExampleCode />
