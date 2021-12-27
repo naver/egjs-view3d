@@ -4,6 +4,7 @@ sidebar_position: 4
 
 import View3D from "@site/src/components/View3D";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
 
 <OptionDescriptor type="number" defaultVal="0" />
 
@@ -16,3 +17,20 @@ Should be a value from -90 to 90.
 
 ### pitch: 45
 <View3D src="/model/meshopt/alarm.glb" pitch={45} envmap="/texture/artist_workshop_1k.hdr" showExampleCode />
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

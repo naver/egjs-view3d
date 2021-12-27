@@ -4,11 +4,12 @@ sidebar_position: 2
 
 import View3D from "@site/src/components/View3D";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
 
 <OptionDescriptor type={`boolean | AutoplayOptions`} defaultVal="true" />
 
 Enable Y-axis rotation autoplay.
-If `true` is given, it will enable autoplay with default values.
+If `true` is given, it will enable autoplay with the default options.
 You can also customize the autoplay with the following properties.
 
 |Name|Type|Default|Description|
@@ -35,3 +36,20 @@ You can also customize the autoplay with the following properties.
 
 ### disableOnInterrupt: true
 <View3D src="/model/meshopt/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" showExampleCode autoplay={{ disableOnInterrupt: true }} />
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

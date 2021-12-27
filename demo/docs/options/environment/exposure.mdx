@@ -1,7 +1,35 @@
+---
+sidebar_position: 4
+---
+
 import View3D from "@site/src/components/View3D";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
 
 <OptionDescriptor type="number" defaultVal="1" />
 
+Exposure value of the HDR envmap/skybox image.
+
 ## Example
-<View3D src="/model/meshopt/alarm.glb" skybox="/texture/spruit_sunrise_1k.hdr" exposure={1.5} showExampleCode />
+### exposure: 1
+<View3D src="/model/meshopt/alarm.glb" skybox="/texture/spruit_sunrise_1k.hdr" exposure={1} showExampleCode />
+
+### exposure: 2
+<View3D src="/model/meshopt/alarm.glb" skybox="/texture/spruit_sunrise_1k.hdr" exposure={2} showExampleCode />
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Spruit Sunrise",
+    link: "https://polyhaven.com/a/spruit_sunrise",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

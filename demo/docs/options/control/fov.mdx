@@ -4,6 +4,7 @@ sidebar_position: 1
 
 import View3D from "@site/src/components/View3D";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
 
 <OptionDescriptor type={`"auto" | number`} defaultVal={`"auto"`} />
 
@@ -16,3 +17,20 @@ If `"auto"` is used, View3D will try to find the appropriate FOV value that mode
 
 ### fov: 120
 <View3D src="/model/meshopt/alarm.glb" fov={120} envmap="/texture/artist_workshop_1k.hdr" showExampleCode />
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

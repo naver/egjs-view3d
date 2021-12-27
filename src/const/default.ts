@@ -26,8 +26,6 @@ export const PITCH_RANGE: Readonly<Range> = {
   min: -89.9, max: 89.9
 };
 
-export const SHADOW_Y_OFFSET = -0.005;
-
 export const AR_OVERLAY_CLASS = "view3d-ar-overlay";
 export const DRACO_DECODER_URL = "https://www.gstatic.com/draco/versioned/decoders/1.4.1/";
 export const KTX_TRANSCODER_URL = "https://unpkg.com/three@0.134.0/examples/js/libs/basis/";

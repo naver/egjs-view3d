@@ -36,17 +36,17 @@ class Scene {
   public get shadowPlane() { return this._shadowPlane; }
 
   /**
-   *
+   * Group that contains volatile user objects
    */
   public get userObjects() { return this._userObjects; }
 
   /**
-   *
+   * Group that contains non-volatile user objects
    */
   public get envObjects() { return this._envObjects; }
 
   /**
-   *
+   * Group that contains objects that View3D manages
    */
   public get fixedObjects() { return this._fixedObjects; }
 

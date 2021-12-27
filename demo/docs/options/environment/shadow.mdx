@@ -1,16 +1,53 @@
+---
+sidebar_position: 5
+---
+
 import View3D from "@site/src/components/View3D";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
 
 <OptionDescriptor type="boolean | ShadowOptions" defaultVal="true" />
 
-See [ShadowOptions](/docs/api/ShadowOptions) for details
+Enable shadow below the model.
+If `true` is given, it will enable shadow with the default options.
+If `false` is given, it will disable the shadow.
+You can also customize the shadow with the following properties.
 
+|Name|Type|Default|Description|
+|:---:|:---:|:---:|---|
+|opacity|number|0.3|Opacity of the shadow.|
+|hardness|number|6|Hardness of the shadow. Should be integer greater than 0, and lower the softer the shadow is.|
+|yaw|number|0|Y-axis rotation of the light that casts shadow.|
+|pitch|number|0|X-axis rotation of the light that casts shadow.|
 
 ## Examples
-<View3D src="/model/meshopt/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" showExampleCode />
+### shadow: true
+<View3D src="/model/meshopt/alarm.glb" shadow={true} envmap="/texture/artist_workshop_1k.hdr" showExampleCode />
+
+### shadow: false
+<View3D src="/model/meshopt/alarm.glb" shadow={false} envmap="/texture/artist_workshop_1k.hdr" showExampleCode />
+
+### Detailed
 <View3D src="/model/meshopt/alarm.glb" shadow={{
   opacity: 1,
   hardness: 12,
   pitch: 50,
   yaw: -30
 }} envmap="/texture/artist_workshop_1k.hdr" showExampleCode />
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

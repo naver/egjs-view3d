@@ -1,5 +1,6 @@
 import View3D from "@site/src/components/View3D";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
 
 <OptionDescriptor type={`"auto" | number[]`} defaultVal={`"auto"`} />
 
@@ -13,3 +14,20 @@ Else, you can use any world position as the pivot.
 
 ### center: [0.03, 0, 0]
 <View3D src="/model/meshopt/alarm.glb" center={[0.03, 0, 0]} envmap="/texture/artist_workshop_1k.hdr" showExampleCode />
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

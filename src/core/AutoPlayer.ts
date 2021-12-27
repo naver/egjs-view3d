@@ -9,12 +9,12 @@ import { OptionGetters } from "../type/utils";
 
 /**
  * @interface
- * @param {number} [options.delay=2000] Reactivation delay after mouse input in milisecond
- * @param {number} [options.delayOnMouseLeave=0] Reactivation delay after mouse leave
- * @param {number} [options.speed=1] Y-axis(yaw) rotation speed
- * @param {boolean} [options.pauseOnHover=false] Whether to pause rotation on mouse hover
- * @param {boolean} [options.canInterrupt=true] Whether user can interrupt the rotation with click/wheel input
- * @param {boolean} [options.disableOnInterrupt=false] Whether to disable autoplay on user interrupt
+ * @param {number} [delay=2000] Reactivation delay after mouse input in milisecond
+ * @param {number} [delayOnMouseLeave=0] Reactivation delay after mouse leave
+ * @param {number} [speed=1] Y-axis(yaw) rotation speed
+ * @param {boolean} [pauseOnHover=false] Whether to pause rotation on mouse hover
+ * @param {boolean} [canInterrupt=true] Whether user can interrupt the rotation with click/wheel input
+ * @param {boolean} [disableOnInterrupt=false] Whether to disable autoplay on user interrupt
  */
 export interface AutoplayOptions {
   delay: number;

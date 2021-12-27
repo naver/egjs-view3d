@@ -227,7 +227,7 @@ class Camera {
     this._distance = effectiveCamDist;
 
     camera.near = Math.max(effectiveCamDist - maxDistToCenter);
-    camera.far = effectiveCamDist + maxDistToCenter;
+    camera.far = 10 * (effectiveCamDist + maxDistToCenter);
     control.zoom.updateRange();
   }
 

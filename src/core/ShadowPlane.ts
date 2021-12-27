@@ -6,7 +6,6 @@
 import * as THREE from "three";
 
 import View3D from "../View3D";
-import * as DEFAULT from "../const/default";
 import { MAX_SAFE_INTEGER } from "../const/browser";
 import { clamp, getRotatedPosition } from "../utils";
 import { OptionGetters } from "../type/utils";
@@ -15,6 +14,10 @@ import Model from "./Model";
 
 /**
  * @interface
+ * @param {number} [opacity=0.3] Opacity of the shadow.
+ * @param {number} [hardness=6] Hardness of the shadow. Should be integer greater than 0, and lower the softer the shadow is.
+ * @param {number} [yaw=0] Y-axis rotation of the light that casts shadow.
+ * @param {number} [pitch=0] X-axis rotation of the light that casts shadow.
  */
 export interface ShadowOptions {
   opacity: number;
@@ -84,8 +87,8 @@ class ShadowPlane implements OptionGetters<ShadowOptions> {
    * @param {object} options Options
    * @param {number} [options.opacity=0.3] Opacity of the shadow.
    * @param {number} [options.hardness=6] Hardness of the shadow. Should be integer greater than 0, and lower the softer the shadow is.
-   * @param {number} [options.yaw=0] Y-axis rotation of the shadow.
-   * @param {number} [options.pitch=0] X-axis rotation of the shadow.
+   * @param {number} [options.yaw=0] Y-axis rotation of the light that casts shadow.
+   * @param {number} [options.pitch=0] X-axis rotation of the light that casts shadow.
    */
   public constructor(view3D: View3D, {
     opacity = 0.3,
@@ -104,7 +107,6 @@ class ShadowPlane implements OptionGetters<ShadowOptions> {
 
     const mesh = this._mesh;
     mesh.rotateX(-Math.PI / 2);
-    mesh.position.setY(DEFAULT.SHADOW_Y_OFFSET); // Move slightly below model, to prevent z-fighting
     mesh.scale.setScalar(2 ** 32 - 1);
     mesh.receiveShadow = true;
     mesh.castShadow = false;
@@ -124,7 +126,7 @@ class ShadowPlane implements OptionGetters<ShadowOptions> {
   }
 
   public update(model: Model) {
-    this._updatePlaneScale(model);
+    this._updatePlane(model);
     this._updateLightPosition(model);
   }
 
@@ -137,15 +139,15 @@ class ShadowPlane implements OptionGetters<ShadowOptions> {
     light.shadow.mapSize.set(shadowSize, shadowSize);
   }
 
-  private _updatePlaneScale(model: Model) {
+  private _updatePlane(model: Model) {
     const mesh = this._mesh;
     const modelBbox = model.bbox;
     const boxPoints = [modelBbox.min.x, modelBbox.min.z, modelBbox.max.x, modelBbox.max.z]
       .map(val => Math.abs(val));
 
-    const maxVal = Math.max(...boxPoints);
+    const maxXZ = Math.max(...boxPoints);
 
-    mesh.scale.setScalar(100 * maxVal);
+    mesh.scale.setScalar(100 * maxXZ);
   }
 
   private _updateLightPosition(model: Model) {
