@@ -70,7 +70,7 @@ const config = {
           },
           {
             type: "doc",
-            docId: "options/sources/src",
+            docId: "options/model/src",
             label: "Options",
             position: "left"
           },
@@ -78,12 +78,6 @@ const config = {
             type: "doc",
             docId: "events/ready",
             label: "Events",
-            position: "left"
-          },
-          {
-            type: "doc",
-            docId: "advanced/Preset",
-            label: "Advanced",
             position: "left"
           },
           {
@@ -120,11 +114,7 @@ const config = {
               },
               {
                 label: "Options",
-                to: "docs/options/sources/src"
-              },
-              {
-                label: "Advanced",
-                to: "docs/advanced/Preset"
+                to: "docs/options/model/src"
               },
               {
                 label: "Events",

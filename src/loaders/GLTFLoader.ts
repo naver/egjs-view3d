@@ -7,7 +7,6 @@ import * as THREE from "three";
 import { GLTFLoader as ThreeGLTFLoader, GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader";
-import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 
 import View3D from "../View3D";
 import Model from "../core/Model";
@@ -20,12 +19,31 @@ const ktx2Loader = new KTX2Loader();
  * GLTFLoader
  */
 class GLTFLoader {
+  public static async setMeshoptDecoder(meshoptPath: string) {
+    return new Promise<void>((resolve, reject) => {
+      const scriptTag = document.createElement("script");
+
+      scriptTag.addEventListener("load", async () => {
+        await (window as any).MeshoptDecoder.ready;
+        GLTFLoader.meshoptDecoder = (window as any).MeshoptDecoder;
+        document.body.removeChild(scriptTag);
+
+        resolve();
+      });
+      scriptTag.addEventListener("error", () => {
+        document.body.removeChild(scriptTag);
+        reject();
+      });
+      scriptTag.src = new URL(meshoptPath, location.href).href;
+
+      document.body.appendChild(scriptTag);
+    });
+  }
+
+  public static meshoptDecoder: any;
+
   private _view3D: View3D;
   private _loader: ThreeGLTFLoader;
-
-  public get loader() { return this._loader; }
-  public get dracoLoader() { return dracoLoader; }
-  public get ktx2Loader() { return ktx2Loader; }
 
   /**
    * Create a new instance of GLTFLoader
@@ -39,21 +57,23 @@ class GLTFLoader {
     loader.setCrossOrigin("anonymous");
     loader.setDRACOLoader(dracoLoader);
     loader.setKTX2Loader(ktx2Loader.detectSupport(view3D.renderer.threeRenderer));
-    loader.setMeshoptDecoder(MeshoptDecoder);
   }
 
   /**
    * Load new GLTF model from the given url
-   * @param url URL to fetch glTF/glb file
+   * @param {string} url URL to fetch glTF/glb file
    * @returns Promise that resolves {@link Model}
    */
   public load(url: string): Promise<Model> {
     const view3D = this._view3D;
     const loader = this._loader;
 
-    loader.manager = new THREE.LoadingManager();
     dracoLoader.setDecoderPath(view3D.dracoPath);
     ktx2Loader.setTranscoderPath(view3D.ktxPath);
+
+    if (GLTFLoader.meshoptDecoder) {
+      loader.setMeshoptDecoder(GLTFLoader.meshoptDecoder);
+    }
 
     return new Promise((resolve, reject) => {
       loader.load(url, gltf => {

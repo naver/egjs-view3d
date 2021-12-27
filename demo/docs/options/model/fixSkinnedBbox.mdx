@@ -1,0 +1,32 @@
+import View3D, { WhiteLightPreset } from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
+
+<OptionDescriptor type="boolean" defaultVal="false" />
+
+Sometimes, some rigged model has the wrong bounding box that when displaying on three.js (usually converted glTF model from [Sketchfab](https://sketchfab.com/))
+Enabling this option can resolve that issue by recalculating bounding box size with the influence of the skeleton weight.
+
+## Example
+### fixSkinnedBbox: false
+<View3D showBbox src="/model/meshopt/trex.glb" envmap="/texture/spruit_sunrise_1k.hdr" showExampleCode />
+
+### fixSkinnedBbox: true
+<View3D showBbox src="/model/meshopt/trex.glb" envmap="/texture/spruit_sunrise_1k.hdr" fixSkinnedBbox={true} showExampleCode />
+
+<License items={[
+  {
+    name: "Tyrannosaurus Rex 2.0",
+    link: "https://skfb.ly/o7NK9",
+    author: "TStevenz",
+    authorLink: "https://sketchfab.com/3dCoast",
+    license: "Creative Commons Attribution"
+  },
+  {
+    name: "Spruit Sunrise",
+    link: "https://polyhaven.com/a/spruit_sunrise",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

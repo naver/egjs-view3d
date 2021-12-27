@@ -1,0 +1,55 @@
+---
+sidebar_position: 4
+---
+
+import View3D from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
+
+<OptionDescriptor type="string | null" defaultVal="null" />
+
+URL to [Meshoptimizer](https://github.com/zeux/meshoptimizer) decoder js path.
+
+It adds an ability to decode 3D models with [EXT_meshopt_compression](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Vendor/EXT_meshopt_compression/README.md) enabled.
+Decoder will be loaded on View3D's initialization, so you should set decoder path before initialization.
+It's `null` by default, which means it won't handle such models.
+Quick fix is to use the CDN below.
+
+```
+https://unpkg.com/meshoptimizer@0.17.0/meshopt_decoder.js
+```
+
+Similar to Draco, meshopt can compress the geometry data of the 3D model.
+The table below compares the before and after compression of the example model below.
+
+|Model|Before Compression|After Compression (Used [gltfpack](https://github.com/zeux/meshoptimizer/tree/master/gltf)'s -tc -cc flag)|
+|---|:---:|:---:|
+|Korean Fire Extinguisher 01|5.95MB|1.37MB (-27.67%)|
+
+
+:::caution
+
+Note that SceneViewer AR session can't handle models with `EXT_meshopt_compression` enabled.
+
+:::
+
+
+## Example
+<View3D src="/model/meshopt/watch.glb" envmap="/texture/comfy_cafe_1k.hdr" showExampleCode={["ktxPath"]} />
+
+<License items={[
+  {
+    name: "Korean Fire Extinguisher 01",
+    link: "https://polyhaven.com/a/korean_fire_extinguisher_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Comfy Café",
+    link: "https://polyhaven.com/a/comfy_cafe",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

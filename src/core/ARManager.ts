@@ -73,7 +73,7 @@ class ARManager {
     for (const session of sessions) {
       try {
         if (await session.isAvailable()) {
-          const sessionInstance = new session(view3D, getObjectOption(view3D[session.type]));
+          const sessionInstance = new session(view3D, getObjectOption(view3D[session.type]) as any);
 
           await sessionInstance.enter();
 

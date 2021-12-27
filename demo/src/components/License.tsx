@@ -16,7 +16,7 @@ export default ({ items = [] }: {
 }) => (
   <article className="message">
     <div className="message-body">
-      <div className="mb-2 is-flex"><img className="mr-1" src="/icon/info.svg" /><span className="has-text-weight-bold">Asset License</span></div>
+      <div className="mb-2 is-flex"><img className="mr-1" src="/icon/info.svg" /><span className="has-text-weight-bold">Assets Used</span></div>
       {
         items.map((item, idx) => (
           <div key={idx}>

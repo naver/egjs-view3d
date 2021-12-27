@@ -1,0 +1,51 @@
+---
+sidebar_position: 3
+---
+
+import View3D from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
+
+<OptionDescriptor type="string" defaultVal="UNPKG CDN" />
+
+URL to [KTX2](http://github.khronos.org/KTX-Specification/#basisu_gd) transcoder location.
+
+Transcoder will be loaded with the given location if the glTF model has the [KHR_texture_basisu](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_texture_basisu/README.md) extension.
+By default, KTX2 transcoder will be loaded from [unpkg CDN](https://unpkg.com/).
+
+```
+https://unpkg.com/three@0.134.0/examples/js/libs/basis/
+```
+
+Using Basis Universal supercompression can decrease model's texture file sizes.
+The table below compares the before and after compression of the example model below.
+
+|Model|Before Compression|After Compression (Used [gltfpack](https://github.com/zeux/meshoptimizer/tree/master/gltf)'s -tc -cc flag)|
+|---|:---:|:---:|
+|Korean Fire Extinguisher 01|5.71MB|4.13MB (-76.97%)|
+
+:::caution
+
+Note that SceneViewer AR session can't handle models with `KHR_texture_basisu` enabled.
+
+:::
+
+## Example
+<View3D src="/model/meshopt/extinguisher.glb" envmap="/texture/comfy_cafe_1k.hdr" showExampleCode={["ktxPath"]} />
+
+<License items={[
+  {
+    name: "Vintage Pocket Watch",
+    link: "https://polyhaven.com/a/vintage_pocket_watch",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Comfy Café",
+    link: "https://polyhaven.com/a/comfy_cafe",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

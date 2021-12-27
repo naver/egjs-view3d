@@ -8,7 +8,7 @@ import OptionExample from "./OptionExample";
 interface DemoOptions extends Partial<View3DOptions> {
   showARButton: boolean;
   showBbox: boolean;
-  showExampleCode: boolean;
+  showExampleCode: boolean | string[];
 }
 
 class View3D extends React.Component<DemoOptions> {
@@ -16,7 +16,9 @@ class View3D extends React.Component<DemoOptions> {
     showARButton: false,
     showBbox: false,
     showExampleCode: false,
-    dracoPath: "/lib/draco/"
+    dracoPath: "/lib/draco/",
+    ktxPath: "/lib/basis/",
+    meshoptPath: "/lib/meshopt_decoder.js"
   };
 
   private _view3D: VanillaView3D;
@@ -54,9 +56,11 @@ class View3D extends React.Component<DemoOptions> {
 
   public render() {
     const { children, showExampleCode, ...restProps } = this.props;
+
+    const optionsToInclude = Array.isArray(showExampleCode) ? showExampleCode : [];
     const view3DOptions = Object.keys(restProps)
       .filter(key => {
-        return key in VanillaView3D.prototype && restProps[key] !== View3D.defaultProps[key];
+        return key in VanillaView3D.prototype && (restProps[key] !== View3D.defaultProps[key] || optionsToInclude.includes(key));
       })
       .reduce((options, key) => {
         return { ...options, [key]: restProps[key] };

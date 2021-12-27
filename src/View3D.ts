@@ -13,7 +13,6 @@ import ModelAnimator from "./core/ModelAnimator";
 import ARManager from "./core/ARManager";
 import { ShadowOptions } from "./core/ShadowPlane";
 import View3DError from "./core/View3DError";
-import Preset from "./preset/Preset";
 import OrbitControl from "./control/OrbitControl";
 import { RotateControlOptions } from "./control/RotateControl";
 import { TranslateControlOptions } from "./control/TranslateControl";
@@ -33,6 +32,7 @@ import { GLTFLoader } from "./loaders";
 
 /**
  * @interface
+ * @see [Events](/docs/events/ready) page for detailed information
  */
 export interface View3DEvents {
   [EVENTS.READY]: EVENT_TYPES.ReadyEvent;
@@ -57,6 +57,7 @@ export interface View3DOptions {
   src: string | null;
   dracoPath: string;
   ktxPath: string;
+  meshoptPath: string | null;
   fixSkinnedBbox: boolean;
 
   // Control
@@ -76,7 +77,6 @@ export interface View3DOptions {
   envmap: string | null;
   background: number | string | null;
   exposure: number;
-  preset: Preset | null;
   shadow: boolean | Partial<ShadowOptions>;
 
   // AR
@@ -123,6 +123,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   private _src: View3DOptions["src"];
   private _dracoPath: View3DOptions["dracoPath"];
   private _ktxPath: View3DOptions["ktxPath"];
+  private _meshoptPath: View3DOptions["meshoptPath"];
   private _fixSkinnedBbox: View3DOptions["fixSkinnedBbox"];
 
   private _fov: View3DOptions["fov"];
@@ -140,7 +141,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   private _envmap: View3DOptions["envmap"];
   private _background: View3DOptions["background"];
   private _exposure: View3DOptions["exposure"];
-  private _preset: View3DOptions["preset"];
   private _shadow: View3DOptions["shadow"];
 
   private _webAR: View3DOptions["webAR"];
@@ -209,14 +209,14 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
 
   // Options Getter
   /**
-   * Source URL to fetch 3D model from
-   * For further information, check our [Tutorial](/docs/loading-model) page
+   * Source URL to fetch 3D model. `glb` / `glTF` models are supported.
    * @type {string | null}
    * @default null
    */
   public get src() { return this._src; }
   public get dracoPath() { return this._dracoPath; }
   public get ktxPath() { return this._ktxPath; }
+  public get meshoptPath() { return this._meshoptPath; }
   public get fixSkinnedBbox() { return this._fixSkinnedBbox; }
   public get fov() { return this._fov; }
   public get center() { return this._center; }
@@ -232,7 +232,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   public get envmap() { return this._envmap; }
   public get background() { return this._background; }
   public get exposure() { return this._exposure; }
-  public get preset() { return this._preset; }
   public get shadow() { return this._shadow; }
   public get webAR() { return this._webAR; }
   public get sceneViewer() { return this._sceneViewer; }
@@ -281,6 +280,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     src = null,
     dracoPath = DEFAULT.DRACO_DECODER_URL,
     ktxPath = DEFAULT.KTX_TRANSCODER_URL,
+    meshoptPath = null,
     fixSkinnedBbox = false,
     skybox = null,
     envmap = null,
@@ -292,7 +292,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     rotate = {},
     translate = {},
     zoom = {},
-    preset = null,
     exposure = 1,
     shadow = true,
     autoplay = false,
@@ -315,6 +314,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._src = src;
     this._dracoPath = dracoPath;
     this._ktxPath = ktxPath;
+    this._meshoptPath = meshoptPath;
     this._fixSkinnedBbox = fixSkinnedBbox;
 
     this._fov = fov;
@@ -332,7 +332,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._envmap = envmap;
     this._background = background;
     this._exposure = exposure;
-    this._preset = preset;
     this._shadow = shadow;
 
     this._webAR = webAR;
@@ -389,6 +388,11 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     const skybox = this._skybox;
     const envmap = this._envmap;
     const background = this._background;
+    const meshoptPath = this._meshoptPath;
+
+    if (meshoptPath && !GLTFLoader.meshoptDecoder) {
+      await GLTFLoader.setMeshoptDecoder(meshoptPath);
+    }
 
     const tasks: [Promise<Model>, ...Array<Promise<any>>] = [
       this._loadModel(this._src)
@@ -413,7 +417,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     if (this._autoplay) {
       this._autoPlayer.enable();
     }
-    this._preset?.init(this);
 
     this._initialized = true;
     this.trigger(EVENTS.READY, { target: this });

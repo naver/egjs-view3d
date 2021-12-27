@@ -8,8 +8,6 @@ import View3D, { View3DOptions, View3DEvents } from "./View3D";
 export * from "./core";
 export * from "./control";
 export * from "./loaders";
-export * from "./extra";
-export * from "./preset";
 export * from "./const/external";
 
 export type {

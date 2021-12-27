@@ -1,0 +1,47 @@
+---
+sidebar_position: 2
+---
+
+import View3D from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
+
+<OptionDescriptor type="string" defaultVal="Google CDN" />
+
+URL to [Draco](https://github.com/google/draco) decoder location.
+
+Decoder will be loaded with the given location if the glTF model has the [KHR_draco_mesh_compression](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_draco_mesh_compression/README.md) extension.
+By default, Draco decoder will be loaded from their official [CDN](https://www.gstatic.com/draco/versioned/decoders/1.4.1/).
+
+```
+https://www.gstatic.com/draco/versioned/decoders/1.4.1/
+```
+
+Draco can be useful to a model with a big mesh file size.
+In other words, if your model has a large `.bin` size compared to textures, you can apply Draco to reduce the time to load the 3D model.
+
+The table below compares the before and after compression of the example model below.
+
+|Model|Before Compression|After Compression(Used [gltfpack](https://github.com/zeux/meshoptimizer/tree/master/gltf)'s -tc -cc flag)|
+|---|:---:|:---:|
+|Korean Public Payphone 01|6.23MB|1.58MB (-74.64%)|
+
+## Example
+<View3D src="/model/draco/payphone.glb" envmap="/texture/comfy_cafe_1k.hdr" dracoPath="/lib/draco/" showExampleCode={["dracoPath"]} />
+
+<License items={[
+  {
+    name: "Korean Public Payphone 01",
+    link: "https://polyhaven.com/a/korean_public_payphone_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Comfy Café",
+    link: "https://polyhaven.com/a/comfy_cafe",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />
