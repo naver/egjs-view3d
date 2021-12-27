@@ -27,9 +27,15 @@ declare global {
 /**
  * Options for WebARSession
  * @interface
- * @property {object} [features={}] You can set additional features(see {@link https://developer.mozilla.org/en-US/docs/Web/API/XRSessionInit XRSessionInit}) with this option. `hit-test` and `dom-overlay` will always be used.
- * @property {boolean} [vertical=false] If set to true, model will be placed at the wall instead of floor. (※ This will disable the rotate control)
- * @property {HTMLElement|string|null} [overlayRoot=null] If this value is set, that element will be used as a root element for WebXR session using the `dom-overlay` feature. If set to `null`, new element will be created and appended to `.view3d-wrapper` element and will be used as a root.
+ * @extends WebARControlOptions
+ * @param {object} [features={}] Additional features(see {@link https://developer.mozilla.org/en-US/docs/Web/API/XRSessionInit XRSessionInit}) of the WebXR session.
+ * @param {HTMLElement|string|null} [overlayRoot=null] `dom-overlay`'s root element. You can set either HTMLElement or query selector for that element.
+ * @param {boolean|ARSwirlControlOptions} [rotate=true] Options for the rotate control inside the AR session. You can disable rotate control by giving `false`.
+ * @param {boolean|ARTranslateControlOptions} [translate=true] Options for the translate control inside the AR session. You can disable translate control by giving `false`.
+ * @param {boolean|ARScaleControlOptions} [scale=true] Options for the scale control inside the AR session. You can disable scale control by giving `false`.
+ * @param {FloorIndicatorOptions} [ring={}] Options for the floor ring.
+ * @param {DeadzoneCheckerOptions} [deadzone={}] Control's deadzone options.
+ * @param {"auto"|number} [initialScale="auto"] Initial scale of the model. If set to "auto", it will modify big overflowing 3D model's scale to fit the screen when it's initially displayed. This won't increase the 3D model's scale more than 1.
  */
 export interface WebARSessionOptions extends WebARControlOptions {
   features: typeof XR.EMPTY_FEATURES;
@@ -87,10 +93,14 @@ class WebARSession implements ARSession {
    * Create new instance of WebARSession
    * @param {View3D} view3D Instance of the View3D
    * @param {object} [options={}] Options
-   * @param {object} [options.features={}] You can set additional features(see {@link https://developer.mozilla.org/en-US/docs/Web/API/XRSessionInit XRSessionInit}) with this option.
-   * @param {HTMLElement|string|null} [options.overlayRoot=null] If this value is set, dom-overlay feature will be automatically added for this session. And this value will be used as dom-overlay's root element. You can set either HTMLElement or query selector for that element.
-   * @param {HTMLElement|string|null} [options.loadingEl=null] This will be used for loading indicator element, which will automatically invisible after placing 3D model by setting `visibility: hidden`. This element must be placed under `overlayRoot`. You can set either HTMLElement or query selector for that element.
-   * @param {boolean} [options.forceOverlay=false] Whether to apply `dom-overlay` feature as required. If set to false, `dom-overlay` will be optional feature.
+   * @param {object} [options.features={}] Additional features(see {@link https://developer.mozilla.org/en-US/docs/Web/API/XRSessionInit XRSessionInit}) of the WebXR session.
+   * @param {HTMLElement|string|null} [options.overlayRoot=null] `dom-overlay`'s root element. You can set either HTMLElement or query selector for that element.
+   * @param {boolean|ARSwirlControlOptions} [options.rotate=true] Options for the rotate control inside the AR session. You can disable rotate control by giving `false`.
+   * @param {boolean|ARTranslateControlOptions} [options.translate=true] Options for the translate control inside the AR session. You can disable translate control by giving `false`.
+   * @param {boolean|ARScaleControlOptions} [options.scale=true] Options for the scale control inside the AR session. You can disable scale control by giving `false`.
+   * @param {FloorIndicatorOptions} [options.ring={}] Options for the floor ring.
+   * @param {DeadzoneCheckerOptions} [options.deadzone={}] Control's deadzone options.
+   * @param {"auto"|number} [options.initialScale="auto"] Initial scale of the model. If set to "auto", it will modify big overflowing 3D model's scale to fit the screen when it's initially displayed. This won't increase the 3D model's scale more than 1.
    */
   public constructor(view3D: View3D, {
     features = XR.EMPTY_FEATURES,

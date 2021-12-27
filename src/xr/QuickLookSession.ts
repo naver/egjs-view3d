@@ -14,6 +14,16 @@ import ARSession from "./ARSession";
 
 /**
  * @interface
+ * @param {string | null} [file=null] USDZ file's location URL. If `null` is given, it will try to use current model shown on the canvas. This behavior only works when the format of the model shown is "usdz".
+ * @param {boolean} [allowsContentScaling=true] Whether to allow content scaling.
+ * @param {string | null} [canonicalWebPageURL=null] The web URL to share when the user invokes the share sheet. If `null` is given, the USDZ file will be shared.
+ * @param {string | null} [applePayButtonType=null] Type of the apple pay button in the banner. See {@link QUICK_LOOK_APPLE_PAY_BUTTON_TYPE}
+ * @param {string | null} [callToAction=null] A text that will be displayed instead of Apple Pay Button. See {@link https://developer.apple.com/documentation/arkit/adding_an_apple_pay_button_or_a_custom_action_in_ar_quick_look#3405143 Official Guide Page}
+ * @param {string | null} [checkoutTitle=null] Title of the previewed item. See {@link https://developer.apple.com/documentation/arkit/adding_an_apple_pay_button_or_a_custom_action_in_ar_quick_look#3405142 Official Guide Page}
+ * @param {string | null} [checkoutSubtitle=null] Subtitle of the previewed item. See {@link https://developer.apple.com/documentation/arkit/adding_an_apple_pay_button_or_a_custom_action_in_ar_quick_look#3405142 Official Guide Page}
+ * @param {string | null} [price=null] Price of the previewed item. See {@link https://developer.apple.com/documentation/arkit/adding_an_apple_pay_button_or_a_custom_action_in_ar_quick_look#3405142 Official Guide Page}
+ * @param {string | null} [custom=null] Custom URL to the banner HTML. See {@link https://developer.apple.com/documentation/arkit/adding_an_apple_pay_button_or_a_custom_action_in_ar_quick_look#3402837 Official Guide Page}
+ * @param {string | null} [customHeight=null] Height of the custom banner. See {@link QUICK_LOOK_CUSTOM_BANNER_SIZE}
  */
 export interface QuickLookSessionOptions {
   file: string | null;

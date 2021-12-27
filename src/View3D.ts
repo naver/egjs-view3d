@@ -318,14 +318,71 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    * @default true
    */
   public get useGrabCursor() { return this._useGrabCursor; }
+  /**
+   * Source to the HDR texture image (RGBE), which will used as the scene environment map & background.
+   * `envmap` will be ignored if this value is not `null`.
+   * @type {string | null}
+   * @default null
+   */
   public get skybox() { return this._skybox; }
+  /**
+   * Source to the HDR texture image (RGBE), which will used as the scene environment map.
+   * @type {string | null}
+   * @default null
+   */
   public get envmap() { return this._envmap; }
+  /**
+   * Color code / URL to a image to use as the background.
+   * For transparent background, use `null`. (default value)
+   * Can be enabled only when the `skybox` is `null`.
+   * @type {number | string | null}
+   * @default null
+   */
   public get background() { return this._background; }
+  /**
+   * Exposure value of the HDR envmap/skybox image.
+   * @type {number}
+   * @default 1
+   */
   public get exposure() { return this._exposure; }
+  /**
+   * Enable shadow below the model.
+   * If `true` is given, it will enable shadow with the default options.
+   * If `false` is given, it will disable the shadow.
+   * @type {boolean | ShadowOptions}
+   * @default true
+   */
   public get shadow() { return this._shadow; }
+  /**
+   * Options for the WebXR-based AR session.
+   * If `false` is given, it will disable WebXR-based AR session.
+   * @type {boolean | WebARSessionOptions}
+   * @default true
+   */
   public get webAR() { return this._webAR; }
+  /**
+   * Options for the {@link https://developers.google.com/ar/develop/java/scene-viewer Google SceneViewer} based AR session.
+   * If `false` is given, it will disable SceneViewer based AR session.
+   * See {@link https://developers.google.com/ar/develop/java/scene-viewer#supported_intent_parameters Official Page} for the parameter details.
+   * @type {boolean | SceneViewerSessionOptions}
+   * @default true
+   */
   public get sceneViewer() { return this._sceneViewer; }
+  /**
+   * Options for the {@link https://developer.apple.com/augmented-reality/quick-look/ Apple AR Quick Look} based AR session.
+   * If `false` is given, it will disable AR Quick Look based AR session.
+   * @type {boolean | QuickLookSessionOptions}
+   * @default true
+   */
   public get quickLook() { return this._quickLook; }
+  /**
+   * Priority array for the AR sessions.
+   * If the two sessions are available in one environment, the session listed earlier will be used first.
+   * If the session name is not included in this priority array, that session will be ignored.
+   * See {@link AR_SESSION_TYPE}
+   * @type {string[]}
+   * @default ["webAR", "sceneViewer", "quickLook"]
+   */
   public get arPriority() { return this._arPriority; }
   public get canvasSelector() { return this._canvasSelector; }
   /**

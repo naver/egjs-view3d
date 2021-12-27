@@ -1,0 +1,60 @@
+---
+sidebar_position: 3
+---
+
+import View3D from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
+
+<OptionDescriptor type={`boolean | QuickLookSessionOptions`} defaultVal="true" />
+
+Options for the [Apple AR Quick Look](https://developer.apple.com/augmented-reality/quick-look/) based AR session.
+If `false` is given, it will disable AR Quick Look based AR session.
+
+|Name|Type|Default|Description|
+|:---:|:---:|:---:|---|
+|file|string \| null|null|USDZ file's location URL. If `null` is given, it will try to use current model shown on the canvas. This behavior only works when the format of the model shown is "usdz".|
+|allowsContentScaling|boolean|true|Whether to allow content scaling.|
+|canonicalWebPageURL|string \| null|null|The web URL to share when the user invokes the share sheet. If `null` is given, the USDZ file will be shared.|
+|applePayButtonType|string \| null|null|Type of the apple pay button in the banner. See [QUICK_LOOK_APPLE_PAY_BUTTON_TYPE](/docs/api/QUICK_LOOK_APPLE_PAY_BUTTON_TYPE)|
+|callToAction|string \| null|null|A text that will be displayed instead of Apple Pay Button. See [Official Guide Page](https://developer.apple.com/documentation/arkit/adding_an_apple_pay_button_or_a_custom_action_in_ar_quick_look#3405143)|
+|checkoutTitle|string \| null|null|Title of the previewed item. See [Official Guide Page](https://developer.apple.com/documentation/arkit/adding_an_apple_pay_button_or_a_custom_action_in_ar_quick_look#3405142)|
+|checkoutSubtitle|string \| null|null|Subtitle of the previewed item. See [Official Guide Page](https://developer.apple.com/documentation/arkit/adding_an_apple_pay_button_or_a_custom_action_in_ar_quick_look#3405142)|
+|price|string \| null|null|Price of the previewed item. See [Official Guide Page](https://developer.apple.com/documentation/arkit/adding_an_apple_pay_button_or_a_custom_action_in_ar_quick_look#3405142)|
+|custom|string \| null|null|Custom URL to the banner HTML. See [Official Guide Page](https://developer.apple.com/documentation/arkit/adding_an_apple_pay_button_or_a_custom_action_in_ar_quick_look#3402837)|
+|customHeight|string \| null|null|Height of the custom banner. See [QUICK_LOOK_CUSTOM_BANNER_SIZE](/docs/api/QUICK_LOOK_CUSTOM_BANNER_SIZE)|
+
+## Example
+### quickLook: true (default)
+<View3D src="/model/draco/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" quickLook={true} webAR={false} sceneViewer={false} showExampleCode showARButton />
+
+### Detailed Options
+<View3D src="/model/draco/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" quickLook={{
+  title: "CUSTOM TITLE",
+  allowsContentScaling: false,
+  canonicalWebPageURL: "https://github.com/naver/egjs-view3d",
+  applePayButtonType: "subscribe",
+  callToAction: "CUSTOM BUTTON TEXT",
+  checkoutTitle: "CUSTOM TITLE TEXT",
+  checkoutSubtitle: "CUSTOM SUBTITLE TEXT",
+  price: "100$",
+  customHeight: "large"
+}} webAR={false} sceneViewer={false} showExampleCode showARButton />
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />
+
