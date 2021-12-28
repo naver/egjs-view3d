@@ -143,6 +143,7 @@ class Renderer {
     autoPlayer.update(deltaMiliSec);
 
     view3D.trigger(EVENTS.BEFORE_RENDER, {
+      type: EVENTS.BEFORE_RENDER,
       target: view3D
     });
 
@@ -150,6 +151,7 @@ class Renderer {
     this._renderer.render(scene.root, camera.threeCamera);
 
     view3D.trigger(EVENTS.RENDER, {
+      type: EVENTS.RENDER,
       target: view3D
     });
   };

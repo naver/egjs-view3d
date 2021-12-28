@@ -1,19 +1,26 @@
 ---
-sidebar_position: 1
+sidebar_position: 8
 ---
 
 import View3D from "@site/src/components/View3D";
 import License from "@site/src/components/License";
 
-An event that fires when View3D is initialized
-This will be called once after the first 3D model is loaded
+Emitted when [WebARSession](/docs/api/WebARSession) is started.
+Not available in SceneViewer or AR Quick Look.
 
 |Property|Type|Description|
 |:---:|:---:|---|
 |type|string|The type of event|
 |target|[View3D](/docs/api/View3D)|An instance of View3D that triggered this event|
+|session|[WebARSession](/docs/api/WebARSession)|An instance of WebARSession that triggered this event|
 
-<View3D src="/model/draco/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" clickToLoad showEventsTriggered={["ready", "load", "modelChange"]} />
+<View3D
+  src="/model/draco/alarm.glb"
+  iosSrc="/model/usdz/alarm.usdz"
+  envmap="/texture/artist_workshop_1k.hdr"
+  webAR={{ overlayRoot: ".view3d-events-overlay" }}
+  showARButton
+  showEventsTriggered={["arStart", "arEnd", "arModelPlaced"]} />
 
 <License items={[
   {

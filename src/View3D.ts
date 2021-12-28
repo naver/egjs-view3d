@@ -208,7 +208,17 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   public get ar() { return this._arManager; }
 
   // Internal State Getter
+  /**
+   * Root(Wrapper) element of View3D that given in the constructor
+   * @type {HTMLElement}
+   * @readonly
+   */
   public get rootEl() { return this._rootEl; }
+  /**
+   * Whether the View3D is initialized. This is set to `true` just before triggering "ready" event.
+   * @type {boolean}
+   * @readonly
+   */
   public get initialized() { return this._initialized; }
 
   // Options Getter
@@ -583,7 +593,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     }
 
     this._initialized = true;
-    this.trigger(EVENTS.READY, { target: this });
+    this.trigger(EVENTS.READY, { type: EVENTS.READY, target: this });
   }
 
   /**
@@ -597,7 +607,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._camera.resize(newSize);
     this._control.resize(newSize);
 
-    this.trigger(EVENTS.RESIZE, { ...newSize, target: this });
+    this.trigger(EVENTS.RESIZE, { ...newSize, type: EVENTS.RESIZE, target: this });
   }
 
   /**
@@ -627,6 +637,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     const model = await loader.load(src);
 
     this.trigger(EVENTS.LOAD, {
+      type: EVENTS.LOAD,
       target: this,
       model
     });
@@ -669,6 +680,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     }
 
     this.trigger(EVENTS.MODEL_CHANGE, {
+      type: EVENTS.MODEL_CHANGE,
       target: this,
       model
     });

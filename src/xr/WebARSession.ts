@@ -187,7 +187,7 @@ class WebARSession implements ARSession {
       renderer.stopAnimationLoop();
       renderer.setAnimationLoop(renderer.defaultRenderLoop);
 
-      view3D.trigger(EVENTS.AR_END, { target: view3D, session: this });
+      view3D.trigger(EVENTS.AR_END, { target: view3D, type: EVENTS.AR_END, session: this });
     };
 
     session.addEventListener("end", onSessionEnd, { once: true });
@@ -224,7 +224,7 @@ class WebARSession implements ARSession {
         size
       };
 
-      view3D.trigger(EVENTS.BEFORE_RENDER, { target: view3D });
+      view3D.trigger(EVENTS.BEFORE_RENDER, { type: EVENTS.BEFORE_RENDER, target: view3D });
 
       if (!this._modelPlaced) {
         this._initModelPosition(ctx);
@@ -235,7 +235,7 @@ class WebARSession implements ARSession {
       }
     });
 
-    view3D.trigger(EVENTS.AR_START, { target: view3D, session: this });
+    view3D.trigger(EVENTS.AR_START, { type: EVENTS.AR_START, target: view3D, session: this });
   }
 
   /**
@@ -323,7 +323,7 @@ class WebARSession implements ARSession {
     hitTest.destroy();
 
     this._modelPlaced = true;
-    view3D.trigger(EVENTS.AR_MODEL_PLACED, { target: view3D, session: this, model });
+    view3D.trigger(EVENTS.AR_MODEL_PLACED, { type: EVENTS.AR_MODEL_PLACED, target: view3D, session: this, model });
 
     void control.init({
       model,

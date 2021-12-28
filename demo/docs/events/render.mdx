@@ -1,19 +1,18 @@
 ---
-sidebar_position: 1
+sidebar_position: 6
 ---
 
 import View3D from "@site/src/components/View3D";
 import License from "@site/src/components/License";
 
-An event that fires when View3D is initialized
-This will be called once after the first 3D model is loaded
+An event that fires after rendering a frame.
 
 |Property|Type|Description|
 |:---:|:---:|---|
 |type|string|The type of event|
 |target|[View3D](/docs/api/View3D)|An instance of View3D that triggered this event|
 
-<View3D src="/model/draco/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" clickToLoad showEventsTriggered={["ready", "load", "modelChange"]} />
+<View3D src="/model/draco/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" showEventsTriggered={["render"]} />
 
 <License items={[
   {

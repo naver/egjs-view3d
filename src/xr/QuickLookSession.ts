@@ -159,6 +159,7 @@ class QuickLookSession implements ARSession, OptionGetters<QuickLookSessionOptio
         // User tapped either Apple pay button / Custom action button
         view3D.trigger(EVENTS.QUICK_LOOK_TAP, {
           ...evt,
+          type: EVENTS.QUICK_LOOK_TAP,
           target: view3D
         });
       }

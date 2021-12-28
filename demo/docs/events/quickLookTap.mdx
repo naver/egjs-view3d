@@ -1,19 +1,21 @@
----
-sidebar_position: 1
----
-
 import View3D from "@site/src/components/View3D";
 import License from "@site/src/components/License";
 
-An event that fires when View3D is initialized
-This will be called once after the first 3D model is loaded
+An event that fires when user clicked the Apple pay button or custom action button.
+- https://developer.apple.com/documentation/arkit/adding_an_apple_pay_button_or_a_custom_action_in_ar_quick_look#3405186
 
 |Property|Type|Description|
 |:---:|:---:|---|
 |type|string|The type of event|
 |target|[View3D](/docs/api/View3D)|An instance of View3D that triggered this event|
 
-<View3D src="/model/draco/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" clickToLoad showEventsTriggered={["ready", "load", "modelChange"]} />
+<View3D
+  src="/model/draco/alarm.glb"
+  iosSrc="/model/usdz/alarm.usdz"
+  envmap="/texture/artist_workshop_1k.hdr"
+  quickLook={{ checkoutTitle: "TITLE", checkoutSubtitle: "SUBTITLE", callToAction: "Trigger Event", price: "4$" }}
+  showARButton
+  showEventsTriggered={["quickLookTap"]} />
 
 <License items={[
   {
