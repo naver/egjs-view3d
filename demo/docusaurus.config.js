@@ -82,7 +82,7 @@ const config = {
           },
           {
             type: "doc",
-            docId: "ar/WebXR",
+            docId: "ar/WebXR - Floor",
             label: "AR",
             position: "left"
           },
@@ -127,7 +127,7 @@ const config = {
             items: [
               {
                 label: "WebXR",
-                to: "docs/ar/WebXR"
+                to: "docs/ar/WebXR - Floor"
               }
             ]
           },

@@ -1,0 +1,77 @@
+---
+title: ⚡ Quick Start
+id: quick-start
+slug: /quick-start
+sidebar_position: 2
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+## DOM Structure
+```html
+<div class="view3d-wrapper view3d-square">
+  <canvas class="view3d-canvas"></canvas>
+</div>
+```
+
+The class `view3d-square`(or `view3d-1by1`) will set the height of canvas element same to its width.
+You can use one of our other pre-defined classes to set responsive canvas height with fixed ratio.
+
+```
+view3d-square
+view3d-1by1
+view3d-5by4
+view3d-4by3
+view3d-3by2
+view3d-5by3
+view3d-16by9
+view3d-2by1
+view3d-3by1
+view3d-4by5
+view3d-3by4
+view3d-2by3
+view3d-3by5
+view3d-9by16
+view3d-1by2
+view3d-1by3
+```
+
+You can also can set canvas width/height without ratio class but with CSS.
+```css
+.view3d-wrapper {
+  width: 100%;
+  height: 100vh;
+}
+```
+
+## Setup Script & Styles
+<Tabs
+  groupId="quick-start"
+  defaultValue="bundler"
+  lazy={true}
+  values={[
+    { label: "With bundlers", value: "bundler" },
+    { label: "Without bundlers", value: "non-bundler" }
+  ]}>
+  <TabItem value="bundler">
+
+```js
+import View3D from "@egjs/view3d";
+import "@egjs/view3d/css/bundle";
+// or import "@egjs/view3d/css"; if you don't use any plugins
+
+const view3D = new View3D("#view3d", {
+  // Options
+})
+```
+
+  </TabItem>
+  <TabItem value="non-bundler">
+
+```js
+import View3D from "@egjs/view3d";
+```
+
+  </TabItem>
+</Tabs>
