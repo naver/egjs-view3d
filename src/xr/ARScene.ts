@@ -50,36 +50,20 @@ class ARScene {
     modelFixed.add(originalScene.fixedObjects);
 
     // Copy environment
-    root.environment = originalScene.root.environment?.clone() ?? null;
+    root.environment = originalScene.root.environment;
 
     // Start with root hidden, as floor should be detected first
     this.hideModel();
   }
 
   public destroy(view3D: View3D) {
-    const root = this._root;
-    const modelRoot = this._modelRoot;
     const modelMovable = this._modelMovable;
     const modelFixed = this._modelFixed;
-    const arRoot = this._arRoot;
     const originalScene = view3D.scene;
 
     [...modelMovable.children, ...modelFixed.children].forEach(child => {
       originalScene.root.add(child);
     });
-
-    // Reset matrix
-    root.matrix.identity();
-    root.matrix.decompose(root.position, root.quaternion, root.scale);
-    root.environment = null;
-    modelRoot.matrix.identity();
-    modelRoot.matrix.decompose(root.position, root.quaternion, root.scale);
-    modelMovable.matrix.identity();
-    modelMovable.matrix.decompose(root.position, root.quaternion, root.scale);
-    modelFixed.matrix.identity();
-    modelFixed.matrix.decompose(root.position, root.quaternion, root.scale);
-    arRoot.matrix.identity();
-    arRoot.matrix.decompose(root.position, root.quaternion, root.scale);
   }
 
   /**

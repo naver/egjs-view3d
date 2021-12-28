@@ -29,10 +29,10 @@ See [Official Page](https://developers.google.com/ar/develop/java/scene-viewer#s
 
 ## Example
 ### sceneViewer: true (default)
-<View3D src="/model/draco/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" sceneViewer={true} webAR={false} quickLook={false} showExampleCode showARButton />
+<View3D src="/model/draco/alarm.glb" iosSrc="/model/usdz/alarm.usdz" envmap="/texture/artist_workshop_1k.hdr" sceneViewer={true} webAR={false} showExampleCode showARButton />
 
 ### Detailed Options
-<View3D src="/model/draco/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" sceneViewer={{
+<View3D src="/model/draco/alarm.glb" iosSrc="/model/usdz/alarm.usdz" envmap="/texture/artist_workshop_1k.hdr" sceneViewer={{
   title: "CUSTOM TITLE",
   link: "https://github.com/naver/egjs-view3d",
   resizable: true,
@@ -40,7 +40,7 @@ See [Official Page](https://developers.google.com/ar/develop/java/scene-viewer#s
   disableOcclusion: true,
   initialScale: "2",
   shareText: "CUSTOM SHARE TEXT"
-}} webAR={false} quickLook={false} showExampleCode showARButton />
+}} webAR={false} showExampleCode showARButton />
 
 <License items={[
   {

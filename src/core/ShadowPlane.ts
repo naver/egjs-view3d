@@ -39,6 +39,8 @@ class ShadowPlane implements OptionGetters<ShadowOptions> {
   private _mesh: THREE.Mesh;
   private _light: THREE.DirectionalLight;
   private _maxHardness: number;
+  private _modelRadius: number;
+  private _baseLightPos: THREE.Vector3;
 
   /**
    * Shadow plane mesh
@@ -104,6 +106,8 @@ class ShadowPlane implements OptionGetters<ShadowOptions> {
     this._material = new THREE.ShadowMaterial({ opacity, fog: false });
     this._mesh = new THREE.Mesh(this._geometry, this._material);
     this._light = new THREE.DirectionalLight();
+    this._baseLightPos = new THREE.Vector3();
+    this._modelRadius = 0;
 
     const mesh = this._mesh;
     mesh.rotateX(-Math.PI / 2);
@@ -128,6 +132,27 @@ class ShadowPlane implements OptionGetters<ShadowOptions> {
   public update(model: Model) {
     this._updatePlane(model);
     this._updateLightPosition(model);
+    this.updateShadow();
+  }
+
+  public updateShadow(worldScale: number = 1) {
+    const light = this._light;
+    const scale = 1.5;
+    const shadowCam = light.shadow.camera;
+    const radius = this._modelRadius;
+
+    light.position.copy(this._baseLightPos.clone().multiplyScalar(worldScale));
+
+    const camSize = scale * worldScale * radius;
+
+    shadowCam.near = 0;
+    shadowCam.far = MAX_SAFE_INTEGER;
+    shadowCam.left = -camSize;
+    shadowCam.right = camSize;
+    shadowCam.top = camSize;
+    shadowCam.bottom = -camSize;
+
+    shadowCam.updateProjectionMatrix();
   }
 
   private _updateSoftnessLevel() {
@@ -151,24 +176,15 @@ class ShadowPlane implements OptionGetters<ShadowOptions> {
   }
 
   private _updateLightPosition(model: Model) {
-    const light = this._light;
-    const scale = 1.5;
-    const shadowCam = light.shadow.camera;
     const yaw = this._yaw;
     const pitch = this._pitch;
     const boundingSphere = model.bbox.getBoundingSphere(new THREE.Sphere());
     const radius = boundingSphere.radius;
 
-    const newPosition = getRotatedPosition(radius, yaw, 90 - pitch);
-
-    light.position.copy(newPosition);
-
-    shadowCam.near = 0;
-    shadowCam.far = MAX_SAFE_INTEGER;
-    shadowCam.left = -scale * radius;
-    shadowCam.right = scale * radius;
-    shadowCam.top = scale * radius;
-    shadowCam.bottom = -scale * radius;
+    // Added AR hover height(0.1) as offset
+    const newPosition = getRotatedPosition(2 * radius + 0.1, yaw, 90 - pitch);
+    this._baseLightPos.copy(newPosition);
+    this._modelRadius = radius;
   }
 }
 

@@ -91,6 +91,7 @@ class FloorIndicator {
     const merged = new THREE.Group();
 
     merged.add(ring, reticle, arrow);
+    merged.position.setY(0.0001); // Set Y higher than shadow plane
 
     this._mesh = merged;
     this._ring = ring;

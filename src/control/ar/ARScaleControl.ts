@@ -20,7 +20,7 @@ import { WebARControlOptions } from "./WebARControl";
  * Options for {@link ARScaleControl}
  * @interface
  * @property {number} [min=0.05] Minimum scale, default is 0.05(5%)
- * @property {number} [max=2] Maximum scale, default is 2(200%)
+ * @property {number} [max=2.5] Maximum scale, default is 2.5(250%)
  */
 export interface ARScaleControlOptions {
   min: number;
@@ -60,11 +60,11 @@ class ARScaleControl implements ARControl {
    * Create new instance of ARScaleControl
    * @param {ARScaleControlOptions} [options={}] Options
    * @param {number} [options.min=0.05] Minimum scale, default is 0.05(5%)
-   * @param {number} [options.max=2] Maximum scale, default is 2(200%)
+   * @param {number} [options.max=5] Maximum scale, default is 5(500%)
    */
   public constructor({
     min = 0.05,
-    max = 2
+    max = 5
   }: Partial<ARScaleControlOptions> = {}) {
     this._motion = new Motion({ duration: 0, range: { min, max } });
     this._motion.reset(1); // default scale is 1(100%)
@@ -158,7 +158,7 @@ class ARScaleControl implements ARControl {
     this._updateUIPosition(ctx);
   }
 
-  public update({ scene }: XRRenderContext, deltaTime: number) {
+  public update({ view3D, scene }: XRRenderContext, deltaTime: number) {
     if (!this._enabled || !this._active) return;
 
     const motion = this._motion;
@@ -168,6 +168,7 @@ class ARScaleControl implements ARControl {
     this._ui.updateScale(this._scaleMultiplier);
 
     scene.setModelScale(this._scaleMultiplier);
+    view3D.scene.shadowPlane.updateShadow(this._scaleMultiplier);
   }
 
   private _updateUIPosition({ view3D, scene, xrCam, vertical }: XRRenderContext) {

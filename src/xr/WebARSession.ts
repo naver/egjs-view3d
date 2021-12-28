@@ -178,6 +178,7 @@ class WebARSession implements ARSession {
         view3D.rootEl.removeChild(overlayEl);
       }
       domOverlay.destroy();
+      view3D.scene.shadowPlane.updateShadow();
 
       // Restore original values
       threeRenderer.setPixelRatio(originalPixelRatio);
@@ -321,7 +322,6 @@ class WebARSession implements ARSession {
     // Don't need hit-test anymore, as we're having new one in WebARControl
     hitTest.destroy();
 
-    // this._domOverlay?.hideLoading();
     this._modelPlaced = true;
     view3D.trigger(EVENTS.AR_MODEL_PLACED, { target: view3D, session: this, model });
 

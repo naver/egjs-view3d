@@ -55,6 +55,7 @@ export interface View3DEvents {
 export interface View3DOptions {
   // Model
   src: string | null;
+  iosSrc: string | null;
   dracoPath: string;
   ktxPath: string;
   meshoptPath: string | null;
@@ -122,6 +123,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
 
   // Options
   private _src: View3DOptions["src"];
+  private _iosSrc: View3DOptions["iosSrc"];
   private _dracoPath: View3DOptions["dracoPath"];
   private _ktxPath: View3DOptions["ktxPath"];
   private _meshoptPath: View3DOptions["meshoptPath"];
@@ -216,6 +218,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    * @default null
    */
   public get src() { return this._src; }
+  /**
+   * Source URL to fetch 3D model in iOS AR Quick Look. `usdz` models are supported.
+   * @type {string | null}
+   * @default null
+   */
+  public get iosSrc() { return this._iosSrc; }
   /**
    * URL to {@link https://github.com/google/draco Draco} decoder location.
    * @type {string}
@@ -384,6 +392,11 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    * @default ["webAR", "sceneViewer", "quickLook"]
    */
   public get arPriority() { return this._arPriority; }
+  /**
+   * CSS Selector for the canvas element.
+   * @type {string}
+   * @default "canvas"
+   */
   public get canvasSelector() { return this._canvasSelector; }
   /**
    * Call {@link View3D#init init()} automatically when creating View3D's instance
@@ -425,6 +438,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    */
   public constructor(root: string | HTMLElement, {
     src = null,
+    iosSrc = null,
     dracoPath = DEFAULT.DRACO_DECODER_URL,
     ktxPath = DEFAULT.KTX_TRANSCODER_URL,
     meshoptPath = null,
@@ -460,6 +474,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
 
     // Bind options
     this._src = src;
+    this._iosSrc = iosSrc;
     this._dracoPath = dracoPath;
     this._ktxPath = ktxPath;
     this._meshoptPath = meshoptPath;

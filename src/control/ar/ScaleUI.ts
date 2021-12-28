@@ -95,7 +95,8 @@ class ScaleUI {
       uiGeometry,
       new THREE.MeshBasicMaterial({
         map: this._texture,
-        transparent: true
+        transparent: true,
+        depthTest: false
       }),
     );
 

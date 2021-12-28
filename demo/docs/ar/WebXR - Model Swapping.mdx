@@ -4,14 +4,21 @@ import ModelSwapper from "@site/src/components/ModelSwapper";
 <>
   {(() => {
     let ref = React.createRef();
-    return (<View3D src="/model/draco/alarm.glb"
+    return (<View3D
+      src="/model/draco/alarm.glb"
+      iosSrc="/model/usdz/alarm.usdz"
       ref={ref}
+      envmap="/texture/artist_workshop_1k.hdr"
       webAR={{ overlayRoot: ".view3d-ar-overlay" }}
       sceneViewer={false}
       quickLook={false}
       showARButton>
       <div className="view3d-ar-overlay">
-        <ModelSwapper view3DRef={ref} models={["/model/bunny.glb", "/model/clock/scene.gltf", "/model/suzanne.glb"]}  />
+        <ModelSwapper view3DRef={ref} models={[
+          { src: "/model/draco/alarm.glb", name: "Alarm Clock" },
+          { src: "/model/draco/payphone.glb", name: "Payphone" },
+          { src: "/model/draco/plant.glb", name: "Plant" }
+        ]}  />
       </div>
     </View3D>);
   })()}

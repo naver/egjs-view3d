@@ -57,7 +57,7 @@ export const EMPTY_FEATURES: {
 } = {};
 
 export const SCENE_VIEWER = {
-  INTENT_AR_CORE: (params: string, fallback: string | null) => `intent://arvr.google.com/scene-viewer/1.1?${params}#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;${fallback ? `S.browser_fallback_url=${fallback};` : ""}end;`,
-  INTENT_SEARCHBOX: (params: string, fallback: string) => `intent://arvr.google.com/scene-viewer/1.1?${params}#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;${fallback ? `S.browser_fallback_url=${fallback};` : ""}end;`,
+  INTENT_AR_CORE: (params: string, fallback: string | null) => `intent://arvr.google.com/scene-viewer/1.2?${params}#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;${fallback ? `S.browser_fallback_url=${fallback};` : ""}end;`,
+  INTENT_SEARCHBOX: (params: string, fallback: string) => `intent://arvr.google.com/scene-viewer/1.2?${params}#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;${fallback ? `S.browser_fallback_url=${fallback};` : ""}end;`,
   FALLBACK_DEFAULT: (params: string) => `https://arvr.google.com/scene-viewer?${params}`
 } as const;

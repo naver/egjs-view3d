@@ -14,7 +14,6 @@ import ARSession from "./ARSession";
 
 /**
  * @interface
- * @param {string | null} [file=null] USDZ file's location URL. If `null` is given, it will try to use current model shown on the canvas. This behavior only works when the format of the model shown is "usdz".
  * @param {boolean} [allowsContentScaling=true] Whether to allow content scaling.
  * @param {string | null} [canonicalWebPageURL=null] The web URL to share when the user invokes the share sheet. If `null` is given, the USDZ file will be shared.
  * @param {string | null} [applePayButtonType=null] Type of the apple pay button in the banner. See {@link QUICK_LOOK_APPLE_PAY_BUTTON_TYPE}
@@ -26,7 +25,6 @@ import ARSession from "./ARSession";
  * @param {string | null} [customHeight=null] Height of the custom banner. See {@link QUICK_LOOK_CUSTOM_BANNER_SIZE}
  */
 export interface QuickLookSessionOptions {
-  file: string | null;
   allowsContentScaling: boolean;
   canonicalWebPageURL: string | null;
   applePayButtonType: LiteralUnion<ValueOf<typeof QUICK_LOOK_APPLE_PAY_BUTTON_TYPE>, string> | null;
@@ -56,7 +54,6 @@ class QuickLookSession implements ARSession, OptionGetters<QuickLookSessionOptio
 
   // Options
   // As those values are referenced only while entering the session, so I'm leaving this values public
-  public file: QuickLookSessionOptions["file"];
   public allowsContentScaling: QuickLookSessionOptions["allowsContentScaling"];
   public canonicalWebPageURL: QuickLookSessionOptions["canonicalWebPageURL"];
   public applePayButtonType: QuickLookSessionOptions["applePayButtonType"];
@@ -73,7 +70,6 @@ class QuickLookSession implements ARSession, OptionGetters<QuickLookSessionOptio
    * Create new instance of QuickLookSession
    * @param {View3D} view3D Instance of the View3D
    * @param {object} [options={}] Quick Look options
-   * @param {string | null} [options.file=null] USDZ file's location URL. If `null` is given, it will try to use current model shown on the canvas. This behavior only works when the format of the model shown is "usdz".
    * @param {boolean} [options.allowsContentScaling=true] Whether to allow content scaling.
    * @param {string | null} [options.canonicalWebPageURL=null] The web URL to share when the user invokes the share sheet. If `null` is given, the USDZ file will be shared.
    * @param {string | null} [options.applePayButtonType=null] Type of the apple pay button in the banner. See {@link QUICK_LOOK_APPLE_PAY_BUTTON_TYPE}
@@ -85,7 +81,6 @@ class QuickLookSession implements ARSession, OptionGetters<QuickLookSessionOptio
    * @param {string | null} [options.customHeight=null] Height of the custom banner. See {@link QUICK_LOOK_CUSTOM_BANNER_SIZE}
    */
   public constructor(view3D: View3D, {
-    file = null,
     allowsContentScaling = true,
     canonicalWebPageURL = null,
     applePayButtonType = null,
@@ -98,7 +93,6 @@ class QuickLookSession implements ARSession, OptionGetters<QuickLookSessionOptio
   }: Partial<QuickLookSessionOptions> = {}) {
     this._view3D = view3D;
 
-    this.file = file;
     this.allowsContentScaling = allowsContentScaling;
     this.canonicalWebPageURL = canonicalWebPageURL;
     this.applePayButtonType = applePayButtonType;
@@ -115,11 +109,10 @@ class QuickLookSession implements ARSession, OptionGetters<QuickLookSessionOptio
    */
   public enter() {
     const view3D = this._view3D;
-    const model = view3D.model!;
-    const file = this.file;
+    const file = view3D.iosSrc;
 
     if (!file) {
-      return Promise.reject(new View3DError(ERROR.MESSAGES.FILE_NOT_SUPPORTED(this.file ?? model.src), ERROR.CODES.FILE_NOT_SUPPORTED));
+      return Promise.reject(new View3DError(ERROR.MESSAGES.FILE_NOT_SUPPORTED(`${file}`), ERROR.CODES.FILE_NOT_SUPPORTED));
     }
 
     const canonicalWebPageURL = this.canonicalWebPageURL;

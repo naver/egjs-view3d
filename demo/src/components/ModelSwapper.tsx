@@ -3,7 +3,7 @@ import View3D from "./View3D";
 
 class ModelSwapper extends React.Component<{
   view3DRef: React.RefObject<View3D>;
-  models: string[];
+  models: Array<{ src: string; name: string }>;
 }> {
   public render() {
     const { models } = this.props;
@@ -15,8 +15,8 @@ class ModelSwapper extends React.Component<{
 
           if (!view3D) return;
 
-          view3D.view3D.load(model);
-        }}>{ model }</div>)
+          view3D.view3D.load(model.src);
+        }}>{ model.name }</div>)
       }</div>
     );
   }
