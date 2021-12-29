@@ -3,7 +3,7 @@
  * egjs projects are licensed under the MIT license
  */
 
-export { CODES as ERROR_CODES } from "./error";
+export { ERROR_CODES } from "./error";
 
 export const AUTO = "auto";
 

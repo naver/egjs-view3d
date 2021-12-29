@@ -123,15 +123,6 @@ const config = {
             ]
           },
           {
-            title: "AR",
-            items: [
-              {
-                label: "WebXR",
-                to: "docs/ar/WebXR - Floor"
-              }
-            ]
-          },
-          {
             title: "Demo",
             items: [
               {

@@ -16,7 +16,7 @@ import { toPowerOfTwo } from "../../utils";
  * @property {number} [font="64px sans-serif"] UI's font. See {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/font CanvasRenderingContext2D#font}
  * @property {number} [color="white"] UI's font color. See {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle CanvasRenderingContext2D#fillStyle}
  */
-export interface ScaleUIOption {
+export interface ScaleUIOptions {
   width: number;
   padding: number;
   offset: number;
@@ -56,7 +56,7 @@ class ScaleUI {
 
   /**
    * Create new instance of ScaleUI
-   * @param {ScaleUIOption} [options={}] Options
+   * @param {ScaleUIOptions} [options={}] Options
    */
   public constructor({
     width = 0.1,
@@ -64,7 +64,7 @@ class ScaleUI {
     offset = 0.05,
     font = "64px sans-serif",
     color = "white"
-  }: Partial<ScaleUIOption> = {}) {
+  }: Partial<ScaleUIOptions> = {}) {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d")!;
 

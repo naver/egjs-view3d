@@ -10,7 +10,7 @@ import SceneViewerSession from "../xr/SceneViewerSession";
 import QuickLookSession from "../xr/QuickLookSession";
 import { getObjectOption } from "../utils";
 import { AR_SESSION_TYPE, EVENTS } from "../const/external";
-import * as ERROR from "../const/error";
+import ERROR from "../const/error";
 
 const sessionCtors = {
   [AR_SESSION_TYPE.WEBXR]: WebARSession,

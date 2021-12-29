@@ -32,7 +32,7 @@
 		"printsizes": "print-sizes ./dist --exclude=\\.map",
 		"lint": "eslint 'src/**/*.ts'",
 		"lint:test": "eslint 'test/unit/**/*.ts'",
-		"docs:build": "jsdoc-to-mdx -c ./jsdoc-to-mdx.json",
+		"docs:build": "rm -rf ./demo/docs/api && jsdoc-to-mdx -c ./jsdoc-to-mdx.json",
 		"demo:build": "npm run build && cpx 'dist/**/*' demo/release/latest/dist --clean",
 		"demo:prebuild-version": "cpx 'dist/**/*' demo/release/$npm_package_version/dist --clean && cpx 'docs/**/*' demo/release/$npm_package_version/docs --clean",
 		"demo:prebuild-latest": "cpx 'dist/**/*' demo/release/latest/dist --clean && cpx 'docs/**/*' demo/release/latest/docs --clean",

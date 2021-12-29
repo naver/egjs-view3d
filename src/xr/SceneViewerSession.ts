@@ -8,7 +8,7 @@ import View3DError from "../core/View3DError";
 import { IS_ANDROID } from "../const/browser";
 import { AR_SESSION_TYPE, AUTO } from "../const/external";
 import { SCENE_VIEWER_MODE } from "../const/external";
-import * as ERROR from "../const/error";
+import ERROR from "../const/error";
 import * as XR from "../const/xr";
 import { toBooleanString } from "../utils";
 import { LiteralUnion, OptionGetters, ValueOf } from "../type/utils";

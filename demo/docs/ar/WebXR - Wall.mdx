@@ -3,6 +3,7 @@ sidebar_position: 2
 ---
 
 import View3D from "@site/src/components/View3D";
+import License from "@site/src/components/License";
 
 <View3D
   src="/model/draco/payphone.glb"
@@ -10,5 +11,22 @@ import View3D from "@site/src/components/View3D";
   envmap="/texture/artist_workshop_1k.hdr"
   webAR={{ vertical: true }}
   sceneViewer={{ vertical: true }}
-  quickLook={{ file: "/model/bunny.usdz" }}
+  showExampleCode
   showARButton />
+
+<License items={[
+  {
+    name: "Korean Public Payphone 01",
+    link: "https://polyhaven.com/a/korean_public_payphone_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

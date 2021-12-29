@@ -6,7 +6,7 @@ import TranslateControl from "~/controls/TranslateControl";
 import DistanceControl from "~/controls/DistanceControl";
 import View3DError from "~/View3DError";
 import Camera from "~/core/camera/Camera";
-import * as ERROR from "~/consts/error";
+import ERROR from "~/consts/error";
 
 describe("OrbitControl", () => {
   describe("Initial states", () => {

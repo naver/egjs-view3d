@@ -1,6 +1,8 @@
 import View3D from "@site/src/components/View3D";
 import ModelSwapper from "@site/src/components/ModelSwapper";
 
+This kind of interaction is only available in the [WebARSession](/docs/api/WebARSession)
+
 <>
   {(() => {
     let ref = React.createRef();
@@ -12,6 +14,7 @@ import ModelSwapper from "@site/src/components/ModelSwapper";
       webAR={{ overlayRoot: ".view3d-ar-overlay" }}
       sceneViewer={false}
       quickLook={false}
+      showExampleCode
       showARButton>
       <div className="view3d-ar-overlay">
         <ModelSwapper view3DRef={ref} models={[

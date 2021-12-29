@@ -2,7 +2,7 @@ import Sinon, * as sinon from "sinon";
 
 import AutoControl from "~/controls/AutoControl";
 import View3DError from "~/View3DError";
-import * as ERROR from "~/consts/error";
+import ERROR from "~/consts/error";
 import * as BROWSER from "~/consts/browser";
 
 describe("AutoControl", () => {

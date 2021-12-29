@@ -26,3 +26,11 @@
 html[data-theme='dark'] .docusaurus-highlight-code-line {
   background-color: rgba(0, 0, 0, 0.3);
 }
+
+html[data-theme='dark'] {
+  --ifm-background-color: rgb(36, 37, 38);
+}
+
+html[data-theme='dark'] .navbar {
+  --ifm-navbar-shadow: 0 1px 2px 0 rgba(255, 255, 255, 0.1);
+}

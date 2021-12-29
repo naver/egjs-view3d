@@ -7,7 +7,7 @@ import View3DError from "../core/View3DError";
 import { IS_IOS } from "../const/browser";
 import { QUICK_LOOK_SUPPORTED } from "../const/xr";
 import { AR_SESSION_TYPE, EVENTS, QUICK_LOOK_APPLE_PAY_BUTTON_TYPE, QUICK_LOOK_CUSTOM_BANNER_SIZE } from "../const/external";
-import * as ERROR from "../const/error";
+import ERROR from "../const/error";
 import { LiteralUnion, OptionGetters, ValueOf } from "../type/utils";
 
 import ARSession from "./ARSession";

@@ -93,12 +93,21 @@ class GLTFLoader {
    * @returns Promise that resolves {@link Model}
    */
   public loadFromFiles(files: File[]): Promise<Model> {
+    const view3D = this._view3D;
+    const loader = this._loader;
     const objectURLs: string[] = [];
     const revokeURLs = () => {
       objectURLs.forEach(url => {
         URL.revokeObjectURL(url);
       });
     };
+
+    dracoLoader.setDecoderPath(view3D.dracoPath);
+    ktx2Loader.setTranscoderPath(view3D.ktxPath);
+
+    if (GLTFLoader.meshoptDecoder) {
+      loader.setMeshoptDecoder(GLTFLoader.meshoptDecoder);
+    }
 
     return new Promise((resolve, reject) => {
       if (files.length <= 0) {
@@ -137,10 +146,9 @@ class GLTFLoader {
         return fileURL;
       });
 
-      const loader = this._loader;
       loader.manager = manager;
       loader.load(gltfURL, gltf => {
-        const model = this._parseToModel(gltf, gltfURL);
+        const model = this._parseToModel(gltf, gltfFile.name);
         resolve(model);
         revokeURLs();
       }, undefined, err => {

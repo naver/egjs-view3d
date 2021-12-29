@@ -5,7 +5,6 @@
 
 /**
  * Error codes of {@link View3DError}
- * @name ERROR_CODES
  * @type object
  * @property {number} WRONG_TYPE 0
  * @property {number} ELEMENT_NOT_FOUND 1
@@ -17,7 +16,7 @@
  * @property {number} FILE_NOT_SUPPORTED 7
  * @property {number} NOT_INITIALIZED 8
  */
-export const CODES: {
+export const ERROR_CODES: {
   [key in keyof typeof MESSAGES]: number;
 } = {
   WRONG_TYPE: 0,
@@ -41,4 +40,9 @@ export const MESSAGES = {
   FORMAT_NOT_SUPPORTED: (format: string) => `Given format "${format}" is not supported or invalid`,
   FILE_NOT_SUPPORTED: (src: string) => `Given file "${src}" is not supported.`,
   NOT_INITIALIZED: "View3D is not initialized yet"
+};
+
+export default {
+  CODES: ERROR_CODES,
+  MESSAGES
 };

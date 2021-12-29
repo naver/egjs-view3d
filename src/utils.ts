@@ -6,7 +6,7 @@
 import * as THREE from "three";
 
 import View3DError from "./core/View3DError";
-import * as ERROR from "./const/error";
+import ERROR from "./const/error";
 import { NoBoolean } from "./type/utils";
 
 export const getNullableElement = (el: HTMLElement | string | null, parent?: HTMLElement): HTMLElement | null => {

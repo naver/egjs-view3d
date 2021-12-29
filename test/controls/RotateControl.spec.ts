@@ -2,7 +2,7 @@ import * as sinon from "sinon";
 
 import RotateControl from "~/controls/RotateControl";
 import View3DError from "~/View3DError";
-import * as ERROR from "~/consts/error";
+import ERROR from "~/consts/error";
 import * as BROWSER from "~/consts/browser";
 
 describe("RotateControl", () => {

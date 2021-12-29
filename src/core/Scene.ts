@@ -146,12 +146,19 @@ class Scene {
    * @param url An URL to equirectangular image
    * @returns {Promise<void>}
    */
-  public async setSkybox(url: string): Promise<void> {
-    const textureLoader = new TextureLoader(this._view3D.renderer);
-    const renderTarget = await textureLoader.loadHDRTexture(url);
+  public async setSkybox(url: string | null): Promise<void> {
+    const root = this._root;
 
-    this._root.background = renderTarget.texture;
-    this._root.environment = renderTarget.texture;
+    if (url) {
+      const textureLoader = new TextureLoader(this._view3D.renderer);
+      const renderTarget = await textureLoader.loadHDRTexture(url);
+
+      root.background = renderTarget.texture;
+      root.environment = renderTarget.texture;
+    } else {
+      root.background = null;
+      root.environment = null;
+    }
   }
 
   /**
@@ -159,11 +166,15 @@ class Scene {
    * @param url An URL to equirectangular image
    * @returns {void}
    */
-  public async setEnvMap(url: string): Promise<void> {
-    const textureLoader = new TextureLoader(this._view3D.renderer);
-    const renderTarget = await textureLoader.loadHDRTexture(url);
+  public async setEnvMap(url: string | null): Promise<void> {
+    if (url) {
+      const textureLoader = new TextureLoader(this._view3D.renderer);
+      const renderTarget = await textureLoader.loadHDRTexture(url);
 
-    this._root.environment = renderTarget.texture;
+      this._root.environment = renderTarget.texture;
+    } else {
+      this._root.environment = null;
+    }
   }
 
   private _removeChildsOf(obj: THREE.Object3D) {

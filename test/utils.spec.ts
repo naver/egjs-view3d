@@ -16,7 +16,7 @@ import {
   getBoxPoints,
   toPowerOfTwo
 } from "~/utils";
-import * as ERROR from "~/consts/error";
+import ERROR from "~/consts/error";
 
 describe("Utils", () => {
   describe("getElement", () => {

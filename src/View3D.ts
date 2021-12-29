@@ -23,7 +23,7 @@ import { SceneViewerSessionOptions } from "./xr/SceneViewerSession";
 import { QuickLookSessionOptions } from "./xr/QuickLookSession";
 import { EVENTS, AUTO, AR_SESSION_TYPE } from "./const/external";
 import * as DEFAULT from "./const/default";
-import * as ERROR from "./const/error";
+import ERROR from "./const/error";
 import * as EVENT_TYPES from "./type/event";
 import { View3DPlugin } from "./plugin";
 import { getElement, getObjectOption } from "./utils";
@@ -428,6 +428,21 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    * @default true
    */
   public get useResizeObserver() { return this._useResizeObserver; }
+
+  public set skybox(val: View3DOptions["skybox"]) {
+    void this._scene.setSkybox(val);
+    this._skybox = val;
+  }
+
+  public set envmap(val: View3DOptions["envmap"]) {
+    void this._scene.setEnvMap(val);
+    this._envmap = val;
+  }
+
+  public set exposure(val: View3DOptions["exposure"]) {
+    this._renderer.threeRenderer.toneMappingExposure = val;
+    this._exposure = val;
+  }
 
   public set useGrabCursor(val: View3DOptions["useGrabCursor"]) {
     this._useGrabCursor = val;
