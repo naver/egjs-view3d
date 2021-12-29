@@ -50,7 +50,7 @@ export interface View3DEvents {
 
 /**
  * @interface
- * @see [Options](/docs/options/sources/src) page for detailed information
+ * @see [Options](/docs/options/model/src) page for detailed information
  */
 export interface View3DOptions {
   // Model

@@ -21,6 +21,7 @@ $dark: rgba(0,0,0,.7)
 @import "../../node_modules/bulma/sass/elements/title.sass"
 @import "../../node_modules/bulma/sass/components/card.sass"
 @import "../../node_modules/bulma/sass/components/message.sass"
+@import "../../node_modules/bulma/sass/components/level.sass"
 
 $body-family: BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif !default
 $code-family: monospace !default
@@ -56,6 +57,10 @@ h2
   font-size: 2rem
 h3
   font-size: 1.5rem
+
+.title,
+.subtitle
+  color: var(--ifm-font-color-base)
 
 $tag-background-color: $background !default
 $tag-color: $text !default

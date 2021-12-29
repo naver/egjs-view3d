@@ -1,0 +1,13 @@
+.max400 {
+  width: 100%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.btnsWrapper {
+  justify-content: center !important;
+}
+.btnsWrapper * {
+  flex-grow: 0 !important;
+}

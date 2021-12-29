@@ -136,6 +136,7 @@ class Camera {
    */
   public async reset(duration: number = 0, easing: (x: number) => number = DEFAULT.EASING): Promise<void> {
     const view3D = this._view3D;
+    const control = view3D.control;
     const currentPose = this._currentPose;
     const defaultPose = this._defaultPose;
 
@@ -143,7 +144,7 @@ class Camera {
       // Reset camera immediately
       this._currentPose = defaultPose.clone();
 
-      view3D.control.sync();
+      control.sync();
 
       return Promise.resolve();
     } else {
@@ -152,13 +153,13 @@ class Camera {
       resetControl.duration = duration;
       resetControl.easing = easing;
 
-      // TODO: DISABLE CONTROLS
+      control.disable();
       // FIXME: START ANIMATION
 
       return new Promise(resolve => {
         resetControl.onFinished(() => {
-          view3D.control.sync();
-          // TODO: ENABLE CONTROLS
+          control.sync();
+          control.enable();
           resolve();
         });
       });

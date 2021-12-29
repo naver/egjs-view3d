@@ -102,7 +102,7 @@ export const SCENE_VIEWER_MODE = {
 } as const;
 
 /**
- * ![https://docs-assets.developer.apple.com/published/b122cc68df/10cb0534-e1f6-42ed-aadb-5390c55ad3ff.png](button types)
+ * <img src="https://docs-assets.developer.apple.com/published/b122cc68df/10cb0534-e1f6-42ed-aadb-5390c55ad3ff.png" />
  * @see https://developer.apple.com/documentation/arkit/adding_an_apple_pay_button_or_a_custom_action_in_ar_quick_look
  * @property {"plain"} PLAIN
  * @property {"pay"} PAY

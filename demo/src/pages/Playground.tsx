@@ -31,7 +31,7 @@ class Playground extends React.Component<{}, {
   public componentDidMount() {
     const view3D = new VanillaView3D("#playground-view3d", {
       src: "/model/cube.glb",
-      envmap: "/texture/artist_workshop_1k.hdr",
+      skybox: "/texture/artist_workshop_1k.hdr",
       autoplay: true
     });
 
@@ -69,7 +69,7 @@ class Playground extends React.Component<{}, {
           <EnvmapChange onChange={this._onEnvmapChange} onExposureChange={val => this._view3D.exposure = val} isLoading={isLoading} />
           <div className="is-flex is-align-items-center mb-4">
             <span className="mr-2">Skybox</span>
-            <input ref={this._skyboxRef} type="checkbox" onChange={e => {
+            <input ref={this._skyboxRef} type="checkbox" defaultChecked={true} onChange={e => {
               const view3D = this._view3D;
               const root = view3D.scene.root;
               const checked = e.currentTarget.checked;
