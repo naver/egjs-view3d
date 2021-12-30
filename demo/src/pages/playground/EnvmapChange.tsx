@@ -13,6 +13,7 @@ const models = [
   { name: "Fireplace", path: "/texture/fireplace_1k.hdr" },
   { name: "Venice Sunset", path: "/texture/venice_sunset_1k.hdr" },
   { name: "Moonless Golf", path: "/texture/moonless_golf_1k.hdr" },
+  { name: "Studio Garden", path: "/texture/studio_garden_1k.hdr" },
   { name: "Studio", path: "/texture/studio_small_08_1k.hdr" }
 ];
 

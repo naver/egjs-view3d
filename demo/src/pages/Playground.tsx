@@ -43,7 +43,17 @@ class Playground extends React.Component<{}, {
     const fileInput = document.querySelector("#dropdown-file");
     const dropzone = new SimpleDropzone(pageWrapper, fileInput);
 
-    dropzone.on("drop", e => this._onFileChange(e.files));
+    dropzone.on("drop", e => {
+      const fileNames = [...e.files.keys()];
+      const hdri = fileNames.find(name => /\.hdr$/i.test(name));
+
+      if (hdri) {
+        const hdriURL = URL.createObjectURL(e.files.get(hdri));
+        void this._onEnvmapChange(hdriURL);
+      } else {
+        void this._onFileChange(e.files);
+      }
+    });
   }
 
   public render() {
