@@ -1,0 +1,54 @@
+---
+sidebar_position: 2
+---
+
+import View3D from "@site/src/components/View3D";
+import License from "@site/src/components/License";
+
+[Meshopt Compression](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Vendor/EXT_meshopt_compression/README.md) is GPU-friendly mesh optimization that makes meshes smaller and faster to render.
+It can dramatically decrease the 3D model size when there're huge amount of geometry data in the 3D model.
+i.e. you can apply Draco compression if your glTF model's `.bin` size is big enough to be considered.
+
+Meshopt is not enabled by default in View3D. You can enable it by using the [meshoptPath](/docs/options/model/meshoptPath) option.
+
+[gltfpack](https://github.com/zeux/meshoptimizer/tree/master/gltf) is a great tool to apply `EXT_meshopt_compression` extension. (Use `-c` or `-cc` flag)
+
+<div className="columns">
+  <div className="column">
+    <div className="title">Original</div>
+    <div className="subtitle">30.1MB (7.4MB gzipped)</div>
+    <View3D
+      src="/model/lucy.glb"
+      envmap="/texture/artist_workshop_1k.hdr"
+      poster="/poster/lucy.png"
+      clickToLoad
+      showExampleCode />
+  </div>
+  <div className="column">
+    <div className="title">Meshopt Compressed</div>
+    <div className="subtitle">3.5MB (2.7MB gzipped, -91.03%)</div>
+    <View3D
+      src="/model/meshopt/lucy.glb"
+      envmap="/texture/artist_workshop_1k.hdr"
+      poster="/poster/lucy.png"
+      clickToLoad
+      showExampleCode />
+  </div>
+</div>
+
+<License items={[
+  {
+    name: "Stanford Lucy",
+    link: "https://skfb.ly/HRAL",
+    author: "uptown",
+    authorLink: "https://sketchfab.com/uptown",
+    license: "Creative Commons Attribution"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

@@ -5,8 +5,7 @@
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "paths": {
-      "~/*": ["../src/*"],
-      "@theme/*": ["./node_modules/@docusaurus/theme-classic/src/theme/*"]
+      "~/*": ["../src/*"]
     }
   }
 }

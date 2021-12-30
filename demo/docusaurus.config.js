@@ -82,7 +82,7 @@ const config = {
           },
           {
             type: "doc",
-            docId: "ar/WebXR - Floor",
+            docId: "ar/default",
             label: "AR",
             position: "left"
           },

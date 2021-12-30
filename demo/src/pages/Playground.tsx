@@ -68,7 +68,7 @@ class Playground extends React.Component<{}, {
           <ModelChange onSelect={this._onModelSelect} onUpload={this._onFileChange} isLoading={isLoading} />
           <EnvmapChange onChange={this._onEnvmapChange} onExposureChange={val => this._view3D.exposure = val} isLoading={isLoading} />
           <div className="is-flex is-align-items-center mb-4">
-            <span className="mr-2">Skybox</span>
+            <span className="mr-2">Show Skybox</span>
             <input ref={this._skyboxRef} type="checkbox" defaultChecked={true} onChange={e => {
               const view3D = this._view3D;
               const root = view3D.scene.root;

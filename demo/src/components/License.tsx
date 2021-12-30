@@ -1,11 +1,14 @@
 import React from "react";
+import clsx from "clsx";
 
 const LICENSE_TO_LINK = {
   CC0: "https://creativecommons.org/publicdomain/zero/1.0/",
-  "Creative Commons Attribution": "https://creativecommons.org/licenses/by/4.0/"
+  "Creative Commons Attribution": "https://creativecommons.org/licenses/by/4.0/",
+  "CC Attribution-NonCommercial-ShareAlike": "http://creativecommons.org/licenses/by-nc-sa/4.0/"
 };
 
-export default ({ items = [] }: {
+export default ({ items = [], className = "" }: {
+  className: string;
   items: Array<{
     name: string;
     link: string;
@@ -13,7 +16,7 @@ export default ({ items = [] }: {
     authorLink: string;
     license: string;
   }>;
-}) => (
+}) => (<div className={className}>
   <article className="message">
     <div className="message-body">
       <div className="mb-2 is-flex"><img className="mr-1" src="/icon/info.svg" /><span className="has-text-weight-bold">Assets Used</span></div>
@@ -26,4 +29,4 @@ export default ({ items = [] }: {
       }
     </div>
   </article>
-);
+</div>);

@@ -99,6 +99,8 @@ const view3D = new View3D("#view3d", {
 
 <View3D
   src="/model/draco/alarm.glb"
+  poster="/poster/alarm.png"
+  clickToLoad
   showExampleCode />
 
 But as there's no lighting yet, model will be shown in black (unless it has emissive property enabled)
@@ -107,6 +109,8 @@ View3D uses HDR image as envmap for IBL(image-based lighting), so you can set an
 <View3D
   src="/model/draco/alarm.glb"
   envmap="/texture/artist_workshop_1k.hdr"
+  poster="/poster/alarm.png"
+  clickToLoad
   showExampleCode />
 
 To get HDR images, check this [awesome collection of Poly Haven](https://polyhaven.com/hdris)

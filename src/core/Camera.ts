@@ -227,8 +227,8 @@ class Camera {
     defaultPose.pivot = modelCenter.clone();
     this._distance = effectiveCamDist;
 
-    camera.near = Math.min(0.01, effectiveCamDist - maxDistToCenter);
-    camera.far = 10 * (effectiveCamDist + maxDistToCenter);
+    camera.near = (effectiveCamDist - maxDistToCenter) * 0.1;
+    camera.far = (effectiveCamDist + maxDistToCenter) * 10;
     control.zoom.updateRange();
   }
 

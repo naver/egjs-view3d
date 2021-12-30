@@ -17,7 +17,12 @@ To get `total` bytes, you should serve the 3D model with the `Content-Length` he
 |loaded|number|A 64-bit unsigned integer value indicating the amount of work already performed by the underlying process. The ratio of work done can be calculated by dividing total by the value of this property. When downloading a resource using HTTP, this only counts the body of the HTTP message, and doesn't include headers and other overhead|
 |total|number|A 64-bit unsigned integer representing the total amount of work that the underlying process is in the progress of performing. When downloading a resource using HTTP, this is the Content-Length (the size of the body of the message), and doesn't include the headers and other overhead|
 
-<View3D src="/model/draco/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" clickToLoad showEventsTriggered={["progress"]} />
+<View3D
+  src="/model/draco/alarm.glb"
+  envmap="/texture/artist_workshop_1k.hdr"
+  poster="/poster/alarm.png"
+  clickToLoad
+  showEventsTriggered={["progress"]} />
 
 <License items={[
   {

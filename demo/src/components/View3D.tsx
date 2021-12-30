@@ -1,12 +1,16 @@
 import React from "react";
 import * as THREE from "three";
+import clsx from "clsx";
 import VanillaView3D, { View3DOptions } from "../../../src";
 import { ARButton, ARUI } from "../../../src/plugin";
+import DownloadIcon from "../../static/icon/file_download_black.svg";
 
 import OptionExample from "./OptionExample";
 import EventsList from "./EventsList";
 
 interface DemoOptions extends Partial<View3DOptions> {
+  className: string;
+  poster: string | null;
   clickToLoad: boolean;
   showARButton: boolean;
   showBbox: boolean;
@@ -14,8 +18,13 @@ interface DemoOptions extends Partial<View3DOptions> {
   showEventsTriggered: null | string[];
 }
 
-class View3D extends React.Component<DemoOptions> {
+class View3D extends React.Component<DemoOptions, {
+  arAvailable: boolean;
+  initialized: boolean;
+}> {
   public static defaultProps: DemoOptions = {
+    className: "",
+    poster: null,
     clickToLoad: false,
     showARButton: false,
     showBbox: false,
@@ -34,7 +43,10 @@ class View3D extends React.Component<DemoOptions> {
   public constructor(props: DemoOptions) {
     super(props);
 
-    this.state = { arAvailable: false };
+    this.state = {
+      arAvailable: false,
+      initialized: false
+    };
   }
 
   public componentDidMount() {
@@ -45,6 +57,11 @@ class View3D extends React.Component<DemoOptions> {
       autoInit: clickToLoad ? false : restProps.autoInit
     };
     const view3D = new VanillaView3D(this._rootRef.current, options);
+    view3D.on("ready", () => {
+      this.setState({
+        initialized: true
+      });
+    });
 
     this._view3D = view3D;
 
@@ -67,7 +84,8 @@ class View3D extends React.Component<DemoOptions> {
   }
 
   public render() {
-    const { children, showExampleCode, clickToLoad, showEventsTriggered, ...restProps } = this.props;
+    const { initialized } = this.state;
+    const { children, className, poster, showExampleCode, clickToLoad, showEventsTriggered, ...restProps } = this.props;
 
     const optionsToInclude = Array.isArray(showExampleCode) ? showExampleCode : [];
     const view3DOptions = Object.keys(restProps)
@@ -79,19 +97,24 @@ class View3D extends React.Component<DemoOptions> {
       }, {});
 
     return <>
-      <div ref={this._rootRef} className="view3d-wrapper view3d-square mb-2">
+      <div ref={this._rootRef} className={clsx(className, "view3d-wrapper", "view3d-square", "mb-2")}>
         <canvas className="view3d-canvas"></canvas>
-        { clickToLoad && <div className="view3d-overlay"><div className="button is-large" onClick={e => {
-          const btn = e.currentTarget;
+        { clickToLoad && <div className={clsx({ "view3d-overlay": true, "hidden": initialized })}>
+          <div className="button is-medium" onClick={e => {
+            const btn = e.currentTarget;
 
-          if (btn.classList.contains("is-loading")) return;
+            if (btn.classList.contains("is-loading")) return;
 
-          btn.classList.add("is-loading");
-          void this._view3D.init()
-            .then(() => {
-              btn.parentElement.classList.add("hidden");
-            });
-        }}>Load 3D model</div></div>}
+            btn.classList.add("is-loading");
+            void this._view3D.init();
+          }}>
+            <span className="icon is-medium">
+              <DownloadIcon />
+            </span>
+            <span>Load 3D model</span>
+          </div>
+        </div>}
+        { (poster && !initialized) && <img className="view3d-poster" src={poster} />}
         { showEventsTriggered && <EventsList view3D={this} events={showEventsTriggered} />}
         { children }
       </div>

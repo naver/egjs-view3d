@@ -1,3 +1,11 @@
+@font-face
+{
+  font-family: 'Staatliches';
+  font-weight: normal;
+  font-style: normal;
+  src: url('/font/Staatliches/Staatliches-Regular.ttf');
+}
+
 .max400 {
   width: 100%;
   max-width: 400px;
@@ -5,9 +13,23 @@
   margin-right: auto;
 }
 
-.btnsWrapper {
-  justify-content: center !important;
+.packageName {
+  font-family: 'Staatliches', monospace;
 }
-.btnsWrapper * {
-  flex-grow: 0 !important;
+
+.badges {
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.badges *:not(:last-child) {
+  margin-right: 0.5rem;
+}
+
+.btnsWrapper {
+  display: flex;
+  justify-content: center;
 }

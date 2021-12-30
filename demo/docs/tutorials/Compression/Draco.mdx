@@ -1,0 +1,60 @@
+---
+sidebar_position: 1
+---
+
+import View3D from "@site/src/components/View3D";
+import License from "@site/src/components/License";
+
+[Draco](https://google.github.io/draco/) is a library for compressing and decompressing 3D geometric meshes and point clouds.
+It can dramatically decrease the 3D model size when there're huge amount of geometry data in the 3D model.
+i.e. you can apply Draco compression if your glTF model's `.bin` size is big enough to be considered.
+
+Draco decoder will be loaded asynchronously with the [dracoPath](/docs/options/model/dracoPath) option.
+Note that as Draco decoder size is pretty big (100KB+), so use Draco compression only when file size saving from compression is greater than the decoder size.
+By default, Draco decoder will be loaded from their official [CDN](https://www.gstatic.com/draco/versioned/decoders/1.4.1/).
+
+```
+https://www.gstatic.com/draco/versioned/decoders/1.4.1/
+```
+
+[gltf-pipeline](https://github.com/CesiumGS/gltf-pipeline) is a great tool to apply Draco compression (Use the `-d` flag).
+
+<div className="columns">
+  <div className="column">
+    <div className="title">Original</div>
+    <div className="subtitle">30.1MB (7.4MB gzipped)</div>
+    <View3D
+      src="/model/lucy.glb"
+      envmap="/texture/artist_workshop_1k.hdr"
+      poster="/poster/lucy.png"
+      clickToLoad
+      showExampleCode />
+  </div>
+  <div className="column">
+    <div className="title">Draco Compressed</div>
+    <div className="subtitle">1.24MB (-95.88%)</div>
+    <View3D
+      src="/model/draco/lucy.glb"
+      envmap="/texture/artist_workshop_1k.hdr"
+      poster="/poster/lucy.png"
+      clickToLoad
+      showExampleCode />
+  </div>
+</div>
+
+<License items={[
+  {
+    name: "Stanford Lucy",
+    link: "https://skfb.ly/HRAL",
+    author: "uptown",
+    authorLink: "https://sketchfab.com/uptown",
+    license: "Creative Commons Attribution"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

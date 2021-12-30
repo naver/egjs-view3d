@@ -13,7 +13,12 @@ An event that fires when the 3D Model is loaded and displayed on the canvas.
 |target|[View3D](/docs/api/View3D)|An instance of View3D that triggered this event|
 |model|[Model](/docs/api/Model)|A new model that loaded|
 
-<View3D src="/model/draco/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" clickToLoad showEventsTriggered={["ready", "load", "modelChange"]} />
+<View3D
+  src="/model/draco/alarm.glb"
+  envmap="/texture/artist_workshop_1k.hdr"
+  poster="/poster/alarm.png"
+  clickToLoad
+  showEventsTriggered={["ready", "load", "modelChange"]} />
 
 <License items={[
   {

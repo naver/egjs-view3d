@@ -9,6 +9,10 @@ const models = [
   { name: "Evening Meadow", path: "/texture/evening_meadow_1k.hdr" },
   { name: "Royal Esplanade", path: "/texture/royal_esplanade_1k.hdr" },
   { name: "Spruit Sunrise", path: "/texture/spruit_sunrise_1k.hdr" },
+  { name: "Vignaioli Night", path: "/texture/vignaioli_night_1k.hdr" },
+  { name: "Fireplace", path: "/texture/fireplace_1k.hdr" },
+  { name: "Venice Sunset", path: "/texture/venice_sunset_1k.hdr" },
+  { name: "Moonless Golf", path: "/texture/moonless_golf_1k.hdr" },
   { name: "Studio", path: "/texture/studio_small_08_1k.hdr" }
 ];
 

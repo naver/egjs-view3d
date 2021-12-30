@@ -13,7 +13,12 @@ This will be called once after the first 3D model is loaded
 |type|string|The type of event|
 |target|[View3D](/docs/api/View3D)|An instance of View3D that triggered this event|
 
-<View3D src="/model/draco/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" clickToLoad showEventsTriggered={["ready", "load", "modelChange"]} />
+<View3D
+  src="/model/draco/alarm.glb"
+  envmap="/texture/artist_workshop_1k.hdr"
+  poster="/poster/alarm.png"
+  clickToLoad
+  showEventsTriggered={["ready", "load", "modelChange"]} />
 
 <License items={[
   {
