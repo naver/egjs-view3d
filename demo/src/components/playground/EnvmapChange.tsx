@@ -3,18 +3,18 @@ import clsx from "clsx";
 import { Range } from "react-range";
 
 const models = [
-  { name: "Artist Workshop", path: "/texture/artist_workshop_1k.hdr" },
-  { name: "Comfy Cafe", path: "/texture/comfy_cafe_1k.hdr" },
-  { name: "Dry Hay Field", path: "/texture/dry_hay_field_1k.hdr" },
-  { name: "Evening Meadow", path: "/texture/evening_meadow_1k.hdr" },
-  { name: "Royal Esplanade", path: "/texture/royal_esplanade_1k.hdr" },
-  { name: "Spruit Sunrise", path: "/texture/spruit_sunrise_1k.hdr" },
-  { name: "Vignaioli Night", path: "/texture/vignaioli_night_1k.hdr" },
-  { name: "Fireplace", path: "/texture/fireplace_1k.hdr" },
-  { name: "Venice Sunset", path: "/texture/venice_sunset_1k.hdr" },
-  { name: "Moonless Golf", path: "/texture/moonless_golf_1k.hdr" },
-  { name: "Studio Garden", path: "/texture/studio_garden_1k.hdr" },
-  { name: "Studio", path: "/texture/studio_small_08_1k.hdr" }
+  { name: "Artist Workshop", path: "/egjs-view3d/texture/artist_workshop_1k.hdr" },
+  { name: "Comfy Cafe", path: "/egjs-view3d/texture/comfy_cafe_1k.hdr" },
+  { name: "Dry Hay Field", path: "/egjs-view3d/texture/dry_hay_field_1k.hdr" },
+  { name: "Evening Meadow", path: "/egjs-view3d/texture/evening_meadow_1k.hdr" },
+  { name: "Royal Esplanade", path: "/egjs-view3d/texture/royal_esplanade_1k.hdr" },
+  { name: "Spruit Sunrise", path: "/egjs-view3d/texture/spruit_sunrise_1k.hdr" },
+  { name: "Vignaioli Night", path: "/egjs-view3d/texture/vignaioli_night_1k.hdr" },
+  { name: "Fireplace", path: "/egjs-view3d/texture/fireplace_1k.hdr" },
+  { name: "Venice Sunset", path: "/egjs-view3d/texture/venice_sunset_1k.hdr" },
+  { name: "Moonless Golf", path: "/egjs-view3d/texture/moonless_golf_1k.hdr" },
+  { name: "Studio Garden", path: "/egjs-view3d/texture/studio_garden_1k.hdr" },
+  { name: "Studio", path: "/egjs-view3d/texture/studio_small_08_1k.hdr" }
 ];
 
 export default ({ onChange, onExposureChange, isLoading }) => {
@@ -44,7 +44,7 @@ export default ({ onChange, onExposureChange, isLoading }) => {
           }}></input>
           <span className="file-cta">
             <span className="file-icon">
-              <img src="/icon/file_upload_black.svg" />
+              <img src="/egjs-view3d/icon/file_upload_black.svg" />
             </span>
             <span className="file-label">HDR</span>
           </span>

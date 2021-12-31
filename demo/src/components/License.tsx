@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx";
+import InfoSVG from "../../static/icon/info.svg";
 
 const LICENSE_TO_LINK = {
   CC0: "https://creativecommons.org/publicdomain/zero/1.0/",
@@ -19,7 +19,7 @@ export default ({ items = [], className = "" }: {
 }) => (<div className={className}>
   <article className="message">
     <div className="message-body">
-      <div className="mb-2 is-flex"><img className="mr-1" src="/icon/info.svg" /><span className="has-text-weight-bold">Assets Used</span></div>
+      <div className="mb-2 is-flex is-align-items-center"><InfoSVG className="mr-1" /><span className="has-text-weight-bold">Assets Used</span></div>
       {
         items.map((item, idx) => (
           <div key={idx}>

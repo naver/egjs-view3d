@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 import Renderer from "~/core/Renderer";
-import TextureLoader from "~/loaders/TextureLoader";
+import TextureLoader from "~/loader/TextureLoader";
 import { range } from "~/utils";
 
 describe("TextureLoader", () => {

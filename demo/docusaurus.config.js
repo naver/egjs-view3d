@@ -5,14 +5,12 @@ const lightCodeTheme = require("prism-react-renderer/themes/oceanicNext");
 const darkCodeTheme = require("prism-react-renderer/themes/palenight");
 const glslify = require("./plugin/glslify");
 
-const isDev = process.env.NODE_ENV === "development";
-
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "View3D",
   tagline: "Fast & customizable 3D model viewer for everyone based on three.js & typescript",
   url: "https://naver.github.io",
-  baseUrl: isDev ? "/" : "/egjs-view3d/",
+  baseUrl: "/egjs-view3d/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.png",
@@ -92,8 +90,15 @@ const config = {
             position: "left"
           },
           {
+            href: "https://www.npmjs.com/package/@egjs/view3d",
+            className: "header-npm-link",
+            "aria-label": "NPM Package",
+            position: "right"
+          },
+          {
             href: "https://github.com/naver/egjs-view3d",
-            label: "GitHub",
+            className: "header-github-link",
+            "aria-label": "GitHub Repository",
             position: "right"
           }
         ]

@@ -1,6 +1,6 @@
 <center>
 
-<img width="400" src="./demo/static/poster/cube.png">
+<img width="400" src="https://naver.github.io/egjs-view3d/poster/cube.png">
 
 # View3D
 
@@ -12,8 +12,6 @@
 Fast & Customizable glTF 3D model viewer, packed with full of features!
 
 👉 **[Demo](https://naver.github.io/egjs-view3d)** / **[API Document](https://naver.github.io/egjs-view3d/docs/api/View3D)** / **[Tutorial](https://naver.github.io/egjs-view3d/docs/)**
-
-👉 Related Articles: [1](https://medium.com/naver-fe-platform/webar-with-webxr-api-part-1-e191a2dc7177), [2](https://medium.com/naver-fe-platform/webar-with-webxr-api-part-2-dc76b20767fb)
 
 </center>
 
@@ -53,7 +51,7 @@ Then you can use it like
 
 ```js
 import View3D from "@egjs/view3d";
-import "@egjs/view3d/css/bundle";
+import "@egjs/view3d/css";
 
 const canvasEl = document.querySelector("#view3d");
 const view3d = new View3D(canvasEl, {
@@ -68,6 +66,9 @@ const view3d = new View3D("#view3d");
 
 See detailed explanation on our [Tutorial](https://naver.github.io/egjs-view3d/docs/)
 
+## 🔹 Articles
+- [WebAR with WebXR API, Part 1](https://medium.com/naver-fe-platform/webar-with-webxr-api-part-1-e191a2dc7177)
+- [WebAR with WebXR API, Part 2](https://medium.com/naver-fe-platform/webar-with-webxr-api-part-2-dc76b20767fb)
 
 ## 🔹 License
 ```

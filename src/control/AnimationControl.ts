@@ -107,7 +107,7 @@ class AnimationControl implements CameraControl {
     camera.zoom = mix(from.zoom, to.zoom, progress);
     camera.pivot = from.pivot.clone().lerp(to.pivot, progress);
 
-    if (motion.progress >= 1) {
+    if (progress >= 1) {
       this.disable();
       this._finishCallbacks.forEach(callback => callback());
     }

@@ -23,3 +23,4 @@ yarn-error.log*
 docs/api/
 i18n/
 sidebars-api.js
+static/release/

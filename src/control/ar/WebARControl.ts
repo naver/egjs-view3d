@@ -41,7 +41,7 @@ export interface WebARControlOptions {
 }
 
 /**
- * AR control for {@link FloorARSession}
+ * AR control for {@link WebARSession}
  */
 class WebARControl {
   // Options

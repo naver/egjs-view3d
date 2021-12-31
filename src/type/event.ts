@@ -69,10 +69,12 @@ export interface ResizeEvent {
  * @type {object}
  * @property {string} type The type of event.
  * @property {View3D} target An instance of View3D that triggered this event.
+ * @property {number} delta Time passed from the previous render call, in milisecond.
  */
 export interface BeforeRenderEvent {
   type: string;
   target: View3D;
+  delta: number;
 }
 
 /**
@@ -81,10 +83,12 @@ export interface BeforeRenderEvent {
  * @type {object}
  * @property {string} type The type of event.
  * @property {View3D} target An instance of View3D that triggered this event.
+ * @property {number} delta Time passed from the previous render call, in milisecond.
  */
 export interface RenderEvent {
   type: string;
   target: View3D;
+  delta: number;
 }
 
 /**

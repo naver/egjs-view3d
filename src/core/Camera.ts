@@ -9,7 +9,8 @@ import View3D from "../View3D";
 import AnimationControl from "../control/AnimationControl";
 import { toRadian, clamp, circulate, toDegree, getRotatedPosition } from "../utils";
 import * as DEFAULT from "../const/default";
-import { AUTO } from "../const/external";
+import { AUTO, EVENTS } from "../const/external";
+import { BeforeRenderEvent } from "../type/event";
 
 import Pose from "./Pose";
 import Model from "./Model";
@@ -152,14 +153,23 @@ class Camera {
       const resetControl = new AnimationControl(view3D, currentPose, defaultPose);
       resetControl.duration = duration;
       resetControl.easing = easing;
+      resetControl.enable();
 
       control.disable();
-      // FIXME: START ANIMATION
+
+      const updateResetControl = (evt: BeforeRenderEvent) => {
+        resetControl.update(evt.delta);
+      };
+
+      view3D.on(EVENTS.BEFORE_RENDER, updateResetControl);
 
       return new Promise(resolve => {
         resetControl.onFinished(() => {
           control.sync();
           control.enable();
+
+          view3D.off(EVENTS.BEFORE_RENDER, updateResetControl);
+
           resolve();
         });
       });

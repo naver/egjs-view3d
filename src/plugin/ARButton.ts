@@ -8,14 +8,31 @@ import { EVENTS } from "../const/external";
 
 import View3DPlugin from "./View3DPlugin";
 
+/**
+ * Options for the {@link ARButton}
+ * @interface
+ * @param {string} [availableText="View in AR"] A text that will be shown on mouse hover when it's available to enter the AR session.
+ * @param {string} [unavailableText="AR is not available in this browser"] A text that will be shown on mouse hover when it's not available to enter the AR session.
+ */
 export interface ARButtonOptions {
   availableText: string;
   unavailableText: string;
 }
 
+/**
+ * A button that will be shown on the right-bottom side with the AR icon.
+ * It will be disabled automatically when it's not available to enter AR sessions.
+ * User can enter AR sessions by clicking this.
+ */
 class ARButton extends View3DPlugin {
   private _options: Partial<ARButtonOptions>;
 
+  /**
+   * Create new instance of ARButton
+   * @param {object} [options={}] Options for the ARButton
+   * @param {string} [options.availableText="View in AR"] A text that will be shown on mouse hover when it's available to enter the AR session.
+   * @param {string} [options.unavailableText="AR is not available in this browser"] A text that will be shown on mouse hover when it's not available to enter the AR session.
+   */
   public constructor(options: Partial<ARButtonOptions> = {}) {
     super();
 

@@ -3,11 +3,11 @@ import clsx from "clsx";
 
 import styles from "./features.module.css";
 
-import View3D from "../components/View3D";
-import Rotate3DIcon from "../../static/icon/3D.svg";
-import ARIcon from "../../static/icon/ar.svg";
-import ExtensionIcon from "../../static/icon/extension.svg";
-import GLTFIcon from "../../static/icon/glTF.svg";
+import View3D from "../View3D";
+import Rotate3DIcon from "../../../static/icon/3D.svg";
+import ARIcon from "../../../static/icon/ar.svg";
+import ExtensionIcon from "../../../static/icon/extension.svg";
+import GLTFIcon from "../../../static/icon/glTF.svg";
 
 export default () => <section className="py-4">
   <div className="title mb-6">Features</div>
@@ -16,10 +16,10 @@ export default () => <section className="py-4">
       <div className={clsx(styles.features, "subtitle")}><Rotate3DIcon className={clsx(styles.featuresIcon, "mx-2")} />glTF Viewer</div>
       <View3D
         className="image is-square m-0"
-        src="model/draco/plant.glb"
-        poster="poster/plant.png"
+        src="/egjs-view3d/model/draco/plant.glb"
+        poster="/egjs-view3d/poster/plant.png"
         clickToLoad
-        envmap="texture/artist_workshop_1k.hdr" />
+        envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" />
       <div className="block mt-4">View, rotate, translate and zoom your <strong>glTF 3D models</strong> in the web. Works on both <strong>🖥️ Desktop & 📱 Mobile</strong></div>
       <div className="block">Customize your viewer with <a href="docs/options/model/src">Options</a> like <strong>autoplay</strong>, <strong>skybox</strong>, and <strong>shadow</strong></div>
       <div className="block">

@@ -19,7 +19,7 @@ enum STATE {
 }
 
 /**
- * Options for {@link ARFloorTranslateControl}
+ * Options for {@link ARTranslateControl}
  * @interface
  * @property {number} [threshold=0.05] Threshold until translation works, this value is relative to screen size.
  * @property {number} [hoverHeight=0.1] How much model will float from the floor, in meter. Default value is 0.1(10cm).
@@ -34,7 +34,7 @@ export interface ARTranslateControlOptions {
 }
 
 /**
- * Model's translation(position) control for {@link ARFloorControl}
+ * Model's translation(position) control for {@link WebARControl}
  */
 class ARTranslateControl implements ARControl {
   // Options
@@ -70,7 +70,7 @@ class ARTranslateControl implements ARControl {
 
   /**
    * Create new instance of ARTranslateControl
-   * @param {ARFloorTranslateControlOption} [options={}] Options
+   * @param {ARTranslateControlOption} [options={}] Options
    */
   public constructor({
     hoverHeight = 0.1,

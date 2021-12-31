@@ -6,7 +6,7 @@
 import * as THREE from "three";
 
 import View3D from "../View3D";
-import TextureLoader from "../loaders/TextureLoader";
+import TextureLoader from "../loader/TextureLoader";
 import { STANDARD_MAPS } from "../const/internal";
 import { getObjectOption } from "../utils";
 

@@ -3,8 +3,8 @@
  * egjs projects are licensed under the MIT license
  */
 import View3DPlugin from "./View3DPlugin";
-import ARButton from "./ARButton";
-import ARUI from "./ARUI";
+import ARButton, { ARButtonOptions } from "./ARButton";
+import ARUI, { ARUIOptions } from "./ARUI";
 
 export {
   ARButton,
@@ -12,5 +12,7 @@ export {
 };
 
 export type {
+  ARButtonOptions,
+  ARUIOptions,
   View3DPlugin
 };

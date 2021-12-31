@@ -1,5 +1,6 @@
 import React from "react";
 import clsx from "clsx";
+import Layout from "@theme/Layout";
 // @ts-ignore
 import Link from "@docusaurus/Link";
 // @ts-ignore
@@ -8,15 +9,15 @@ import VanillaView3D from "../../../src";
 import License from "../components/License";
 
 import styles from "./home.module.css";
-import Features from "./Features";
-import QuickStart from "./QuickStart";
-import CDN from "./CDN";
+import Features from "../components/home/Features";
+import QuickStart from "../components/home/QuickStart";
+import CDN from "../components/home/CDN";
 
 class Home extends React.Component {
   public componentDidMount() {
     const view3D = new VanillaView3D("#home-view3d", {
-      src: "/model/cube.glb",
-      envmap: "/texture/artist_workshop_1k.hdr",
+      src: "/egjs-view3d/model/cube.glb",
+      envmap: "/egjs-view3d/texture/artist_workshop_1k.hdr",
       zoom: false,
       pitch: 25,
       autoplay: { canInterrupt: false }
@@ -24,7 +25,7 @@ class Home extends React.Component {
   }
 
   public render() {
-    return (
+    return (<Layout>
       <div className="container pb-6">
         <div className={styles.max400}>
           <div id="home-view3d" className="view3d-wrapper view3d-square">
@@ -74,7 +75,7 @@ class Home extends React.Component {
           }
         ]} />
       </div>
-    );
+    </Layout>);
   }
 }
 

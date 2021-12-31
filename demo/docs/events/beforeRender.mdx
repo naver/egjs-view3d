@@ -11,8 +11,12 @@ An event that fires before rendering a frame.
 |:---:|:---:|---|
 |type|string|The type of event|
 |target|[View3D](/docs/api/View3D)|An instance of View3D that triggered this event|
+|delta|number|Time passed from the previous render call, in milisecond|
 
-<View3D src="/model/draco/alarm.glb" envmap="/texture/artist_workshop_1k.hdr" showEventsTriggered={["beforeRender"]} />
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+  showEventsTriggered={["beforeRender"]} />
 
 <License items={[
   {

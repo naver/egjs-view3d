@@ -2,22 +2,23 @@ import React from "react";
 import clsx from "clsx";
 import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter";
 import Swal from "sweetalert2";
-import { SimpleDropzone } from "simple-dropzone";
 // @ts-ignore
 import Layout from "@theme/Layout";
 // @ts-ignore
 import styles from "./playground.module.css";
 
-import ModelChange from "./playground/ModelChange";
-import EnvmapChange from "./playground/EnvmapChange";
 import VanillaView3D, { GLTFLoader } from "../../../src";
+import ModelChange from "../components/playground/ModelChange";
+import EnvmapChange from "../components/playground/EnvmapChange";
+import ResetIcon from "../../static/icon/reset.svg";
 
 class Playground extends React.Component<{}, {
   initialized: boolean;
   isLoading: boolean;
 }> {
-  private _view3D: VanillaView3D;
+  private _view3D;
   private _skyboxRef = React.createRef<HTMLInputElement>();
+  private _loader;
 
   public constructor(props) {
     super(props);
@@ -29,15 +30,18 @@ class Playground extends React.Component<{}, {
   }
 
   public componentDidMount() {
+    const { SimpleDropzone } = require("simple-dropzone");
+
     const view3D = new VanillaView3D("#playground-view3d", {
-      src: "/model/cube.glb",
-      skybox: "/texture/artist_workshop_1k.hdr",
+      src: "/egjs-view3d/model/cube.glb",
+      skybox: "/egjs-view3d/texture/artist_workshop_1k.hdr",
       autoplay: true
     });
 
-    void GLTFLoader.setMeshoptDecoder("/lib/meshopt_decoder.js");
+    void GLTFLoader.setMeshoptDecoder("/egjs-view3d/lib/meshopt_decoder.js");
 
     this._view3D = view3D;
+    this._loader = new GLTFLoader(view3D);
 
     const pageWrapper = document.querySelector("#playground-container");
     const fileInput = document.querySelector("#dropdown-file");
@@ -62,17 +66,21 @@ class Playground extends React.Component<{}, {
     return <Layout>
       <div className={styles.playgroundRoot}>
         <div id="playground-container" className={styles.model}>
-          <div id="playground-view3d" className={clsx("view3d-wrapper", styles.playground)}>
-            <canvas className="view3d-canvas"></canvas>
-          </div>
           {!initialized &&
             <div className={clsx("has-text-white is-size-3", styles.dropdownOverlay)}>
               <label htmlFor="dropdown-file" className={clsx("p-2", styles.dropdownBox)}>
-                <span>Drag <img src="/img/cube_white.svg" style={{ width: "48px", height: "48px" }} /> glTF 2.0 files, zip or folder here</span>
+                <span>Drag <img src="/egjs-view3d/img/cube_white.svg" style={{ width: "48px", height: "48px" }} /> glTF 2.0 files, zip or folder here</span>
                 <input id="dropdown-file" className={styles.dropdownFileInput} type="file" multiple />
               </label>
             </div>
           }
+          <div id="playground-view3d" className={clsx("view3d-wrapper", styles.playground)}>
+            <canvas className="view3d-canvas"></canvas>
+            <div className={clsx(styles.resetBtn, "button", "is-rounded")} onClick={() => { this._view3D.camera.reset(500); }}>
+              <ResetIcon width="32" height="32" />
+              <div className={styles.tooltip}>Reset Camera</div>
+            </div>
+          </div>
         </div>
         <aside className={clsx("menu", "p-4", styles.control)}>
           <ModelChange onSelect={this._onModelSelect} onUpload={this._onFileChange} isLoading={isLoading} />
@@ -92,7 +100,7 @@ class Playground extends React.Component<{}, {
             }}></input>
           </div>
           <button className="button" disabled={isLoading} onClick={this._downloadModel}>
-            <img className="mr-2" src="/icon/file_download_black.svg" />
+            <img className="mr-2" src="/egjs-view3d/icon/file_download_black.svg" />
             <span>Download .glb</span>
           </button>
         </aside>
@@ -122,7 +130,7 @@ class Playground extends React.Component<{}, {
     try {
       const view3D = this._view3D as any;
       const files = Array.from(fileMap) as Array<[string, File]>;
-      const loader = new GLTFLoader(view3D);
+      const loader = this._loader;
       const model = await loader.loadFromFiles(files.map(([name, file]) => file));
 
       view3D._src = model.src;

@@ -1,8 +1,7 @@
 import React from "react";
 import * as THREE from "three";
 import clsx from "clsx";
-import VanillaView3D, { View3DOptions } from "../../../src";
-import { ARButton, ARUI } from "../../../src/plugin";
+import VanillaView3D, { View3DOptions, ARButton, ARUI } from "../../../src";
 import DownloadIcon from "../../static/icon/file_download_black.svg";
 
 import OptionExample from "./OptionExample";
@@ -30,9 +29,9 @@ class View3D extends React.Component<DemoOptions, {
     showBbox: false,
     showExampleCode: false,
     showEventsTriggered: null,
-    dracoPath: "/lib/draco/",
-    ktxPath: "/lib/basis/",
-    meshoptPath: "/lib/meshopt_decoder.js"
+    dracoPath: "/egjs-view3d/lib/draco/",
+    ktxPath: "/egjs-view3d/lib/basis/",
+    meshoptPath: "/egjs-view3d/lib/meshopt_decoder.js"
   };
 
   private _view3D: VanillaView3D;

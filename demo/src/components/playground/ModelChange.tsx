@@ -2,13 +2,13 @@ import React from "react";
 import clsx from "clsx";
 
 const models = [
-  { name: "Cube", path: "/model/cube.glb" },
-  { name: "Alarm", path: "/model/meshopt/alarm.glb" },
-  { name: "Extinguisher", path: "/model/meshopt/extinguisher.glb" },
-  { name: "Plant", path: "/model/draco/plant.glb" },
-  { name: "Watch", path: "/model/meshopt/watch.glb" },
-  { name: "Payphone", path: "/model/draco/payphone.glb" },
-  { name: "Suzanne", path: "/model/meshopt/suzanne.glb" }
+  { name: "Cube", path: "/egjs-view3d/model/cube.glb" },
+  { name: "Alarm", path: "/egjs-view3d/model/meshopt/alarm.glb" },
+  { name: "Extinguisher", path: "/egjs-view3d/model/meshopt/extinguisher.glb" },
+  { name: "Plant", path: "/egjs-view3d/model/draco/plant.glb" },
+  { name: "Watch", path: "/egjs-view3d/model/meshopt/watch.glb" },
+  { name: "Payphone", path: "/egjs-view3d/model/draco/payphone.glb" },
+  { name: "Suzanne", path: "/egjs-view3d/model/meshopt/suzanne.glb" }
 ];
 
 export default ({ onSelect, onUpload, isLoading }) => {
@@ -39,7 +39,7 @@ export default ({ onSelect, onUpload, isLoading }) => {
           }}></input>
           <span className="file-cta">
             <span className="file-icon">
-              <img src="/icon/file_upload_black.svg" />
+              <img src="/egjs-view3d/icon/file_upload_black.svg" />
             </span>
             <span className="file-label">GLB</span>
           </span>

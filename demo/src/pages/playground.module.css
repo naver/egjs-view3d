@@ -34,6 +34,7 @@
   cursor: pointer;
   user-select: none;
   -webkit-user-drag: none;
+  z-index: 1;
 }
 
 html[data-theme='dark'] .dropdownBox {
@@ -56,4 +57,48 @@ html[data-theme='dark'] .dropdownBox {
 
 html[data-theme='dark'] .control {
   box-shadow: -1px 0 2px 0 rgba(255, 255, 255, 0.1);
+}
+
+.resetBtn {
+  position: absolute;
+  display: flex;
+  left: 10px;
+  bottom: 10px;
+  box-sizing: content-box;
+  padding: 12px !important;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+}
+
+.resetBtn .tooltip {
+  visibility: hidden;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 12px;
+  border-radius: 6px;
+  position: absolute;
+  bottom: 100%;
+  left: 0%;
+  z-index: 1;
+  white-space: nowrap;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.resetBtn .tooltip::after {
+  content: " ";
+  position: absolute;
+  top: 100%;
+  left: 27px;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: black transparent transparent transparent;
+}
+
+.resetBtn:hover .tooltip {
+  visibility: visible;
 }

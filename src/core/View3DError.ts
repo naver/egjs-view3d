@@ -3,9 +3,15 @@
  * egjs projects are licensed under the MIT license
  */
 
+/**
+ * Error thrown by View3D
+ */
 class View3DError extends Error {
   public code: number;
 
+  /**
+   * Create new instance of View3DError
+   */
   public constructor(message: string, code: number) {
     super(message);
 

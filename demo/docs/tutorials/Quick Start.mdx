@@ -69,8 +69,8 @@ You can also can set canvas width/height without ratio class but with CSS like t
 
 ```js
 import View3D from "@egjs/view3d";
-import "@egjs/view3d/css/bundle";
-// or import "@egjs/view3d/css"; if you don't use any plugins
+import "@egjs/view3d/css";
+// or import "@egjs/view3d/css/view3d.min.css"; if you don't use any plugins
 
 const view3D = new View3D("#view3d", {
   // Options
@@ -98,8 +98,9 @@ const view3D = new View3D("#view3d", {
 3D model will be displayed on the canvas if you set the option `src`.
 
 <View3D
-  src="/model/draco/alarm.glb"
-  poster="/poster/alarm.png"
+  src="/egjs-view3d/model/draco/alarm.glb"
+  poster="/egjs-view3d/poster/alarm_black.png"
+  translate={false}
   clickToLoad
   showExampleCode />
 
@@ -107,9 +108,9 @@ But as there's no lighting yet, model will be shown in black (unless it has emis
 View3D uses HDR image as envmap for IBL(image-based lighting), so you can set any HDR image for the option `envmap` and model will be litten.
 
 <View3D
-  src="/model/draco/alarm.glb"
-  envmap="/texture/artist_workshop_1k.hdr"
-  poster="/poster/alarm.png"
+  src="/egjs-view3d/model/draco/alarm.glb"
+  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+  poster="/egjs-view3d/poster/alarm.png"
   clickToLoad
   showExampleCode />
 

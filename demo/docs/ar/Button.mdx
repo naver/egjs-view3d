@@ -1,0 +1,102 @@
+---
+title: Displaying a Button/UI
+id: default
+slug: /ar
+sidebar_position: 1
+---
+
+import View3D from "@site/src/components/View3D";
+import License from "@site/src/components/License";
+
+:::caution
+
+Button / AR UI is not final and can be changed in the later versions.
+
+:::
+
+## ARButton
+
+View3D provides a predefined AR button as [Plugin](/docs/api/ARButton).
+To use it, you should include CSS/SASS file for it first.
+
+```js
+// It's included in the bundle CSS
+import "@egjs/view3d/css";
+
+// Or you can use individual css/sass file
+import "@egjs/view3d/css/view3d-ar.min.css"
+import "@egjs/view3d/sass/view3d-ar.sass"
+```
+
+Then, add [ARButton](/docs/api/ARButton) as plugin.
+
+```js
+import View3D, { ARButton } from "@egjs/view3d";
+
+const view3D = new View3D("#el", { ... });
+view3D.loadPlugins(new ARButton());
+```
+
+See [ARButtonOptions](/docs/api/ARButtonOptions) for available options.
+
+### Custom AR Button
+
+You can also create your own custom enter AR button.
+
+```html
+<div class="view3d-wrapper">
+  <canvas class="view3d-canvas"></canvas>
+
+  <!-- Custom AR Button -->
+  <button id="enter-ar">ENTER AR</div>
+</div>
+```
+
+Add a click handler to the button that calls [view3D.ar.enter()](/docs/api/ARManager#enter)
+```js
+document
+  .querySelector("#enter-ar")
+  .addEventListener("click", () => {
+    view3D.ar.enter();
+  });
+```
+
+<hr />
+
+## ARUI
+
+Similarly, View3D also provides default AR UI for [WebARSession](/docs/api/WebARSession)
+It currently only shows close button at the moment, but more UI elements will be added as default later.
+
+See [ARUI](/docs/api/ARUI) and [ARUIOptions](/docs/api/ARUIOptions)
+
+```js
+import View3D, { ARUI } from "@egjs/view3d";
+
+const view3D = new View3D("#el", { ... });
+view3D.loadPlugins(new ARUI());
+```
+
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  iosSrc="/egjs-view3d/model/usdz/alarm.usdz"
+  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+  showExampleCode
+  showARButton />
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

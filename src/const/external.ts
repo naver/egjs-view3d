@@ -10,16 +10,16 @@ export const AUTO = "auto";
 /**
  * Event type object with event name strings of {@link View3D}
  * @type {object}
- * @property {"ready"} READY {@link ReadyEvent}
- * @property {"load"} LOAD {@link LoadEvent}
- * @property {"resize"} RESIZE {@link ResizeEvent}
- * @property {"beforeRender"} BEFORE_RENDER {@link BeforeRenderEvent}
- * @property {"render"} RENDER {@link RenderEvent}
- * @property {"progress"} PROGRESS {@link LoadProgressEvent}
- * @property {"quickLookTap"} QUICK_LOOK_TAP {@link QuickLookTapEvent}
- * @property {"arStart"} AR_START {@link ARStartEvent}
- * @property {"arEnd"} AR_END {@link AREndEvent}
- * @property {"arModelPlaced"} AR_MODEL_PLACED {@link ARModelPlacedEvent}
+ * @property {"ready"} READY {@link /docs/events/ready Ready event}
+ * @property {"load"} LOAD {@link /docs/events/load Load event}
+ * @property {"resize"} RESIZE {@link /docs/events/resize Resize event}
+ * @property {"beforeRender"} BEFORE_RENDER {@link /docs/events/beforeRender Before render event}
+ * @property {"render"} RENDER {@link /docs/events/render Render event}
+ * @property {"progress"} PROGRESS {@link /docs/events/progress Progress event}
+ * @property {"quickLookTap"} QUICK_LOOK_TAP {@link /docs/events/quickLookTap Quick Look Tap event}
+ * @property {"arStart"} AR_START {@link /docs/events/arStart AR start evemt}
+ * @property {"arEnd"} AR_END {@link /docs/events/arEnd AR end event}
+ * @property {"arModelPlaced"} AR_MODEL_PLACED {@link /docs/events/arModelPlaced AR model placed event}
  * @example
  * ```ts
  * import { EVENTS } from "@egjs/view3d";

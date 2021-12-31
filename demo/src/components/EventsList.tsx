@@ -1,5 +1,6 @@
 import React from "react";
 import View3D from "./View3D";
+import RightArrowIcon from "../../static/icon/arrow_right_white.svg";
 
 class EventsList extends React.Component<{
   view3D: View3D;
@@ -35,7 +36,7 @@ class EventsList extends React.Component<{
       <div className="view3d-events">
         <div className="button is-white is-outlined" style={{ pointerEvents: "none" }}>Events Triggered</div>
         { events.map((evt, idx) => (<div className="bulma-tags has-addons mb-0 ml-2" key={evt.name}>
-          { idx > 0 && <img className="mr-2" src="/icon/arrow_right_white.svg" /> }
+          { idx > 0 && <RightArrowIcon className="mr-2" /> }
           <div className="bulma-tag mb-0 is-medium is-dark">{ evt.name }</div>
           <div className="bulma-tag mb-0 is-medium is-info">{ evt.count }</div>
         </div>))}

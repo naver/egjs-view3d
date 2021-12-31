@@ -28,7 +28,7 @@ import * as EVENT_TYPES from "./type/event";
 import { View3DPlugin } from "./plugin";
 import { getElement, getObjectOption } from "./utils";
 import { OptionGetters, ValueOf } from "./type/utils";
-import { GLTFLoader } from "./loaders";
+import { GLTFLoader } from "./loader";
 
 /**
  * @interface

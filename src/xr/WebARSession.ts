@@ -224,7 +224,13 @@ class WebARSession implements ARSession {
         size
       };
 
-      view3D.trigger(EVENTS.BEFORE_RENDER, { type: EVENTS.BEFORE_RENDER, target: view3D });
+      const deltaMiliSec = delta * 1000;
+
+      view3D.trigger(EVENTS.BEFORE_RENDER, {
+        type: EVENTS.BEFORE_RENDER,
+        target: view3D,
+        delta: deltaMiliSec
+      });
 
       if (!this._modelPlaced) {
         this._initModelPosition(ctx);
@@ -233,9 +239,19 @@ class WebARSession implements ARSession {
         view3D.animator.update(delta);
         threeRenderer.render(arScene.root, xrCam);
       }
+
+      view3D.trigger(EVENTS.RENDER, {
+        type: EVENTS.RENDER,
+        target: view3D,
+        delta: deltaMiliSec
+      });
     });
 
-    view3D.trigger(EVENTS.AR_START, { type: EVENTS.AR_START, target: view3D, session: this });
+    view3D.trigger(EVENTS.AR_START, {
+      type: EVENTS.AR_START,
+      target: view3D,
+      session: this
+    });
   }
 
   /**

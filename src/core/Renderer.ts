@@ -144,7 +144,8 @@ class Renderer {
 
     view3D.trigger(EVENTS.BEFORE_RENDER, {
       type: EVENTS.BEFORE_RENDER,
-      target: view3D
+      target: view3D,
+      delta: deltaMiliSec
     });
 
     camera.updatePosition();
@@ -152,7 +153,8 @@ class Renderer {
 
     view3D.trigger(EVENTS.RENDER, {
       type: EVENTS.RENDER,
-      target: view3D
+      target: view3D,
+      delta: deltaMiliSec
     });
   };
 }
