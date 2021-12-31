@@ -10,6 +10,7 @@ import View3DPlugin from "./View3DPlugin";
 
 /**
  * Options for the {@link ARUI}
+ * @interface
  */
 export interface ARUIOptions {
 

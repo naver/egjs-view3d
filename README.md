@@ -66,6 +66,9 @@ const view3d = new View3D("#view3d");
 
 See detailed explanation on our [Tutorial](https://naver.github.io/egjs-view3d/docs/)
 
+## 🔹 Browser Support
+View3D is available for the last two major versions of all evergreen desktop and mobile browsers.
+
 ## 🔹 Articles
 - [WebAR with WebXR API, Part 1](https://medium.com/naver-fe-platform/webar-with-webxr-api-part-1-e191a2dc7177)
 - [WebAR with WebXR API, Part 2](https://medium.com/naver-fe-platform/webar-with-webxr-api-part-2-dc76b20767fb)
