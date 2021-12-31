@@ -1,7 +1,7 @@
 {
 	"name": "@egjs/view3d",
 	"version": "2.0.0-beta.0",
-	"description": "Fast & customizable 3D model viewer for everyone based on three.js & typescript",
+	"description": "Fast & Customizable glTF 3D model viewer, packed with full of features!",
 	"main": "dist/view3d.js",
 	"module": "dist/view3d.esm.js",
 	"es2015": "dist/view3d.esm.js",
