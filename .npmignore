@@ -103,15 +103,20 @@ typings/
 
 ## Custom ###
 .DS_Store
+config/
 outjs/
 docs/
 docs-src/
 demo/
-config/
 test/
-*.config.js
-*.config.dev.js
+.editorconfig
+.eslintrc.json
+.travis.yml
+jsdoc-to-mdx.json
+jsdoc.json
+rollup.config.js
+tsconfig.json
+tsconfig.*.json
 jsdoc.json
 tslint.json
-.editorconfig
 *.pem
