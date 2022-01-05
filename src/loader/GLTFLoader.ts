@@ -76,14 +76,18 @@ class GLTFLoader {
     }
 
     return new Promise((resolve, reject) => {
-      loader.load(url, gltf => {
-        const model = this._parseToModel(gltf, url);
-        resolve(model);
-      }, evt => {
-        view3D.trigger(EVENTS.PROGRESS, { ...evt, target: view3D, type: EVENTS.PROGRESS });
-      }, err => {
+      try {
+        loader.load(url, gltf => {
+          const model = this._parseToModel(gltf, url);
+          resolve(model);
+        }, evt => {
+          view3D.trigger(EVENTS.PROGRESS, { ...evt, target: view3D, type: EVENTS.PROGRESS });
+        }, err => {
+          reject(err);
+        });
+      } catch (err) {
         reject(err);
-      });
+      }
     });
   }
 

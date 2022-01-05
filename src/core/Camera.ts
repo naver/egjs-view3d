@@ -106,11 +106,6 @@ class Camera {
    */
   public get renderHeight() { return 2 * this._distance * Math.tan(toRadian(this._threeCamera.getEffectiveFOV() / 2)); }
 
-  public set pose(val: Pose) {
-    this._currentPose = val;
-    this._view3D.control.sync();
-  }
-
   public set yaw(val: number) { this._currentPose.yaw = val; }
   public set pitch(val: number) { this._currentPose.pitch = val; }
   public set zoom(val: number) { this._currentPose.zoom = val; }
@@ -149,7 +144,7 @@ class Camera {
 
       return Promise.resolve();
     } else {
-      // Plaay the animation
+      // Play the animation
       const resetControl = new AnimationControl(view3D, currentPose, defaultPose);
       resetControl.duration = duration;
       resetControl.easing = easing;
@@ -240,35 +235,6 @@ class Camera {
     camera.near = (effectiveCamDist - maxDistToCenter) * 0.1;
     camera.far = (effectiveCamDist + maxDistToCenter) * 10;
     control.zoom.updateRange();
-  }
-
-  /**
-   * Set default position of camera relative to the 3d model
-   * New default pose will be used when {@link Camera#reset reset()} is called
-   * @param newDefaultPose new default pose to apply
-   * @returns {void}
-   */
-  public setDefaultPose(newDefaultPose: Partial<{
-    yaw: number;
-    pitch: number;
-    distance: number;
-    pivot: THREE.Vector3;
-  }>): void {
-    const defaultPose = this._defaultPose;
-    const { yaw, pitch, distance, pivot } = newDefaultPose;
-
-    if (yaw != null) {
-      defaultPose.yaw = yaw;
-    }
-    if (pitch != null) {
-      defaultPose.pitch = pitch;
-    }
-    if (distance != null) {
-      defaultPose.zoom = distance;
-    }
-    if (pivot != null) {
-      defaultPose.pivot = pivot;
-    }
   }
 
   /**

@@ -86,7 +86,6 @@ class AnimationControl implements CameraControl {
 
   /**
    * Update control by given deltaTime
-   * @param camera Camera to update position
    * @param deltaTime Number of milisec to update
    * @returns {void}
    */

@@ -49,7 +49,6 @@ class ARScaleControl implements ARControl {
   public get scale() { return this._scaleMultiplier; }
   public get ui() { return this._ui; }
 
-  public get scaleMultiplier() { return this._scaleMultiplier; }
   /**
    * Range of the scale
    * @readonly

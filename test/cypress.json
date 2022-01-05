@@ -1,0 +1,9 @@
+{
+  "integrationFolder": "suite",
+  "supportFile": "setup.ts",
+  "fileServerFolder": "asset",
+  "screenshotsFolder": "failed/screenshots",
+  "videosFolder": "failed/videos",
+  "pluginsFile": false,
+  "fixturesFolder": false
+}

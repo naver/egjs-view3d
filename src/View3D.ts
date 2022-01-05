@@ -542,6 +542,8 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._autoPlayer = new AutoPlayer(this, getObjectOption(autoplay));
     this._autoResizer = new AutoResizer(this);
     this._arManager = new ARManager(this);
+    this._model = null;
+    this._initialized = false;
 
     if (src && autoInit) {
       void this.init();

@@ -1,31 +1,12 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "lib": ["es2020", "dom"],
-    "target": "ES5",
-    "noImplicitAny": false,
-    "strictNullChecks": false,
-    "noUnusedLocals": false,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "jsx": "react-jsx",
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "types": [
-      "karma-chai",
-      "chai-as-promised",
-      "mocha"
-    ],
+    "target": "es5",
+    "lib": ["ES2015", "dom"],
+    "types": ["cypress"],
     "baseUrl": ".",
     "paths": {
       "~/*": ["../src/*"]
     }
   },
-  "include": [
-    "../src/**/*.ts",
-    "./**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["**/*.ts"]
 }
