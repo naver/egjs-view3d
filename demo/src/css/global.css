@@ -11,8 +11,16 @@
   display: flex;
 }
 
+.header-github-link {
+  margin-right: 0.5rem;
+}
+
 .header-github-link::before {
   background: url("../../static/icon/github.svg") no-repeat;
+}
+
+html[data-theme='dark'] .header-github-link::before {
+  background: url("../../static/icon/github_white.svg") no-repeat;
 }
 
 .header-npm-link::before {
