@@ -3,10 +3,11 @@
  * egjs projects are licensed under the MIT license
  */
 
-import EventEmitter from "./EventEmitter";
-import * as DEFAULT from "~/consts/default";
-import * as EASING from "~/consts/easing";
-import { circulate } from "~/utils";
+import Component from "@egjs/component";
+
+import * as DEFAULT from "../const/default";
+import { EASING } from "../const/external";
+import { circulate } from "../utils";
 
 /**
  * Fires for every animation frame when animation is active.
@@ -38,12 +39,11 @@ import { circulate } from "~/utils";
 
 /**
  * Self-running animation
- * @category Core
  */
-class Animation extends EventEmitter<{
-  progress: (event: { progress: number, easedProgress: number }) => any,
-  loop: (event: { progress: number, easedProgress: number, loopIndex: number }) => any,
-  finish: void,
+class Animation extends Component<{
+  progress: (event: { progress: number; easedProgress: number }) => any;
+  loop: (event: { progress: number; easedProgress: number; loopIndex: number }) => any;
+  finish: void;
 }> {
   // Options
   private _ctx: any; // Window or XRSession
@@ -61,15 +61,15 @@ class Animation extends EventEmitter<{
    * Create new instance of the Animation
    * @param {object} [options={}] Options
    */
-  constructor({
+  public constructor({
     context = window,
     repeat = 0,
     duration = DEFAULT.ANIMATION_DURATION,
-    easing = EASING.EASE_OUT_CUBIC,
+    easing = EASING.EASE_OUT_CUBIC
   }: Partial<{
-    context: any,
-    repeat: number,
-    duration: number,
+    context: any;
+    repeat: number;
+    duration: number;
     easing: (x: number) => number;
   }> = {}) {
     super();
@@ -120,26 +120,26 @@ class Animation extends EventEmitter<{
     const progress = this._time / duration;
     const progressEvent = {
       progress,
-      easedProgress: this._easing(progress),
+      easedProgress: this._easing(progress)
     };
-    this.emit("progress", progressEvent);
+    this.trigger("progress", progressEvent);
 
     for (let loopIdx = 0; loopIdx < loopIncrease; loopIdx++) {
       this._loopCount++;
       if (this._loopCount > this._repeat) {
-        this.emit("finish");
+        this.trigger("finish");
         this.stop();
         return;
       } else {
-        this.emit("loop", {
+        this.trigger("loop", {
           ...progressEvent,
-          loopIndex: this._loopCount,
+          loopIndex: this._loopCount
         });
       }
     }
 
     this._rafId = this._ctx.requestAnimationFrame(this._loop);
-  }
+  };
 
   private _stopLoop() {
     this._ctx.cancelAnimationFrame(this._rafId);

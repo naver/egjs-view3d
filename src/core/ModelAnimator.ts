@@ -7,7 +7,6 @@ import * as THREE from "three";
 
 /**
  * Component that manages animations of the 3D Model
- * @category Core
  */
 class ModelAnimator {
   private _mixer: THREE.AnimationMixer;
@@ -30,10 +29,9 @@ class ModelAnimator {
 
   /**
    * Create new ModelAnimator instance
-   * @param scene {@link https://threejs.org/docs/index.html#api/en/scenes/Scene THREE.Scene} instance that is root of all 3d objects
    */
-  constructor(scene: THREE.Scene) {
-    this._mixer = new THREE.AnimationMixer(scene);
+  public constructor(root: THREE.Object3D) {
+    this._mixer = new THREE.AnimationMixer(root);
     this._clips = [];
     this._actions = [];
   }
@@ -41,10 +39,12 @@ class ModelAnimator {
   /**
    * Store the given clips
    * @param clips Three.js {@link https://threejs.org/docs/#api/en/animation/AnimationClip AnimationClip}s of the model
-   * @returns {void} Nothing
+   * @returns {void}
    * @example
+   * ```ts
    * // After loading model
    * view3d.animator.setClips(model.animations);
+   * ```
    */
   public setClips(clips: THREE.AnimationClip[]): void {
     const mixer = this._mixer;
@@ -55,7 +55,7 @@ class ModelAnimator {
   /**
    * Play one of the model's animation
    * @param index Index of the animation to play
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public play(index: number): void {
     const action = this._actions[index];
@@ -70,7 +70,7 @@ class ModelAnimator {
    * If you want to stop animation completely, you should call {@link ModelAnimator#stop stop} instead
    * You should call {@link ModelAnimator#resume resume} to resume animation
    * @param index Index of the animation to pause
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public pause(index: number): void {
     const action = this._actions[index];
@@ -84,7 +84,7 @@ class ModelAnimator {
    * Resume one of the model's animation
    * This will play animation from the point when the animation is paused
    * @param index Index of the animation to resume
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public resume(index: number): void {
     const action = this._actions[index];
@@ -97,7 +97,7 @@ class ModelAnimator {
   /**
    * Fully stops one of the model's animation
    * @param index Index of the animation to stop
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public stop(index: number): void {
     const action = this._actions[index];
@@ -110,7 +110,7 @@ class ModelAnimator {
   /**
    * Update animations
    * @param delta number of seconds to play animations attached
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public update(delta: number): void {
     this._mixer.update(delta);
@@ -118,7 +118,7 @@ class ModelAnimator {
 
   /**
    * Reset the instance and remove all cached animation clips attached to it
-   * @returns {void} Nothing
+   * @returns {void}
    */
   public reset(): void {
     const mixer = this._mixer;

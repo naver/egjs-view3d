@@ -3,23 +3,25 @@
  * egjs projects are licensed under the MIT license
  */
 
-import * as XR from "~/consts/xr";
+import * as XR from "../../const/xr";
 
 /**
  * Manager for WebXR hit-test feature
- * @category XR
  */
 class HitTest {
+  /**
+   * Return whether hit-test feature is available
+   */
+  public static isAvailable() {
+    return XR.HIT_TEST_SUPPORTED();
+  }
+
   private _source: any = null;
 
   /**
    * Return whether hit-test is ready
    */
   public get ready() { return this._source != null; }
-  /**
-   * {@link https://developer.mozilla.org/en-US/docs/Web/API/XRSessionInit XRSessionInit} object for hit-test feature
-   */
-  public get features() { return XR.FEATURES.HIT_TEST; }
 
   /**
    * Destroy instance
@@ -44,18 +46,18 @@ class HitTest {
   }
 
   /**
-   * Return whether hit-test feature is available
+   * {@link https://developer.mozilla.org/en-US/docs/Web/API/XRSessionInit XRSessionInit} object for hit-test feature
    */
-  public isAvailable() {
-    return XR.HIT_TEST_SUPPORTED;
+  public getFeatures() {
+    return XR.FEATURES.HIT_TEST;
   }
 
   /**
    * Get hit-test results
    * @param {XRFrame} frame XRFrame instance
    */
-  public getResults(frame: any) {
-    return frame.getHitTestResults(this._source);
+  public getResults(frame?: THREE.XRFrame) {
+    return frame?.getHitTestResults(this._source) ?? [];
   }
 }
 

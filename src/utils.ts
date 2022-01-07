@@ -4,57 +4,71 @@
  */
 
 import * as THREE from "three";
-import View3DError from "./View3DError";
-import * as ERROR from "~/consts/error";
 
-export function getElement(el: HTMLElement | string | null, parent?: HTMLElement): HTMLElement | null {
+import View3DError from "./core/View3DError";
+import ERROR from "./const/error";
+import { NoBoolean } from "./type/utils";
+
+export const getNullableElement = (el: HTMLElement | string | null, parent?: HTMLElement): HTMLElement | null => {
   let targetEl: HTMLElement | null = null;
 
   if (typeof el === "string") {
     const parentEl = parent ? parent : document;
     const queryResult = parentEl.querySelector(el);
+
     if (!queryResult) {
       throw new View3DError(ERROR.MESSAGES.ELEMENT_NOT_FOUND(el), ERROR.CODES.ELEMENT_NOT_FOUND);
     }
+
     targetEl = queryResult as HTMLElement;
   } else if (el && el.nodeType === Node.ELEMENT_NODE) {
     targetEl = el;
   }
 
   return targetEl;
-}
+};
 
-export function getCanvas(el: HTMLElement | string): HTMLCanvasElement {
-  const targetEl = getElement(el);
+export const getElement = (el: HTMLElement | string, parent?: HTMLElement): HTMLElement => {
+  const targetEl = getNullableElement(el, parent);
 
   if (!targetEl) {
     throw new View3DError(ERROR.MESSAGES.WRONG_TYPE(el, ["HTMLElement", "string"]), ERROR.CODES.WRONG_TYPE);
   }
 
-  if (!/^canvas$/i.test(targetEl.tagName)) {
-    throw new View3DError(ERROR.MESSAGES.ELEMENT_NOT_CANVAS(targetEl), ERROR.CODES.ELEMENT_NOT_CANVAS);
+  return targetEl;
+};
+
+export const findCanvas = (root: HTMLElement, selector: string): HTMLCanvasElement => {
+  const canvas = root.querySelector(selector) as HTMLCanvasElement;
+
+  if (!canvas) {
+    throw new View3DError(ERROR.MESSAGES.CANVAS_NOT_FOUND, ERROR.CODES.CANVAS_NOT_FOUND);
   }
 
-  return targetEl as HTMLCanvasElement;
-}
+  return canvas;
+};
 
-export function range(end: number): number[] {
+export const range = (end: number): number[] => {
   if (!end || end <= 0) {
     return [];
   }
 
   return Array.apply(0, Array(end)).map((undef, idx) => idx);
-}
+};
 
-export function toRadian(x: number) {
+export const toRadian = (x: number) => {
   return x * Math.PI / 180;
-}
+};
 
-export function clamp(x: number, min: number, max: number) {
+export const toDegree = (x: number) => {
+  return x * 180 / Math.PI;
+};
+
+export const clamp = (x: number, min: number, max: number) => {
   return Math.max(Math.min(x, max), min);
-}
+};
 
-export function findIndex<T>(target: T, list: T[]) {
+export const findIndex = <T>(target: T, list: T[]) => {
   let index = -1;
   for (const itemIndex of range(list.length)) {
     if (list[itemIndex] === target) {
@@ -63,14 +77,14 @@ export function findIndex<T>(target: T, list: T[]) {
     }
   }
   return index;
-}
+};
 
 // Linear interpolation between a and b
-export function mix(a: number, b: number, t: number) {
+export const mix = (a: number, b: number, t: number) => {
   return a * (1 - t) + b * t;
-}
+};
 
-export function circulate(val: number, min: number, max: number) {
+export const circulate = (val: number, min: number, max: number) => {
   const size = Math.abs(max - min);
 
   if (val < min) {
@@ -82,9 +96,10 @@ export function circulate(val: number, min: number, max: number) {
   }
 
   return val;
-}
+};
 
-export function merge(target: object, ...srcs: object[]): object {
+// eslint-disable-next-line @typescript-eslint/ban-types
+export const merge = (target: object, ...srcs: object[]): object => {
   srcs.forEach(source => {
     Object.keys(source).forEach(key => {
       const value = source[key];
@@ -97,9 +112,9 @@ export function merge(target: object, ...srcs: object[]): object {
   });
 
   return target;
-}
+};
 
-export function getBoxPoints(box: THREE.Box3) {
+export const getBoxPoints = (box: THREE.Box3) => {
   return [
     box.min.clone(),
     new THREE.Vector3(box.min.x, box.min.y, box.max.z),
@@ -108,11 +123,11 @@ export function getBoxPoints(box: THREE.Box3) {
     new THREE.Vector3(box.max.x, box.min.y, box.min.z),
     new THREE.Vector3(box.max.x, box.min.y, box.max.z),
     new THREE.Vector3(box.max.x, box.max.y, box.min.z),
-    box.max.clone(),
+    box.max.clone()
   ];
-}
+};
 
-export function toPowerOfTwo(val: number) {
+export const toPowerOfTwo = (val: number) => {
   let result = 1;
 
   while (result < val) {
@@ -120,9 +135,9 @@ export function toPowerOfTwo(val: number) {
   }
 
   return result;
-}
+};
 
-export function getPrimaryAxisIndex(basis: THREE.Vector3[], viewDir: THREE.Vector3) {
+export const getPrimaryAxisIndex = (basis: THREE.Vector3[], viewDir: THREE.Vector3) => {
   let primaryIdx = 0;
   let maxDot = 0;
 
@@ -136,10 +151,10 @@ export function getPrimaryAxisIndex(basis: THREE.Vector3[], viewDir: THREE.Vecto
   });
 
   return primaryIdx;
-}
+};
 
 // In radian
-export function getRotationAngle(center: THREE.Vector2, v1: THREE.Vector2, v2: THREE.Vector2) {
+export const getRotationAngle = (center: THREE.Vector2, v1: THREE.Vector2, v2: THREE.Vector2) => {
   const centerToV1 = new THREE.Vector2().subVectors(v1, center).normalize();
   const centerToV2 = new THREE.Vector2().subVectors(v2, center).normalize();
 
@@ -150,4 +165,21 @@ export function getRotationAngle(center: THREE.Vector2, v1: THREE.Vector2, v2: T
   const rotationAngle = Math.abs(deg) < Math.abs(compDeg) ? deg : compDeg;
 
   return rotationAngle;
-}
+};
+
+export const getObjectOption = <T extends boolean | Partial<object>>(val: T): NoBoolean<T> => typeof val === "object" ? val : {} as any;
+export const toBooleanString = (val: boolean) => val ? "true" : "false";
+
+export const getRotatedPosition = (distance: number, yawDeg: number, pitchDeg: number) => {
+  const yaw = toRadian(yawDeg);
+  const pitch = toRadian(pitchDeg);
+  const newPos = new THREE.Vector3(0, 0, 0);
+
+  newPos.y = distance * Math.sin(pitch);
+  newPos.z = distance * Math.cos(pitch);
+
+  newPos.x = newPos.z * Math.sin(-yaw);
+  newPos.z = newPos.z * Math.cos(-yaw);
+
+  return newPos;
+};
