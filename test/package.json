@@ -1,0 +1,12 @@
+{
+  "name": "unit",
+  "version": "0.0.0",
+  "scripts": {
+    "test": "cypress run --browser chrome",
+    "ui": "cypress open"
+  },
+  "devDependencies": {
+    "cypress": "^9.2.0",
+    "typescript": "^4.5.4"
+  }
+}
