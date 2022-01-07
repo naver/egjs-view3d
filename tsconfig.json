@@ -2,7 +2,7 @@
   "compilerOptions": {
     "outDir": "./outjs/",
     "module": "es2015",
-    "target": "es5",
+    "target": "es2015",
     "moduleResolution": "node",
     "lib": ["es2015", "dom"],
     "sourceMap": true,
@@ -10,16 +10,11 @@
     "downlevelIteration": true,
     "experimentalDecorators": true,
     "esModuleInterop": true,
-    "baseUrl": ".",
-    "paths": {
-      "~/*": [
-        "src/*"
-      ]
-    },
+    "baseUrl": "."
   },
   "include": [
     "./src/**/*.ts",
-    "./test/**/*.ts",
+    "./test/**/*.ts"
   ],
   "exclude": [
     "node_modules"

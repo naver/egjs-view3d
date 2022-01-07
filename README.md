@@ -1,24 +1,36 @@
-<img src="https://naver.github.io/egjs-view3d/image/view3d.png" />
+<center>
 
-[![Version](https://img.shields.io/npm/v/@egjs/view3d?color=A8C256&label=&style=flat-square&logo=npm)](https://www.npmjs.com/package/@egjs/view3d) [![size](https://img.shields.io/bundlephobia/minzip/@egjs/view3d.svg?style=flat-square&label=%F0%9F%92%BE%20gzipped)](https://bundlephobia.com/result?p=@egjs/view3d@1.0.1) [![build](https://img.shields.io/travis/naver/egjs-view3d.svg?style=flat-square&label=build&logo=travis%20ci)](https://travis-ci.org/naver/egjs-view3d) [![coverage](https://img.shields.io/coveralls/github/naver/egjs-view3d.svg?style=flat-square&label=%E2%9C%85%20coverage)](https://coveralls.io/github/naver/egjs-view3d?branch=main) ![typescript](https://img.shields.io/static/v1.svg?label=&message=TypeScript&color=294E80&style=flat-square&logo=typescript) ![supports](https://img.shields.io/static/v1.svg?label=&message=%F0%9F%93%B1%F0%9F%92%BB%F0%9F%96%A5%EF%B8%8F&color=DDD&style=flat-square)
+<img width="400" src="https://naver.github.io/egjs-view3d/poster/cube.png">
 
-Fast & customizable 3D model viewer for everyone
+# View3D
 
-👉 **[Demo](https://naver.github.io/egjs-view3d)** / **[API Document](https://naver.github.io/egjs-view3d/release/latest/docs/)** / **[Tutorial](https://naver.github.io/egjs-view3d/release/latest/docs//tutorial-Adding%20Controls.html)**
+<img alt="npm (scoped)" src="https://img.shields.io/npm/v/@egjs/view3d?logo=npm"></img>
+<img alt="License" src="https://img.shields.io/github/license/naver/egjs-view3d" />
+<img alt="Typescript" src="https://img.shields.io/static/v1.svg?label=&message=TypeScript&color=294E80&style=flat-square&logo=typescript" />
+<img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/naver/egjs-view3d?style=social" />
 
-👉 Related Articles: [1](https://medium.com/naver-fe-platform/webar-with-webxr-api-part-1-e191a2dc7177), [2](https://medium.com/naver-fe-platform/webar-with-webxr-api-part-2-dc76b20767fb)
+Fast & Customizable glTF 3D model viewer, packed with full of features!
 
-## Features
-- A customizable 3D model viewer based on the [three.js](https://github.com/mrdoob/three.js/)
-- Supports LOD, which can greatly decrease time before 3D model displays.
-  - [Demo](https://naver.github.io/egjs-view3d#features-lod)
-- Supports WebXR & SceneViewer AR for Android & AR Quick Look for iOS
-- Supports multiple AR types
-  - [Demo](https://naver.github.io/egjs-view3d#features-ar)
-- Fully documented API
+👉 **[Demo](https://naver.github.io/egjs-view3d)** / **[API Document](https://naver.github.io/egjs-view3d/docs/api/View3D)** / **[Tutorial](https://naver.github.io/egjs-view3d/docs/)**
+
+</center>
+
+## 🔹 Features
+- glTF Viewer based on the [three.js](https://github.com/mrdoob/three.js/)
+  - View, rotate, translate and zoom your glTF 3D models in the web.
+  - Works on both 🖥️ Desktop & 📱 Mobile
+  - Customize your viewer with options like autoplay, skybox, and shadow
+- Augmented Reality
+  - View3D supports Augmented Reality based on WebXR, Scene Viewer, and AR Quick Look
+  - You can see, rotate, move, and scale the 3D model on the floor & wall in our AR sessions.
+- Supports compressed glTF 2.0 models
+  - View3D can display compressed glTF models with the following extensions.
+    - KHR_draco_mesh_compression
+    - EXT_meshopt_compression
+    - KHR_texture_basisu
 - Typescript-based
 
-## Install
+## 🔹 Installation
 
 ```sh
 npm i @egjs/view3d
@@ -26,63 +38,42 @@ npm i @egjs/view3d
 yarn add @egjs/view3d
 ```
 
-## Getting Started
-@egjs/view3d requires one canvas element to be initialized.
+## 🔹 Quick Start
+@egjs/view3d requires one wrapper & one canvas element to be initialized.
 
 ```html
-<!-- Wrapper element -->
-<div id="some-wrapper">
-  <!-- View3D needs one canvas element to render a 3d model -->
-  <!-- You don't have to set width / height attribute of it, as View3D will manage that for you. -->
-  <!-- Just set its size with CSS, then View3D will use it -->
-  <canvas id="my-canvas"></canvas>
-  <!-- Other UI elements of your choice here -->
+<div id="view3d" class="view3d-wrapper">
+  <canvas class="my-canvas"></canvas>
 </div>
-
-<!-- Here's some sample CSS style for the reference -->
-<style>
-#some-wrapper {
-  width: 100vw;
-  height: 100vh;
-}
-#my-canvas {
-  width: 100%;
-  height: 100%;
-}
-</style>
 ```
 
 Then you can use it like
 
 ```js
 import View3D from "@egjs/view3d";
+import "@egjs/view3d/css";
 
-const canvasEl = document.querySelector("#my-canvas");
-const view3d = new View3D(canvasEl);
+const canvasEl = document.querySelector("#view3d");
+const view3d = new View3D(canvasEl, {
+  src: "URL_TO_YOUR_3D_MODEL",
+  envmap: "URL_TO_YOUR_HDR_IMAGE",
+});
+
 // or just
-const view3d = new View3D("#my-canvas");
+
+const view3d = new View3D("#view3d");
 ```
 
-See more examples on our [Demo](https://naver.github.io/egjs-view3d) / [Tutorial](https://naver.github.io/egjs-view3d/docs/tutorial-Adding%20Controls.html)
+See detailed explanation on our [Tutorial](https://naver.github.io/egjs-view3d/docs/)
 
-## Browser Coverage
-View3D is available for browsers support webgl.
+## 🔹 Browser Support
+View3D is available for the last two major versions of all evergreen desktop and mobile browsers.
 
-|<img width="20" src="https://simpleicons.org/icons/internetexplorer.svg" alt="IE" />|<img width="20" src="https://simpleicons.org/icons/googlechrome.svg" alt="Chrome" />|<img width="20" src="https://simpleicons.org/icons/firefoxbrowser.svg" alt="Firefox" />|<img width="20" src="https://simpleicons.org/icons/safari.svg" alt="Safari" />|<img width="20" src="https://simpleicons.org/icons/apple.svg" alt="iOS" />|<img width="20" src="https://simpleicons.org/icons/android.svg" alt="Android">|
-|:---:|:---:|:---:|:---:|:---:|:---:|
-|11+|Latest|Latest|Latest|8+|5+|
+## 🔹 Articles
+- [WebAR with WebXR API, Part 1](https://medium.com/naver-fe-platform/webar-with-webxr-api-part-1-e191a2dc7177)
+- [WebAR with WebXR API, Part 2](https://medium.com/naver-fe-platform/webar-with-webxr-api-part-2-dc76b20767fb)
 
-See more details at https://caniuse.com/webgl
-
-## Augmented Reality(AR) Coverage
-<img width="20" src="https://simpleicons.org/icons/android.svg" alt="Android"><br/>(WebXR)|<img width="20" src="https://simpleicons.org/icons/android.svg" alt="Android"><br/>(Google SceneViewer)|<img width="20" src="https://simpleicons.org/icons/apple.svg" alt="iOS" /><br/>(AR QuickLook)|
-|:---:|:---:|:---:|
-|<img width="15" src="https://simpleicons.org/icons/googlechrome.svg" alt="Chrome" />|All browsers|<img width="15" src="https://simpleicons.org/icons/safari.svg" alt="Safari" /> <img width="15" src="https://simpleicons.org/icons/googlechrome.svg" alt="Chrome" />|
-|Android 7.0+, Chromium 81+|Android 7.0+|iOS 11+|
-- We also support AR session based on Google's [SceneViewer](https://developers.google.com/ar/develop/java/scene-viewer) and Apple's [AR Quick Look](https://developer.apple.com/augmented-reality/quick-look/)
-- For Android device coverage, see https://developers.google.com/ar/discover/supported-devices
-
-## License
+## 🔹 License
 ```
 Copyright (c) 2020-present NAVER Corp.
 
