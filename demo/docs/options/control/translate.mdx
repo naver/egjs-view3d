@@ -1,0 +1,48 @@
+---
+sidebar_position: 6
+---
+
+import View3D from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
+
+<OptionDescriptor type="boolean | TranslateControlOptions" defaultVal="true" />
+
+Options for the [TranslateControl](/docs/api/TranslateControl).
+If `false` is given, it will disable the translate control.
+
+|Name|Type|Default|Description|
+|:---:|:---:|:---:|---|
+|scale|number|1|Scale factor for rotation|
+|duration|number|0|Duration of the input animation (ms)|
+|easing|function|EASING.EASE_OUT_CUBIC|Easing function of the animation|
+
+## Example
+### translate: true (default)
+<View3D src="/egjs-view3d/model/meshopt/alarm.glb" envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" translate={true} showExampleCode />
+
+### translate: false
+<View3D src="/egjs-view3d/model/meshopt/alarm.glb" envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" translate={false} showExampleCode />
+
+### Detailed options
+<View3D src="/egjs-view3d/model/meshopt/alarm.glb" envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" translate={{
+  scale: 2,
+  duration: 2000
+}} showExampleCode />
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

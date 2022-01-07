@@ -1,0 +1,22 @@
+---
+title: Handling Errors
+id: handling-errors
+slug: /handling-errors
+sidebar_position: 6
+---
+
+View3D will throw its own defined custom error with error code.
+You can handle it with the `code` value of the error.
+See [Error Codes](/docs/api/ERROR_CODES) that can be thrown.
+
+```ts
+import View3D, { ERROR_CODES } from "@egjs/view3d";
+
+try {
+  const view3d = new View3D("#wrapper");
+} catch (err) {
+  if (err.code === ERROR_CODES.ELEMENT_NOT_FOUND) {
+    console.error("Element not found");
+  }
+}
+```

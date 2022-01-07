@@ -1,0 +1,36 @@
+---
+sidebar_position: 8
+---
+
+import View3D from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
+
+<OptionDescriptor type="boolean" defaultVal="true" />
+
+Enable browser scrolling with touch on the canvas area.
+This will block the rotate(pitch) control if the user is currently scrolling.
+
+## Example
+### scrollable: true (default)
+<View3D src="/egjs-view3d/model/meshopt/alarm.glb" envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" scrollable={true} showExampleCode />
+
+### scrollable: false
+<View3D src="/egjs-view3d/model/meshopt/alarm.glb" envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" scrollable={false} showExampleCode />
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

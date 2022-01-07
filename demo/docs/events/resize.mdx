@@ -1,0 +1,37 @@
+---
+sidebar_position: 4
+---
+
+import View3D from "@site/src/components/View3D";
+import License from "@site/src/components/License";
+
+An event that fires when View3D's canvas size is changed.
+
+|Property|Type|Description|
+|:---:|:---:|---|
+|type|string|The type of event|
+|target|[View3D](/docs/api/View3D)|An instance of View3D that triggered this event|
+|width|number|New width of the canvas|
+|height|number|New height of the canvas|
+
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+  showEventsTriggered={["resize"]} />
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

@@ -1,0 +1,47 @@
+---
+sidebar_position: 1
+---
+
+import View3D from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
+
+<OptionDescriptor type={`boolean | WebARSessionOptions`} defaultVal="true" />
+
+Options for the WebXR-based AR session.
+If `false` is given, it will disable WebXR-based AR session.
+
+|Name|Type|Default|Description|
+|:---:|:---:|:---:|---|
+|features|object|{}|Additional features(see [XRSessionInit](https://developer.mozilla.org/en-US/docs/Web/API/XRSessionInit)) of the WebXR session.|
+|overlayRoot|HTMLElement \| string \| null|null|`dom-overlay`'s root element. You can set either HTMLElement or query selector for that element.|
+|rotate|boolean \| [ARSwirlControlOptions](/docs/api/ARSwirlControlOptions)|true|Options for the rotate control inside the AR session. You can disable rotate control by giving `false`.|
+|translate|boolean \| [ARTranslateControlOptions](/docs/api/ARTranslateControlOptions)|true|Options for the translate control inside the AR session. You can disable translate control by giving `false`.|
+|scale|boolean \| [ARScaleControlOptions](/docs/api/ARScaleControlOptions)|true|Options for the scale control inside the AR session. You can disable scale control by giving `false`.|
+|ring|[FloorIndicatorOptions](/docs/api/FloorIndicatorOptions)|{}|Options for the floor ring.|
+|deadzone|[DeadzoneCheckerOptions](/docs/api/DeadzoneCheckerOptions)|{}|Control's deadzone options.|
+|initialScale|"auto" \| number|"auto"|Initial scale of the model. If set to "auto", it will modify big overflowing 3D model's scale to fit the screen when it's initially displayed. This won't increase the 3D model's scale more than 1.|
+
+## Example
+### webAR: true (default)
+<View3D src="/egjs-view3d/model/draco/alarm.glb" iosSrc="/egjs-view3d/model/usdz/alarm.usdz" envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" webAR={true} showExampleCode showARButton />
+
+### webAR: false
+<View3D src="/egjs-view3d/model/draco/alarm.glb" iosSrc="/egjs-view3d/model/usdz/alarm.usdz" envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" webAR={false} showExampleCode showARButton />
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

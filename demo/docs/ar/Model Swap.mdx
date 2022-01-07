@@ -1,0 +1,73 @@
+import View3D from "@site/src/components/View3D";
+import ModelSwapper from "@site/src/components/ModelSwapper";
+
+Tutorial for changing 3D models during the AR session.
+
+:::caution
+This kind of interaction is only available in the [WebARSession](/docs/api/WebARSession)
+:::
+
+1. Add an element with class `view3d-ar-overlay` inside the `.view3d-wrapper` element
+```html
+<div class="view3d-wrapper">
+  <canvas class="view3d-canvas"></canvas>
+  <div class="view3d-ar-overlay"></div>
+</div>
+```
+
+2. Add some buttons inside `view3d-ar-overlay`.
+```html
+<div class="view3d-ar-overlay">
+  <button id="btn-alarm">Alarm Clock</button>
+  <button id="btn-payphone">Payphone</button>
+  <button id="btn-plant">Plant</button>
+</div>
+```
+
+3. Add click handlers for buttons
+```js
+import View3D from "@egjs/view3d";
+
+const view3D = new View3D("#el", {
+  src: "...",
+  envmap: "...",
+  // IMPORTANT, set overlay root to ".view3d-ar-overlay"
+  webAR: { overlayRoot: ".view3d-ar-overlay" }
+});
+
+const buttons = [
+  { el: document.getElementById("btn-alarm"), src: "/egjs-view3d/model/draco/alarm.glb" },
+  { el: document.getElementById("btn-payphone"), src: "/egjs-view3d/model/draco/payphone.glb" },
+  { el: document.getElementById("btn-plant"), src: "/egjs-view3d/model/draco/plant.glb" }
+];
+
+buttons.forEach(btn => {
+  btn.el.addEventListener("click", () => {
+    view3D.load(btn.src);
+  });
+})
+```
+
+<>
+  {(() => {
+    let ref = React.createRef();
+    return (<View3D
+      src="/egjs-view3d/model/draco/alarm.glb"
+      iosSrc="/egjs-view3d/model/usdz/alarm.usdz"
+      ref={ref}
+      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+      webAR={{ overlayRoot: ".view3d-ar-overlay" }}
+      sceneViewer={false}
+      quickLook={false}
+      showExampleCode
+      showARButton>
+      <div className="view3d-ar-overlay">
+        <ModelSwapper view3DRef={ref} models={[
+          { src: "/egjs-view3d/model/draco/alarm.glb", name: "Alarm Clock" },
+          { src: "/egjs-view3d/model/draco/payphone.glb", name: "Payphone" },
+          { src: "/egjs-view3d/model/draco/plant.glb", name: "Plant" }
+        ]}  />
+      </div>
+    </View3D>);
+  })()}
+</>

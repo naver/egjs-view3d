@@ -1,0 +1,33 @@
+import View3D from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
+
+<OptionDescriptor type={`"auto" | number[]`} defaultVal={`"auto"`} />
+
+Center of the camera rotation.
+If `"auto"` is given, it will use the center of the model's bounding box as the pivot.
+Else, you can use any world position as the pivot.
+
+## Example
+### center: "auto" (default)
+<View3D src="/egjs-view3d/model/meshopt/alarm.glb" center="auto" envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" showExampleCode />
+
+### center: [0.03, 0, 0]
+<View3D src="/egjs-view3d/model/meshopt/alarm.glb" center={[0.03, 0, 0]} envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" showExampleCode />
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

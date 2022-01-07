@@ -1,0 +1,42 @@
+---
+sidebar_position: 7
+---
+
+import View3D from "@site/src/components/View3D";
+import License from "@site/src/components/License";
+
+An event that fires while the 3D model is loading.
+This extends the native [ProgressEvent](https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent).
+To get `total` bytes, you should serve the 3D model with the `Content-Length` header.
+
+|Property|Type|Description|
+|:---:|:---:|---|
+|type|string|The type of event|
+|target|[View3D](/docs/api/View3D)|An instance of View3D that triggered this event|
+|lengthComputable|boolean|A boolean flag indicating if the total work to be done, and the amount of work already done, by the underlying process is calculable. In other words, it tells if the progress is measurable or not|
+|loaded|number|A 64-bit unsigned integer value indicating the amount of work already performed by the underlying process. The ratio of work done can be calculated by dividing total by the value of this property. When downloading a resource using HTTP, this only counts the body of the HTTP message, and doesn't include headers and other overhead|
+|total|number|A 64-bit unsigned integer representing the total amount of work that the underlying process is in the progress of performing. When downloading a resource using HTTP, this is the Content-Length (the size of the body of the message), and doesn't include the headers and other overhead|
+
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+  poster="/egjs-view3d/poster/alarm.png"
+  clickToLoad
+  showEventsTriggered={["progress"]} />
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

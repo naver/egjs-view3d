@@ -1,0 +1,36 @@
+---
+sidebar_position: 5
+---
+
+import View3D from "@site/src/components/View3D";
+import License from "@site/src/components/License";
+
+An event that fires before rendering a frame.
+
+|Property|Type|Description|
+|:---:|:---:|---|
+|type|string|The type of event|
+|target|[View3D](/docs/api/View3D)|An instance of View3D that triggered this event|
+|delta|number|Time passed from the previous render call, in milisecond|
+
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+  showEventsTriggered={["beforeRender"]} />
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />
