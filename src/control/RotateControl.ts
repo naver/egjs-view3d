@@ -20,11 +20,15 @@ import CameraControl from "./CameraControl";
  * @param {number} [scale=1] Scale factor for rotation
  * @param {number} [duration=300] Duration of the input animation (ms)
  * @param {function} [easing=EASING.EASE_OUT_CUBIC] Easing function of the animation
+ * @param {boolean} [disablePitch=false] Disable X-axis(pitch) rotation
+ * @param {boolean} [disableYaw=false] Disable Y-axis(yaw) rotation
  */
 export interface RotateControlOptions {
   scale: number;
   duration: number;
   easing: (x: number) => number;
+  disablePitch: boolean;
+  disableYaw: boolean;
 }
 
 /**
@@ -35,6 +39,8 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
   private _scale: RotateControlOptions["scale"];
   private _duration: RotateControlOptions["duration"];
   private _easing: RotateControlOptions["easing"];
+  private _disablePitch: RotateControlOptions["disablePitch"];
+  private _disableYaw: RotateControlOptions["disableYaw"];
 
   // Internal values
   private _view3D: View3D;
@@ -72,6 +78,18 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
    * @see EASING
    */
   public get easing() { return this._easing; }
+  /**
+   * Disable X-axis(pitch) rotation
+   * @type {boolean}
+   * @default false
+   */
+  public get disablePitch() { return this._disablePitch; }
+  /**
+   * Disable Y-axis(yaw) rotation
+   * @type {boolean}
+   * @default false
+   */
+  public get disableYaw() { return this._disableYaw; }
 
   public set scale(val: RotateControlOptions["scale"]) {
     this._scale = val;
@@ -97,7 +115,9 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
   public constructor(view3D: View3D, {
     duration = DEFAULT.ANIMATION_DURATION,
     easing = DEFAULT.EASING,
-    scale = 1
+    scale = 1,
+    disablePitch = false,
+    disableYaw = false
   }: Partial<RotateControlOptions> = {}) {
     super();
 
@@ -105,6 +125,8 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
     this._scale = scale;
     this._duration = duration;
     this._easing = easing;
+    this._disablePitch = disablePitch;
+    this._disableYaw = disableYaw;
 
     this._isFirstTouch = false;
     this._isScrolling = false;
@@ -129,14 +151,21 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
     const camera = this._view3D.camera;
     const xMotion = this._xMotion;
     const yMotion = this._yMotion;
+    const yawEnabled = !this._disableYaw;
+    const pitchEnabled = !this._disablePitch;
 
     const delta = new THREE.Vector2(
       xMotion.update(deltaTime),
       yMotion.update(deltaTime),
     );
 
-    camera.yaw += delta.x;
-    camera.pitch += delta.y;
+    if (yawEnabled) {
+      camera.yaw += delta.x;
+    }
+
+    if (pitchEnabled) {
+      camera.pitch += delta.y;
+    }
   }
 
   /**
