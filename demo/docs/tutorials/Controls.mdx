@@ -27,6 +27,30 @@ Each controls can be disabled easily by setting it to `false`.
 
 > *The right click(Translation) is disabled*
 
+### Disabling rotation axis
+It is possible to deactivate only one axis of the rotation with `disablePitch` (X-axis) and `disableYaw` (Y-axis).
+
+<div className="columns">
+  <div className="column">
+  <View3D
+    src="/egjs-view3d/model/draco/alarm.glb"
+    envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+    poster="/egjs-view3d/poster/alarm.png"
+    rotate={{ disablePitch: true }}
+    clickToLoad
+    showExampleCode />
+  </div>
+  <div className="column">
+    <View3D
+    src="/egjs-view3d/model/draco/alarm.glb"
+    envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+    poster="/egjs-view3d/poster/alarm.png"
+    rotate={{ disableYaw: true }}
+    clickToLoad
+    showExampleCode />
+  </div>
+</div>
+
 ## Scrolling
 ### Mobile
 By default, [scrollable](/docs/options/control/scrollable) is enabled to enable scrolling on the canvas area for mobile(touch) devices.
