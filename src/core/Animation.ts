@@ -7,7 +7,7 @@ import Component from "@egjs/component";
 
 import * as DEFAULT from "../const/default";
 import { EASING } from "../const/external";
-import { circulate } from "../utils";
+import { circulate, clamp } from "../utils";
 
 /**
  * Fires for every animation frame when animation is active.
@@ -112,10 +112,15 @@ class Animation extends Component<{
   private _loop = () => {
     const delta = this._getDeltaTime();
     const duration = this._duration;
-    this._time += delta;
+    const repeat = this._repeat;
+    const prevTime = this._time;
 
-    const loopIncrease = Math.floor(this._time / duration);
-    this._time = circulate(this._time, 0, duration);
+    const time = prevTime + delta;
+
+    const loopIncrease = Math.floor(time / duration);
+    this._time = this._loopCount >= repeat
+      ? clamp(time, 0, duration)
+      : circulate(time, 0, duration);
 
     const progress = this._time / duration;
     const progressEvent = {
@@ -126,7 +131,7 @@ class Animation extends Component<{
 
     for (let loopIdx = 0; loopIdx < loopIncrease; loopIdx++) {
       this._loopCount++;
-      if (this._loopCount > this._repeat) {
+      if (this._loopCount > repeat) {
         this.trigger("finish");
         this.stop();
         return;

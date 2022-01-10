@@ -156,7 +156,7 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
 
     const delta = new THREE.Vector2(
       xMotion.update(deltaTime),
-      yMotion.update(deltaTime),
+      yMotion.update(deltaTime)
     );
 
     if (yawEnabled) {

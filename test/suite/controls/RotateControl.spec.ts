@@ -1,8 +1,6 @@
 import RotateControl from "~/control/RotateControl";
-import View3DError from "~/core/View3DError";
-import ERROR from "~/const/error";
 import * as BROWSER from "~/const/browser";
-import { createView3D } from "../../test-utils";
+import { createView3D, simulate } from "../../test-utils";
 
 describe("RotateControl", () => {
   describe("Initial state", () => {
@@ -17,6 +15,20 @@ describe("RotateControl", () => {
       const view3D = await createView3D();
 
       expect(new RotateControl(view3D).enabled).to.be.false;
+    });
+  });
+
+  describe("Options", () => {
+    describe("disablePitch", () => {
+      it("should disable x-axis rotation", async () => {
+        const view3D = await createView3D({ rotate: { disablePitch: true } });
+        view3D.control.rotate.enable();
+        view3D.renderer.setAnimationLoop(view3D.renderer.defaultRenderLoop);
+
+        await simulate(view3D.renderer.canvas, { deltaY: 50 });
+
+        expect(view3D.camera.pitch, "Camera pitch").to.equal(0);
+      });
     });
   });
 

@@ -1,11 +1,7 @@
-import * as THREE from "three";
-
 import View3D, { View3DOptions } from "~/View3D";
-import Model from "~/core/Model";
 import { EVENTS } from "~/const/external";
-
-// import XRSessionMock from "./xr/XRSessionMock";
-// import { XRRenderContext } from "~/type/internal";
+import { merge } from "~/utils";
+import { Animation } from "~/core";
 
 export const createSandbox = (id: string = ""): HTMLElement => {
   const tmp = document.createElement("div");
@@ -55,29 +51,51 @@ export const wait = (time: number) => {
   });
 };
 
-// export const createXRRenderingContext = ({
-//   view3d = new View3D(document.createElement("canvas")),
-//   model = new Model({ scenes: [] }),
-//   delta = 0,
-//   xrCam = new THREE.PerspectiveCamera(),
-//   size = { width: 100, height: 100 },
-//   session = new XRSessionMock().session
-// }: {
-//   view3d?: XRRenderContext["view3d"];
-//   model?: XRRenderContext["model"];
-//   delta?: XRRenderContext["delta"];
-//   xrCam?: XRRenderContext["xrCam"];
-//   size?: XRRenderContext["size"];
-//   session?: XRRenderContext["session"];
-// } = {}): XRRenderContext => {
-//   return {
-//     view3d,
-//     xrCam,
-//     size,
-//     model,
-//     delta,
-//     session,
-//     frame: {},
-//     referenceSpace: {}
-//   };
-// };
+export const simulate = (el: HTMLElement, options: Partial<{
+  pos: [number, number];
+  deltaX: number;
+  deltaY: number;
+  duration: number;
+}> = {}): Promise<void> => (
+  new Promise<void>(resolve => {
+    options = merge({
+      pos: [el.offsetLeft + el.offsetWidth / 2, el.offsetTop + el.offsetHeight / 2],
+      deltaX: 0,
+      deltaY: 0,
+      duration: 500
+    }, options);
+
+    // Fire mousedown first
+    const downEvt = createMouseEvent("mousedown", options.pos[0], options.pos[1]);
+    el.dispatchEvent(downEvt);
+
+    const animation = new Animation({ duration: options.duration });
+
+    animation.on("progress", e => {
+      const x = options.pos[0] + e.easedProgress * options.deltaX;
+      const y = options.pos[1] + e.easedProgress * options.deltaY;
+
+      const moveEvt = createMouseEvent("mousemove", x, y);
+      window.dispatchEvent(moveEvt);
+    });
+    animation.on("finish", () => {
+      const upEvt = createMouseEvent("mouseup", options.pos[0], options.pos[1]);
+      el.dispatchEvent(upEvt);
+
+      resolve();
+    });
+
+    animation.start();
+  })
+);
+
+const createMouseEvent = (name: string, x: number, y: number) => {
+  const evt = new MouseEvent(name, {
+    screenX: x,
+    screenY: y,
+    clientX: x,
+    clientY: y
+  });
+
+  return evt;
+};

@@ -31,14 +31,35 @@ describe("Animation", () => {
   it("should loop exact n times given in the options", async () => {
     const animation = new Animation({ duration: 50, repeat: 5 });
     const loopSpy = Cypress.sinon.spy();
-    const finishSpy = Cypress.sinon.spy();
 
     animation.on("loop", loopSpy);
-    animation.on("finish", finishSpy);
-    animation.start();
-    await wait(350);
 
-    expect(loopSpy.callCount).to.equal(5);
-    expect(finishSpy.calledOnce).to.be.true;
+    return new Promise<void>(resolve => {
+      animation.on("finish", () => {
+        expect(loopSpy.callCount).to.equal(5);
+
+        resolve();
+      });
+
+      animation.start();
+    });
+  });
+
+  it("should set progress: 1 in the last progress event", async () => {
+    const animation = new Animation({ duration: 50, repeat: 5 });
+    const progressSpy = Cypress.sinon.spy();
+
+    animation.on("progress", progressSpy);
+
+    return new Promise<void>(resolve => {
+      animation.on("finish", () => {
+        expect(progressSpy.lastCall.args[0].progress, "last progress").to.equal(1);
+        expect(progressSpy.lastCall.args[0].easedProgress, "last easedProgress").to.equal(1);
+
+        resolve();
+      });
+
+      animation.start();
+    });
   });
 });
