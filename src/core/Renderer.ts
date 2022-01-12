@@ -128,6 +128,7 @@ class Renderer {
 
   private _defaultRenderLoop = (delta: number) => {
     const view3D = this._view3D;
+    const threeRenderer = this._renderer;
     const {
       scene,
       camera,
@@ -149,7 +150,17 @@ class Renderer {
     });
 
     camera.updatePosition();
-    this._renderer.render(scene.root, camera.threeCamera);
+    if (scene.skybox.enabled) {
+      threeRenderer.autoClear = false;
+
+      threeRenderer.clear();
+      scene.skybox.render();
+      threeRenderer.render(scene.root, camera.threeCamera);
+
+      threeRenderer.autoClear = true;
+    } else {
+      threeRenderer.render(scene.root, camera.threeCamera);
+    }
 
     view3D.trigger(EVENTS.RENDER, {
       type: EVENTS.RENDER,

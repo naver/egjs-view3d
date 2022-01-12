@@ -80,3 +80,10 @@ html[data-theme='dark'] .header-github-link::before {
   left: 0;
   filter: blur(1rem);
 }
+
+.control-gui-wrapper {
+  position: absolute;
+  display: flex;
+  top: 0;
+  right: 0;
+}

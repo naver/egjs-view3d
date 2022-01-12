@@ -40,11 +40,13 @@ class TextureLoader {
    * @param url url to fetch equirectangular image
    * @returns WebGLCubeRenderTarget created
    */
-  public loadEquirectagularTexture(url: string): Promise<THREE.WebGLRenderTarget> {
+  public loadEquirectagularTexture(url: string): Promise<THREE.Texture> {
     return new Promise((resolve, reject) => {
       const loader = new THREE.TextureLoader();
-      loader.load(url, skyboxTexture => {
-        resolve(this._equirectToCubemap(skyboxTexture));
+
+      loader.load(url, texture => {
+        texture.mapping = THREE.EquirectangularReflectionMapping;
+        resolve(texture);
       }, undefined, reject);
     });
   }
@@ -65,25 +67,19 @@ class TextureLoader {
   /**
    * Create new texture with given HDR(RGBE) image url
    * @param url image url
-   * @param isEquirectangular Whether to read this image as a equirectangular texture
    */
-  public loadHDRTexture(url: string): Promise<THREE.WebGLRenderTarget> {
+  public loadHDRTexture(url: string): Promise<THREE.Texture> {
     return new Promise((resolve, reject) => {
       const loader = new RGBELoader();
 
+      // loader.setDataType(THREE.FloatType);
       loader.setCrossOrigin("anonymous");
       loader.load(url, texture => {
-        resolve(this._equirectToCubemap(texture));
+        texture.mapping = THREE.EquirectangularReflectionMapping;
+
+        resolve(texture);
       }, undefined, reject);
     });
-  }
-
-  private _equirectToCubemap(texture: THREE.Texture): THREE.WebGLRenderTarget {
-    const pmremGenerator = new THREE.PMREMGenerator(this._renderer.threeRenderer);
-    const hdrCubeRenderTarget = pmremGenerator.fromEquirectangular(texture);
-    pmremGenerator.compileCubemapShader();
-
-    return hdrCubeRenderTarget;
   }
 }
 

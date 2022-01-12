@@ -11,6 +11,7 @@ import { STANDARD_MAPS } from "../const/internal";
 import { getObjectOption } from "../utils";
 
 import ShadowPlane from "./ShadowPlane";
+import Skybox from "./Skybox";
 
 /**
  * Scene that View3D will render.
@@ -18,11 +19,14 @@ import ShadowPlane from "./ShadowPlane";
  */
 class Scene {
   private _view3D: View3D;
+  private _skybox: Skybox;
   private _root: THREE.Scene;
   private _shadowPlane: ShadowPlane;
   private _userObjects: THREE.Group;
   private _envObjects: THREE.Group;
   private _fixedObjects: THREE.Group;
+
+  public get skybox() { return this._skybox; }
 
   /**
    * Root {@link https://threejs.org/docs/#api/en/scenes/Scene THREE.Scene} object
@@ -55,6 +59,7 @@ class Scene {
    */
   public constructor(view3D: View3D) {
     this._view3D = view3D;
+    this._skybox = new Skybox(view3D);
     this._root = new THREE.Scene();
     this._userObjects = new THREE.Group();
     this._envObjects = new THREE.Group();
@@ -148,13 +153,49 @@ class Scene {
    */
   public async setSkybox(url: string | null): Promise<void> {
     const root = this._root;
+    const view3D = this._view3D;
 
     if (url) {
-      const textureLoader = new TextureLoader(this._view3D.renderer);
-      const renderTarget = await textureLoader.loadHDRTexture(url);
+      const textureLoader = new TextureLoader(view3D.renderer);
+      const texture = await textureLoader.loadHDRTexture(url);
 
-      root.background = renderTarget.texture;
-      root.environment = renderTarget.texture;
+      if (view3D.skyboxBlur) {
+        const skybox = this._skybox;
+
+        // const fakeScene = new THREE.Scene();
+        // const fakeRenderTarget = new THREE.WebGLRenderTarget(view3D.renderer.size.width, view3D.renderer.size.height);
+        // fakeScene.background = skybox.toBlurredHDR(texture);
+        // root.background = fakeRenderTarget.texture;
+
+        // root.background = skybox.toBlurredHDR(texture);
+        const blurred = skybox.useBlurredHDR(texture);
+
+        // view3D.on("beforeRender", () => {
+        //   threeRenderer.autoClear = false;
+        //   threeRenderer.clear();
+
+        //   const origRenderTarget = threeRenderer.getRenderTarget();
+
+        //   threeRenderer.setRenderTarget(fakeRenderTarget, undefined, 6);
+
+        //   threeRenderer.render(fakeScene, view3D.camera.threeCamera);
+
+        //   threeRenderer.setRenderTarget(origRenderTarget);
+        // });
+
+        // view3D.on("render", () => {
+        //   threeRenderer.autoClear = true;
+        // });
+
+        // const testPlane = new THREE.PlaneGeometry(1, 1);
+        // const testMat = new THREE.MeshBasicMaterial({ map: blurred });
+
+        // root.add(new THREE.Mesh(testPlane, testMat));
+      } else {
+        root.background = texture;
+      }
+
+      root.environment = texture;
     } else {
       root.background = null;
       root.environment = null;
@@ -169,9 +210,9 @@ class Scene {
   public async setEnvMap(url: string | null): Promise<void> {
     if (url) {
       const textureLoader = new TextureLoader(this._view3D.renderer);
-      const renderTarget = await textureLoader.loadHDRTexture(url);
+      const texture = await textureLoader.loadHDRTexture(url);
 
-      this._root.environment = renderTarget.texture;
+      this._root.environment = texture;
     } else {
       this._root.environment = null;
     }

@@ -80,6 +80,7 @@ export interface View3DOptions {
   background: number | string | null;
   exposure: number;
   shadow: boolean | Partial<ShadowOptions>;
+  skyboxBlur: boolean | number;
 
   // AR
   webAR: boolean | Partial<WebARSessionOptions>;
@@ -146,6 +147,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   private _background: View3DOptions["background"];
   private _exposure: View3DOptions["exposure"];
   private _shadow: View3DOptions["shadow"];
+  private _skyboxBlur: View3DOptions["skyboxBlur"];
 
   private _webAR: View3DOptions["webAR"];
   private _sceneViewer: View3DOptions["sceneViewer"];
@@ -372,6 +374,15 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    */
   public get shadow() { return this._shadow; }
   /**
+   * Apply blur to the current skybox image.
+   * If `true` is given, it will enable blur with the default blurriness
+   * If `false` is given, it will disable the blur.
+   * If integer is given, it will enable blur with the given value as a blur radius in radians. (Higher the blurrier)
+   * @type {boolean | number}
+   * @default false
+   */
+  public get skyboxBlur() { return this._skyboxBlur; }
+  /**
    * Options for the WebXR-based AR session.
    * If `false` is given, it will disable WebXR-based AR session.
    * @type {boolean | WebARSessionOptions}
@@ -468,9 +479,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     ktxPath = DEFAULT.KTX_TRANSCODER_URL,
     meshoptPath = null,
     fixSkinnedBbox = false,
-    skybox = null,
-    envmap = null,
-    background = null,
     fov = AUTO,
     center = AUTO,
     yaw = 0,
@@ -478,12 +486,16 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     rotate = true,
     translate = true,
     zoom = true,
-    exposure = 1,
-    shadow = true,
     autoplay = false,
     scrollable = true,
     wheelScrollable = false,
     useGrabCursor = true,
+    skybox = null,
+    envmap = null,
+    background = null,
+    exposure = 1,
+    shadow = true,
+    skyboxBlur = false,
     webAR = true,
     sceneViewer = true,
     quickLook = true,
@@ -522,6 +534,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._background = background;
     this._exposure = exposure;
     this._shadow = shadow;
+    this._skyboxBlur = skyboxBlur;
 
     this._webAR = webAR;
     this._sceneViewer = sceneViewer;
