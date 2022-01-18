@@ -72,7 +72,6 @@ class TextureLoader {
     return new Promise((resolve, reject) => {
       const loader = new RGBELoader();
 
-      // loader.setDataType(THREE.FloatType);
       loader.setCrossOrigin("anonymous");
       loader.load(url, texture => {
         texture.mapping = THREE.EquirectangularReflectionMapping;

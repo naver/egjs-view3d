@@ -375,10 +375,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   public get shadow() { return this._shadow; }
   /**
    * Apply blur to the current skybox image.
-   * If `true` is given, it will enable blur with the default blurriness
-   * If `false` is given, it will disable the blur.
-   * If integer is given, it will enable blur with the given value as a blur radius in radians. (Higher the blurrier)
-   * @type {boolean | number}
+   * @type {boolean}
    * @default false
    */
   public get skyboxBlur() { return this._skyboxBlur; }

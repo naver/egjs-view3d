@@ -19,14 +19,11 @@ import Skybox from "./Skybox";
  */
 class Scene {
   private _view3D: View3D;
-  private _skybox: Skybox;
   private _root: THREE.Scene;
   private _shadowPlane: ShadowPlane;
   private _userObjects: THREE.Group;
   private _envObjects: THREE.Group;
   private _fixedObjects: THREE.Group;
-
-  public get skybox() { return this._skybox; }
 
   /**
    * Root {@link https://threejs.org/docs/#api/en/scenes/Scene THREE.Scene} object
@@ -59,7 +56,6 @@ class Scene {
    */
   public constructor(view3D: View3D) {
     this._view3D = view3D;
-    this._skybox = new Skybox(view3D);
     this._root = new THREE.Scene();
     this._userObjects = new THREE.Group();
     this._envObjects = new THREE.Group();
@@ -160,37 +156,7 @@ class Scene {
       const texture = await textureLoader.loadHDRTexture(url);
 
       if (view3D.skyboxBlur) {
-        const skybox = this._skybox;
-
-        // const fakeScene = new THREE.Scene();
-        // const fakeRenderTarget = new THREE.WebGLRenderTarget(view3D.renderer.size.width, view3D.renderer.size.height);
-        // fakeScene.background = skybox.toBlurredHDR(texture);
-        // root.background = fakeRenderTarget.texture;
-
-        // root.background = skybox.toBlurredHDR(texture);
-        const blurred = skybox.useBlurredHDR(texture);
-
-        // view3D.on("beforeRender", () => {
-        //   threeRenderer.autoClear = false;
-        //   threeRenderer.clear();
-
-        //   const origRenderTarget = threeRenderer.getRenderTarget();
-
-        //   threeRenderer.setRenderTarget(fakeRenderTarget, undefined, 6);
-
-        //   threeRenderer.render(fakeScene, view3D.camera.threeCamera);
-
-        //   threeRenderer.setRenderTarget(origRenderTarget);
-        // });
-
-        // view3D.on("render", () => {
-        //   threeRenderer.autoClear = true;
-        // });
-
-        // const testPlane = new THREE.PlaneGeometry(1, 1);
-        // const testMat = new THREE.MeshBasicMaterial({ map: blurred });
-
-        // root.add(new THREE.Mesh(testPlane, testMat));
+        root.background = new Skybox(view3D).useBlurredHDR(texture);
       } else {
         root.background = texture;
       }

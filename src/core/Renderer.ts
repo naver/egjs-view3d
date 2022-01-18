@@ -150,17 +150,7 @@ class Renderer {
     });
 
     camera.updatePosition();
-    if (scene.skybox.enabled) {
-      threeRenderer.autoClear = false;
-
-      threeRenderer.clear();
-      scene.skybox.render();
-      threeRenderer.render(scene.root, camera.threeCamera);
-
-      threeRenderer.autoClear = true;
-    } else {
-      threeRenderer.render(scene.root, camera.threeCamera);
-    }
+    threeRenderer.render(scene.root, camera.threeCamera);
 
     view3D.trigger(EVENTS.RENDER, {
       type: EVENTS.RENDER,
