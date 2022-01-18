@@ -3,48 +3,13 @@ sidebar_position: 6
 ---
 
 import View3D from "@site/src/components/View3D";
+import SkyboxBlur from "@site/src/components/demo/SkyboxBlur";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
 import License from "@site/src/components/License";
 
-<OptionDescriptor type="boolean | number" defaultVal="false" />
+<OptionDescriptor type="boolean" defaultVal="false" />
 
 Apply blur to the current skybox image.
-If `true` is given, it will enable blur with the default blurriness (0.04)
-If `false` is given, it will disable the blur.
-If a number is given, it will enable blur with the given value as a blur radius in radians. (Higher the blurrier)
 
 ## Example
-<div className="columns">
-  <div className="column">
-    <View3D
-      src="/egjs-view3d/model/meshopt/alarm.glb"
-      skybox="/egjs-view3d/texture/artist_workshop_1k.hdr"
-      skyboxBlur={true}
-      showControl
-      showExampleCode />
-  </div>
-  <div className="column">
-    <View3D
-      src="/egjs-view3d/model/meshopt/alarm.glb"
-      skybox="/egjs-view3d/texture/artist_workshop_1k.hdr"
-      showControl
-      showExampleCode />
-  </div>
-</div>
-
-<License items={[
-  {
-    name: "Alarm Clock 01",
-    link: "https://polyhaven.com/a/alarm_clock_01",
-    author: "Poly Haven",
-    authorLink: "https://polyhaven.com/",
-    license: "CC0"
-  },
-  {
-    name: "Artist Workshop",
-    link: "https://polyhaven.com/a/artist_workshop",
-    author: "Poly Haven",
-    authorLink: "https://polyhaven.com/",
-    license: "CC0"
-  }
-]} />
+<SkyboxBlur />

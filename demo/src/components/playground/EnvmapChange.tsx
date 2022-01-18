@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import clsx from "clsx";
 import { Range } from "react-range";
 
-const models = [
+const envmaps = [
   { name: "Artist Workshop", path: "/egjs-view3d/texture/artist_workshop_1k.hdr" },
   { name: "Comfy Cafe", path: "/egjs-view3d/texture/comfy_cafe_1k.hdr" },
   { name: "Dry Hay Field", path: "/egjs-view3d/texture/dry_hay_field_1k.hdr" },
@@ -29,8 +29,8 @@ export default ({ onChange, onExposureChange, isLoading }) => {
         <select onChange={e => {
           onChange(e.target.value);
         }} disabled={isLoading}>
-          { models.map((model, idx) => (
-            <option key={idx} value={model.path}>{model.name}</option>
+          { envmaps.map((envmap, idx) => (
+            <option key={idx} value={envmap.path}>{envmap.name}</option>
           )) }
         </select>
       </div>

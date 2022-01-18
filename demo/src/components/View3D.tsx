@@ -15,7 +15,6 @@ interface DemoOptions extends Partial<View3DOptions> {
   showBbox: boolean;
   showExampleCode: boolean | string[];
   showEventsTriggered: null | string[];
-  showControl: string[] | null;
 }
 
 class View3D extends React.Component<DemoOptions, {
@@ -30,7 +29,6 @@ class View3D extends React.Component<DemoOptions, {
     showBbox: false,
     showExampleCode: false,
     showEventsTriggered: null,
-    showControl: null,
     dracoPath: "/egjs-view3d/lib/draco/",
     ktxPath: "/egjs-view3d/lib/basis/",
     meshoptPath: "/egjs-view3d/lib/meshopt_decoder.js"
@@ -38,7 +36,6 @@ class View3D extends React.Component<DemoOptions, {
 
   private _view3D: VanillaView3D;
   private _rootRef = React.createRef<HTMLDivElement>();
-  private _guiRef = React.createRef<ControlGUI>();
 
   public get view3D() { return this._view3D; }
 
@@ -52,7 +49,7 @@ class View3D extends React.Component<DemoOptions, {
   }
 
   public componentDidMount() {
-    const { children, showBbox, showARButton, showExampleCode, showControl, clickToLoad, ...restProps } = this.props;
+    const { children, showBbox, showARButton, showExampleCode, clickToLoad, ...restProps } = this.props;
 
     const options = {
       ...restProps,
@@ -79,10 +76,6 @@ class View3D extends React.Component<DemoOptions, {
     if (showARButton) {
       void view3D.loadPlugins(new ARButton(), new AROverlay());
     }
-
-    if (showControl) {
-
-    }
   }
 
   public componentWillUnmount() {
@@ -91,7 +84,7 @@ class View3D extends React.Component<DemoOptions, {
 
   public render() {
     const { initialized } = this.state;
-    const { children, className, poster, showExampleCode, showControl, clickToLoad, showEventsTriggered, ...restProps } = this.props;
+    const { children, className, poster, showExampleCode, clickToLoad, showEventsTriggered, ...restProps } = this.props;
 
     const optionsToInclude = Array.isArray(showExampleCode) ? showExampleCode : [];
     const view3DOptions = Object.keys(restProps)
@@ -122,7 +115,6 @@ class View3D extends React.Component<DemoOptions, {
         </div>}
         { (poster && !initialized) && <img className="view3d-poster" src={poster} />}
         { showEventsTriggered && <EventsList view3D={this} events={showEventsTriggered} />}
-        { showControl && <ControlGUI ref={this._guiRef} /> }
         { children }
       </div>
       { showExampleCode && <OptionExample options={view3DOptions} />}

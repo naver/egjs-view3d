@@ -8,8 +8,8 @@ const LICENSE_TO_LINK = {
 };
 
 export default ({ items = [], className = "" }: {
-  className: string;
-  items: Array<{
+  className?: string;
+  items?: Array<{
     name: string;
     link: string;
     author: string;
