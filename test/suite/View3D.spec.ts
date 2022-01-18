@@ -88,6 +88,12 @@ describe("View3D", () => {
       });
     });
 
+    describe("skyboxBlur", () => {
+      it("should have 'false' as a default value", async () => {
+        expect((await createView3D()).skyboxBlur).to.be.false;
+      });
+    });
+
     describe("envmap", () => {
       it("should have 'null' as a default value", async () => {
         expect((await createView3D()).envmap).to.be.null;
