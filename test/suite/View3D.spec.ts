@@ -208,6 +208,51 @@ describe("View3D", () => {
       });
     });
 
+    describe("poster", () => {
+      it("should have 'null' as a default value", async () => {
+        expect((await createView3D()).poster).to.be.null;
+      });
+
+      it("should add img element as a child of root element if string is given", async () => {
+        const view3D = await createView3D({ poster: "SOME_URL", autoInit: false });
+        const imgEl = view3D.rootEl.querySelector("img");
+
+        expect(imgEl).not.to.be.null;
+        expect(imgEl.parentElement).to.equal(view3D.rootEl);
+      });
+
+      it("should add img element with 'src' attribute same to the given string", async () => {
+        const posterURL = new URL("SOME_POSTER_URL", location.href);
+        const view3D = await createView3D({ poster: posterURL.href, autoInit: false });
+        const imgEl = view3D.rootEl.querySelector("img");
+
+        expect(imgEl).not.to.be.null;
+        expect(imgEl.src).to.equal(posterURL.href);
+      });
+
+      it("should add img element which have 'view3d-poster' class in it", async () => {
+        const posterURL = "SOME_POSTER_URL";
+        const view3D = await createView3D({ poster: posterURL, autoInit: false });
+        const imgEl = view3D.rootEl.querySelector("img");
+
+        expect(imgEl).not.to.be.null;
+        expect(imgEl.classList.contains("view3d-poster")).to.be.true;
+      });
+
+      it("should add img element which should be removed after initialization", async () => {
+        const posterURL = "SOME_POSTER_URL";
+        const view3D = await createView3D({ poster: posterURL, autoInit: false });
+        const imgEl = view3D.rootEl.querySelector("img");
+
+        expect(imgEl).not.to.be.null;
+        expect(imgEl.parentElement).not.to.be.null;
+
+        await view3D.load("/cube.glb");
+
+        expect(imgEl.parentElement).to.be.null;
+      });
+    });
+
     describe("canvasSelector", () => {
       it("should have 'canvas' as a default value", async () => {
         expect((await createView3D()).canvasSelector).to.equal("canvas");
