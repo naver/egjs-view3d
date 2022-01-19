@@ -21,7 +21,7 @@ import AutoPlayer, { AutoplayOptions } from "./core/AutoPlayer";
 import { WebARSessionOptions } from "./xr/WebARSession";
 import { SceneViewerSessionOptions } from "./xr/SceneViewerSession";
 import { QuickLookSessionOptions } from "./xr/QuickLookSession";
-import { EVENTS, AUTO, AR_SESSION_TYPE } from "./const/external";
+import { EVENTS, AUTO, AR_SESSION_TYPE, DEFAULT_CLASS } from "./const/external";
 import * as DEFAULT from "./const/default";
 import ERROR from "./const/error";
 import * as EVENT_TYPES from "./type/event";
@@ -89,6 +89,7 @@ export interface View3DOptions {
   arPriority: Array<ValueOf<typeof AR_SESSION_TYPE>>;
 
   // Others
+  poster: string | null;
   canvasSelector: string;
   autoInit: boolean;
   autoResize: boolean;
@@ -154,6 +155,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   private _quickLook: View3DOptions["quickLook"];
   private _arPriority: View3DOptions["arPriority"];
 
+  private _poster: View3DOptions["poster"];
   private _canvasSelector: View3DOptions["canvasSelector"];
   private _autoInit: View3DOptions["autoInit"];
   private _autoResize: View3DOptions["autoResize"];
@@ -411,6 +413,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    */
   public get arPriority() { return this._arPriority; }
   /**
+   * A URL to the image that will be displayed before the 3D model is loaded.
+   * @type {string | null}
+   * @default null
+   */
+  public get poster() { return this._poster; }
+  /**
    * CSS Selector for the canvas element.
    * @type {string}
    * @default "canvas"
@@ -497,6 +505,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     sceneViewer = true,
     quickLook = true,
     arPriority = DEFAULT.AR_PRIORITY,
+    poster = null,
     canvasSelector = "canvas",
     autoInit = true,
     autoResize = true,
@@ -538,6 +547,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._quickLook = quickLook;
     this._arPriority = arPriority;
 
+    this._poster = poster;
     this._canvasSelector = canvasSelector;
     this._autoInit = autoInit;
     this._autoResize = autoResize;
@@ -554,6 +564,8 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._arManager = new ARManager(this);
     this._model = null;
     this._initialized = false;
+
+    this._addPosterImage();
 
     if (src && autoInit) {
       void this.init();
@@ -655,8 +667,31 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     }
   }
 
+  /**
+   * Add new plugins to View3D
+   * @param {View3DPlugin[]} plugins Plugins to add
+   * @returns {Promise<void>}
+   */
   public async loadPlugins(...plugins: View3DPlugin[]) {
     return Promise.all(plugins.map(plugin => plugin.init(this)));
+  }
+
+  /**
+   * Take a screenshot of current rendered canvas image
+   */
+  public screenshot(fileName: string = "screenshot") {
+    const canvas = this._renderer.canvas;
+    const imgURL = canvas.toDataURL("png");
+
+    return {
+      save: () => {
+        const anchorEl = document.createElement("a");
+        anchorEl.href = imgURL;
+        anchorEl.download = fileName;
+        anchorEl.click();
+      },
+      url: imgURL
+    };
   }
 
   private async _loadModel(src: string) {
@@ -710,6 +745,24 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
       type: EVENTS.MODEL_CHANGE,
       target: this,
       model
+    });
+  }
+
+  private _addPosterImage() {
+    const poster = this._poster;
+    const rootEl = this._rootEl;
+
+    if (!poster) return;
+
+    const imgEl = document.createElement("img");
+    imgEl.className = DEFAULT_CLASS.POSTER;
+    imgEl.src = poster;
+
+    rootEl.appendChild(imgEl);
+
+    this.once(EVENTS.READY, () => {
+      if (imgEl.parentElement !== rootEl) return;
+      rootEl.removeChild(imgEl);
     });
   }
 }

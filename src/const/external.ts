@@ -74,6 +74,10 @@ export const EASING = {
   }
 } as const;
 
+export const DEFAULT_CLASS = {
+  POSTER: "view3d-poster"
+} as const;
+
 /**
  * Available AR session types
  * @type {object}
