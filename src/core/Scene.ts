@@ -20,6 +20,7 @@ import Skybox from "./Skybox";
 class Scene {
   private _view3D: View3D;
   private _root: THREE.Scene;
+  private _skybox: Skybox | null;
   private _shadowPlane: ShadowPlane;
   private _userObjects: THREE.Group;
   private _envObjects: THREE.Group;
@@ -29,6 +30,11 @@ class Scene {
    * Root {@link https://threejs.org/docs/#api/en/scenes/Scene THREE.Scene} object
    */
   public get root() { return this._root; }
+
+  /**
+   * Skybox object for rendering background
+   */
+  public get skybox() { return this._skybox; }
 
   /**
    * Shadow plane & light
@@ -53,10 +59,12 @@ class Scene {
 
   /**
    * Create new Scene instance
+   * @param {View3D} view3D An instance of View3D
    */
   public constructor(view3D: View3D) {
     this._view3D = view3D;
     this._root = new THREE.Scene();
+    this._skybox = null;
     this._userObjects = new THREE.Group();
     this._envObjects = new THREE.Group();
     this._fixedObjects = new THREE.Group();
@@ -128,17 +136,20 @@ class Scene {
    * @returns {Promise<void>}
    */
   public async setBackground(background: number | string): Promise<void> {
-    const root = this._root;
+    const view3D = this._view3D;
+    const skybox = new Skybox(view3D);
+
+    this._skybox = skybox;
 
     if (typeof background === "number" || background.charAt(0) === "#") {
-      root.background = new THREE.Color(background);
+      skybox.useColor(background);
     } else {
       const textureLoader = new TextureLoader(this._view3D.renderer);
       const texture = await textureLoader.load(background);
 
       texture.encoding = THREE.sRGBEncoding;
 
-      root.background = texture;
+      skybox.useTexture(texture);
     }
   }
 
@@ -154,16 +165,18 @@ class Scene {
     if (url) {
       const textureLoader = new TextureLoader(view3D.renderer);
       const texture = await textureLoader.loadHDRTexture(url);
+      const skybox = new Skybox(view3D);
 
       if (view3D.skyboxBlur) {
-        root.background = new Skybox(view3D).useBlurredHDR(texture);
+        skybox.useBlurredHDR(texture);
       } else {
-        root.background = texture;
+        skybox.useTexture(texture);
       }
 
+      this._skybox = skybox;
       root.environment = texture;
     } else {
-      root.background = null;
+      this._skybox = null;
       root.environment = null;
     }
   }

@@ -150,7 +150,17 @@ class Renderer {
     });
 
     camera.updatePosition();
+
+    threeRenderer.autoClear = false;
+    threeRenderer.clear();
+
+    if (scene.skybox) {
+      scene.skybox.updateCamera();
+      threeRenderer.render(scene.skybox.scene, scene.skybox.camera);
+    }
+
     threeRenderer.render(scene.root, camera.threeCamera);
+    threeRenderer.autoClear = true;
 
     view3D.trigger(EVENTS.RENDER, {
       type: EVENTS.RENDER,

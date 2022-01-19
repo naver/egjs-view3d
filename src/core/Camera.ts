@@ -271,7 +271,6 @@ class Camera {
     const tanHalfVFov = tanHalfHFov * Math.max(1, (this._maxTanHalfHFov / tanHalfHFov) / camera.aspect);
 
     this._baseFov = toDegree(2 * Math.atan(tanHalfVFov));
-    camera.updateProjectionMatrix();
   }
 }
 

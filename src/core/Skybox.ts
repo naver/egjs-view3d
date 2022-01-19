@@ -2,12 +2,36 @@ import * as THREE from "three";
 import { LightProbeGenerator } from "three/examples/jsm/lights/LightProbeGenerator";
 
 import View3D from "../View3D";
+import { toRadian } from "../utils";
 
 class Skybox {
   private _view3D: View3D;
+  private _scene: THREE.Scene;
+  private _camera: THREE.PerspectiveCamera;
+
+  public get scene() { return this._scene; }
+  public get camera() { return this._camera; }
 
   public constructor(view3D: View3D) {
     this._view3D = view3D;
+    this._scene = new THREE.Scene();
+    this._camera = new THREE.PerspectiveCamera();
+  }
+
+  public updateCamera() {
+    const view3D = this._view3D;
+    const bgCam = this._camera;
+    const camera = view3D.camera;
+    const camPos = camera.threeCamera.position;
+    const camPosXZ = new THREE.Vector2(camPos.x, camPos.z);
+    const pivot = camera.currentPose.pivot;
+
+    camPosXZ.rotateAround(new THREE.Vector2(pivot.x, pivot.z), toRadian(view3D.skyboxRotation));
+
+    bgCam.copy(camera.threeCamera);
+    bgCam.position.set(camPosXZ.x, camPos.y, camPosXZ.y);
+    bgCam.lookAt(pivot);
+    bgCam.updateProjectionMatrix();
   }
 
   public useBlurredHDR(texture: THREE.Texture) {
@@ -49,7 +73,21 @@ class Skybox {
     cubeCamera.update(threeRenderer, skyboxScene);
     threeRenderer.toneMappingExposure = origExposure;
 
-    return cubeRenderTarget.texture;
+    this._scene.background = cubeRenderTarget.texture;
+
+    return this;
+  }
+
+  public useTexture(texture: THREE.Texture) {
+    this._scene.background = texture;
+
+    return this;
+  }
+
+  public useColor(color: number | string) {
+    this._scene.background = new THREE.Color(color);
+
+    return this;
   }
 }
 

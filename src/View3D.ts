@@ -80,7 +80,8 @@ export interface View3DOptions {
   background: number | string | null;
   exposure: number;
   shadow: boolean | Partial<ShadowOptions>;
-  skyboxBlur: boolean | number;
+  skyboxBlur: boolean;
+  skyboxRotation: number;
 
   // AR
   webAR: boolean | Partial<WebARSessionOptions>;
@@ -149,6 +150,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   private _exposure: View3DOptions["exposure"];
   private _shadow: View3DOptions["shadow"];
   private _skyboxBlur: View3DOptions["skyboxBlur"];
+  private _skyboxRotation: View3DOptions["skyboxRotation"];
 
   private _webAR: View3DOptions["webAR"];
   private _sceneViewer: View3DOptions["sceneViewer"];
@@ -382,6 +384,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    */
   public get skyboxBlur() { return this._skyboxBlur; }
   /**
+   * Apply y-axis rotation (in degrees) to the current skybox image.
+   * @type {number}
+   * @default 0
+   */
+  public get skyboxRotation() { return this._skyboxRotation; }
+  /**
    * Options for the WebXR-based AR session.
    * If `false` is given, it will disable WebXR-based AR session.
    * @type {boolean | WebARSessionOptions}
@@ -496,6 +504,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     wheelScrollable = false,
     useGrabCursor = true,
     skybox = null,
+    skyboxRotation = 0,
     envmap = null,
     background = null,
     exposure = 1,
@@ -541,6 +550,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._exposure = exposure;
     this._shadow = shadow;
     this._skyboxBlur = skyboxBlur;
+    this._skyboxRotation = skyboxRotation;
 
     this._webAR = webAR;
     this._sceneViewer = sceneViewer;
