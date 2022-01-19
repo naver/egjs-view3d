@@ -1,0 +1,105 @@
+---
+sidebar_position: 1
+---
+
+import View3D from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
+
+<OptionDescriptor type="string | null" defaultVal="null" />
+
+A URL to the image that will be displayed before the 3D model is loaded.
+
+:::info
+
+This option requires `view3d.css` file for correct placement of image element.
+See [Setup Script & Styles](/docs/quick-start#setup-script--styles) guide page for adding required CSS file.
+
+:::
+
+## Example
+### Basics
+<View3D
+  src="/egjs-view3d/model/meshopt/alarm.glb"
+  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+  poster="/egjs-view3d/poster/alarm.png"
+  showExampleCode />
+
+### Blur amount
+We use `1em` as CSS blur filter's value, so blurring amount can be changed by changing CSS `font-size` of `.view3d-poster` element.
+
+<div className="columns">
+  <div className="column has-text-centered">
+    <span className="subtitle">font-size: 32px</span>
+  </div>
+  <div className="column has-text-centered">
+    <span className="subtitle">font-size: 8px</span>
+  </div>
+</div>
+<div className="columns">
+  <div className="column">
+    <View3D
+      src="/egjs-view3d/model/meshopt/alarm.glb"
+      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+      poster="/egjs-view3d/poster/alarm.png"
+      autoInit={false}
+      style={{ fontSize: "32px" }}
+      showExampleCode />
+  </div>
+  <div className="column">
+    <View3D
+      src="/egjs-view3d/model/meshopt/alarm.glb"
+      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+      poster="/egjs-view3d/poster/alarm.png"
+      autoInit={false}
+      style={{ fontSize: "8px" }}
+      showExampleCode />
+  </div>
+</div>
+
+### Disabling Blur
+Add `noblur` class to `.view3d-wrapper` element and poster blur will be removed.
+<div className="columns">
+  <div className="column has-text-centered">
+    <span className="subtitle">Default</span>
+  </div>
+  <div className="column has-text-centered">
+    <span className="subtitle">noblur</span>
+  </div>
+</div>
+<div className="columns">
+  <div className="column">
+    <View3D
+      src="/egjs-view3d/model/meshopt/alarm.glb"
+      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+      poster="/egjs-view3d/poster/alarm.png"
+      autoInit={false}
+      showExampleCode />
+  </div>
+  <div className="column">
+    <View3D
+      className="noblur"
+      src="/egjs-view3d/model/meshopt/alarm.glb"
+      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+      poster="/egjs-view3d/poster/alarm.png"
+      autoInit={false}
+      showExampleCode />
+  </div>
+</div>
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

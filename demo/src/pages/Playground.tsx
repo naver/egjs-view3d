@@ -99,9 +99,13 @@ class Playground extends React.Component<{}, {
               }
             }}></input>
           </div>
-          <button className="button" disabled={isLoading} onClick={this._downloadModel}>
+          <button className="button mb-2" disabled={isLoading} onClick={this._downloadModel}>
             <img className="mr-2" src="/egjs-view3d/icon/file_download_black.svg" />
             <span>Download .glb</span>
+          </button>
+          <button className="button" disabled={isLoading} onClick={this._downloadPoster}>
+            <img className="mr-2" src="/egjs-view3d/icon/image.svg" />
+            <span>Download Poster Image</span>
           </button>
         </aside>
       </div>
@@ -209,6 +213,10 @@ class Playground extends React.Component<{}, {
     } finally {
       this.setState({ isLoading: false });
     }
+  };
+
+  private _downloadPoster = () => {
+    this._view3D.screenshot("poster").save();
   };
 }
 

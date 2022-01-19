@@ -5,11 +5,9 @@ import DownloadIcon from "../../static/icon/file_download_black.svg";
 
 import OptionExample from "./OptionExample";
 import EventsList from "./EventsList";
-import ControlGUI from "./ControlGUI";
 
 interface DemoOptions extends Partial<View3DOptions> {
   className: string;
-  poster: string | null;
   clickToLoad: boolean;
   showARButton: boolean;
   showBbox: boolean;
@@ -17,13 +15,12 @@ interface DemoOptions extends Partial<View3DOptions> {
   showEventsTriggered: null | string[];
 }
 
-class View3D extends React.Component<DemoOptions, {
+class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivElement>, {
   arAvailable: boolean;
   initialized: boolean;
 }> {
   public static defaultProps: DemoOptions = {
     className: "",
-    poster: null,
     clickToLoad: false,
     showARButton: false,
     showBbox: false,
@@ -39,7 +36,7 @@ class View3D extends React.Component<DemoOptions, {
 
   public get view3D() { return this._view3D; }
 
-  public constructor(props: DemoOptions) {
+  public constructor(props: DemoOptions & React.HTMLAttributes<HTMLDivElement>) {
     super(props);
 
     this.state = {
@@ -84,7 +81,7 @@ class View3D extends React.Component<DemoOptions, {
 
   public render() {
     const { initialized } = this.state;
-    const { children, className, poster, showExampleCode, clickToLoad, showEventsTriggered, ...restProps } = this.props;
+    const { children, className, showExampleCode, clickToLoad, showEventsTriggered, style, ...restProps } = this.props;
 
     const optionsToInclude = Array.isArray(showExampleCode) ? showExampleCode : [];
     const view3DOptions = Object.keys(restProps)
@@ -96,7 +93,7 @@ class View3D extends React.Component<DemoOptions, {
       }, {});
 
     return <>
-      <div ref={this._rootRef} className={clsx(className, "view3d-wrapper", "view3d-square", "mb-2")}>
+      <div ref={this._rootRef} className={clsx(className, "view3d-wrapper", "view3d-square", "mb-2")} style={style}>
         <canvas className="view3d-canvas"></canvas>
         { clickToLoad && <div className={clsx({ "view3d-overlay": true, "hidden": initialized })}>
           <div className="button is-medium" onClick={e => {
@@ -113,7 +110,6 @@ class View3D extends React.Component<DemoOptions, {
             <span>Load 3D model</span>
           </div>
         </div>}
-        { (poster && !initialized) && <img className="view3d-poster" src={poster} />}
         { showEventsTriggered && <EventsList view3D={this} events={showEventsTriggered} />}
         { children }
       </div>
