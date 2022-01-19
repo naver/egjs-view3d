@@ -1,0 +1,10 @@
+---
+sidebar_position: 4
+---
+
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+
+<OptionDescriptor type="boolean" defaultVal="true" />
+
+Whether to listen [Resizeobserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver) for resize detection 's event instead of Window's [resize](https://developer.mozilla.org/en-US/docs/Web/API/Window/resize_event) when using the `autoResize` option.
+If set to false, it will use `window.resize` event in any environment.

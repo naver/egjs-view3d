@@ -1,0 +1,41 @@
+---
+sidebar_position: 3
+---
+
+import View3D from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
+
+<OptionDescriptor type="boolean" defaultVal="true" />
+
+Call View3D's [init()](/docs/api/View3D#init) automatically when creating instance.
+When the option `src` is not given, `init` won't be called even if this option is true.
+
+If `src` is given, you can call [init()](/docs/api/View3D#init) anytime to initialize View3D.
+Or, if the `src` is `null` you can call [load()](/docs/api/View3D#load) to set new 3D model & initialize.
+
+## Example
+<View3D
+  src="/egjs-view3d/model/meshopt/alarm.glb"
+  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+  poster="/egjs-view3d/poster/alarm.png"
+  autoInit={false}
+  clickToLoad
+  showExampleCode />
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

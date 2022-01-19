@@ -73,6 +73,7 @@ class Renderer {
     renderer.toneMapping = THREE.LinearToneMapping;
     renderer.toneMappingExposure = view3D.exposure;
     renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.setClearColor(0x000000, 0);
 
     this._renderer = renderer;
     this._clock = new THREE.Clock(false);
