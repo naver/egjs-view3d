@@ -25,10 +25,16 @@ class Skybox {
     this._enabled = true;
   }
 
+  /**
+   * Enable skybox
+   */
   public enable() {
     this._enabled = true;
   }
 
+  /**
+   * Disable skybox
+   */
   public disable() {
     this._enabled = false;
   }

@@ -6,7 +6,7 @@ import View3D from "@site/src/components/View3D";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
 import License from "@site/src/components/License";
 
-<OptionDescriptor type="boolean" defaultVal="false" />
+<OptionDescriptor type="number" defaultVal="0" />
 
 Apply y-axis rotation (in degrees) to the current skybox image.
 
@@ -24,6 +24,22 @@ Apply y-axis rotation (in degrees) to the current skybox image.
       src="/egjs-view3d/model/meshopt/alarm.glb"
       skybox="/egjs-view3d/texture/spruit_sunrise_1k.hdr"
       skyboxRotation={180}
+      showExampleCode />
+  </div>
+</div>
+<div className="columns">
+  <div className="column">
+    <View3D
+      src="/egjs-view3d/model/meshopt/alarm.glb"
+      skybox="/egjs-view3d/texture/spruit_sunrise_1k.hdr"
+      skyboxRotation={90}
+      showExampleCode />
+  </div>
+  <div className="column">
+    <View3D
+      src="/egjs-view3d/model/meshopt/alarm.glb"
+      skybox="/egjs-view3d/texture/spruit_sunrise_1k.hdr"
+      skyboxRotation={-90}
       showExampleCode />
   </div>
 </div>
