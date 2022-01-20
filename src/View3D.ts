@@ -650,11 +650,17 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    * @returns {void}
    */
   public resize() {
-    this._renderer.resize();
+    const renderer = this._renderer;
+    renderer.resize();
 
-    const newSize = this._renderer.size;
+    const newSize = renderer.size;
     this._camera.resize(newSize);
     this._control.resize(newSize);
+
+    if (!renderer.threeRenderer.xr.isPresenting) {
+      // Prevent flickering on resize
+      renderer.defaultRenderLoop(0);
+    }
 
     this.trigger(EVENTS.RESIZE, { ...newSize, type: EVENTS.RESIZE, target: this });
   }

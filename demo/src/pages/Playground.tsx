@@ -89,13 +89,13 @@ class Playground extends React.Component<{}, {
             <span className="mr-2">Show Skybox</span>
             <input ref={this._skyboxRef} type="checkbox" defaultChecked={true} onChange={e => {
               const view3D = this._view3D;
-              const root = view3D.scene.root;
+              const scene = view3D.scene;
               const checked = e.currentTarget.checked;
 
               if (checked) {
-                root.background = root.environment;
+                scene.skybox.enable();
               } else {
-                root.background = null;
+                scene.skybox.disable();
               }
             }}></input>
           </div>
@@ -164,10 +164,10 @@ class Playground extends React.Component<{}, {
 
       this.setState({ isLoading: true });
 
-      if (this._skyboxRef.current.checked) {
-        view3D.skybox = url;
-      } else {
-        view3D.envmap = url;
+      await view3D.scene.setSkybox(url);
+
+      if (!this._skyboxRef.current.checked) {
+        view3D.scene.skybox.disable();
       }
     } catch (err) {
       void Swal.fire({

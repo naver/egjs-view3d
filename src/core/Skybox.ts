@@ -4,20 +4,38 @@ import { LightProbeGenerator } from "three/examples/jsm/lights/LightProbeGenerat
 import View3D from "../View3D";
 import { toRadian } from "../utils";
 
+/**
+ * Skybox that can renders background in a different scene.
+ */
 class Skybox {
   private _view3D: View3D;
   private _scene: THREE.Scene;
   private _camera: THREE.PerspectiveCamera;
+  private _enabled: boolean;
 
   public get scene() { return this._scene; }
   public get camera() { return this._camera; }
+  public get enabled() { return this._enabled; }
 
+  /** */
   public constructor(view3D: View3D) {
     this._view3D = view3D;
     this._scene = new THREE.Scene();
     this._camera = new THREE.PerspectiveCamera();
+    this._enabled = true;
   }
 
+  public enable() {
+    this._enabled = true;
+  }
+
+  public disable() {
+    this._enabled = false;
+  }
+
+  /**
+   * Update current skybox camera to match main camera & apply rotation
+   */
   public updateCamera() {
     const view3D = this._view3D;
     const bgCam = this._camera;
@@ -34,6 +52,11 @@ class Skybox {
     bgCam.updateProjectionMatrix();
   }
 
+  /**
+   * Create blurred cubemap texture of the given texture and use that as the skybox
+   * @param {THREE.Texture} texture Equirect texture
+   * @returns {this}
+   */
   public useBlurredHDR(texture: THREE.Texture) {
     const threeRenderer = this._view3D.renderer.threeRenderer;
     const bgScene = new THREE.Scene();
@@ -78,12 +101,22 @@ class Skybox {
     return this;
   }
 
+  /**
+   * Use the given texture as a skybox scene background
+   * @param {THREE.Texture} texture A texture that compatible for scene background
+   * @returns {this}
+   */
   public useTexture(texture: THREE.Texture) {
     this._scene.background = texture;
 
     return this;
   }
 
+  /**
+   * Use the given color as a skybox scene background
+   * @param {number | string} color A hexadecimal number or string that represents color
+   * @returns {this}
+   */
   public useColor(color: number | string) {
     this._scene.background = new THREE.Color(color);
 

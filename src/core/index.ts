@@ -15,6 +15,7 @@ import Pose from "./Pose";
 import Renderer from "./Renderer";
 import Scene from "./Scene";
 import ShadowPlane from "./ShadowPlane";
+import Skybox from "./Skybox";
 import View3DError from "./View3DError";
 
 export {
@@ -30,6 +31,7 @@ export {
   Renderer,
   Scene,
   ShadowPlane,
+  Skybox,
   View3DError
 };
 

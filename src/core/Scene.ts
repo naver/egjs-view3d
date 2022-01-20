@@ -28,32 +28,39 @@ class Scene {
 
   /**
    * Root {@link https://threejs.org/docs/#api/en/scenes/Scene THREE.Scene} object
+   * @readonly
    */
   public get root() { return this._root; }
 
   /**
    * Skybox object for rendering background
+   * @type {Skybox}
+   * @readonly
    */
   public get skybox() { return this._skybox; }
 
   /**
    * Shadow plane & light
    * @type {ShadowPlane}
+   * @readonly
    */
   public get shadowPlane() { return this._shadowPlane; }
 
   /**
    * Group that contains volatile user objects
+   * @readonly
    */
   public get userObjects() { return this._userObjects; }
 
   /**
    * Group that contains non-volatile user objects
+   * @readonly
    */
   public get envObjects() { return this._envObjects; }
 
   /**
    * Group that contains objects that View3D manages
+   * @readonly
    */
   public get fixedObjects() { return this._fixedObjects; }
 
