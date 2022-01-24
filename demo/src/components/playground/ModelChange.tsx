@@ -3,12 +3,13 @@ import clsx from "clsx";
 
 const models = [
   { name: "Cube", path: "/egjs-view3d/model/cube.glb" },
-  { name: "Alarm", path: "/egjs-view3d/model/meshopt/alarm.glb" },
-  { name: "Extinguisher", path: "/egjs-view3d/model/meshopt/extinguisher.glb" },
+  { name: "Alarm", path: "/egjs-view3d/model/draco/alarm.glb" },
+  { name: "Extinguisher", path: "/egjs-view3d/model/draco/extinguisher.glb" },
   { name: "Plant", path: "/egjs-view3d/model/draco/plant.glb" },
-  { name: "Watch", path: "/egjs-view3d/model/meshopt/watch.glb" },
+  { name: "Watch", path: "/egjs-view3d/model/draco/watch.glb" },
   { name: "Payphone", path: "/egjs-view3d/model/draco/payphone.glb" },
-  { name: "Suzanne", path: "/egjs-view3d/model/meshopt/suzanne.glb" }
+  { name: "Suzanne", path: "/egjs-view3d/model/meshopt/suzanne.glb" },
+  { name: "Lucy", path: "/egjs-view3d/model/draco/lucy.glb" }
 ];
 
 export default ({ onSelect, onUpload, isLoading }) => {

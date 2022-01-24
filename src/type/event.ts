@@ -26,11 +26,13 @@ export interface ReadyEvent {
  * @property {string} type The type of event.
  * @property {View3D} target An instance of View3D that triggered this event.
  * @property {Model} model A new model that loaded.
+ * @property {number} level A level of model when loading multiple models at once, an integer starting from 0.
  */
 export interface LoadEvent {
   type: string;
   target: View3D;
   model: Model;
+  level: number;
 }
 
 /**

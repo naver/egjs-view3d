@@ -21,6 +21,7 @@
     "@svgr/webpack": "^5.5.0",
     "clsx": "^1.1.1",
     "file-loader": "^6.2.0",
+    "mesh-simplifier": "^2.0.0-beta.0",
     "prism-react-renderer": "^1.2.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
@@ -46,6 +47,7 @@
     "docusaurus-plugin-sass": "^0.2.1",
     "glslify-loader": "^2.0.0",
     "raw-loader": "^4.0.2",
+    "react-tooltip": "^4.2.21",
     "remark-breaks": "^2.0.2",
     "sass": "^1.43.4"
   }

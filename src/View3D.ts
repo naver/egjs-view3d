@@ -54,7 +54,7 @@ export interface View3DEvents {
  */
 export interface View3DOptions {
   // Model
-  src: string | null;
+  src: string | string[] | null;
   iosSrc: string | null;
   dracoPath: string;
   ktxPath: string;
@@ -617,7 +617,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
       await GLTFLoader.setMeshoptDecoder(meshoptPath);
     }
 
-    const tasks: [Promise<Model>, ...Array<Promise<any>>] = [
+    const tasks: Array<Promise<any>> = [
       this._loadModel(this._src)
     ];
 
@@ -632,9 +632,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
       tasks.push(scene.setBackground(background));
     }
 
-    const [model] = await Promise.all(tasks);
-
-    this._display(model);
+    await Promise.all(tasks);
 
     this._control.enable();
     if (this._autoplay) {
@@ -667,15 +665,14 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
 
   /**
    * Load a new 3D model and replace it with the current one
-   * @param {string} src Source URL to fetch 3D model from
+   * @param {string | string[]} src Source URL to fetch 3D model from
    */
-  public async load(src: string) {
+  public async load(src: string | string[]) {
     if (this._initialized) {
-      const model = await this._loadModel(src);
+      await this._loadModel(src);
 
+      // Change the src later as an error can occur while loading the model
       this._src = src;
-
-      this._display(model);
     } else {
       this._src = src;
 
@@ -684,46 +681,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   }
 
   /**
-   * Add new plugins to View3D
-   * @param {View3DPlugin[]} plugins Plugins to add
-   * @returns {Promise<void>}
+   * Display the given model in the canvas
+   * @param {Model} model A model to display
    */
-  public async loadPlugins(...plugins: View3DPlugin[]) {
-    return Promise.all(plugins.map(plugin => plugin.init(this)));
-  }
-
-  /**
-   * Take a screenshot of current rendered canvas image
-   */
-  public screenshot(fileName: string = "screenshot") {
-    const canvas = this._renderer.canvas;
-    const imgURL = canvas.toDataURL("png");
-
-    return {
-      save: () => {
-        const anchorEl = document.createElement("a");
-        anchorEl.href = imgURL;
-        anchorEl.download = fileName;
-        anchorEl.click();
-      },
-      url: imgURL
-    };
-  }
-
-  private async _loadModel(src: string) {
-    const loader = new GLTFLoader(this);
-    const model = await loader.load(src);
-
-    this.trigger(EVENTS.LOAD, {
-      type: EVENTS.LOAD,
-      target: this,
-      model
-    });
-
-    return model;
-  }
-
-  private _display(model: Model): void {
+  public display(model: Model): void {
     const renderer = this._renderer;
     const scene = this._scene;
     const camera = this._camera;
@@ -762,6 +723,66 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
       target: this,
       model
     });
+  }
+
+  /**
+   * Add new plugins to View3D
+   * @param {View3DPlugin[]} plugins Plugins to add
+   * @returns {Promise<void>}
+   */
+  public async loadPlugins(...plugins: View3DPlugin[]) {
+    return Promise.all(plugins.map(plugin => plugin.init(this)));
+  }
+
+  /**
+   * Take a screenshot of current rendered canvas image and download it
+   */
+  public screenshot(fileName = "screenshot") {
+    const canvas = this._renderer.canvas;
+    const imgURL = canvas.toDataURL("png");
+
+    const anchorEl = document.createElement("a");
+    anchorEl.href = imgURL;
+    anchorEl.download = fileName;
+    anchorEl.click();
+  }
+
+  private async _loadModel(src: string | string[]) {
+    const loader = new GLTFLoader(this);
+
+    if (Array.isArray(src)) {
+      const loaded = src.map(() => false);
+      const loadModels = src.map(async (srcLevel, level) => {
+        const model = await loader.load(srcLevel);
+        const higherLevelLoaded = loaded.slice(level + 1).some(val => !!val);
+
+        if (!higherLevelLoaded) {
+          this.display(model);
+        }
+
+        loaded[level] = true;
+
+        this.trigger(EVENTS.LOAD, {
+          type: EVENTS.LOAD,
+          target: this,
+          model,
+          level
+        });
+      });
+
+      await Promise.race(loadModels);
+    } else {
+      const model = await loader.load(src);
+
+      this.display(model);
+
+      this.trigger(EVENTS.LOAD, {
+        type: EVENTS.LOAD,
+        target: this,
+        model,
+        level: 0
+      });
+    }
   }
 
   private _addPosterImage() {

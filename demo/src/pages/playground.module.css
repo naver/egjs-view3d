@@ -71,34 +71,12 @@ html[data-theme='dark'] .control {
   cursor: pointer;
 }
 
-.resetBtn .tooltip {
-  visibility: hidden;
-  background-color: black;
-  color: #fff;
-  text-align: center;
-  padding: 12px;
-  border-radius: 6px;
+.modelInfo {
   position: absolute;
-  bottom: 100%;
-  left: 0%;
-  z-index: 1;
-  white-space: nowrap;
-  font-size: 1rem;
-  font-weight: 700;
-  line-height: 1.5;
-}
-
-.resetBtn .tooltip::after {
-  content: " ";
-  position: absolute;
-  top: 100%;
-  left: 27px;
-  margin-left: -5px;
-  border-width: 5px;
-  border-style: solid;
-  border-color: black transparent transparent transparent;
-}
-
-.resetBtn:hover .tooltip {
-  visibility: visible;
+  display: flex;
+  top: 0px;
+  right: 0px;
+  color: white;
+  flex-direction: column;
+  background-color: rgba(0, 0, 0, 0.3);
 }
