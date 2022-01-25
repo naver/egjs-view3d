@@ -20,7 +20,7 @@ export interface AROverlayOptions {
  * An UI that will be displayed on top of {@link WebARSession}.
  * This will be automatically added on the overlayRoot of the {@link WebARSession}.
  */
-class AROverlay extends View3DPlugin {
+class AROverlay implements View3DPlugin {
   private _options: Partial<AROverlayOptions>;
   private _cachedElements: {
     closeButton: HTMLElement;
@@ -31,8 +31,6 @@ class AROverlay extends View3DPlugin {
    * @param {object} [options={}] Options for the AROverlay
    */
   public constructor(options: Partial<AROverlayOptions> = {}) {
-    super();
-
     this._options = options;
   }
 
@@ -77,6 +75,10 @@ class AROverlay extends View3DPlugin {
         closeButton.removeEventListener("click", closeButtonHandler);
       });
     });
+  }
+
+  public teardown() {
+    // DO NOTHING
   }
 }
 

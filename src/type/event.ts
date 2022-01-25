@@ -20,6 +20,18 @@ export interface ReadyEvent {
 }
 
 /**
+ * An event that fires when View3D is destroyed.
+ * @event View3D#destroy
+ * @type {object}
+ * @property {string} type The type of event.
+ * @property {View3D} target An instance of View3D that triggered this event.
+ */
+export interface DestroyEvent {
+  type: string;
+  target: View3D;
+}
+
+/**
  * An event that fires when the 3D model is loaded but not displayed yet.
  * @event View3D#load
  * @type {object}
@@ -106,7 +118,7 @@ export interface RenderEvent {
  * @property {number} loaded A 64-bit unsigned integer value indicating the amount of work already performed by the underlying process. The ratio of work done can be calculated by dividing total by the value of this property. When downloading a resource using HTTP, this only counts the body of the HTTP message, and doesn't include headers and other overhead.
  * @property {number} total A 64-bit unsigned integer representing the total amount of work that the underlying process is in the progress of performing. When downloading a resource using HTTP, this is the Content-Length (the size of the body of the message), and doesn't include the headers and other overhead.
  */
-export interface LoadProgressEvent extends Omit<ProgressEvent, "target"> {
+export interface LoadProgressEvent {
   type: string;
   target: View3D;
   lengthComputable: boolean;

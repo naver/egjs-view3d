@@ -1,6 +1,6 @@
 import React from "react";
 import clsx from "clsx";
-import VanillaView3D, { View3DOptions, ARButton, AROverlay } from "../../../src";
+import VanillaView3D, { View3DOptions, ARButton, AROverlay, LoadingBar } from "../../../src";
 import DownloadIcon from "../../static/icon/file_download_black.svg";
 
 import OptionExample from "./OptionExample";
@@ -10,6 +10,7 @@ interface DemoOptions extends Partial<View3DOptions> {
   className: string;
   clickToLoad: boolean;
   showARButton: boolean;
+  showLoadingBar: boolean;
   showBbox: boolean;
   showExampleCode: boolean | string[];
   showEventsTriggered: null | string[];
@@ -23,6 +24,7 @@ class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivE
     className: "",
     clickToLoad: false,
     showARButton: false,
+    showLoadingBar: false,
     showBbox: false,
     showExampleCode: false,
     showEventsTriggered: null,
@@ -46,7 +48,15 @@ class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivE
   }
 
   public componentDidMount() {
-    const { children, showBbox, showARButton, showExampleCode, clickToLoad, ...restProps } = this.props;
+    const {
+      children,
+      showBbox,
+      showARButton,
+      showLoadingBar,
+      showExampleCode,
+      clickToLoad,
+      ...restProps
+    } = this.props;
 
     const options = {
       ...restProps,
@@ -72,6 +82,10 @@ class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivE
 
     if (showARButton) {
       void view3D.loadPlugins(new ARButton(), new AROverlay());
+    }
+
+    if (showLoadingBar) {
+      void view3D.loadPlugins(new LoadingBar());
     }
   }
 

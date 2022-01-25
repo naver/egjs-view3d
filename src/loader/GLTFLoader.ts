@@ -81,7 +81,13 @@ class GLTFLoader {
           const model = this._parseToModel(gltf, url);
           resolve(model);
         }, evt => {
-          view3D.trigger(EVENTS.PROGRESS, { ...evt, target: view3D, type: EVENTS.PROGRESS });
+          view3D.trigger(EVENTS.PROGRESS, {
+            type: EVENTS.PROGRESS,
+            target: view3D,
+            lengthComputable: evt.lengthComputable,
+            loaded: evt.loaded,
+            total: evt.total
+          });
         }, err => {
           reject(err);
         });

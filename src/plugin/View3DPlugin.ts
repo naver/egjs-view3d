@@ -8,11 +8,11 @@ import View3D from "../View3D";
 
 /**
  * Plugin for View3D
- * @abstract
+ * @interface
  */
-abstract class View3DPlugin {
-  public async init(view3D: View3D): Promise<void> {}
-  public async teardown(view3D: View3D): Promise<void> {}
+interface View3DPlugin {
+  init(view3D: View3D): Promise<void>;
+  teardown(view3D: View3D): void;
 }
 
 /* eslint-enable */

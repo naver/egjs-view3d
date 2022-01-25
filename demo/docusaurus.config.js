@@ -80,6 +80,12 @@ const config = {
           },
           {
             type: "doc",
+            docId: "plugins/about",
+            label: "Plugins",
+            position: "left"
+          },
+          {
+            type: "doc",
             docId: "ar/default",
             label: "AR",
             position: "left"
@@ -124,6 +130,10 @@ const config = {
               {
                 label: "Events",
                 to: "docs/events/ready"
+              },
+              {
+                label: "Plugins",
+                to: "docs/plugins"
               }
             ]
           },

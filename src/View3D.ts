@@ -122,6 +122,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
 
   // Internal States
   private _rootEl: HTMLElement;
+  private _plugins: View3DPlugin[];
   private _initialized: boolean;
 
   // Options
@@ -574,6 +575,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._arManager = new ARManager(this);
     this._model = null;
     this._initialized = false;
+    this._plugins = [];
 
     this._addPosterImage();
 
@@ -591,6 +593,8 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._renderer.stopAnimationLoop();
     this._control.destroy();
     this._autoResizer.disable();
+    this._plugins.forEach(plugin => plugin.teardown(this));
+    this._plugins = [];
   }
 
   /**
@@ -728,10 +732,29 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   /**
    * Add new plugins to View3D
    * @param {View3DPlugin[]} plugins Plugins to add
-   * @returns {Promise<void>}
+   * @returns {Promise<void>} A promise that resolves when all plugins are initialized
    */
   public async loadPlugins(...plugins: View3DPlugin[]) {
-    return Promise.all(plugins.map(plugin => plugin.init(this)));
+    await Promise.all(plugins.map(plugin => plugin.init(this)));
+
+    this._plugins.push(...plugins);
+  }
+
+  /**
+   * Remove plugins from View3D
+   * @param {View3DPlugin[]} plugins Plugins to remove
+   * @returns {Promise<void>} A promise that resolves when all plugins are removed
+   */
+  public async removePlugins(...plugins: View3DPlugin[]) {
+    await Promise.all(plugins.map(plugin => plugin.teardown(this)));
+
+    plugins.forEach(plugin => {
+      const pluginIdx = this._plugins.indexOf(plugin);
+
+      if (pluginIdx < 0) return;
+
+      this._plugins.splice(pluginIdx, 1);
+    });
   }
 
   /**
