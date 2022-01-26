@@ -10,7 +10,7 @@ interface DemoOptions extends Partial<View3DOptions> {
   className: string;
   clickToLoad: boolean;
   showARButton: boolean;
-  showLoadingBar: boolean;
+  showLoadingBar: boolean | string;
   showBbox: boolean;
   showExampleCode: boolean | string[];
   showEventsTriggered: null | string[];
@@ -85,7 +85,10 @@ class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivE
     }
 
     if (showLoadingBar) {
-      void view3D.loadPlugins(new LoadingBar());
+      const type = typeof showLoadingBar === "string"
+        ? showLoadingBar as any
+        : "default";
+      void view3D.loadPlugins(new LoadingBar({ type }));
     }
   }
 

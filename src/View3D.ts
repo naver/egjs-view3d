@@ -36,6 +36,7 @@ import { GLTFLoader } from "./loader";
  */
 export interface View3DEvents {
   [EVENTS.READY]: EVENT_TYPES.ReadyEvent;
+  [EVENTS.LOAD_START]: EVENT_TYPES.LoadStartEvent;
   [EVENTS.LOAD]: EVENT_TYPES.LoadEvent;
   [EVENTS.MODEL_CHANGE]: EVENT_TYPES.ModelChangeEvent;
   [EVENTS.RESIZE]: EVENT_TYPES.ResizeEvent;
@@ -776,14 +777,15 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     if (Array.isArray(src)) {
       const loaded = src.map(() => false);
       const loadModels = src.map(async (srcLevel, level) => {
+        this.trigger(EVENTS.LOAD_START, {
+          type: EVENTS.LOAD_START,
+          target: this,
+          src: srcLevel,
+          level
+        });
+
         const model = await loader.load(srcLevel);
         const higherLevelLoaded = loaded.slice(level + 1).some(val => !!val);
-
-        if (!higherLevelLoaded) {
-          this.display(model);
-        }
-
-        loaded[level] = true;
 
         this.trigger(EVENTS.LOAD, {
           type: EVENTS.LOAD,
@@ -791,13 +793,24 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
           model,
           level
         });
+
+        if (!higherLevelLoaded) {
+          this.display(model);
+        }
+
+        loaded[level] = true;
       });
 
       await Promise.race(loadModels);
     } else {
-      const model = await loader.load(src);
+      this.trigger(EVENTS.LOAD_START, {
+        type: EVENTS.LOAD_START,
+        target: this,
+        src,
+        level: 0
+      });
 
-      this.display(model);
+      const model = await loader.load(src);
 
       this.trigger(EVENTS.LOAD, {
         type: EVENTS.LOAD,
@@ -805,6 +818,8 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
         model,
         level: 0
       });
+
+      this.display(model);
     }
   }
 

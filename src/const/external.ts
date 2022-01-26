@@ -11,6 +11,7 @@ export const AUTO = "auto";
  * Event type object with event name strings of {@link View3D}
  * @type {object}
  * @property {"ready"} READY {@link /docs/events/ready Ready event}
+ * @property {"loadStart"} LOAD_START {@link /docs/events/loadStart Load start event}
  * @property {"load"} LOAD {@link /docs/events/load Load event}
  * @property {"resize"} RESIZE {@link /docs/events/resize Resize event}
  * @property {"beforeRender"} BEFORE_RENDER {@link /docs/events/beforeRender Before render event}
@@ -28,6 +29,7 @@ export const AUTO = "auto";
  */
 export const EVENTS = {
   READY: "ready",
+  LOAD_START: "loadStart",
   LOAD: "load",
   MODEL_CHANGE: "modelChange",
   RESIZE: "resize",

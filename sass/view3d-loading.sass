@@ -7,23 +7,30 @@
   align-items: center
   top: 0
   left: 0
-  color: white
-  background-color: rgba(0, 0, 0, 0.3)
   flex-direction: column
+  &.type-top
+    height: auto
+    background-color: transparent !important
+    .view3d-lb-wrapper
+      width: 100%
+    .view3d-lb-label
+      display: none
+    .view3d-lb-base
+      width: 100%
+      margin-left: 0%
+      border-radius: 0px
 
 .view3d-lb-wrapper
   position: relative
 
 .view3d-lb-base
   width: 140%
-  height: 10px
   margin-left: -20%
-  background-color: #bbbbbb
   border-radius: 9999px
   overflow: hidden
   position: relative
   margin-bottom: 5px
-  &.is-spinning
+  &.type-spinner
     width: 70%
     height: 0
     padding-top: 70%
@@ -33,18 +40,16 @@
     .view3d-lb-filler
       background-color: transparent
       border: 15px solid #3e8ed0
+      width: 100%
       border-left-color: transparent
-      // border-right-color: transparent
-      transition: all 1s 0.5s
-      animation: view3d-lb-spin 1.2s 0.5s linear infinite
+      animation: view3d-lb-spin 1.2s linear infinite
 
 .view3d-lb-filler
-  background-color: #3e8ed0
   position: absolute
   top: 0
   left: 0
   border-radius: 9999px
-  width: 100%
+  width: 0
   height: 100%
 
 @keyframes view3d-lb-spin

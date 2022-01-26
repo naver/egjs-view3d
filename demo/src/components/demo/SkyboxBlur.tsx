@@ -93,7 +93,7 @@ export default () => {
         <div className="column">
           <View3D
             ref={view3D1}
-            src="/egjs-view3d/model/meshopt/alarm.glb"
+            src="/egjs-view3d/model/draco/alarm.glb"
             skybox="/egjs-view3d/texture/royal_esplanade_1k.hdr"
             skyboxBlur={true}
             showExampleCode />
@@ -101,7 +101,7 @@ export default () => {
         <div className="column">
           <View3D
             ref={view3D2}
-            src="/egjs-view3d/model/meshopt/alarm.glb"
+            src="/egjs-view3d/model/draco/alarm.glb"
             skybox="/egjs-view3d/texture/royal_esplanade_1k.hdr"
             showExampleCode />
         </div>

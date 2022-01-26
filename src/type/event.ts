@@ -32,6 +32,22 @@ export interface DestroyEvent {
 }
 
 /**
+ * An event that fires before loading a 3D model via network.
+ * @event View3D#load
+ * @type {object}
+ * @property {string} type The type of event.
+ * @property {View3D} target An instance of View3D that triggered this event.
+ * @property {Model} src A source URL of model to load.
+ * @property {number} level A level of model when loading multiple models at once, an integer starting from 0.
+ */
+export interface LoadStartEvent {
+  type: string;
+  target: View3D;
+  src: string;
+  level: number;
+}
+
+/**
  * An event that fires when the 3D model is loaded but not displayed yet.
  * @event View3D#load
  * @type {object}
