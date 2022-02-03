@@ -51,7 +51,7 @@ Then you can use it like
 
 ```js
 import View3D from "@egjs/view3d";
-import "@egjs/view3d/css";
+import "@egjs/view3d/css/view3d-bundle.min.css";
 
 const canvasEl = document.querySelector("#view3d");
 const view3d = new View3D(canvasEl, {

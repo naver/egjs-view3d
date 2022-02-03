@@ -11,7 +11,7 @@ export default () => <section className="py-4">
     </div>
     <div className="column">
       <CodeBlock className="language-js" title="JS">{`import View3D from "@egjs/view3d";
-import "@egjs/view3d/css";
+import "@egjs/view3d/css/view3d-bundle.min.css";
 
 const view3D = new View3D("#view3d", {
   src: "URL_TO_YOUR_3D_MODEL",

@@ -104,8 +104,9 @@ typings/
 ## Custom ###
 .DS_Store
 demo/release/
-dist/
+
 outjs/
 declaration/
+css/
 TODO.md
 *.pem
