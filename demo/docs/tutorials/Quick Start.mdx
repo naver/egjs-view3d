@@ -1,0 +1,134 @@
+---
+title: Quick Start
+id: quick-start
+slug: /quick-start
+sidebar_position: 2
+---
+
+import View3D from "@site/src/components/View3D";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import License from "@site/src/components/License";
+
+## DOM Structure
+View3D requires appropriate DOM structure for initialization.
+There should be one `canvas` element inside the wrapper element.
+
+```html
+<div id="wrapper-el" class="view3d-wrapper view3d-square">
+  <canvas class="view3d-canvas"></canvas>
+</div>
+```
+```js
+new View3D("#wrapper-el");
+```
+
+All class names are optional, but it's needed when you're using our CSS files.
+
+### Ratio helper classes
+The class `view3d-square`(or `view3d-1by1`) will set the height of canvas element same to its width.
+You can use one of our other pre-defined classes to set responsive canvas height with fixed ratio.
+
+```
+view3d-square
+view3d-1by1
+view3d-5by4
+view3d-4by3
+view3d-3by2
+view3d-5by3
+view3d-16by9
+view3d-2by1
+view3d-3by1
+view3d-4by5
+view3d-3by4
+view3d-2by3
+view3d-3by5
+view3d-9by16
+view3d-1by2
+view3d-1by3
+```
+
+You can also can set canvas width/height without ratio class but with CSS like this, and View3D will follow.
+```css
+.view3d-wrapper {
+  width: 100%;
+  height: 100vh;
+}
+```
+
+## Setup Script & Styles
+<Tabs
+  groupId="quick-start"
+  defaultValue="bundler"
+  lazy={true}
+  values={[
+    { label: "With bundlers", value: "bundler" },
+    { label: "Without bundlers", value: "non-bundler" }
+  ]}>
+  <TabItem value="bundler">
+
+```js
+import View3D from "@egjs/view3d";
+import "@egjs/view3d/css";
+// or import "@egjs/view3d/css/view3d.min.css"; if you don't use any plugins
+
+const view3D = new View3D("#view3d", {
+  // Options
+})
+```
+
+  </TabItem>
+  <TabItem value="non-bundler">
+
+```html
+<script src="https://unpkg.com/@egjs/view3d@latest/dist/view3d.pkgd.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@egjs/view3d@latest/dist/view3d-bundle.min.css">
+```
+
+```js
+const view3D = new View3D("#view3d", {
+  // Options
+})
+```
+
+  </TabItem>
+</Tabs>
+
+## Displaying a model
+3D model will be displayed on the canvas if you set the option `src`.
+
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  poster="/egjs-view3d/poster/alarm_black.png"
+  translate={false}
+  clickToLoad
+  showExampleCode />
+
+But as there's no lighting yet, model will be shown in black (unless it has emissive property enabled)
+View3D uses HDR image as envmap for IBL(image-based lighting), so you can set any HDR image for the option `envmap` and model will be litten.
+
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+  poster="/egjs-view3d/poster/alarm.png"
+  clickToLoad
+  showExampleCode />
+
+To get HDR images, check this [awesome collection of Poly Haven](https://polyhaven.com/hdris)
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

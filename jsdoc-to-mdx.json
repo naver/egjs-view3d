@@ -1,0 +1,7 @@
+{
+  "locales": [],
+  "outDir": "./demo/docs/api",
+  "sidebar": "./demo",
+  "jsdoc": "./jsdoc.json",
+  "bulma": true
+}

@@ -3,22 +3,36 @@
  * egjs projects are licensed under the MIT license
  */
 
-import ModelAnimator from "./ModelAnimator";
+import Animation from "./Animation";
+import ARManager from "./ARManager";
+import AutoPlayer, { AutoplayOptions } from "./AutoPlayer";
+import AutoResizer from "./AutoResizer";
+import Camera from "./Camera";
 import Model from "./Model";
+import ModelAnimator from "./ModelAnimator";
+import Motion from "./Motion";
+import Pose from "./Pose";
 import Renderer from "./Renderer";
 import Scene from "./Scene";
-import XRManager from "./XRManager";
-import Camera from "./camera/Camera";
-import Controller from "./camera/Controller";
-import Pose from "./camera/Pose";
+import ShadowPlane from "./ShadowPlane";
+import View3DError from "./View3DError";
 
 export {
-  ModelAnimator,
+  Animation,
+  ARManager,
+  AutoPlayer,
+  AutoResizer,
+  Camera,
   Model,
+  ModelAnimator,
+  Motion,
+  Pose,
   Renderer,
   Scene,
-  XRManager,
-  Camera,
-  Controller,
-  Pose,
+  ShadowPlane,
+  View3DError
+};
+
+export type {
+  AutoplayOptions
 };

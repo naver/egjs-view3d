@@ -1,0 +1,55 @@
+---
+title: Controls & Scroll
+id: controls
+slug: /controls
+sidebar_position: 3
+---
+
+import View3D from "@site/src/components/View3D";
+import License from "@site/src/components/License";
+
+You can modify camera controls with the following options.
+
+- [rotate](/docs/options/control/rotate)
+- [translate](/docs/options/control/translate)
+- [zoom](/docs/options/control/zoom)
+
+## Disabling Controls
+Each controls can be disabled easily by setting it to `false`.
+
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+  poster="/egjs-view3d/poster/alarm.png"
+  translate={false}
+  clickToLoad
+  showExampleCode />
+
+> *The right click(Translation) is disabled*
+
+## Scrolling
+### Mobile
+By default, [scrollable](/docs/options/control/scrollable) is enabled to enable scrolling on the canvas area for mobile(touch) devices.
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+  poster="/egjs-view3d/poster/alarm.png"
+  scrollable={true}
+  clickToLoad
+  showExampleCode />
+
+> *Check the page in mobile*
+
+Set it to `false` if the canvas area is small, so there's enough space to scroll.
+
+### Desktop
+In desktop browsers, [wheelScrollable](/docs/options/control/wheelScrollable) is disabled by default.
+You can scroll on the canvas if you enable it, but you can't adjust zoom in this case.
+
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+  poster="/egjs-view3d/poster/alarm.png"
+  wheelScrollable={true}
+  clickToLoad
+  showExampleCode />

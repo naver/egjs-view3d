@@ -1,0 +1,61 @@
+---
+title: Basis Universal (KTX2)
+sidebar_position: 3
+---
+
+import View3D from "@site/src/components/View3D";
+import License from "@site/src/components/License";
+
+View3D supports [KTX v2 texture images with Basis Universal supercompression](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_texture_basisu/README.md).
+
+KTX2 texture decoder will be loaded asynchronously with the [ktxPath](/docs/options/model/ktxPath) option.
+By default, KTX2 transcoder will be loaded from [unpkg CDN](https://unpkg.com/).
+
+```
+https://unpkg.com/three@0.134.0/examples/js/libs/basis/
+```
+
+[gltfpack](https://github.com/zeux/meshoptimizer/tree/master/gltf) is a great tool to apply `KHR_texture_basisu` extension. (Use `-tc` flag)
+
+
+<div className="columns">
+  <div className="column">
+    <div className="title">Original</div>
+    <div className="subtitle">61.0MB (60.0MB gzipped)</div>
+    <View3D
+      src="/egjs-view3d/model/artorias.glb"
+      envmap="/egjs-view3d/texture/moonless_golf_1k.hdr"
+      poster="/egjs-view3d/poster/artorias.png"
+      exposure={2}
+      clickToLoad
+      showExampleCode />
+  </div>
+  <div className="column">
+    <div className="title">Basis Universal Compressed</div>
+    <div className="subtitle">10.8MB (-82.30%)</div>
+    <View3D
+      src="/egjs-view3d/model/meshopt/artorias.glb"
+      envmap="/egjs-view3d/texture/moonless_golf_1k.hdr"
+      poster="/egjs-view3d/poster/artorias.png"
+      exposure={2}
+      clickToLoad
+      showExampleCode />
+  </div>
+</div>
+
+<License items={[
+  {
+    name: "Knight Artorias",
+    link: "https://sketchfab.com/3d-models/knight-artorias-0affb3436519401db2bad31cfced95c1",
+    author: "samize",
+    authorLink: "https://sketchfab.com/samize",
+    license: "CC Attribution-NonCommercial-ShareAlike"
+  },
+  {
+    name: "Moonless Golf",
+    link: "https://polyhaven.com/a/moonless_golf",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

@@ -1,0 +1,55 @@
+---
+sidebar_position: 2
+---
+
+import View3D from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
+
+<OptionDescriptor type={`boolean | AutoplayOptions`} defaultVal="true" />
+
+Enable Y-axis rotation autoplay.
+If `true` is given, it will enable autoplay with the default options.
+You can also customize the autoplay with the following properties.
+
+|Name|Type|Default|Description|
+|:---:|:---:|:---:|---|
+|delay|number|2000|Reactivation delay after mouse input in milisecond|
+|delayOnMouseLeave|number|0|Reactivation delay after mouse leave|
+|speed|number|1|Y-axis(yaw) rotation speed|
+|pauseOnHover|boolean|false|Whether to pause rotation on mouse hover|
+|canInterrupt|boolean|true|Whether user can interrupt the rotation with click/wheel input|
+|disableOnInterrupt|boolean|false|Whether to disable autoplay on user interrupt|
+
+## Example
+### autoplay: true (default)
+<View3D src="/egjs-view3d/model/meshopt/alarm.glb" envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" showExampleCode autoplay={true} />
+
+### delay: 5000
+<View3D src="/egjs-view3d/model/meshopt/alarm.glb" envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" showExampleCode autoplay={{ delay: 5000 }} />
+
+### pauseOnHover: true & delayOnMouseLeave: 2000
+<View3D src="/egjs-view3d/model/meshopt/alarm.glb" envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" showExampleCode autoplay={{ delayOnMouseLeave: 2000, pauseOnHover: true }} />
+
+### speed: -5 & canInterrupt: false
+<View3D src="/egjs-view3d/model/meshopt/alarm.glb" envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" showExampleCode autoplay={{ speed: -5, canInterrupt: false }} />
+
+### disableOnInterrupt: true
+<View3D src="/egjs-view3d/model/meshopt/alarm.glb" envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" showExampleCode autoplay={{ disableOnInterrupt: true }} />
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

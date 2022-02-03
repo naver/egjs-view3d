@@ -1,0 +1,60 @@
+---
+sidebar_position: 2
+---
+
+import View3D from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
+
+<OptionDescriptor type={`boolean | SceneViewerSessionOptions`} defaultVal="true" />
+
+Options for the [Google SceneViewer](https://developers.google.com/ar/develop/java/scene-viewer) based AR session.
+If `false` is given, it will disable SceneViewer based AR session.
+
+See [Official Page](https://developers.google.com/ar/develop/java/scene-viewer#supported_intent_parameters) for the parameter details.
+
+|Name|Type|Default|Description|
+|:---:|:---:|:---:|---|
+|file|string \| null|null|This URL specifies the glTF or glb file that should be loaded into Scene Viewer. This should be URL-escaped. If `null` is given, it will try to use current model shown on the canvas.|
+|fallbackURL|string \| null|null|This is a Google Chrome feature supported only for web-based implementations. When the Google app com.google.android.googlequicksearchbox is not present on the device, this is the URL that Google Chrome navigates to.|
+|mode|string|"ar_only"|See [SCENE_VIEWER_MODE](/docs/api/SCENE_VIEWER_MODE) for available modes (also check their [official page](https://developers.google.com/ar/develop/java/scene-viewer) for details).|
+|title|string \| null|null|A name for the model. If present, it will be displayed in the UI. The name will be truncated with ellipses after 60 characters.|
+|link|string \| null|null|A URL for an external webpage. If present, a button will be surfaced in the UI that intents to this URL when clicked.|
+|sound|string \| null|null|A URL to a looping audio track that is synchronized with the first animation embedded in a glTF file. It should be provided alongside a glTF with an animation of matching length. If present, the sound is looped after the model is loaded. This should be URL-escaped.|
+|resizable|boolean|true|When set to false, users will not be able to scale the model in the AR experience. Scaling works normally in the 3D experience.|
+|vertical|boolean|false|When set to true, users will be able to place the model on a vertical surface.|
+|disableOcclusion|boolean|false|When set to true, SceneViewer will disable {@link https://developers.google.com/ar/develop/java/depth/introduction object blending}|
+|initialScale|string \| null|"auto"|Initial scale of the 3D model. If set to `null`, 3D model will shown as its original size and will disable the "View actual size" button. Default value is "auto", and "1" will show model size in 100%, "2" in 200%, "0.5" in 50% and so on.|
+|shareText|string \| null|null|A text that will be displayed when user clicked the share button.|
+
+## Example
+### sceneViewer: true (default)
+<View3D src="/egjs-view3d/model/draco/alarm.glb" iosSrc="/egjs-view3d/model/usdz/alarm.usdz" envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" sceneViewer={true} webAR={false} showExampleCode showARButton />
+
+### Detailed Options
+<View3D src="/egjs-view3d/model/draco/alarm.glb" iosSrc="/egjs-view3d/model/usdz/alarm.usdz" envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" sceneViewer={{
+  title: "CUSTOM TITLE",
+  link: "https://github.com/naver/egjs-view3d",
+  resizable: true,
+  vertical: true,
+  disableOcclusion: true,
+  initialScale: "2",
+  shareText: "CUSTOM SHARE TEXT"
+}} webAR={false} showExampleCode showARButton />
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

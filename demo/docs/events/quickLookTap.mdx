@@ -1,0 +1,39 @@
+---
+sidebar_position: 11
+---
+
+import View3D from "@site/src/components/View3D";
+import License from "@site/src/components/License";
+
+An event that fires when user clicked the Apple pay button or custom action button.
+- https://developer.apple.com/documentation/arkit/adding_an_apple_pay_button_or_a_custom_action_in_ar_quick_look#3405186
+
+|Property|Type|Description|
+|:---:|:---:|---|
+|type|string|The type of event|
+|target|[View3D](/docs/api/View3D)|An instance of View3D that triggered this event|
+
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  iosSrc="/egjs-view3d/model/usdz/alarm.usdz"
+  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+  quickLook={{ checkoutTitle: "TITLE", checkoutSubtitle: "SUBTITLE", callToAction: "Trigger Event", price: "4$" }}
+  showARButton
+  showEventsTriggered={["quickLookTap"]} />
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />
