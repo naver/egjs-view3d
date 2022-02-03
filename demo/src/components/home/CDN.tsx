@@ -38,13 +38,13 @@ export default () => <section className="py-4">
           { label: "CSS @import", value: "css" }
         ]}>
         <TabItem value="url">
-          <CodeBlock className="language-shell">https://unpkg.com/@egjs/view3d@latest/dist/view3d-bundle.min.css</CodeBlock>
+          <CodeBlock className="language-shell">https://unpkg.com/@egjs/view3d@latest/css/view3d-bundle.min.css</CodeBlock>
         </TabItem>
         <TabItem value="html">
-          <CodeBlock className="language-html">{`<link rel="stylesheet" href="https://unpkg.com/@egjs/view3d@latest/dist/view3d-bundle.min.css">`}</CodeBlock>
+          <CodeBlock className="language-html">{`<link rel="stylesheet" href="https://unpkg.com/@egjs/view3d@latest/css/view3d-bundle.min.css">`}</CodeBlock>
         </TabItem>
         <TabItem value="css">
-          <CodeBlock className="language-css">{`@import "https://unpkg.com/@egjs/view3d@latest/dist/view3d-bundle.min.css";`}</CodeBlock>
+          <CodeBlock className="language-css">{`@import "https://unpkg.com/@egjs/view3d@latest/css/view3d-bundle.min.css";`}</CodeBlock>
         </TabItem>
       </Tabs>
     </div>
