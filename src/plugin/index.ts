@@ -4,15 +4,15 @@
  */
 import View3DPlugin from "./View3DPlugin";
 import ARButton, { ARButtonOptions } from "./ARButton";
-import ARUI, { ARUIOptions } from "./ARUI";
+import AROverlay, { AROverlayOptions } from "./AROverlay";
 
 export {
   ARButton,
-  ARUI
+  AROverlay
 };
 
 export type {
   ARButtonOptions,
-  ARUIOptions,
+  AROverlayOptions,
   View3DPlugin
 };

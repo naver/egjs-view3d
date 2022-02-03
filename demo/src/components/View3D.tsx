@@ -1,7 +1,7 @@
 import React from "react";
 import * as THREE from "three";
 import clsx from "clsx";
-import VanillaView3D, { View3DOptions, ARButton, ARUI } from "../../../src";
+import VanillaView3D, { View3DOptions, ARButton, AROverlay } from "../../../src";
 import DownloadIcon from "../../static/icon/file_download_black.svg";
 
 import OptionExample from "./OptionExample";
@@ -74,7 +74,7 @@ class View3D extends React.Component<DemoOptions, {
     }
 
     if (showARButton) {
-      void view3D.loadPlugins(new ARButton(), new ARUI());
+      void view3D.loadPlugins(new ARButton(), new AROverlay());
     }
   }
 

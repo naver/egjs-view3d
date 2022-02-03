@@ -63,18 +63,18 @@ document
 
 <hr />
 
-## ARUI
+## AROverlay
 
 Similarly, View3D also provides default AR UI for [WebARSession](/docs/api/WebARSession)
 It currently only shows close button at the moment, but more UI elements will be added as default later.
 
-See [ARUI](/docs/api/ARUI) and [ARUIOptions](/docs/api/ARUIOptions)
+See [AROverlay](/docs/api/AROverlay) and [AROverlayOptions](/docs/api/AROverlayOptions)
 
 ```js
-import View3D, { ARUI } from "@egjs/view3d";
+import View3D, { AROverlay } from "@egjs/view3d";
 
 const view3D = new View3D("#el", { ... });
-view3D.loadPlugins(new ARUI());
+view3D.loadPlugins(new AROverlay());
 ```
 
 <View3D

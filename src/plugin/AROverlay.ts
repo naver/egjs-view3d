@@ -9,10 +9,10 @@ import { EVENTS } from "../const/external";
 import View3DPlugin from "./View3DPlugin";
 
 /**
- * Options for the {@link ARUI}
+ * Options for the {@link AROverlay}
  * @interface
  */
-export interface ARUIOptions {
+export interface AROverlayOptions {
 
 }
 
@@ -20,17 +20,17 @@ export interface ARUIOptions {
  * An UI that will be displayed on top of {@link WebARSession}.
  * This will be automatically added on the overlayRoot of the {@link WebARSession}.
  */
-class ARUI extends View3DPlugin {
-  private _options: Partial<ARUIOptions>;
+class AROverlay extends View3DPlugin {
+  private _options: Partial<AROverlayOptions>;
   private _cachedElements: {
     closeButton: HTMLElement;
   } | null;
 
   /**
-   * Create new instance of ARUI
-   * @param {object} [options={}] Options for the ARUI
+   * Create new instance of AROverlay
+   * @param {object} [options={}] Options for the AROverlay
    */
-  public constructor(options: Partial<ARUIOptions> = {}) {
+  public constructor(options: Partial<AROverlayOptions> = {}) {
     super();
 
     this._options = options;
@@ -80,4 +80,4 @@ class ARUI extends View3DPlugin {
   }
 }
 
-export default ARUI;
+export default AROverlay;
