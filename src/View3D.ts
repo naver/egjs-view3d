@@ -613,6 +613,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     }
 
     const scene = this._scene;
+    const renderer = this._renderer;
     const skybox = this._skybox;
     const envmap = this._envmap;
     const background = this._background;
@@ -638,6 +639,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     }
 
     await Promise.all(tasks);
+
+    // Start rendering
+    renderer.stopAnimationLoop();
+    renderer.setAnimationLoop(renderer.defaultRenderLoop);
 
     this._control.enable();
     if (this._autoplay) {
@@ -712,10 +717,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
 
     this._model = model;
 
-    if (!inXR) {
-      renderer.stopAnimationLoop();
-      renderer.setAnimationLoop(renderer.defaultRenderLoop);
-    } else {
+    if (inXR) {
       const activeSession = this._arManager.activeSession;
 
       if (activeSession) {

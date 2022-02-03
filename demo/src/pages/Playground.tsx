@@ -9,7 +9,7 @@ import Layout from "@theme/Layout";
 // @ts-ignore
 import styles from "./playground.module.css";
 
-import VanillaView3D, { GLTFLoader, Model } from "../../../src";
+import VanillaView3D, { GLTFLoader, Model, LoadingBar } from "../../../src";
 import ModelChange from "../components/playground/ModelChange";
 import EnvmapChange from "../components/playground/EnvmapChange";
 import MeshSimplification from "../components/playground/MeshSimplification";
@@ -41,12 +41,15 @@ class Playground extends React.Component<{}, {
     const view3D = new VanillaView3D("#playground-view3d", {
       src: "/egjs-view3d/model/cube.glb",
       skybox: "/egjs-view3d/texture/artist_workshop_1k.hdr",
-      autoplay: true
+      autoplay: true,
+      autoInit: false
     }).on("ready", () => {
       this._originalModel = view3D.model;
       this.setState({});
     });
 
+    void view3D.loadPlugins(new LoadingBar({ type: "top" }));
+    void view3D.init();
     void GLTFLoader.setMeshoptDecoder("/egjs-view3d/lib/meshopt_decoder.js");
 
     this._view3D = view3D;

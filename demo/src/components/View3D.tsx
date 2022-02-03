@@ -1,5 +1,6 @@
 import React from "react";
 import clsx from "clsx";
+import * as THREE from "three";
 import VanillaView3D, { View3DOptions, ARButton, AROverlay, LoadingBar } from "../../../src";
 import DownloadIcon from "../../static/icon/file_download_black.svg";
 

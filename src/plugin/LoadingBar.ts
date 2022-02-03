@@ -4,7 +4,7 @@
  */
 import View3D from "../View3D";
 import { EVENTS } from "../const/external";
-import { LoadProgressEvent } from "../type/event";
+import { LoadProgressEvent, LoadStartEvent } from "../type/event";
 import { ValueOf } from "../type/utils";
 
 import View3DPlugin from "./View3DPlugin";
@@ -57,16 +57,15 @@ class LoadingBar implements View3DPlugin {
   }
 
   public async init(view3D: View3D) {
-    view3D.once(EVENTS.LOAD_START, () => {
-      this._startLoading(view3D);
-    });
+    view3D.on(EVENTS.LOAD_START, this._startLoading);
   }
 
   public teardown(view3D: View3D): void {
+    view3D.off(EVENTS.LOAD_START, this._startLoading);
     this._removeOverlay(view3D);
   }
 
-  private _startLoading = (view3D: View3D) => {
+  private _startLoading = ({ target: view3D }: LoadStartEvent) => {
     const {
       type = "default",
       loadingLabel = "Loading 3D Model...",
