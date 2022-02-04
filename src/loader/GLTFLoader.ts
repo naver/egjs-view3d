@@ -174,6 +174,7 @@ class GLTFLoader {
     const model = new Model({
       src,
       scenes: gltf.scenes,
+      json: gltf.parser.json,
       animations: gltf.animations,
       fixSkinnedBbox
     });

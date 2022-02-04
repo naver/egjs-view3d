@@ -13,6 +13,7 @@ class Model {
   private _scene: THREE.Group;
   private _bbox: THREE.Box3;
   private _animations: THREE.AnimationClip[];
+  private _json: Record<string, any>;
 
   /**
    * Source URL of this model
@@ -30,6 +31,11 @@ class Model {
    * @readonly
    */
   public get animations() { return this._animations; }
+  /**
+   * JSON data of original glTF file
+   * @readonly
+   */
+  public get json() { return this._json; }
   /**
    * {@link https://threejs.org/docs/#api/en/objects/Mesh THREE.Mesh}es inside model if there's any.
    * @readonly
@@ -76,6 +82,7 @@ class Model {
     src,
     scenes,
     animations = [],
+    json = {},
     fixSkinnedBbox = false,
     castShadow = true,
     receiveShadow = false
@@ -83,6 +90,7 @@ class Model {
     src: string;
     scenes: THREE.Object3D[];
     animations?: THREE.AnimationClip[];
+    json?: any; // Original json of the glTF file
     fixSkinnedBbox?: boolean;
     castShadow?: boolean;
     receiveShadow?: boolean;
@@ -94,6 +102,7 @@ class Model {
     this._scene.add(...scenes);
 
     this._animations = animations;
+    this._json = json;
 
     this._bbox = this._getInitialBbox(fixSkinnedBbox);
 

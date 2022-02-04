@@ -4,6 +4,8 @@ import ReactTooltip from "react-tooltip";
 import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter";
 import { FastQuadric, ThreeAdapter } from "mesh-simplifier";
 import Swal from "sweetalert2";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 // @ts-ignore
 import Layout from "@theme/Layout";
 // @ts-ignore
@@ -19,7 +21,7 @@ class Playground extends React.Component<{}, {
   initialized: boolean;
   isLoading: boolean;
 }> {
-  private _view3D;
+  private _view3D: VanillaView3D;
   private _originalModel;
   private _skyboxRef = React.createRef<HTMLInputElement>();
   private _loader;
@@ -235,17 +237,43 @@ class Playground extends React.Component<{}, {
     }
   };
 
-  private _downloadModel = () => {
+  private _downloadModel = async () => {
     try {
       this.setState({ isLoading: true });
 
       const origModel = this._view3D.model;
 
-      new GLTFExporter().parse(origModel.scene, gltf => {
-        const tempAnchorTag = document.createElement("a");
+      const materials = origModel.meshes.reduce((mats, mesh) => {
+        if (Array.isArray(mesh.material)) {
+          return [...mats, ...mesh.material];
+        } else {
+          return [...mats, mesh.material];
+        }
+      }, [] as THREE.Material[]);
+      const textures = new Map<string, THREE.Texture>();
 
-        const blob = new Blob([gltf as ArrayBuffer]);
-        const url = URL.createObjectURL(blob);
+      materials.forEach(mat => {
+        for (const key in mat) {
+          if (mat[key] && key.toLowerCase().endsWith("map") && (mat[key] as THREE.Texture).isTexture) {
+            const texture = mat[key] as THREE.Texture;
+            texture.image.src = texture.uuid;
+
+            textures.set(texture.uuid, texture);
+          }
+        }
+      });
+
+      new GLTFExporter().parse(origModel.scene, async data => {
+        const gltf = data as {
+          images?: Array<{
+            mimeType: string;
+            uri: string;
+          }>;
+          textures?: Array<{
+            source: number;
+            [key: string]: any;
+          }>;
+        };
 
         const nameGuessRegex = /(\w+)\.\w+$/i;
         const regexRes = nameGuessRegex.exec(origModel.src);
@@ -253,11 +281,97 @@ class Playground extends React.Component<{}, {
           ? "model"
           : regexRes[1];
 
-        tempAnchorTag.href = url;
-        tempAnchorTag.download = `${modelName}.glb`;
-        tempAnchorTag.click();
-        URL.revokeObjectURL(url);
-      }, { binary: true, animations: origModel.animations, includeCustomExtensions: true });
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        const zip = new JSZip();
+
+        const images = gltf.images ?? [];
+        const gltfTextures = gltf.textures ?? [];
+
+        gltfTextures.forEach(texture => {
+          const origImgSource = texture.source;
+
+          if (!texture.extensions) {
+            texture.extensions = {};
+          }
+
+          // eslint-disable-next-line @typescript-eslint/dot-notation
+          texture.extensions["EXT_texture_webp"] = {
+            source: origImgSource + images.length
+          };
+        });
+
+        const toImageFiles = [...images].map((gltfImage, idx) => {
+          const imageURI = gltfImage.uri.split("/");
+          const texture = textures.get(imageURI[imageURI.length - 1]);
+
+          const origImages = origModel.json?.images ?? [];
+          const mimeType = origImages[idx]?.mimeType ?? "image/png";
+          const type = mimeType.split("/")[1];
+          const imgFileName = `${modelName}${idx}`;
+
+          gltfImage.uri = `${imgFileName}.${type}`;
+
+          // Add webp version of textures
+          images.push({
+            mimeType: "image/webp",
+            uri: `${imgFileName}.webp`
+          });
+
+          const { image } = texture;
+
+          canvas.width = image.width;
+          canvas.height = image.height;
+
+          if (texture.flipY) {
+            ctx.translate( 0, canvas.height );
+				    ctx.scale(1, -1);
+          }
+
+          // Most of the codes are from GLTFExporter of THREE.js
+          // https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/GLTFExporter.js
+          if ((typeof HTMLImageElement !== "undefined" && image instanceof HTMLImageElement) ||
+            (typeof HTMLCanvasElement !== "undefined" && image instanceof HTMLCanvasElement) ||
+            (typeof OffscreenCanvas !== "undefined" && image instanceof OffscreenCanvas) ||
+            (typeof ImageBitmap !== "undefined" && image instanceof ImageBitmap)) {
+            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+          } else {
+            const imgData = new Uint8ClampedArray(image.height * image.width * 4);
+
+            for (let i = 0; i < imgData.length; i += 4) {
+              imgData[i + 0] = image.data[i + 0];
+              imgData[i + 1] = image.data[i + 1];
+              imgData[i + 2] = image.data[i + 2];
+              imgData[i + 3] = image.data[i + 3];
+            }
+
+            ctx.putImageData(new ImageData(imgData, image.width, image.height), 0, 0);
+          }
+
+          const saveOrigImage = new Promise<void>(resolve => {
+            canvas.toBlob(blob => {
+              zip.file(`${imgFileName}.${type}`, blob);
+              resolve();
+            }, mimeType);
+          });
+          const saveWebpImage = new Promise<void>(resolve => {
+            canvas.toBlob(blob => {
+              zip.file(`${imgFileName}.webp`, blob);
+              resolve();
+            }, "image/webp");
+          });
+
+          return Promise.all([saveOrigImage, saveWebpImage]);
+        });
+
+        await Promise.all(toImageFiles);
+
+        zip.file(`${modelName}.gltf`, JSON.stringify(gltf, null, 2));
+
+        const zipContent = await zip.generateAsync({ type: "blob" });
+        saveAs(zipContent, `${modelName}.zip`);
+      }, { binary: false, animations: origModel.animations, includeCustomExtensions: true, embedImages: false });
     } catch (err) {
       void Swal.fire({
         title: "Error!",
