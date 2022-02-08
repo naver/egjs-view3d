@@ -54,7 +54,7 @@ return <div>
           const animator = view3D.animator;
           animator.paused ? animator.resume() : animator.pause();
         }}>Pause/Resume</span>
-        <span className="button" onClick={() => { ref.current.view3D.animator.stop( ); }}>Stop</span>
+        <span className="button" onClick={() => { ref.current.view3D.animator.stop(); }}>Stop</span>
       </div>
     </div>
   </View3D>
@@ -82,6 +82,15 @@ When there's no active animation playing, it will fadein to the selected animati
 Otherwise, it will gradually mix two animations for a given time.
 
 If you want to fadeout current animation playing and return the model to default pose, use `animator.fadeOut`.
+
+`crossFade` and `fadeOut` both returns Promise that resolves when the fade is finished.
+Resolved promise has a value indicating whether the fade was successful.
+
+```js
+// true when crossfade is done without any interfere and successfully changed animation to index 1
+// false when there were any interfere, like calling `stop` during crossfade.
+const fadeSuccess = await view3D.animator.crossFade(1, 3000);
+```
 
 <>
 {(() => {

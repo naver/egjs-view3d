@@ -580,7 +580,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._camera = new Camera(this);
     this._control = new OrbitControl(this);
     this._scene = new Scene(this);
-    this._animator = new ModelAnimator(this._scene.userObjects);
+    this._animator = new ModelAnimator(this);
     this._autoPlayer = new AutoPlayer(this, getObjectOption(autoplay));
     this._autoResizer = new AutoResizer(this);
     this._arManager = new ARManager(this);
@@ -608,6 +608,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._renderer.stopAnimationLoop();
     this._control.destroy();
     this._autoResizer.disable();
+    this._animator.reset();
     this._plugins.forEach(plugin => plugin.teardown(this));
     this._plugins = [];
   }

@@ -5,14 +5,22 @@
 
 import * as THREE from "three";
 
+import View3D from "../View3D";
+import { EVENTS } from "../const/external";
+
 /**
  * Component that manages animations of the 3D Model
  */
 class ModelAnimator {
+  private _view3D: View3D;
   private _mixer: THREE.AnimationMixer;
   private _clips: THREE.AnimationClip[];
   private _actions: THREE.AnimationAction[];
   private _activeAnimationIdx: number;
+  private _fadePromises: Array<{
+    listener: () => any;
+    resolve: (value: boolean | PromiseLike<boolean>) => void;
+  }>;
 
   /**
    * Three.js {@link https://threejs.org/docs/#api/en/animation/AnimationClip AnimationClip}s that stored
@@ -66,11 +74,13 @@ class ModelAnimator {
   /**
    * Create new ModelAnimator instance
    */
-  public constructor(root: THREE.Object3D) {
-    this._mixer = new THREE.AnimationMixer(root);
+  public constructor(view3D: View3D) {
+    this._view3D = view3D;
+    this._mixer = new THREE.AnimationMixer(view3D.scene.userObjects);
     this._clips = [];
     this._actions = [];
     this._activeAnimationIdx = -1;
+    this._fadePromises = [];
   }
 
   /**
@@ -103,33 +113,39 @@ class ModelAnimator {
   public play(index: number): void {
     const action = this._actions[index];
 
-    if (action) {
-      this.stop(); // Stop all previous actions
-      this._restoreTimeScale();
+    if (!action) return;
 
-      action.setEffectiveTimeScale(1);
-      action.setEffectiveWeight(1);
-      action.play();
+    this.stop(); // Stop all previous actions
+    this._restoreTimeScale();
 
-      this._activeAnimationIdx = index;
-    }
+    action.setEffectiveTimeScale(1);
+    action.setEffectiveWeight(1);
+    action.play();
+
+    this._activeAnimationIdx = index;
+
+    this._flushFadePromises();
   }
 
   /**
    * Crossfade animation from one to another
    * @param {number} index Index of the animation to crossfade to
    * @param {number} duration Duration of the crossfade animation, in milisec
+   * @returns {Promise<boolean>} A promise that resolves boolean value that indicates whether the crossfade is successfully done without any inference
    */
   public async crossFade(index: number, duration: number, {
     synchronize = false
   }: Partial<{
     synchronize: boolean;
-  }> = {}) {
+  }> = {}): Promise<boolean> {
+    const view3D = this._view3D;
     const mixer = this._mixer;
     const actions = this._actions;
     const activeAnimationIdx = this._activeAnimationIdx;
     const endAction = actions[index];
     const startAction = actions[activeAnimationIdx] ?? endAction;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const EVT_LOOP = "loop";
 
     this._restoreTimeScale();
 
@@ -146,31 +162,72 @@ class ModelAnimator {
     if (synchronize) {
       const onLoop: THREE.EventListener<THREE.Event, "loop", THREE.AnimationMixer> = evt => {
         if (evt.action === startAction) {
-          mixer.removeEventListener("loop", onLoop);
+          mixer.removeEventListener(EVT_LOOP, onLoop);
 
           doCrossfade();
         }
       };
 
-      mixer.addEventListener("loop", onLoop);
+      mixer.addEventListener(EVT_LOOP, onLoop);
     } else {
       doCrossfade();
     }
+
+    this._flushFadePromises();
+
+    const fadePromise = new Promise<boolean>(resolve => {
+      const onFrame = () => {
+        if (endAction.getEffectiveWeight() < 1) return;
+
+        view3D.off(EVENTS.BEFORE_RENDER, onFrame);
+        resolve(true);
+      };
+
+      view3D.on(EVENTS.BEFORE_RENDER, onFrame);
+
+      this._fadePromises.push({
+        listener: onFrame,
+        resolve
+      });
+    });
+
+    return fadePromise;
   }
 
   /**
    * Fadeout active animation, and restore to the default pose
    * @param {number} duration Duration of the crossfade animation, in milisec
+   * @returns {Promise<boolean>} A promise that resolves boolean value that indicates whether the fadeout is successfully done without any inference
    */
-  public fadeOut(duration: number) {
+  public async fadeOut(duration: number): Promise<boolean> {
+    const view3D = this._view3D;
     const actions = this._actions;
     const activeAction = actions[this._activeAnimationIdx];
 
-    if (!activeAction) return;
+    if (!activeAction) return false;
 
+    this._flushFadePromises();
     this._restoreTimeScale();
     activeAction.fadeOut(duration / 1000);
     this._activeAnimationIdx = -1;
+
+    const fadePromise = new Promise<boolean>(resolve => {
+      const onFrame = () => {
+        if (activeAction.getEffectiveWeight() > 0) return;
+
+        view3D.off(EVENTS.BEFORE_RENDER, onFrame);
+        resolve(true);
+      };
+
+      view3D.on(EVENTS.BEFORE_RENDER, onFrame);
+
+      this._fadePromises.push({
+        listener: onFrame,
+        resolve
+      });
+    });
+
+    return fadePromise;
   }
 
   /**
@@ -203,6 +260,7 @@ class ModelAnimator {
     });
 
     this._activeAnimationIdx = -1;
+    this._flushFadePromises();
   }
 
   /**
@@ -231,6 +289,18 @@ class ModelAnimator {
 
   private _restoreTimeScale() {
     this._mixer.timeScale = 1;
+  }
+
+  private _flushFadePromises() {
+    const view3D = this._view3D;
+    const fadePromises = this._fadePromises;
+
+    fadePromises.forEach(({ resolve, listener }) => {
+      resolve(false);
+      view3D.off(EVENTS.BEFORE_RENDER, listener);
+    });
+
+    this._fadePromises = [];
   }
 }
 
