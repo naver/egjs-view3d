@@ -96,13 +96,15 @@ export interface View3DOptions {
   autoInit: boolean;
   autoResize: boolean;
   useResizeObserver: boolean;
+  on: Partial<View3DEvents>;
+  plugins: View3DPlugin[];
 }
 
 /**
  * @extends Component
  * @see https://naver.github.io/egjs-component/
  */
-class View3D extends Component<View3DEvents> implements OptionGetters<View3DOptions> {
+class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3DOptions, "on">> {
   /**
    * Current version of the View3D
    * @type {string}
@@ -228,6 +230,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    * @readonly
    */
   public get initialized() { return this._initialized; }
+  /**
+   * Active plugins of view3D
+   * @type {View3DPlugin[]}
+   * @readonly
+   */
+  public get plugins() { return this._plugins; }
 
   // Options Getter
   /**
@@ -520,7 +528,9 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     canvasSelector = "canvas",
     autoInit = true,
     autoResize = true,
-    useResizeObserver = true
+    useResizeObserver = true,
+    on = {},
+    plugins = []
   }: Partial<View3DOptions> = {}) {
     super();
 
@@ -576,7 +586,9 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._arManager = new ARManager(this);
     this._model = null;
     this._initialized = false;
-    this._plugins = [];
+    this._plugins = plugins;
+
+    this._addEventHandlers(on);
 
     this._addPosterImage();
 
@@ -612,12 +624,15 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
       this._autoResizer.enable();
     }
 
+    const plugins = this._plugins;
     const scene = this._scene;
     const renderer = this._renderer;
     const skybox = this._skybox;
     const envmap = this._envmap;
     const background = this._background;
     const meshoptPath = this._meshoptPath;
+
+    await Promise.all(plugins.map(plugin => plugin.init(this)));
 
     if (meshoptPath && !GLTFLoader.meshoptDecoder) {
       await GLTFLoader.setMeshoptDecoder(meshoptPath);
@@ -823,6 +838,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
 
       this.display(model);
     }
+  }
+
+  private _addEventHandlers(events: Partial<View3DEvents>) {
+    Object.keys(events).forEach((evtName: keyof typeof EVENT_TYPES) => {
+      this.on(evtName, events[evtName]);
+    });
   }
 
   private _addPosterImage() {

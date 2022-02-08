@@ -171,6 +171,12 @@ class GLTFLoader {
   private _parseToModel(gltf: GLTF, src: string): Model {
     const fixSkinnedBbox = this._view3D.fixSkinnedBbox;
 
+    gltf.scenes.forEach(scene => {
+      scene.traverse(obj => {
+        obj.frustumCulled = false;
+      });
+    });
+
     const model = new Model({
       src,
       scenes: gltf.scenes,

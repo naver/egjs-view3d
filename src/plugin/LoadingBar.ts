@@ -137,11 +137,11 @@ class LoadingBar implements View3DPlugin {
   };
 
   private _removeOverlay(view3D: View3D) {
-    const wrapper = this._overlay;
-    if (!wrapper) return;
+    const overlay = this._overlay;
+    if (!overlay) return;
 
-    if (wrapper.parentElement === view3D.rootEl) {
-      view3D.rootEl.removeChild(wrapper);
+    if (overlay.parentElement === view3D.rootEl) {
+      view3D.rootEl.removeChild(overlay);
     }
 
     this._overlay = null;
