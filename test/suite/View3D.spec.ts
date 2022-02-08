@@ -43,6 +43,10 @@ describe("View3D", () => {
     it("should have initialized as false", async () => {
       expect((await createView3D()).initialized).to.be.false;
     });
+
+    it("should have plugins as an empty array", async () => {
+      expect((await createView3D()).plugins).to.be.empty;
+    });
   });
 
   describe("Options", () => {
