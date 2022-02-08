@@ -72,9 +72,10 @@ html[data-theme='dark'] .header-github-link::before {
   display: none;
 }
 
-.control-gui-wrapper {
+.view3d-demo-controls {
   position: absolute;
   display: flex;
   top: 0;
   right: 0;
+  flex-direction: column;
 }

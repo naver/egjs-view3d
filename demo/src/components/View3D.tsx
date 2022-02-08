@@ -1,7 +1,7 @@
 import React from "react";
 import clsx from "clsx";
 import * as THREE from "three";
-import VanillaView3D, { View3DOptions, ARButton, AROverlay, LoadingBar } from "../../../src";
+import VanillaView3D, { View3DOptions, ARButton, AROverlay, LoadingBar, View3DPlugin } from "../../../src";
 import DownloadIcon from "../../static/icon/file_download_black.svg";
 
 import OptionExample from "./OptionExample";
@@ -59,8 +59,22 @@ class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivE
       ...restProps
     } = this.props;
 
+    const plugins: View3DPlugin[] = [];
+
+    if (showARButton) {
+      plugins.push(new ARButton(), new AROverlay());
+    }
+
+    if (showLoadingBar) {
+      const type = typeof showLoadingBar === "string"
+        ? showLoadingBar as any
+        : "default";
+      plugins.push(new LoadingBar({ type }));
+    }
+
     const options = {
       ...restProps,
+      plugins,
       autoInit: clickToLoad ? false : restProps.autoInit
     };
     const view3D = new VanillaView3D(this._rootRef.current, options);
@@ -79,17 +93,6 @@ class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivE
 
         view3D.scene.add(boxHelper);
       });
-    }
-
-    if (showARButton) {
-      void view3D.loadPlugins(new ARButton(), new AROverlay());
-    }
-
-    if (showLoadingBar) {
-      const type = typeof showLoadingBar === "string"
-        ? showLoadingBar as any
-        : "default";
-      void view3D.loadPlugins(new LoadingBar({ type }));
     }
   }
 

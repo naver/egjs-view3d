@@ -1,0 +1,155 @@
+---
+title: Animations
+id: animations
+slug: /animations
+sidebar_position: 4
+---
+
+import View3D from "@site/src/components/View3D";
+import License from "@site/src/components/License";
+
+After your 3D model is loaded, the first animation of the model will automatically play if it exists.
+If your 3D model has multiple animations, you can use View3D's `animator` to play other animations, or get information about the animations.
+See [ModelAnimator](/docs/api/ModelAnimator) page for further informations.
+
+## Animation infos
+The animations of the current 3D model is stored in `clips` as an array of [THREE.AnimationClip](https://threejs.org/docs/#api/en/animation/AnimationClip).
+
+```js
+import { View3D } from "@egjs/view3d";
+const view3D = new View3D("#el", { src: "SOME_URL", autoInit: false });
+
+// Wait 3D model to be loaded, you can also use "ready" event if you want.
+await view3D.init();
+
+// Retrieve the names of the animations
+const animationNames = view3D.animator.clips.map(clip => clip.name);
+
+// Retrieve the animation count
+const animationCount = view3D.animator.animationCount; // same to animator.clips.length
+```
+
+## Play / Pause / Stop
+Playing different animation can change model's pose immediately.
+
+<>
+{(() => {
+const ref = React.createRef();
+return <div>
+  <View3D
+    ref={ref}
+    src="/egjs-view3d/model/RobotExpressive.glb"
+    envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" >
+    <div className="view3d-demo-controls">
+      <div className="is-flex is-flex-direction-row is-align-items-center">
+        <span className="mr-2 has-text-weight-bold">Play:</span>
+        <span className="button mr-1" onClick={() => { ref.current.view3D.animator.play(0); }}>Dance</span>
+        <span className="button mr-1" onClick={() => { ref.current.view3D.animator.play(3); }}>Jump</span>
+        <span className="button" onClick={() => { ref.current.view3D.animator.play(6); }}>Run</span>
+      </div>
+      <div className="mt-2 is-flex">
+        <span style={{ flex: 1 }}></span>
+        <span className="button mr-1" onClick={() => {
+          const view3D = ref.current.view3D;
+          const animator = view3D.animator;
+          animator.paused ? animator.resume() : animator.pause();
+        }}>Pause/Resume</span>
+        <span className="button" onClick={() => { ref.current.view3D.animator.stop( ); }}>Stop</span>
+      </div>
+    </div>
+  </View3D>
+</div>
+})()}
+</>
+
+```js
+// Play animation at index 1
+view3D.animator.play(1);
+
+// This will pause the current animation playing (index 1)
+view3D.animator.pause();
+
+// This will resume the current animation playing (index 1)
+view3D.animator.resume();
+
+// This will fully stops the current animation playing
+view3D.animator.stop();
+```
+
+## Animation Mixing (Crossfade) / Fadeout
+You can mix animations by calling `animator.crossFade`.
+When there's no active animation playing, it will fadein to the selected animation.
+Otherwise, it will gradually mix two animations for a given time.
+
+If you want to fadeout current animation playing and return the model to default pose, use `animator.fadeOut`.
+
+<>
+{(() => {
+const ref = React.createRef();
+const [weights, setWeights] = React.useState([1, 0, 0]);
+return <div>
+  <View3D
+    ref={ref}
+    src="/egjs-view3d/model/RobotExpressive.glb"
+    envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+    on={{
+      ready: (evt) => { evt.target.animator.play(2); },
+      render: (evt) => {
+        const actions = evt.target.animator.actions;
+        if (!actions.length) return;
+        const newWeights = [actions[2], actions[10], actions[6]].map(action => action.getEffectiveWeight());
+        if (newWeights.some((weight, idx) => weights[idx] !== weight)) {
+          setWeights(newWeights);
+        }
+      }
+    }}>
+    <div className="view3d-demo-controls">
+      <div className="is-flex is-flex-direction-row is-align-items-center">
+        <span className="mr-2 has-text-weight-bold">Crossfade to:</span>
+        <span className="button mr-1" onClick={() => { ref.current.view3D.animator.crossFade(2, 3000); }}>Idle</span>
+        <span className="button mr-1" onClick={() => { ref.current.view3D.animator.crossFade(10, 3000); }}>Walk</span>
+        <span className="button" onClick={() => { ref.current.view3D.animator.crossFade(6, 3000); }}>Run</span>
+      </div>
+      <div className="mt-2 is-flex">
+        <span style={{ flex: 1 }}></span>
+        <span className="button mr-1" onClick={() => {
+          const view3D = ref.current.view3D;
+          const animator = view3D.animator;
+          animator.paused ? animator.resume() : animator.pause();
+        }}>Pause/Resume</span>
+        <span className="button mr-1" onClick={() => { ref.current.view3D.animator.stop(); }}>Stop</span>
+        <span className="button" onClick={() => { ref.current.view3D.animator.fadeOut(3000); }}>Fadeout</span>
+      </div>
+      <div className="is-flex is-flex-direction-column is-align-items-end has-text-weight-bold">
+        <div>Idle: {weights[0].toFixed(2)}</div>
+        <div>Walk: {weights[1].toFixed(2)}</div>
+        <div>Run: {weights[2].toFixed(2)}</div>
+      </div>
+    </div>
+  </View3D>
+</div>
+})()}
+</>
+
+```js
+// Crossfade to animation at index 1 in 3000ms
+// With synchronizing animations, which will start crossfade when current animation's loop ends
+view3D.animator.crossFade(1, 3000, { synchronize: true });
+```
+
+<License items={[
+  {
+    name: "RobotExpressive",
+    link: "https://github.com/mrdoob/three.js/tree/master/examples/models/gltf/RobotExpressive",
+    author: "Tomás Laulhé",
+    authorLink: "https://www.patreon.com/quaternius",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />
