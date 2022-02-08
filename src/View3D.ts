@@ -589,12 +589,14 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._plugins = plugins;
 
     this._addEventHandlers(on);
-
     this._addPosterImage();
 
-    if (src && autoInit) {
-      void this.init();
-    }
+    void this._initPlugins(plugins)
+      .then(() => {
+        if (src && autoInit) {
+          void this.init();
+        }
+      });
   }
 
   /**
@@ -624,15 +626,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
       this._autoResizer.enable();
     }
 
-    const plugins = this._plugins;
     const scene = this._scene;
     const renderer = this._renderer;
     const skybox = this._skybox;
     const envmap = this._envmap;
     const background = this._background;
     const meshoptPath = this._meshoptPath;
-
-    await Promise.all(plugins.map(plugin => plugin.init(this)));
 
     if (meshoptPath && !GLTFLoader.meshoptDecoder) {
       await GLTFLoader.setMeshoptDecoder(meshoptPath);
@@ -753,8 +752,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    * @returns {Promise<void>} A promise that resolves when all plugins are initialized
    */
   public async loadPlugins(...plugins: View3DPlugin[]) {
-    await Promise.all(plugins.map(plugin => plugin.init(this)));
-
+    await this._initPlugins(plugins);
     this._plugins.push(...plugins);
   }
 
@@ -862,6 +860,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
       if (imgEl.parentElement !== rootEl) return;
       rootEl.removeChild(imgEl);
     });
+  }
+
+  private async _initPlugins(plugins: View3DPlugin[]) {
+    await Promise.all(plugins.map(plugin => plugin.init(this)));
   }
 }
 

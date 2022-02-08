@@ -6,3 +6,42 @@ slug: /plugins
 ---
 
 Plugins are set of optional UI components that adds additional ability to View3D.
+
+## Adding plugins
+Plugins can be added in two ways.
+
+1. Add plugins before initialization with the option [plugins](/docs/options/miscellaneous/plugins)
+
+```js
+import { LoadingBar } from "@egjs/view3d";
+
+const view3D = new View3D("#el_id", {
+  plugins: [new LoadingBar()]
+})
+```
+
+2. Add plugins at anytime with [loadPlugins](/docs/api/View3D#loadPlugins)
+
+```js
+import { LoadingBar } from "@egjs/view3d";
+
+const view3D = new View3D("#el_id");
+
+view3D.loadPlugins(new LoadingBar());
+```
+
+## Removing plugins
+Plugins can be removed at anytime by calling [removePlugins](/docs/api/View3D#removePlugins).
+Otherwise, they will be removed when View3D's [destroy](/docs/api/View3D#destroy) is called.
+
+```js
+import { LoadingBar } from "@egjs/view3d";
+
+const plugin = new LoadingBar();
+const view3D = new View3D("#el_id", {
+  plugins: [plugin]
+});
+
+// Remove loading bar
+view3D.removePlugins(plugin);
+```

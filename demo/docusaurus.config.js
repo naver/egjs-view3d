@@ -74,7 +74,7 @@ const config = {
           },
           {
             type: "doc",
-            docId: "events/ready",
+            docId: "events/register",
             label: "Events",
             position: "left"
           },
@@ -129,7 +129,7 @@ const config = {
               },
               {
                 label: "Events",
-                to: "docs/events/ready"
+                to: "docs/events"
               },
               {
                 label: "Plugins",
