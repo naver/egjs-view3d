@@ -2,6 +2,7 @@
  * Copyright (c) 2020 NAVER Corp.
  * egjs projects are licensed under the MIT license
  */
+import * as THREE from "three";
 import Component from "@egjs/component";
 
 import Renderer from "./core/Renderer";
@@ -660,22 +661,26 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
       await GLTFLoader.setMeshoptDecoder(meshoptPath);
     }
 
-    const tasks: Array<Promise<any>> = [
-      this._loadModel(this._src)
-    ];
-
     // Load & set skybox / envmap before displaying model
-    if (skybox) {
-      tasks.push(scene.setSkybox(skybox));
-    } else if (envmap) {
-      tasks.push(scene.setEnvMap(envmap));
+    const hasEnvmap = skybox || envmap;
+    if (hasEnvmap) {
+      const tempLight = new THREE.AmbientLight();
+      scene.add(tempLight, false);
+
+      const loadEnv = skybox
+        ? scene.setSkybox(skybox)
+        : scene.setEnvMap(envmap);
+
+      void loadEnv.then(() => {
+        scene.remove(tempLight);
+      });
     }
 
     if (!skybox && background) {
-      tasks.push(scene.setBackground(background));
+      void scene.setBackground(background);
     }
 
-    await Promise.all(tasks);
+    await this._loadModel(this._src);
 
     // Start rendering
     renderer.stopAnimationLoop();

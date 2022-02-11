@@ -134,7 +134,8 @@ class Scene {
   public remove(object: THREE.Object3D | THREE.Object3D[]): void {
     const objects = Array.isArray(object) ? object : [object];
 
-    this._root.remove(...objects);
+    this._userObjects.remove(...objects);
+    this._envObjects.remove(...objects);
   }
 
   /**
