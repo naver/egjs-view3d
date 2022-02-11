@@ -483,9 +483,8 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._skyboxBlur = val;
     const scene = this._scene;
     const origEnvmapTexture = scene.root.environment;
-    const hasSkybox = !!scene.skybox;
 
-    if (origEnvmapTexture && hasSkybox) {
+    if (origEnvmapTexture && !!scene.skybox) {
       if (val) {
         scene.skybox.useBlurredHDR(origEnvmapTexture);
       } else {

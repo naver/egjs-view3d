@@ -64,7 +64,7 @@ class ARButton implements View3DPlugin {
       availableText = "View in AR",
       unavailableText = "AR is not available in this browser",
       buttonClass = "view3d-ar-button",
-      tooltipClass = "view3d-ar-button"
+      tooltipClass = "view3d-tooltip"
     } = this._options;
     const arAvailable = await view3D.ar.isAvailable();
 

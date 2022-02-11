@@ -20,24 +20,12 @@ export interface ReadyEvent {
 }
 
 /**
- * An event that fires when View3D is destroyed.
- * @event View3D#destroy
+ * An event that fires before loading a 3D model.
+ * @event View3D#loadStart
  * @type {object}
  * @property {string} type The type of event.
  * @property {View3D} target An instance of View3D that triggered this event.
- */
-export interface DestroyEvent {
-  type: string;
-  target: View3D;
-}
-
-/**
- * An event that fires before loading a 3D model via network.
- * @event View3D#load
- * @type {object}
- * @property {string} type The type of event.
- * @property {View3D} target An instance of View3D that triggered this event.
- * @property {Model} src A source URL of model to load.
+ * @property {Model} src A source URL of the model to load.
  * @property {number} level A level of model when loading multiple models at once, an integer starting from 0.
  */
 export interface LoadStartEvent {

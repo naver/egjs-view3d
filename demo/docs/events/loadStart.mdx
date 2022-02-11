@@ -1,29 +1,34 @@
 ---
-sidebar_position: 4
+sidebar_position: 2
 ---
 
 import View3D from "@site/src/components/View3D";
 import License from "@site/src/components/License";
 
-An event that fires when the 3D Model is loaded and displayed on the canvas.
+An event that fires before loading a 3D model.
 
 |Property|Type|Description|
 |:---:|:---:|---|
 |type|string|The type of event|
 |target|[View3D](/docs/api/View3D)|An instance of View3D that triggered this event|
 |model|[Model](/docs/api/Model)|A new model that loaded|
+|src|string|A source URL of the model to load|
+|level|number|A level of model when loading multiple models at once, an integer starting from 0|
 
 <View3D
-  src="/egjs-view3d/model/draco/alarm.glb"
+    src={[
+    "/egjs-view3d/model/lod/plant/simplified.gltf",
+    "/egjs-view3d/model/draco/plant.glb"
+  ]}
   envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
-  poster="/egjs-view3d/poster/alarm.png"
+  poster="/egjs-view3d/poster/plant.png"
   clickToLoad
   showEventsTriggered={["ready", "load", "loadStart", "modelChange"]} />
 
 <License items={[
   {
-    name: "Alarm Clock 01",
-    link: "https://polyhaven.com/a/alarm_clock_01",
+    name: "Potted Plant 04",
+    link: "https://polyhaven.com/a/potted_plant_04",
     author: "Poly Haven",
     authorLink: "https://polyhaven.com/",
     license: "CC0"
