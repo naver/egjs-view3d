@@ -53,6 +53,9 @@ html[data-theme='dark'] .dropdownBox {
   width: 358px;
   height: 100%;
   box-shadow: -1px 0 2px 0 rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
 }
 
 html[data-theme='dark'] .control {
@@ -79,4 +82,47 @@ html[data-theme='dark'] .control {
   color: white;
   flex-direction: column;
   background-color: rgba(0, 0, 0, 0.3);
+}
+
+.asideMenu {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+}
+
+.asideMenu *:not(:last-child) {
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+html[data-theme='dark'] .asideMenu *:not(:last-child) {
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.asideMenuItem {
+  flex: 1;
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.05);
+  font-weight: bold;
+}
+
+html[data-theme='dark'] .asideMenuItem {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.asideMenuItem.selected,
+html[data-theme='dark'] .asideMenuItem.selected {
+  border-bottom: none;
+  background-color: transparent;
+}
+
+.asideContent {
+  flex: 1;
+  overflow-y: auto;
 }

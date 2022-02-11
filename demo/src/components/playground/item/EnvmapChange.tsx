@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import clsx from "clsx";
 import { Range } from "react-range";
+import MenuItem from "../MenuItem";
 
 const envmaps = [
   { name: "Artist Workshop", path: "/egjs-view3d/texture/artist_workshop_1k.hdr" },
@@ -20,43 +21,46 @@ const envmaps = [
 export default ({ onChange, onExposureChange, isLoading }) => {
   const [exposure, setExposure] = useState(1);
 
-  return <div>
-    <p className="menu-label">
-      Choose HDR envmap
-    </p>
-    <div className="is-flex is-flex-direction-row">
-      <div className={clsx({ select: true, "mr-1": true, "is-loading": isLoading })}>
-        <select onChange={e => {
-          onChange(e.target.value);
-        }} disabled={isLoading}>
-          { envmaps.map((envmap, idx) => (
-            <option key={idx} value={envmap.path}>{envmap.name}</option>
-          )) }
-        </select>
-      </div>
-      <div className="file">
-        <label className="file-label">
-          <input className="file-input" type="file" name="resume" accept=".hdr" onChange={e => {
-            const file = e.target.files[0];
-            if (!file) return;
+  return <>
+    <MenuItem>
+      <p className="menu-label">
+        Choose HDR envmap
+      </p>
+      <div className="is-flex is-flex-direction-row">
+        <div className={clsx({ select: true, "mr-1": true, "is-loading": isLoading })}>
+          <select onChange={e => {
+            onChange(e.target.value);
+          }} disabled={isLoading}>
+            { envmaps.map((envmap, idx) => (
+              <option key={idx} value={envmap.path}>{envmap.name}</option>
+            )) }
+          </select>
+        </div>
+        <div className="file">
+          <label className="file-label">
+            <input className="file-input" type="file" name="resume" accept=".hdr" onChange={e => {
+              const file = e.target.files[0];
+              if (!file) return;
 
-            onChange(URL.createObjectURL(file));
-          }}></input>
-          <span className="file-cta">
-            <span className="file-icon">
-              <img src="/egjs-view3d/icon/file_upload_black.svg" />
+              onChange(URL.createObjectURL(file));
+            }}></input>
+            <span className="file-cta">
+              <span className="file-icon">
+                <img src="/egjs-view3d/icon/file_upload_black.svg" />
+              </span>
+              <span className="file-label">HDR</span>
             </span>
-            <span className="file-label">HDR</span>
-          </span>
-        </label>
+          </label>
+        </div>
       </div>
-    </div>
-    <div className="py-4">
-      <div className="mb-4">Exposure: {exposure}</div>
+    </MenuItem>
+    <MenuItem>
+      <div className="menu-label mb-4">Exposure: {exposure}</div>
       <Range
         step={0.01}
         min={0}
         max={2}
+        disabled={isLoading}
         values={[exposure]}
         onChange={(values) => {
           setExposure(values[0]);
@@ -87,6 +91,6 @@ export default ({ onChange, onExposureChange, isLoading }) => {
             }}
           />
         )}/>
-    </div>
-  </div>;
+    </MenuItem>
+  </>;
 };

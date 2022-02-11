@@ -1,5 +1,7 @@
 import React from "react";
 import clsx from "clsx";
+import UploadIcon from "../../../../static/icon/file_upload_black.svg";
+import MenuItem from "../MenuItem";
 
 const models = [
   { name: "Cube", path: "/egjs-view3d/model/cube.glb" },
@@ -13,7 +15,7 @@ const models = [
 ];
 
 export default ({ onSelect, onUpload, isLoading }) => {
-  return <div className="mb-4">
+  return <MenuItem>
     <p className="menu-label">
       Choose 3D Model
     </p>
@@ -39,13 +41,11 @@ export default ({ onSelect, onUpload, isLoading }) => {
             onUpload(fileMap);
           }}></input>
           <span className="file-cta">
-            <span className="file-icon">
-              <img src="/egjs-view3d/icon/file_upload_black.svg" />
-            </span>
+            <span className="file-icon"><UploadIcon /></span>
             <span className="file-label">GLB</span>
           </span>
         </label>
       </div>
     </div>
-  </div>;
+  </MenuItem>;
 };

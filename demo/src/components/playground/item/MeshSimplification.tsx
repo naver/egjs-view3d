@@ -1,15 +1,16 @@
 import React, { useState } from "react";
-import Range from "../Range";
-import WarningIcon from "../../../static/icon/warning.svg";
+import Range from "../../Range";
+import WarningIcon from "../../../../static/icon/warning.svg";
+import MenuItem from "../MenuItem";
 
 export default ({ onSimplify, isLoading }) => {
   const [targetPercentage, setTargetPercentage] = useState(0.5);
   const [aggressiveness, setAggressiveness] = useState(7);
 
-  return <div className="mb-4">
+  return <MenuItem>
     <div className="is-flex is-flex-direction-row is-align-items-center">
-      <WarningIcon data-tip="⚠ WARNING: This feature is experimental and some models are not compatible" className="mr-2" />
-      <span className="mr-2">Apply mesh simplify(low-poly)</span>
+      <WarningIcon data-tip="⚠ WARNING: This feature is experimental and some models are not compatible" className="mr-2" style={{ fill: "#ffe08a" }} />
+      <span className="menu-label m-0">Apply mesh simplify(low-poly)</span>
     </div>
     <div className="ml-4 mt-4 is-size-7 has-text-centered">
       <div className="is-flex is-flex-direction-row is-align-items-center is-justify-content-center mb-2">
@@ -19,7 +20,7 @@ export default ({ onSimplify, isLoading }) => {
           step={0.01}
           min={0}
           max={1}
-          val={targetPercentage}
+          val={[targetPercentage]}
           onChange={(values) => {
             setTargetPercentage(values[0]);
           }} />
@@ -32,7 +33,7 @@ export default ({ onSimplify, isLoading }) => {
           step={1}
           min={1}
           max={14}
-          val={aggressiveness}
+          val={[aggressiveness]}
           onChange={(values) => {
             setAggressiveness(values[0]);
           }} />
@@ -44,5 +45,5 @@ export default ({ onSimplify, isLoading }) => {
         }}>Apply</button>
       </div>
     </div>
-  </div>;
+  </MenuItem>;
 };

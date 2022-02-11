@@ -26,6 +26,13 @@ class Skybox {
   }
 
   /**
+   * Destroy skybox and release all memories
+   */
+  public destroy() {
+    this._disposeOldSkybox();
+  }
+
+  /**
    * Enable skybox
    */
   public enable() {
@@ -64,6 +71,8 @@ class Skybox {
    * @returns {this}
    */
   public useBlurredHDR(texture: THREE.Texture) {
+    this._disposeOldSkybox();
+
     const threeRenderer = this._view3D.renderer.threeRenderer;
     const bgScene = new THREE.Scene();
     bgScene.background = texture;
@@ -78,10 +87,9 @@ class Skybox {
     });
 
     const cubeCamera = new THREE.CubeCamera(0.1, 1000, cubeRenderTarget);
-
     cubeCamera.update(threeRenderer, bgScene);
-    const lightProbe = LightProbeGenerator.fromCubeRenderTarget(threeRenderer, cubeRenderTarget);
 
+    const lightProbe = LightProbeGenerator.fromCubeRenderTarget(threeRenderer, cubeRenderTarget);
     const skyboxMat = new THREE.MeshStandardMaterial({
       side: THREE.BackSide
     });
@@ -127,6 +135,15 @@ class Skybox {
     this._scene.background = new THREE.Color(color);
 
     return this;
+  }
+
+  private _disposeOldSkybox() {
+    const skyboxTexture = this._scene.background;
+
+    if (!skyboxTexture) return;
+
+    (skyboxTexture as THREE.Texture).dispose();
+    this._scene.background = null;
   }
 }
 

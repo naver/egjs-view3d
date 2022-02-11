@@ -80,8 +80,20 @@ class ShadowPlane implements OptionGetters<ShadowOptions> {
    */
   public get pitch() { return this._pitch; }
 
+  public get radius() { return this._light.shadow.radius; }
+
   public set opacity(val: number) {
     this._material.opacity = val;
+  }
+
+  public set hardness(val: number) {
+    this._hardness = Math.min(val, this._maxHardness);
+    this._updateSoftnessLevel();
+  }
+
+  public set radius(val: number) {
+    this._light.shadow.radius = val;
+    this._light.shadow.needsUpdate = true;
   }
 
   /**
@@ -159,9 +171,11 @@ class ShadowPlane implements OptionGetters<ShadowOptions> {
     const light = this._light;
 
     const hardness = clamp(Math.floor(this._hardness), 1, this._maxHardness);
-    const shadowSize = Math.pow(2, hardness);
+    const shadowSize = Math.pow(2, Math.floor(hardness));
 
     light.shadow.mapSize.set(shadowSize, shadowSize);
+    light.shadow.map?.dispose();
+    (light.shadow as any).map = null;
   }
 
   private _updatePlane(model: Model) {

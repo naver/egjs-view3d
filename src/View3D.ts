@@ -478,6 +478,28 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._exposure = val;
   }
 
+  public set skyboxBlur(val: View3DOptions["skyboxBlur"]) {
+    this._skyboxBlur = val;
+    const scene = this._scene;
+    const origEnvmapTexture = scene.root.environment;
+    const hasSkybox = !!scene.skybox;
+
+    if (origEnvmapTexture && hasSkybox) {
+      if (val) {
+        scene.skybox.useBlurredHDR(origEnvmapTexture);
+      } else {
+        scene.skybox.useTexture(origEnvmapTexture);
+      }
+    }
+  }
+
+  public set skyboxRotation(val: View3DOptions["skyboxRotation"]) {
+    this._skyboxRotation = val;
+
+    const skybox = this._scene.skybox;
+    if (skybox) skybox.updateCamera();
+  }
+
   public set useGrabCursor(val: View3DOptions["useGrabCursor"]) {
     this._useGrabCursor = val;
     this._control.updateCursor();
@@ -708,8 +730,14 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   /**
    * Display the given model in the canvas
    * @param {Model} model A model to display
+   * @param {object} options Options for displaying model
+   * @param {boolean} [options.resetCamera=true] Reset camera to default pose
    */
-  public display(model: Model): void {
+  public display(model: Model, {
+    resetCamera = true
+  }: Partial<{
+    resetCamera: boolean;
+  }> = {}): void {
     const renderer = this._renderer;
     const scene = this._scene;
     const camera = this._camera;
@@ -720,8 +748,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     scene.add(model.scene);
     scene.shadowPlane.update(model);
 
-    camera.fit(model, this._center);
-    void camera.reset(0);
+    if (resetCamera) {
+      camera.fit(model, this._center);
+      void camera.reset(0);
+    }
 
     animator.reset();
     animator.setClips(model.animations);
@@ -802,6 +832,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
         const model = await loader.load(srcLevel);
         const higherLevelLoaded = loaded.slice(level + 1).some(val => !!val);
+        const modelLoadedBefore = loaded.some(val => !!val);
 
         this.trigger(EVENTS.LOAD, {
           type: EVENTS.LOAD,
@@ -811,7 +842,9 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
         });
 
         if (!higherLevelLoaded) {
-          this.display(model);
+          this.display(model, {
+            resetCamera: !modelLoadedBefore
+          });
         }
 
         loaded[level] = true;

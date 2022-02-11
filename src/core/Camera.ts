@@ -252,10 +252,10 @@ class Camera {
     // Clamp current pose
     currentPose.yaw = circulate(currentPose.yaw, 0, 360);
     currentPose.pitch = clamp(currentPose.pitch, DEFAULT.PITCH_RANGE.min, DEFAULT.PITCH_RANGE.max);
-    currentPose.zoom = clamp(baseFov + currentPose.zoom, zoomRange.min, zoomRange.max) - baseFov;
+    currentPose.zoom = -(clamp(baseFov - currentPose.zoom, zoomRange.min, zoomRange.max) - baseFov);
 
     const newCamPos = getRotatedPosition(distance, currentPose.yaw, currentPose.pitch);
-    const fov = currentPose.zoom + baseFov;
+    const fov = baseFov - currentPose.zoom;
 
     newCamPos.add(currentPose.pivot);
 

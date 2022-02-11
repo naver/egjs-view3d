@@ -143,7 +143,7 @@ class ZoomControl implements CameraControl, OptionGetters<ZoomControlOptions> {
     const camera = this._view3D.camera;
     const motion = this._motion;
 
-    camera.zoom -= motion.update(deltaTime);
+    camera.zoom += motion.update(deltaTime);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

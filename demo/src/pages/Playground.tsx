@@ -1,29 +1,38 @@
 import React from "react";
 import clsx from "clsx";
 import ReactTooltip from "react-tooltip";
-import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter";
-import { FastQuadric, ThreeAdapter } from "mesh-simplifier";
 import Swal from "sweetalert2";
-import JSZip from "jszip";
-import { saveAs } from "file-saver";
 // @ts-ignore
 import Layout from "@theme/Layout";
 // @ts-ignore
 import styles from "./playground.module.css";
 
-import VanillaView3D, { GLTFLoader, Model, LoadingBar } from "../../../src";
-import ModelChange from "../components/playground/ModelChange";
-import EnvmapChange from "../components/playground/EnvmapChange";
-import MeshSimplification from "../components/playground/MeshSimplification";
+import VanillaView3D, { GLTFLoader, LoadingBar } from "../../../src";
+import ModelTab from "../components/playground/tab/ModelTab";
+import EnvironmentTab from "../components/playground/tab/EnvironmentTab";
+import DownloadTab from "../components/playground/tab/DownloadTab";
+import ModelInfo from "../components/playground/ModelInfo";
 import ResetIcon from "../../static/icon/reset.svg";
+
+const menus = [
+  {
+    name: "Model"
+  },
+  {
+    name: "Environment"
+  },
+  {
+    name: "Download"
+  }
+];
 
 class Playground extends React.Component<{}, {
   initialized: boolean;
   isLoading: boolean;
+  selectedMenu: number;
 }> {
+  public originalModel;
   private _view3D: VanillaView3D;
-  private _originalModel;
-  private _skyboxRef = React.createRef<HTMLInputElement>();
   private _loader;
 
   public get view3D() { return this._view3D; }
@@ -33,7 +42,8 @@ class Playground extends React.Component<{}, {
 
     this.state = {
       initialized: false,
-      isLoading: false
+      isLoading: false,
+      selectedMenu: 0
     };
   }
 
@@ -44,14 +54,12 @@ class Playground extends React.Component<{}, {
       src: "/egjs-view3d/model/cube.glb",
       skybox: "/egjs-view3d/texture/artist_workshop_1k.hdr",
       autoplay: true,
-      autoInit: false
+      plugins: [new LoadingBar({ type: "top" })]
     }).on("ready", () => {
-      this._originalModel = view3D.model;
+      this.originalModel = view3D.model;
       this.setState({});
     });
 
-    void view3D.loadPlugins(new LoadingBar({ type: "top" }));
-    void view3D.init();
     void GLTFLoader.setMeshoptDecoder("/egjs-view3d/lib/meshopt_decoder.js");
 
     this._view3D = view3D;
@@ -67,15 +75,19 @@ class Playground extends React.Component<{}, {
 
       if (hdri) {
         const hdriURL = URL.createObjectURL(e.files.get(hdri));
-        void this._onEnvmapChange(hdriURL);
+        void this.onEnvmapChange(hdriURL);
       } else {
-        void this._onFileChange(e.files);
+        void this.onFileChange(e.files);
       }
     });
   }
 
+  public componentDidUpdate() {
+    ReactTooltip.rebuild();
+  }
+
   public render() {
-    const { initialized, isLoading } = this.state;
+    const { initialized, isLoading, selectedMenu } = this.state;
 
     return <Layout>
       <div className={styles.playgroundRoot}>
@@ -90,113 +102,55 @@ class Playground extends React.Component<{}, {
           }
           <div id="playground-view3d" className={clsx("view3d-wrapper", styles.playground)}>
             <canvas className="view3d-canvas"></canvas>
-            <div data-tip="Reset Camera" className={clsx(styles.resetBtn, "button", "is-rounded")} onClick={() => { this._view3D.camera.reset(500); }}>
+            <div data-tip="Reset Camera" className={clsx(styles.resetBtn, "button", "is-rounded")} onClick={() => { void this._view3D.camera.reset(500); }}>
               <ResetIcon width="32" height="32" />
             </div>
-            <div className={styles.modelInfo}>
-              {this._originalModel &&
-                <div className="p-4">
-                  <div>src: { this._originalModel.src }</div>
-                  <div>vertices: { this._originalModel.meshes.reduce((total, mesh) => {
-                    if (!mesh.geometry.attributes.position) return total;
-
-                    const vCount = mesh.geometry.attributes.position.count;
-                    return total + vCount;
-                  }, 0) }</div>
-                  <div>triangles: { this._originalModel.meshes.reduce((total, mesh) => {
-                    if (!mesh.geometry.index) return total;
-
-                    const tCount = mesh.geometry.index.count / 3;
-                    return total + tCount;
-                  }, 0) }</div>
-                </div>
-              }
-              {(this._originalModel && this._view3D.model !== this._originalModel) &&
-                <div className="p-4">
-                  <span>Simplified</span>
-                  <div>vertices: { this._view3D.model.meshes.reduce((total, mesh) => {
-                    if (!mesh.geometry.attributes.position) return total;
-
-                    const vCount = mesh.geometry.attributes.position.count;
-
-                    return total + vCount;
-                  }, 0) }</div>
-                  <div>triangles: { this._view3D.model.meshes.reduce((total, mesh) => {
-                    if (!mesh.geometry.index) return total;
-
-                    const tCount = mesh.geometry.index.count / 3;
-                    return total + tCount;
-                  }, 0) }</div>
-                </div>
-              }
-            </div>
+            <ModelInfo playground={this} />
           </div>
         </div>
-        <aside className={clsx("menu", "p-4", styles.control)}>
-          <ModelChange onSelect={this._onModelSelect} onUpload={this._onFileChange} isLoading={isLoading} />
-          <EnvmapChange onChange={this._onEnvmapChange} onExposureChange={val => this._view3D.exposure = val} isLoading={isLoading} />
-          <div className="is-flex is-align-items-center mb-4">
-            <span className="mr-2">Show Skybox</span>
-            <input ref={this._skyboxRef} type="checkbox" defaultChecked={true} onChange={e => {
-              const view3D = this._view3D;
-              const scene = view3D.scene;
-              const checked = e.currentTarget.checked;
-
-              if (checked) {
-                scene.skybox.enable();
-              } else {
-                scene.skybox.disable();
-              }
-            }}></input>
+        <aside className={clsx(styles.control)}>
+          <div className={clsx(styles.asideMenu)}>
+            { menus.map((menu, menuIdx) => (
+              <div
+                key={menuIdx}
+                onClick={() => { this.setState({ selectedMenu: menuIdx }); }}
+                className={clsx(styles.asideMenuItem, menuIdx === selectedMenu ? styles.selected : "")}>
+                { menu.name }
+              </div>
+            )) }
           </div>
-          <MeshSimplification onSimplify={this._onSimplify} isLoading={isLoading} />
-          <button className="button mb-2" disabled={isLoading} onClick={this._downloadModel}>
-            <img className="mr-2" src="/egjs-view3d/icon/file_download_black.svg" />
-            <span>Download .glb</span>
-          </button>
-          <button className="button mb-2" disabled={isLoading} onClick={this._downloadPoster}>
-            <img className="mr-2" src="/egjs-view3d/icon/image.svg" />
-            <span>Download Poster Image as .png</span>
-          </button>
+          <div className={clsx(styles.asideContent, "bulma-menu", "p-4")}>
+            {(() => {
+              if (selectedMenu === 0) {
+                return <ModelTab playground={this} isLoading={isLoading} onFileChange={this.onFileChange} />;
+              } else if (selectedMenu === 1) {
+                return <EnvironmentTab playground={this} isLoading={isLoading} onEnvmapChange={this.onEnvmapChange} />;
+              } else {
+                return <DownloadTab playground={this} isLoading={isLoading} />;
+              }
+            })()}
+          </div>
         </aside>
       </div>
       <ReactTooltip effect="solid" />
     </Layout>;
   }
 
-  private _onModelSelect = async (e) => {
-    const view3D = this._view3D;
-    const selected = e.target.value;
-    if (!selected) return;
-
-    this.setState({ isLoading: true });
-
-    await view3D.load(selected);
-    view3D.autoPlayer.disable();
-
-    this._originalModel = view3D.model;
-
-    this.setState({
-      initialized: true,
-      isLoading: false
-    });
-  };
-
-  private _onFileChange = async (fileMap) => {
+  public onFileChange = async (fileMap) => {
     this.setState({ isLoading: true });
 
     try {
-      const view3D = this._view3D as any;
+      const view3D = this._view3D;
       const files = Array.from(fileMap) as Array<[string, File]>;
       const loader = this._loader;
       const model = await loader.loadFromFiles(files.map(([name, file]) => file));
 
-      view3D._src = model.src;
+      (view3D as any)._src = model.src;
 
       view3D.display(model);
       view3D.autoPlayer.disable();
 
-      this._originalModel = model;
+      this.originalModel = model;
 
       this.setState({
         initialized: true,
@@ -214,15 +168,17 @@ class Playground extends React.Component<{}, {
     }
   };
 
-  private _onEnvmapChange = async (url) => {
+  public onEnvmapChange = async (url) => {
     try {
       const view3D = this._view3D;
+      const wasSkyboxEnabled = view3D.scene.skybox.enabled;
 
       this.setState({ isLoading: true });
 
       await view3D.scene.setSkybox(url);
+      (view3D as any)._skybox = url;
 
-      if (!this._skyboxRef.current.checked) {
+      if (!wasSkyboxEnabled) {
         view3D.scene.skybox.disable();
       }
     } catch (err) {
@@ -235,175 +191,6 @@ class Playground extends React.Component<{}, {
       this.setState({ isLoading: false });
       URL.revokeObjectURL(url);
     }
-  };
-
-  private _downloadModel = async () => {
-    try {
-      this.setState({ isLoading: true });
-
-      const origModel = this._view3D.model;
-
-      const materials = origModel.meshes.reduce((mats, mesh) => {
-        if (Array.isArray(mesh.material)) {
-          return [...mats, ...mesh.material];
-        } else {
-          return [...mats, mesh.material];
-        }
-      }, [] as THREE.Material[]);
-      const textures = new Map<string, THREE.Texture>();
-
-      materials.forEach(mat => {
-        for (const key in mat) {
-          if (mat[key] && key.toLowerCase().endsWith("map") && (mat[key] as THREE.Texture).isTexture) {
-            const texture = mat[key] as THREE.Texture;
-            texture.image.src = texture.uuid;
-
-            textures.set(texture.uuid, texture);
-          }
-        }
-      });
-
-      new GLTFExporter().parse(origModel.scene, async data => {
-        const gltf = data as {
-          images?: Array<{
-            mimeType: string;
-            uri: string;
-          }>;
-          textures?: Array<{
-            source: number;
-            [key: string]: any;
-          }>;
-        };
-
-        const nameGuessRegex = /(\w+)\.\w+$/i;
-        const regexRes = nameGuessRegex.exec(origModel.src);
-        const modelName = (!regexRes || !regexRes[1])
-          ? "model"
-          : regexRes[1];
-
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-
-        const zip = new JSZip();
-
-        const images = gltf.images ?? [];
-        const gltfTextures = gltf.textures ?? [];
-
-        gltfTextures.forEach(texture => {
-          const origImgSource = texture.source;
-
-          if (!texture.extensions) {
-            texture.extensions = {};
-          }
-
-          // eslint-disable-next-line @typescript-eslint/dot-notation
-          texture.extensions["EXT_texture_webp"] = {
-            source: origImgSource + images.length
-          };
-        });
-
-        const toImageFiles = [...images].map((gltfImage, idx) => {
-          const imageURI = gltfImage.uri.split("/");
-          const texture = textures.get(imageURI[imageURI.length - 1]);
-
-          const origImages = origModel.json?.images ?? [];
-          const mimeType = origImages[idx]?.mimeType ?? "image/png";
-          const type = mimeType.split("/")[1];
-          const imgFileName = `${modelName}${idx}`;
-
-          gltfImage.uri = `${imgFileName}.${type}`;
-
-          // Add webp version of textures
-          images.push({
-            mimeType: "image/webp",
-            uri: `${imgFileName}.webp`
-          });
-
-          const { image } = texture;
-
-          canvas.width = image.width;
-          canvas.height = image.height;
-
-          if (texture.flipY) {
-            ctx.translate( 0, canvas.height );
-				    ctx.scale(1, -1);
-          }
-
-          // Most of the codes are from GLTFExporter of THREE.js
-          // https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/GLTFExporter.js
-          if ((typeof HTMLImageElement !== "undefined" && image instanceof HTMLImageElement) ||
-            (typeof HTMLCanvasElement !== "undefined" && image instanceof HTMLCanvasElement) ||
-            (typeof OffscreenCanvas !== "undefined" && image instanceof OffscreenCanvas) ||
-            (typeof ImageBitmap !== "undefined" && image instanceof ImageBitmap)) {
-            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-          } else {
-            const imgData = new Uint8ClampedArray(image.height * image.width * 4);
-
-            for (let i = 0; i < imgData.length; i += 4) {
-              imgData[i + 0] = image.data[i + 0];
-              imgData[i + 1] = image.data[i + 1];
-              imgData[i + 2] = image.data[i + 2];
-              imgData[i + 3] = image.data[i + 3];
-            }
-
-            ctx.putImageData(new ImageData(imgData, image.width, image.height), 0, 0);
-          }
-
-          const saveOrigImage = new Promise<void>(resolve => {
-            canvas.toBlob(blob => {
-              zip.file(`${imgFileName}.${type}`, blob);
-              resolve();
-            }, mimeType);
-          });
-          const saveWebpImage = new Promise<void>(resolve => {
-            canvas.toBlob(blob => {
-              zip.file(`${imgFileName}.webp`, blob);
-              resolve();
-            }, "image/webp");
-          });
-
-          return Promise.all([saveOrigImage, saveWebpImage]);
-        });
-
-        await Promise.all(toImageFiles);
-
-        zip.file(`${modelName}.gltf`, JSON.stringify(gltf, null, 2));
-
-        const zipContent = await zip.generateAsync({ type: "blob" });
-        saveAs(zipContent, `${modelName}.zip`);
-      }, { binary: false, animations: origModel.animations, includeCustomExtensions: true, embedImages: false });
-    } catch (err) {
-      void Swal.fire({
-        title: "Error!",
-        text: err.message,
-        icon: "error"
-      });
-    } finally {
-      this.setState({ isLoading: false });
-    }
-  };
-
-  private _downloadPoster = () => {
-    this._view3D.screenshot("poster");
-  };
-
-  private _onSimplify = (targetPercentage, aggressiveness) => {
-    const view3D = this._view3D;
-    const origModel = this._originalModel;
-    const simplifier = new FastQuadric({ targetPercentage, aggressiveness });
-    const adaptedModel = new ThreeAdapter(origModel.scene, true);
-
-    this.setState({ isLoading: true });
-
-    requestAnimationFrame(() => {
-      simplifier.simplify(adaptedModel);
-
-      const simplifiedModel = new Model({ src: origModel.src, scenes: [adaptedModel.object] });
-
-      view3D.display(simplifiedModel);
-
-      this.setState({ isLoading: false });
-    });
   };
 }
 

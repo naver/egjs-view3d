@@ -169,6 +169,8 @@ class Scene {
     const root = this._root;
     const view3D = this._view3D;
 
+    if (this._skybox) this._skybox.destroy();
+
     if (url) {
       const textureLoader = new TextureLoader(view3D.renderer);
       const texture = await textureLoader.loadHDRTexture(url);

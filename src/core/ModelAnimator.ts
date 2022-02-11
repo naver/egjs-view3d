@@ -131,7 +131,7 @@ class ModelAnimator {
    * Crossfade animation from one to another
    * @param {number} index Index of the animation to crossfade to
    * @param {number} duration Duration of the crossfade animation, in milisec
-   * @returns {Promise<boolean>} A promise that resolves boolean value that indicates whether the crossfade is successfully done without any inference
+   * @returns {Promise<boolean>} A promise that resolves boolean value that indicates whether the crossfade is fullfilled without any inference
    */
   public async crossFade(index: number, duration: number, {
     synchronize = false
@@ -197,7 +197,7 @@ class ModelAnimator {
   /**
    * Fadeout active animation, and restore to the default pose
    * @param {number} duration Duration of the crossfade animation, in milisec
-   * @returns {Promise<boolean>} A promise that resolves boolean value that indicates whether the fadeout is successfully done without any inference
+   * @returns {Promise<boolean>} A promise that resolves boolean value that indicates whether the fadeout is fullfilled without any inference
    */
   public async fadeOut(duration: number): Promise<boolean> {
     const view3D = this._view3D;

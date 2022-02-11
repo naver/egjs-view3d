@@ -11,6 +11,7 @@ import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader";
 import View3D from "../View3D";
 import Model from "../core/Model";
 import { EVENTS } from "../const/external";
+import { CUSTOM_TEXTURE_LOD_EXTENSION, STANDARD_MAPS } from "../const/internal";
 
 const dracoLoader = new DRACOLoader();
 const ktx2Loader = new KTX2Loader();
@@ -169,13 +170,62 @@ class GLTFLoader {
   }
 
   private _parseToModel(gltf: GLTF, src: string): Model {
-    const fixSkinnedBbox = this._view3D.fixSkinnedBbox;
+    const view3D = this._view3D;
+    const fixSkinnedBbox = view3D.fixSkinnedBbox;
 
     gltf.scenes.forEach(scene => {
       scene.traverse(obj => {
         obj.frustumCulled = false;
       });
     });
+
+    const extensionsUsed = gltf.parser.json.extensionsUsed as string[] | undefined;
+    if (extensionsUsed && extensionsUsed.some(extension => extension === CUSTOM_TEXTURE_LOD_EXTENSION)) {
+      const maxTextureSize = view3D.renderer.threeRenderer.capabilities.maxTextureSize;
+      const meshes: THREE.Mesh[] = [];
+
+      gltf.scenes.forEach(scene => {
+        scene.traverse(obj => {
+          if ((obj as any).isMesh) {
+            meshes.push(obj as THREE.Mesh);
+          }
+        });
+      });
+
+      const materials = meshes.reduce((allMaterials, mesh) => {
+        return [...allMaterials, ...(Array.isArray(mesh.material) ? mesh.material : [mesh.material])];
+      }, []);
+      const textures: THREE.Texture[] = materials.reduce((allTextures, material) => {
+        return [
+          ...allTextures,
+          ...STANDARD_MAPS.filter(map => material[map]).map(mapName => material[mapName])
+        ];
+      }, []);
+
+      const associations = gltf.parser.associations;
+      const gltfJSON = gltf.parser.json;
+
+      const gltfTextures = textures
+        .filter(texture => associations.has(texture))
+        .map(texture => {
+          return gltfJSON.textures[associations.get(texture)!.textures!];
+        });
+
+      gltfTextures.forEach((texture, texIdx) => {
+        if (!texture.extensions[CUSTOM_TEXTURE_LOD_EXTENSION]) return;
+
+        const levels = texture.extensions[CUSTOM_TEXTURE_LOD_EXTENSION].levels as Array<{ index: number; size: number }>;
+
+        levels.filter(({ size }) => size <= maxTextureSize)
+          .forEach(async ({ index }) => {
+            const currentTexture = textures[texIdx];
+            const lodTexture = await gltf.parser.loadTexture(index);
+
+            currentTexture.image = lodTexture.image;
+            currentTexture.needsUpdate = true;
+          });
+      });
+    }
 
     const model = new Model({
       src,
