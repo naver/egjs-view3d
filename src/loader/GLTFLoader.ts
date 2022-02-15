@@ -76,6 +76,8 @@ class GLTFLoader {
       loader.setMeshoptDecoder(GLTFLoader.meshoptDecoder);
     }
 
+    loader.manager = THREE.DefaultLoadingManager;
+
     return new Promise((resolve, reject) => {
       try {
         loader.load(url, gltf => {
@@ -143,6 +145,8 @@ class GLTFLoader {
 
       const manager = new THREE.LoadingManager();
       manager.setURLModifier(fileURL => {
+        if (/^data:.*,.*$/i.test(fileURL)) return fileURL;
+
         const fileNameResult = /[^\/|\\]+$/.exec(fileURL);
         const fileName = (fileNameResult && fileNameResult[0]) || "";
 
@@ -211,19 +215,33 @@ class GLTFLoader {
           return gltfJSON.textures[associations.get(texture)!.textures!];
         });
 
-      gltfTextures.forEach((texture, texIdx) => {
-        if (!texture.extensions[CUSTOM_TEXTURE_LOD_EXTENSION]) return;
+      const texturesByLevel: Array<Array<{ index: number; texture: THREE.Texture }>> = gltfTextures.reduce((levels, texture, texIdx) => {
+        if (!texture.extensions[CUSTOM_TEXTURE_LOD_EXTENSION]) return levels;
 
-        const levels = texture.extensions[CUSTOM_TEXTURE_LOD_EXTENSION].levels as Array<{ index: number; size: number }>;
+        const currentTexture = textures[texIdx];
+        const lodLevels = texture.extensions[CUSTOM_TEXTURE_LOD_EXTENSION].levels as Array<{ index: number; size: number }>;
 
-        levels.filter(({ size }) => size <= maxTextureSize)
-          .forEach(async ({ index }) => {
-            const currentTexture = textures[texIdx];
-            const lodTexture = await gltf.parser.loadTexture(index);
+        lodLevels.forEach(({ index, size }, level) => {
+          if (size > maxTextureSize) return;
+          if (!levels[level]) {
+            levels[level] = [];
+          }
 
-            currentTexture.image = lodTexture.image;
-            currentTexture.needsUpdate = true;
-          });
+          levels[level].push({ index, texture: currentTexture });
+        });
+
+        return levels;
+      }, []);
+
+      texturesByLevel.forEach(async levelTextures => {
+        const texturesLoaded = await Promise.all(levelTextures.map(({ index }) => gltf.parser.getDependency("texture", index) as Promise<THREE.Texture>))
+
+        // Change textures when all texture of the level loaded
+        texturesLoaded.forEach((texture, index) => {
+          const origTexture = levelTextures[index].texture;
+          origTexture.image = texture.image;
+          origTexture.needsUpdate = true;
+        });
       });
     }
 
