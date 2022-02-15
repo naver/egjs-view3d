@@ -10,6 +10,7 @@ export * from "./control";
 export * from "./loader";
 export * from "./plugin";
 export * from "./const/external";
+export * from "./static";
 
 export type {
   View3DOptions,
