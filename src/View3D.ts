@@ -845,13 +845,13 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
           level
         });
 
-        if (!higherLevelLoaded) {
-          this.display(model, {
-            resetCamera: !modelLoadedBefore
-          });
-        }
-
         loaded[level] = true;
+
+        if (higherLevelLoaded) return;
+
+        this.display(model, {
+          resetCamera: !modelLoadedBefore
+        });
       });
 
       await Promise.race(loadModels);

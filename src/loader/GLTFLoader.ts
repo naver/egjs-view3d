@@ -233,10 +233,17 @@ class GLTFLoader {
         return levels;
       }, []);
 
-      texturesByLevel.forEach(async levelTextures => {
-        const texturesLoaded = await Promise.all(levelTextures.map(({ index }) => gltf.parser.getDependency("texture", index) as Promise<THREE.Texture>))
+      const loaded = texturesByLevel.map(() => false);
 
+      texturesByLevel.forEach(async (levelTextures, level) => {
         // Change textures when all texture of the level loaded
+        const texturesLoaded = await Promise.all(levelTextures.map(({ index }) => gltf.parser.getDependency("texture", index) as Promise<THREE.Texture>))
+        const higherLevelLoaded = loaded.slice(level + 1).some(val => !!val);
+
+        loaded[level] = true;
+
+        if (higherLevelLoaded) return;
+
         texturesLoaded.forEach((texture, index) => {
           const origTexture = levelTextures[index].texture;
           origTexture.image = texture.image;
