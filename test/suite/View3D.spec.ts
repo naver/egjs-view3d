@@ -98,12 +98,6 @@ describe("View3D", () => {
       });
     });
 
-    describe("skyboxRotation", () => {
-      it("should have '0' as a default value", async () => {
-        expect((await createView3D()).skyboxRotation).to.equal(0);
-      });
-    });
-
     describe("envmap", () => {
       it("should have 'null' as a default value", async () => {
         expect((await createView3D()).envmap).to.be.null;

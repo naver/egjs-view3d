@@ -17,54 +17,9 @@ describe("Skybox", () => {
         expect(new Skybox(view3D).camera).to.be.an.instanceOf(THREE.PerspectiveCamera);
       });
     });
-
-    describe("enabled", () => {
-      it("should be true by default", async () => {
-        const view3D = await createView3D();
-        expect(new Skybox(view3D).enabled).to.be.true;
-      });
-    });
   });
 
   describe("Methods", () => {
-    describe("enable", () => {
-      it("should set enabled to be true", async () => {
-        const view3D = await createView3D();
-        const skybox = new Skybox(view3D);
-
-        skybox.disable();
-        skybox.enable();
-
-        expect(skybox.enabled).to.be.true;
-      });
-    });
-
-    describe("disable", () => {
-      it("should set enabled to be true", async () => {
-        const view3D = await createView3D();
-        const skybox = new Skybox(view3D);
-
-        skybox.enable();
-        skybox.disable();
-
-        expect(skybox.enabled).to.be.false;
-      });
-    });
-
-    describe("updateCamera", () => {
-      it("should rotate camera yaw by 'skyboxRotation' compared to the main camera", async () => {
-        const view3D = await createView3D({ src: "/cube.glb ", skyboxRotation: 90 });
-        const skybox = new Skybox(view3D);
-
-        const mainCam = view3D.camera.threeCamera;
-        const skyboxCam = skybox.camera;
-
-        const mainCamPos = mainCam.position.clone();
-
-        expect(mainCamPos.applyEuler(new THREE.Euler(0, 90, 0))).to.deep.equal(skyboxCam.position);
-      });
-    });
-
     describe("useTexture", () => {
       it("should set its scene background to given texture", async () => {
         const view3D = await createView3D();

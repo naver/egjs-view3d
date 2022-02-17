@@ -83,7 +83,6 @@ export interface View3DOptions {
   exposure: number;
   shadow: boolean | Partial<ShadowOptions>;
   skyboxBlur: boolean;
-  skyboxRotation: number;
 
   // AR
   webAR: boolean | Partial<WebARSessionOptions>;
@@ -155,7 +154,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _exposure: View3DOptions["exposure"];
   private _shadow: View3DOptions["shadow"];
   private _skyboxBlur: View3DOptions["skyboxBlur"];
-  private _skyboxRotation: View3DOptions["skyboxRotation"];
 
   private _webAR: View3DOptions["webAR"];
   private _sceneViewer: View3DOptions["sceneViewer"];
@@ -395,12 +393,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get skyboxBlur() { return this._skyboxBlur; }
   /**
-   * Apply y-axis rotation (in degrees) to the current skybox image.
-   * @type {number}
-   * @default 0
-   */
-  public get skyboxRotation() { return this._skyboxRotation; }
-  /**
    * Options for the WebXR-based AR session.
    * If `false` is given, it will disable WebXR-based AR session.
    * @type {boolean | WebARSessionOptions}
@@ -493,13 +485,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     }
   }
 
-  public set skyboxRotation(val: View3DOptions["skyboxRotation"]) {
-    this._skyboxRotation = val;
-
-    const skybox = this._scene.skybox;
-    if (skybox) skybox.updateCamera();
-  }
-
   public set useGrabCursor(val: View3DOptions["useGrabCursor"]) {
     this._useGrabCursor = val;
     this._control.updateCursor();
@@ -536,7 +521,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     wheelScrollable = false,
     useGrabCursor = true,
     skybox = null,
-    skyboxRotation = 0,
     envmap = null,
     background = null,
     exposure = 1,
@@ -584,7 +568,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._exposure = exposure;
     this._shadow = shadow;
     this._skyboxBlur = skyboxBlur;
-    this._skyboxRotation = skyboxRotation;
 
     this._webAR = webAR;
     this._sceneViewer = sceneViewer;

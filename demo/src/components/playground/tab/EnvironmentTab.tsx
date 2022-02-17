@@ -43,19 +43,6 @@ class EnvironmentTab extends React.Component<{
         }}></input>
       </MenuItem>
       <MenuItem>
-        <div className="menu-label mb-4">Skybox Rotation: {playground.view3D?.skyboxRotation ?? 0}°</div>
-        <Range
-          className="mb-2"
-          step={1}
-          min={0}
-          max={360}
-          val={playground.view3D?.skyboxRotation ?? 0}
-          onChange={(values) => {
-            playground.view3D.skyboxRotation = values[0];
-            this.forceUpdate();
-          }} />
-      </MenuItem>
-      <MenuItem>
         <div className="menu-label mb-4">Shadow opacity: {playground.view3D?.scene.shadowPlane.opacity ?? 0.3}</div>
         <Range
           className="mb-2"
