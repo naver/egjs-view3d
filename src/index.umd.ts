@@ -3,22 +3,10 @@
  * egjs projects are licensed under the MIT license
  */
 
-import View3D from "./View3D";
-import View3DError from "./core/View3DError";
-import * as Core from "./core";
-import * as Controls from "./control";
-import * as Loaders from "./loader";
-import * as Plugins from "./plugin";
-import * as Constants from "./const/external";
-import * as Static from "./static";
 import { merge } from "./utils";
 
-merge(View3D, Core);
-merge(View3D, Controls);
-merge(View3D, Loaders);
-merge(View3D, Plugins);
-merge(View3D, Constants);
-merge(View3D, Static);
-(View3D as any).View3DError = View3DError;
+import View3D, * as modules from "./index";
+
+merge(View3D, modules);
 
 export default View3D;
