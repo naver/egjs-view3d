@@ -11,6 +11,7 @@ import { STANDARD_MAPS } from "../const/internal";
 import { getObjectOption } from "../utils";
 
 import ShadowPlane from "./ShadowPlane";
+import Skybox from "./Skybox";
 
 /**
  * Scene that View3D will render.
@@ -19,6 +20,7 @@ import ShadowPlane from "./ShadowPlane";
 class Scene {
   private _view3D: View3D;
   private _root: THREE.Scene;
+  private _skybox: Skybox | null;
   private _shadowPlane: ShadowPlane;
   private _userObjects: THREE.Group;
   private _envObjects: THREE.Group;
@@ -26,36 +28,50 @@ class Scene {
 
   /**
    * Root {@link https://threejs.org/docs/#api/en/scenes/Scene THREE.Scene} object
+   * @readonly
    */
   public get root() { return this._root; }
 
   /**
+   * Skybox object for rendering background
+   * @type {Skybox}
+   * @readonly
+   */
+  public get skybox() { return this._skybox; }
+
+  /**
    * Shadow plane & light
    * @type {ShadowPlane}
+   * @readonly
    */
   public get shadowPlane() { return this._shadowPlane; }
 
   /**
    * Group that contains volatile user objects
+   * @readonly
    */
   public get userObjects() { return this._userObjects; }
 
   /**
    * Group that contains non-volatile user objects
+   * @readonly
    */
   public get envObjects() { return this._envObjects; }
 
   /**
    * Group that contains objects that View3D manages
+   * @readonly
    */
   public get fixedObjects() { return this._fixedObjects; }
 
   /**
    * Create new Scene instance
+   * @param {View3D} view3D An instance of View3D
    */
   public constructor(view3D: View3D) {
     this._view3D = view3D;
     this._root = new THREE.Scene();
+    this._skybox = null;
     this._userObjects = new THREE.Group();
     this._envObjects = new THREE.Group();
     this._fixedObjects = new THREE.Group();
@@ -118,7 +134,8 @@ class Scene {
   public remove(object: THREE.Object3D | THREE.Object3D[]): void {
     const objects = Array.isArray(object) ? object : [object];
 
-    this._root.remove(...objects);
+    this._userObjects.remove(...objects);
+    this._envObjects.remove(...objects);
   }
 
   /**
@@ -127,17 +144,20 @@ class Scene {
    * @returns {Promise<void>}
    */
   public async setBackground(background: number | string): Promise<void> {
-    const root = this._root;
+    const view3D = this._view3D;
+    const skybox = new Skybox(view3D);
+
+    this._skybox = skybox;
 
     if (typeof background === "number" || background.charAt(0) === "#") {
-      root.background = new THREE.Color(background);
+      skybox.useColor(background);
     } else {
       const textureLoader = new TextureLoader(this._view3D.renderer);
       const texture = await textureLoader.load(background);
 
       texture.encoding = THREE.sRGBEncoding;
 
-      root.background = texture;
+      skybox.useTexture(texture);
     }
   }
 
@@ -148,15 +168,26 @@ class Scene {
    */
   public async setSkybox(url: string | null): Promise<void> {
     const root = this._root;
+    const view3D = this._view3D;
+
+    // Destroy previous skybox
+    this._skybox?.destroy();
 
     if (url) {
-      const textureLoader = new TextureLoader(this._view3D.renderer);
-      const renderTarget = await textureLoader.loadHDRTexture(url);
+      const textureLoader = new TextureLoader(view3D.renderer);
+      const texture = await textureLoader.loadHDRTexture(url);
+      const skybox = new Skybox(view3D);
 
-      root.background = renderTarget.texture;
-      root.environment = renderTarget.texture;
+      if (view3D.skyboxBlur) {
+        skybox.useBlurredHDR(texture);
+      } else {
+        skybox.useTexture(texture);
+      }
+
+      this._skybox = skybox;
+      root.environment = texture;
     } else {
-      root.background = null;
+      this._skybox = null;
       root.environment = null;
     }
   }
@@ -169,9 +200,9 @@ class Scene {
   public async setEnvMap(url: string | null): Promise<void> {
     if (url) {
       const textureLoader = new TextureLoader(this._view3D.renderer);
-      const renderTarget = await textureLoader.loadHDRTexture(url);
+      const texture = await textureLoader.loadHDRTexture(url);
 
-      this._root.environment = renderTarget.texture;
+      this._root.environment = texture;
     } else {
       this._root.environment = null;
     }

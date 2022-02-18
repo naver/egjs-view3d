@@ -21,13 +21,14 @@
     "@svgr/webpack": "^5.5.0",
     "clsx": "^1.1.1",
     "file-loader": "^6.2.0",
+    "file-saver": "^2.0.5",
+    "jszip": "^3.7.1",
     "prism-react-renderer": "^1.2.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-range": "^1.8.11",
     "simple-dropzone": "^0.8.1",
     "sweetalert2": "^11.3.1",
-    "three": "^0.134.0",
     "url-loader": "^4.1.1"
   },
   "browserslist": {
@@ -43,10 +44,12 @@
     ]
   },
   "devDependencies": {
+    "@types/offscreencanvas": "^2019.6.4",
     "bulma": "^0.9.3",
     "docusaurus-plugin-sass": "^0.2.1",
     "glslify-loader": "^2.0.0",
     "raw-loader": "^4.0.2",
+    "react-tooltip": "^4.2.21",
     "remark-breaks": "^2.0.2",
     "sass": "^1.43.4"
   }

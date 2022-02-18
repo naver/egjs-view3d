@@ -13,10 +13,14 @@ import View3DPlugin from "./View3DPlugin";
  * @interface
  * @param {string} [availableText="View in AR"] A text that will be shown on mouse hover when it's available to enter the AR session.
  * @param {string} [unavailableText="AR is not available in this browser"] A text that will be shown on mouse hover when it's not available to enter the AR session.
+ * @param {string} [buttonClass="view3d-ar-button"] A class that will be applied to the button element.
+ * @param {string} [tooltipClass="view3d-tooltip"] A class that will be applied to the tooltip element.
  */
 export interface ARButtonOptions {
   availableText: string;
   unavailableText: string;
+  buttonClass: string;
+  tooltipClass: string;
 }
 
 /**
@@ -24,8 +28,9 @@ export interface ARButtonOptions {
  * It will be disabled automatically when it's not available to enter AR sessions.
  * User can enter AR sessions by clicking this.
  */
-class ARButton extends View3DPlugin {
+class ARButton implements View3DPlugin {
   private _options: Partial<ARButtonOptions>;
+  private _button: HTMLButtonElement | null;
 
   /**
    * Create new instance of ARButton
@@ -34,19 +39,32 @@ class ARButton extends View3DPlugin {
    * @param {string} [options.unavailableText="AR is not available in this browser"] A text that will be shown on mouse hover when it's not available to enter the AR session.
    */
   public constructor(options: Partial<ARButtonOptions> = {}) {
-    super();
-
     this._options = options;
+    this._button = null;
   }
 
   public async init(view3D: View3D) {
     await this._addButton(view3D);
   }
 
+  public teardown(view3D: View3D) {
+    const button = this._button;
+
+    if (!button) return;
+
+    if (button.parentElement === view3D.rootEl) {
+      view3D.rootEl.removeChild(button);
+    }
+
+    this._button = null;
+  }
+
   private async _addButton(view3D: View3D) {
     const {
       availableText = "View in AR",
-      unavailableText = "AR is not available in this browser"
+      unavailableText = "AR is not available in this browser",
+      buttonClass = "view3d-ar-button",
+      tooltipClass = "view3d-tooltip"
     } = this._options;
     const arAvailable = await view3D.ar.isAvailable();
 
@@ -54,14 +72,16 @@ class ARButton extends View3DPlugin {
     const tooltip = document.createElement("div");
     const tooltipText = document.createTextNode(arAvailable ? availableText : unavailableText);
 
-    button.classList.add("view3d-ar-button");
-    tooltip.classList.add("view3d-tooltip");
+    button.classList.add(buttonClass);
+    tooltip.classList.add(tooltipClass);
 
     button.disabled = true;
     button.innerHTML = ARIcon;
     button.appendChild(tooltip);
     tooltip.appendChild(tooltipText);
     view3D.rootEl.appendChild(button);
+
+    this._button = button;
 
     if (view3D.initialized) {
       await this._setAvailable(view3D, button, arAvailable);

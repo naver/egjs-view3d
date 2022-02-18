@@ -1,0 +1,113 @@
+---
+sidebar_position: 2
+---
+
+import View3D from "@site/src/components/View3D";
+import License from "@site/src/components/License";
+
+LoadingBar adds a simple loading bar while loading your 3D model.
+
+
+```js
+import View3D, { LoadingBar } from "@egjs/view3d";
+
+const view3D = new View3D(...);
+
+view3D.loadPlugins(new LoadingBar({
+  type: "spinner",
+  loadingLabel: "CUSTOM_LOADING_LABEL"
+}));
+```
+
+:::caution
+
+`default` and `top` requires your model served with `Content-Length` header.
+Without it, they won't be displayed correctly.
+
+:::
+
+## Types
+<>
+{(() => {
+  const refs = Array(3).fill(0).map(() => React.createRef());
+  return <div className="columns has-text-centered">
+    <div className="column">
+      <div className="column is-size-4">default</div>
+      <View3D
+        ref={refs[0]}
+        src="/egjs-view3d/model/draco/payphone.glb"
+        envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+        poster="/egjs-view3d/poster/payphone.png"
+        autoInit={false}
+        showLoadingBar />
+      <button className="button" onClick={() => { refs[0].current.view3D.init(); }}>Load</button>
+    </div>
+    <div className="column">
+      <div className="column is-size-4">top</div>
+      <View3D
+        ref={refs[1]}
+        src="/egjs-view3d/model/meshopt/alarm.glb"
+        envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+        poster="/egjs-view3d/poster/alarm.png"
+        autoInit={false}
+        showLoadingBar="top" />
+      <button className="button" onClick={() => { refs[1].current.view3D.init(); }}>Load</button>
+    </div>
+    <div className="column">
+      <div className="column is-size-4">spinner</div>
+      <View3D
+        ref={refs[2]}
+        src="/egjs-view3d/model/draco/watch.glb"
+        envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+        poster="/egjs-view3d/poster/watch.png"
+        autoInit={false}
+        showLoadingBar="spinner" />
+      <button className="button" onClick={() => { refs[2].current.view3D.init(); }}>Load</button>
+    </div>
+  </div>
+})()}
+</>
+
+
+## Options
+|Option|Type|Default|Description|
+|:---:|---|:---:|---|
+|type|string|"default"|A type(style) of the loading bar.|
+|loadingLabel|string|"Loading 3D Model..."|A text to display while loading 3D model.|
+|parsingLabel|string|"Parsing 3D Model..."|A text to display while parsing the model after loading is done.|
+|labelColor|string|"#ffffff"|A text color in CSS string|
+|barHeight|string|"10px"|Loading bar's height in CSS string|
+|barBackground|string|"#bbbbbb"|Loading bar's background color in CSS string|
+|barForeground|string|"#3e8ed0"|Loading bar's foreground color in CSS string|
+|overlayBackground|string|"rgba(0, 0, 0, 0.3)"|Overlay's background color in CSS string|
+
+<License items={[
+  {
+    name: "Korean Public Payphone 01",
+    link: "https://polyhaven.com/a/korean_public_payphone_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+    {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Vintage Pocket Watch",
+    link: "https://polyhaven.com/a/vintage_pocket_watch",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

@@ -26,6 +26,12 @@ export const EVENTS = {
   ERROR: "error"
 } as const;
 
+export const CURSOR = {
+  GRAB: "grab",
+  GRABBING: "grabbing",
+  NONE: ""
+} as const;
+
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
 export enum MOUSE_BUTTON {
   LEFT,

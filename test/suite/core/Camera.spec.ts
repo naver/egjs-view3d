@@ -64,7 +64,10 @@ describe("Camera", () => {
       await camera.reset(500);
 
       expect(poseBeforeReset).not.to.deep.equal(camera.defaultPose);
-      expect(camera.currentPose).to.deep.equal(camera.defaultPose);
+      expect(camera.currentPose.pitch).to.equal(camera.defaultPose.pitch);
+      expect(camera.currentPose.yaw).to.equal(camera.defaultPose.yaw);
+      expect(camera.currentPose.zoom).to.equal(camera.defaultPose.zoom);
+      expect(camera.currentPose.pivot).to.deep.equal(camera.defaultPose.pivot);
     });
   });
 

@@ -1,7 +1,7 @@
 {
   "integrationFolder": "suite",
   "supportFile": "setup.ts",
-  "fileServerFolder": "asset",
+  "fileServerFolder": "static",
   "screenshotsFolder": "failed/screenshots",
   "videosFolder": "failed/videos",
   "pluginsFile": false,

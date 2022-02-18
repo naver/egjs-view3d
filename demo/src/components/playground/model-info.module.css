@@ -1,0 +1,9 @@
+.modelInfo {
+  position: absolute;
+  display: flex;
+  top: 0px;
+  right: 0px;
+  color: white;
+  flex-direction: column;
+  background-color: rgba(0, 0, 0, 0.3);
+}

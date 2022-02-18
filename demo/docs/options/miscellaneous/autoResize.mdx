@@ -1,0 +1,24 @@
+---
+sidebar_position: 3
+---
+
+import View3D from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
+
+<OptionDescriptor type="boolean" defaultVal="true" />
+
+Whether to automatically call [resize()](/docs/api/View3D#resize) when the canvas element's size is changed.
+It will use [Resizeobserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver) for resize detection if `useResizeObserver` set to true, or window's `resize` event if not.
+
+:::info
+
+Change the window size or rotate device to check its effect!
+
+:::
+
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+  showExampleCode />
+

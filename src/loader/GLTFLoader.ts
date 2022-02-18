@@ -11,6 +11,7 @@ import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader";
 import View3D from "../View3D";
 import Model from "../core/Model";
 import { EVENTS } from "../const/external";
+import { CUSTOM_TEXTURE_LOD_EXTENSION, STANDARD_MAPS } from "../const/internal";
 
 const dracoLoader = new DRACOLoader();
 const ktx2Loader = new KTX2Loader();
@@ -75,13 +76,21 @@ class GLTFLoader {
       loader.setMeshoptDecoder(GLTFLoader.meshoptDecoder);
     }
 
+    loader.manager = THREE.DefaultLoadingManager;
+
     return new Promise((resolve, reject) => {
       try {
         loader.load(url, gltf => {
           const model = this._parseToModel(gltf, url);
           resolve(model);
         }, evt => {
-          view3D.trigger(EVENTS.PROGRESS, { ...evt, target: view3D, type: EVENTS.PROGRESS });
+          view3D.trigger(EVENTS.PROGRESS, {
+            type: EVENTS.PROGRESS,
+            target: view3D,
+            lengthComputable: evt.lengthComputable,
+            loaded: evt.loaded,
+            total: evt.total
+          });
         }, err => {
           reject(err);
         });
@@ -136,6 +145,8 @@ class GLTFLoader {
 
       const manager = new THREE.LoadingManager();
       manager.setURLModifier(fileURL => {
+        if (/^data:.*,.*$/i.test(fileURL)) return fileURL;
+
         const fileNameResult = /[^\/|\\]+$/.exec(fileURL);
         const fileName = (fileNameResult && fileNameResult[0]) || "";
 
@@ -163,11 +174,88 @@ class GLTFLoader {
   }
 
   private _parseToModel(gltf: GLTF, src: string): Model {
-    const fixSkinnedBbox = this._view3D.fixSkinnedBbox;
+    const view3D = this._view3D;
+    const fixSkinnedBbox = view3D.fixSkinnedBbox;
+
+    gltf.scenes.forEach(scene => {
+      scene.traverse(obj => {
+        obj.frustumCulled = false;
+      });
+    });
+
+    const extensionsUsed = gltf.parser.json.extensionsUsed as string[] | undefined;
+    if (extensionsUsed && extensionsUsed.some(extension => extension === CUSTOM_TEXTURE_LOD_EXTENSION)) {
+      const maxTextureSize = view3D.renderer.threeRenderer.capabilities.maxTextureSize;
+      const meshes: THREE.Mesh[] = [];
+
+      gltf.scenes.forEach(scene => {
+        scene.traverse(obj => {
+          if ((obj as any).isMesh) {
+            meshes.push(obj as THREE.Mesh);
+          }
+        });
+      });
+
+      const materials = meshes.reduce((allMaterials, mesh) => {
+        return [...allMaterials, ...(Array.isArray(mesh.material) ? mesh.material : [mesh.material])];
+      }, []);
+      const textures: THREE.Texture[] = materials.reduce((allTextures, material) => {
+        return [
+          ...allTextures,
+          ...STANDARD_MAPS.filter(map => material[map]).map(mapName => material[mapName])
+        ];
+      }, []);
+
+      const associations = gltf.parser.associations;
+      const gltfJSON = gltf.parser.json;
+
+      const gltfTextures = textures
+        .filter(texture => associations.has(texture))
+        .map(texture => {
+          return gltfJSON.textures[associations.get(texture)!.textures!];
+        });
+
+      const texturesByLevel: Array<Array<{ index: number; texture: THREE.Texture }>> = gltfTextures.reduce((levels, texture, texIdx) => {
+        if (!texture.extensions[CUSTOM_TEXTURE_LOD_EXTENSION]) return levels;
+
+        const currentTexture = textures[texIdx];
+        const lodLevels = texture.extensions[CUSTOM_TEXTURE_LOD_EXTENSION].levels as Array<{ index: number; size: number }>;
+
+        lodLevels.forEach(({ index, size }, level) => {
+          if (size > maxTextureSize) return;
+          if (!levels[level]) {
+            levels[level] = [];
+          }
+
+          levels[level].push({ index, texture: currentTexture });
+        });
+
+        return levels;
+      }, []);
+
+      const loaded = texturesByLevel.map(() => false);
+
+      texturesByLevel.forEach(async (levelTextures, level) => {
+        // Change textures when all texture of the level loaded
+        const texturesLoaded = await Promise.all(levelTextures.map(({ index }) => gltf.parser.getDependency("texture", index) as Promise<THREE.Texture>))
+        const higherLevelLoaded = loaded.slice(level + 1).some(val => !!val);
+
+        loaded[level] = true;
+
+        if (higherLevelLoaded) return;
+
+        texturesLoaded.forEach((texture, index) => {
+          const origTexture = levelTextures[index].texture;
+          origTexture.image = texture.image;
+          origTexture.needsUpdate = true;
+        });
+      });
+    }
 
     const model = new Model({
       src,
       scenes: gltf.scenes,
+      json: gltf.parser.json,
       animations: gltf.animations,
       fixSkinnedBbox
     });

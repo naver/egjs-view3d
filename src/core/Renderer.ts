@@ -73,6 +73,7 @@ class Renderer {
     renderer.toneMapping = THREE.LinearToneMapping;
     renderer.toneMappingExposure = view3D.exposure;
     renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.setClearColor(0x000000, 0);
 
     this._renderer = renderer;
     this._clock = new THREE.Clock(false);
@@ -128,6 +129,7 @@ class Renderer {
 
   private _defaultRenderLoop = (delta: number) => {
     const view3D = this._view3D;
+    const threeRenderer = this._renderer;
     const {
       scene,
       camera,
@@ -149,7 +151,17 @@ class Renderer {
     });
 
     camera.updatePosition();
-    this._renderer.render(scene.root, camera.threeCamera);
+
+    threeRenderer.autoClear = false;
+    threeRenderer.clear();
+
+    if (scene.skybox) {
+      scene.skybox.updateCamera();
+      threeRenderer.render(scene.skybox.scene, scene.skybox.camera);
+    }
+
+    threeRenderer.render(scene.root, camera.threeCamera);
+    threeRenderer.autoClear = true;
 
     view3D.trigger(EVENTS.RENDER, {
       type: EVENTS.RENDER,

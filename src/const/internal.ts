@@ -37,3 +37,5 @@ export enum GESTURE {
   TWO_FINGER = 4 | 8,
   PINCH = 16,
 }
+
+export const CUSTOM_TEXTURE_LOD_EXTENSION = "EXT_View3D_texture_LOD";

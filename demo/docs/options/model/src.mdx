@@ -6,17 +6,47 @@ import View3D from "@site/src/components/View3D";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
 import License from "@site/src/components/License";
 
-<OptionDescriptor type="string | null" defaultVal="null" />
+<OptionDescriptor type="string | string[] | null" defaultVal="null" />
 
 Source URL to fetch 3D model. `glb` / `glTF` models are supported.
+If an array is given, it will load and display the models in the given order.
 
 ## Example
-<View3D src="/egjs-view3d/model/meshopt/alarm.glb" envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" showExampleCode />
+### Single
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+  showExampleCode />
+
+### LOD(Level of Detail) applied
+View3D will load and display all 3D models given in the `src` array sequentially.
+You can use this behavior to load 3D model with smaller size, which can decrease time to interactive.
+
+:::info
+Test this example with the network throttling applied.
+:::
+
+<View3D
+  src={[
+    "/egjs-view3d/model/lod/plant/simplified.gltf",
+    "/egjs-view3d/model/draco/plant.glb"
+  ]}
+  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+  poster="/egjs-view3d/poster/plant.png"
+  clickToLoad
+  showExampleCode />
 
 <License items={[
   {
     name: "Alarm Clock 01",
     link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Potted Plant 04",
+    link: "https://polyhaven.com/a/potted_plant_04",
     author: "Poly Haven",
     authorLink: "https://polyhaven.com/",
     license: "CC0"

@@ -1,0 +1,20 @@
+---
+sidebar_position: 5
+---
+
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+
+<OptionDescriptor type="object" defaultVal="{}" />
+
+Add event handlers before initialization.
+Event handlers can be detached with `view3D.off` later.
+
+```js
+const view3D = new View3D("#el", {
+  on: {
+    ready: evt => {
+      // DO_SOMETHING
+    }
+  }
+});
+```

@@ -1,7 +1,7 @@
 import React from "react";
-import * as THREE from "three";
 import clsx from "clsx";
-import VanillaView3D, { View3DOptions, ARButton, AROverlay } from "../../../src";
+import * as THREE from "three";
+import VanillaView3D, { View3DOptions, ARButton, AROverlay, LoadingBar, View3DPlugin } from "../../../src";
 import DownloadIcon from "../../static/icon/file_download_black.svg";
 
 import OptionExample from "./OptionExample";
@@ -9,23 +9,23 @@ import EventsList from "./EventsList";
 
 interface DemoOptions extends Partial<View3DOptions> {
   className: string;
-  poster: string | null;
   clickToLoad: boolean;
   showARButton: boolean;
+  showLoadingBar: boolean | string;
   showBbox: boolean;
   showExampleCode: boolean | string[];
   showEventsTriggered: null | string[];
 }
 
-class View3D extends React.Component<DemoOptions, {
+class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivElement>, {
   arAvailable: boolean;
   initialized: boolean;
 }> {
   public static defaultProps: DemoOptions = {
     className: "",
-    poster: null,
     clickToLoad: false,
     showARButton: false,
+    showLoadingBar: false,
     showBbox: false,
     showExampleCode: false,
     showEventsTriggered: null,
@@ -39,7 +39,7 @@ class View3D extends React.Component<DemoOptions, {
 
   public get view3D() { return this._view3D; }
 
-  public constructor(props: DemoOptions) {
+  public constructor(props: DemoOptions & React.HTMLAttributes<HTMLDivElement>) {
     super(props);
 
     this.state = {
@@ -49,10 +49,32 @@ class View3D extends React.Component<DemoOptions, {
   }
 
   public componentDidMount() {
-    const { children, showBbox, showARButton, showExampleCode, clickToLoad, ...restProps } = this.props;
+    const {
+      children,
+      showBbox,
+      showARButton,
+      showLoadingBar,
+      showExampleCode,
+      clickToLoad,
+      ...restProps
+    } = this.props;
+
+    const plugins: View3DPlugin[] = [];
+
+    if (showARButton) {
+      plugins.push(new ARButton(), new AROverlay());
+    }
+
+    if (showLoadingBar) {
+      const type = typeof showLoadingBar === "string"
+        ? showLoadingBar as any
+        : "default";
+      plugins.push(new LoadingBar({ type }));
+    }
 
     const options = {
       ...restProps,
+      plugins,
       autoInit: clickToLoad ? false : restProps.autoInit
     };
     const view3D = new VanillaView3D(this._rootRef.current, options);
@@ -72,10 +94,6 @@ class View3D extends React.Component<DemoOptions, {
         view3D.scene.add(boxHelper);
       });
     }
-
-    if (showARButton) {
-      void view3D.loadPlugins(new ARButton(), new AROverlay());
-    }
   }
 
   public componentWillUnmount() {
@@ -84,7 +102,7 @@ class View3D extends React.Component<DemoOptions, {
 
   public render() {
     const { initialized } = this.state;
-    const { children, className, poster, showExampleCode, clickToLoad, showEventsTriggered, ...restProps } = this.props;
+    const { children, className, showExampleCode, clickToLoad, showEventsTriggered, style, ...restProps } = this.props;
 
     const optionsToInclude = Array.isArray(showExampleCode) ? showExampleCode : [];
     const view3DOptions = Object.keys(restProps)
@@ -96,7 +114,7 @@ class View3D extends React.Component<DemoOptions, {
       }, {});
 
     return <>
-      <div ref={this._rootRef} className={clsx(className, "view3d-wrapper", "view3d-square", "mb-2")}>
+      <div ref={this._rootRef} className={clsx(className, "view3d-wrapper", "view3d-square", "mb-2")} style={style}>
         <canvas className="view3d-canvas"></canvas>
         { clickToLoad && <div className={clsx({ "view3d-overlay": true, "hidden": initialized })}>
           <div className="button is-medium" onClick={e => {
@@ -113,7 +131,6 @@ class View3D extends React.Component<DemoOptions, {
             <span>Load 3D model</span>
           </div>
         </div>}
-        { (poster && !initialized) && <img className="view3d-poster" src={poster} />}
         { showEventsTriggered && <EventsList view3D={this} events={showEventsTriggered} />}
         { children }
       </div>

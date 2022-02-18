@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 import View3D from "@site/src/components/View3D";
@@ -12,13 +12,14 @@ An event that fires when the 3D model is loaded but not displayed yet.
 |type|string|The type of event|
 |target|[View3D](/docs/api/View3D)|An instance of View3D that triggered this event|
 |model|[Model](/docs/api/Model)|A new model that loaded|
+|level|number|A level of model when loading multiple models at once, an integer starting from 0|
 
 <View3D
   src="/egjs-view3d/model/draco/alarm.glb"
   envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
   poster="/egjs-view3d/poster/alarm.png"
   clickToLoad
-  showEventsTriggered={["ready", "load", "modelChange"]} />
+  showEventsTriggered={["ready", "load", "loadStart", "modelChange"]} />
 
 <License items={[
   {

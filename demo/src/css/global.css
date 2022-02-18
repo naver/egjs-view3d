@@ -36,26 +36,6 @@ html[data-theme='dark'] .header-github-link::before {
   overflow-x: auto;
 }
 
-.view3d-events-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.view3d-events {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  display: flex;
-  max-width: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
-  padding: 0.5rem;
-  border-radius: 10px;
-}
-
 .view3d-overlay {
   position: absolute;
   bottom: 0;
@@ -72,11 +52,10 @@ html[data-theme='dark'] .header-github-link::before {
   display: none;
 }
 
-.view3d-poster {
+.view3d-demo-controls {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  display: flex;
   top: 0;
-  left: 0;
-  filter: blur(1rem);
+  right: 0;
+  flex-direction: column;
 }

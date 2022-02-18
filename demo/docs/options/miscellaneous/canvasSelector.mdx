@@ -1,0 +1,24 @@
+---
+sidebar_position: 2
+---
+
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+
+<OptionDescriptor type="string" defaultVal={'"canvas"'} />
+
+CSS Selector string for the canvas element.
+By default, View3D will select the first `<canvas>` element inside the wrapper.
+To change this behavior, you can use specific CSS selector to target the element.
+
+```html
+<div id="wrapper" class="view3d-wrapper">
+  <canvas id="NOT_ME"></canvas>
+  <canvas id="SELECT_ME" class="view3d-canvas"></canvas>
+</div>
+```
+
+```js
+new View3D("#wrapper", {
+  canvasSelector: "#SELECT_ME"
+})
+```

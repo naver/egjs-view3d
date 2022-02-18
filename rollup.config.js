@@ -1,6 +1,7 @@
 /* eslint-disable import/order */
 const glslify = require("rollup-plugin-glslify");
 const buildHelper = require("./config/build-helper");
+const { babel } = require("@rollup/plugin-babel");
 
 export const name = "View3D";
 export const fileName = "view3d";
@@ -10,10 +11,18 @@ const external = {
   "three/examples/jsm/loaders/GLTFLoader": "GLTFLoader",
   "three/examples/jsm/loaders/RGBELoader": "RGBELoader",
   "three/examples/jsm/loaders/DRACOLoader": "DRACOLoader",
-  "three/examples/jsm/loaders/KTX2Loader": "KTX2Loader"
+  "three/examples/jsm/loaders/KTX2Loader": "KTX2Loader",
+  "three/examples/jsm/lights/LightProbeGenerator": "LightProbeGenerator"
 };
 const tsconfig = "tsconfig.build.json";
-const plugins = [glslify()];
+const plugins = [
+  glslify(),
+  babel({
+    babelHelpers: "bundled",
+    include: ["src/**", "node_modules/three/**"],
+    configFile: "./babel.config.js"
+  })
+];
 
 const common = {
   sourcemap: false,

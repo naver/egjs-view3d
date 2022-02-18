@@ -2,6 +2,7 @@
  * Copyright (c) 2020 NAVER Corp.
  * egjs projects are licensed under the MIT license
  */
+import * as THREE from "three";
 import Component from "@egjs/component";
 
 import Renderer from "./core/Renderer";
@@ -21,7 +22,7 @@ import AutoPlayer, { AutoplayOptions } from "./core/AutoPlayer";
 import { WebARSessionOptions } from "./xr/WebARSession";
 import { SceneViewerSessionOptions } from "./xr/SceneViewerSession";
 import { QuickLookSessionOptions } from "./xr/QuickLookSession";
-import { EVENTS, AUTO, AR_SESSION_TYPE } from "./const/external";
+import { EVENTS, AUTO, AR_SESSION_TYPE, DEFAULT_CLASS } from "./const/external";
 import * as DEFAULT from "./const/default";
 import ERROR from "./const/error";
 import * as EVENT_TYPES from "./type/event";
@@ -36,6 +37,7 @@ import { GLTFLoader } from "./loader";
  */
 export interface View3DEvents {
   [EVENTS.READY]: EVENT_TYPES.ReadyEvent;
+  [EVENTS.LOAD_START]: EVENT_TYPES.LoadStartEvent;
   [EVENTS.LOAD]: EVENT_TYPES.LoadEvent;
   [EVENTS.MODEL_CHANGE]: EVENT_TYPES.ModelChangeEvent;
   [EVENTS.RESIZE]: EVENT_TYPES.ResizeEvent;
@@ -54,7 +56,7 @@ export interface View3DEvents {
  */
 export interface View3DOptions {
   // Model
-  src: string | null;
+  src: string | string[] | null;
   iosSrc: string | null;
   dracoPath: string;
   ktxPath: string;
@@ -80,6 +82,7 @@ export interface View3DOptions {
   background: number | string | null;
   exposure: number;
   shadow: boolean | Partial<ShadowOptions>;
+  skyboxBlur: boolean;
 
   // AR
   webAR: boolean | Partial<WebARSessionOptions>;
@@ -88,17 +91,20 @@ export interface View3DOptions {
   arPriority: Array<ValueOf<typeof AR_SESSION_TYPE>>;
 
   // Others
+  poster: string | null;
   canvasSelector: string;
   autoInit: boolean;
   autoResize: boolean;
   useResizeObserver: boolean;
+  on: Partial<View3DEvents>;
+  plugins: View3DPlugin[];
 }
 
 /**
  * @extends Component
  * @see https://naver.github.io/egjs-component/
  */
-class View3D extends Component<View3DEvents> implements OptionGetters<View3DOptions> {
+class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3DOptions, "on">> {
   /**
    * Current version of the View3D
    * @type {string}
@@ -119,6 +125,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
 
   // Internal States
   private _rootEl: HTMLElement;
+  private _plugins: View3DPlugin[];
   private _initialized: boolean;
 
   // Options
@@ -146,12 +153,14 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
   private _background: View3DOptions["background"];
   private _exposure: View3DOptions["exposure"];
   private _shadow: View3DOptions["shadow"];
+  private _skyboxBlur: View3DOptions["skyboxBlur"];
 
   private _webAR: View3DOptions["webAR"];
   private _sceneViewer: View3DOptions["sceneViewer"];
   private _quickLook: View3DOptions["quickLook"];
   private _arPriority: View3DOptions["arPriority"];
 
+  private _poster: View3DOptions["poster"];
   private _canvasSelector: View3DOptions["canvasSelector"];
   private _autoInit: View3DOptions["autoInit"];
   private _autoResize: View3DOptions["autoResize"];
@@ -220,6 +229,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    * @readonly
    */
   public get initialized() { return this._initialized; }
+  /**
+   * Active plugins of view3D
+   * @type {View3DPlugin[]}
+   * @readonly
+   */
+  public get plugins() { return this._plugins; }
 
   // Options Getter
   /**
@@ -372,6 +387,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    */
   public get shadow() { return this._shadow; }
   /**
+   * Apply blur to the current skybox image.
+   * @type {boolean}
+   * @default false
+   */
+  public get skyboxBlur() { return this._skyboxBlur; }
+  /**
    * Options for the WebXR-based AR session.
    * If `false` is given, it will disable WebXR-based AR session.
    * @type {boolean | WebARSessionOptions}
@@ -402,6 +423,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    * @default ["webAR", "sceneViewer", "quickLook"]
    */
   public get arPriority() { return this._arPriority; }
+  /**
+   * A URL to the image that will be displayed before the 3D model is loaded.
+   * @type {string | null}
+   * @default null
+   */
+  public get poster() { return this._poster; }
   /**
    * CSS Selector for the canvas element.
    * @type {string}
@@ -444,6 +471,20 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._exposure = val;
   }
 
+  public set skyboxBlur(val: View3DOptions["skyboxBlur"]) {
+    this._skyboxBlur = val;
+    const scene = this._scene;
+    const origEnvmapTexture = scene.root.environment;
+
+    if (origEnvmapTexture && !!scene.skybox) {
+      if (val) {
+        scene.skybox.useBlurredHDR(origEnvmapTexture);
+      } else {
+        scene.skybox.useTexture(origEnvmapTexture);
+      }
+    }
+  }
+
   public set useGrabCursor(val: View3DOptions["useGrabCursor"]) {
     this._useGrabCursor = val;
     this._control.updateCursor();
@@ -468,9 +509,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     ktxPath = DEFAULT.KTX_TRANSCODER_URL,
     meshoptPath = null,
     fixSkinnedBbox = false,
-    skybox = null,
-    envmap = null,
-    background = null,
     fov = AUTO,
     center = AUTO,
     yaw = 0,
@@ -478,20 +516,27 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     rotate = true,
     translate = true,
     zoom = true,
-    exposure = 1,
-    shadow = true,
     autoplay = false,
     scrollable = true,
     wheelScrollable = false,
     useGrabCursor = true,
+    skybox = null,
+    envmap = null,
+    background = null,
+    exposure = 1,
+    shadow = true,
+    skyboxBlur = false,
     webAR = true,
     sceneViewer = true,
     quickLook = true,
     arPriority = DEFAULT.AR_PRIORITY,
+    poster = null,
     canvasSelector = "canvas",
     autoInit = true,
     autoResize = true,
-    useResizeObserver = true
+    useResizeObserver = true,
+    on = {},
+    plugins = []
   }: Partial<View3DOptions> = {}) {
     super();
 
@@ -522,12 +567,14 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._background = background;
     this._exposure = exposure;
     this._shadow = shadow;
+    this._skyboxBlur = skyboxBlur;
 
     this._webAR = webAR;
     this._sceneViewer = sceneViewer;
     this._quickLook = quickLook;
     this._arPriority = arPriority;
 
+    this._poster = poster;
     this._canvasSelector = canvasSelector;
     this._autoInit = autoInit;
     this._autoResize = autoResize;
@@ -538,16 +585,23 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._camera = new Camera(this);
     this._control = new OrbitControl(this);
     this._scene = new Scene(this);
-    this._animator = new ModelAnimator(this._scene.userObjects);
+    this._animator = new ModelAnimator(this);
     this._autoPlayer = new AutoPlayer(this, getObjectOption(autoplay));
     this._autoResizer = new AutoResizer(this);
     this._arManager = new ARManager(this);
     this._model = null;
     this._initialized = false;
+    this._plugins = plugins;
 
-    if (src && autoInit) {
-      void this.init();
-    }
+    this._addEventHandlers(on);
+    this._addPosterImage();
+
+    void this._initPlugins(plugins)
+      .then(() => {
+        if (src && autoInit) {
+          void this.init();
+        }
+      });
   }
 
   /**
@@ -559,6 +613,9 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     this._renderer.stopAnimationLoop();
     this._control.destroy();
     this._autoResizer.disable();
+    this._animator.reset();
+    this._plugins.forEach(plugin => plugin.teardown(this));
+    this._plugins = [];
   }
 
   /**
@@ -576,6 +633,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     }
 
     const scene = this._scene;
+    const renderer = this._renderer;
     const skybox = this._skybox;
     const envmap = this._envmap;
     const background = this._background;
@@ -585,24 +643,30 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
       await GLTFLoader.setMeshoptDecoder(meshoptPath);
     }
 
-    const tasks: [Promise<Model>, ...Array<Promise<any>>] = [
-      this._loadModel(this._src)
-    ];
-
     // Load & set skybox / envmap before displaying model
-    if (skybox) {
-      tasks.push(scene.setSkybox(skybox));
-    } else if (envmap) {
-      tasks.push(scene.setEnvMap(envmap));
+    const hasEnvmap = skybox || envmap;
+    if (hasEnvmap) {
+      const tempLight = new THREE.AmbientLight();
+      scene.add(tempLight, false);
+
+      const loadEnv = skybox
+        ? scene.setSkybox(skybox)
+        : scene.setEnvMap(envmap);
+
+      void loadEnv.then(() => {
+        scene.remove(tempLight);
+      });
     }
 
     if (!skybox && background) {
-      tasks.push(scene.setBackground(background));
+      void scene.setBackground(background);
     }
 
-    const [model] = await Promise.all(tasks);
+    await this._loadModel(this._src);
 
-    this._display(model);
+    // Start rendering
+    renderer.stopAnimationLoop();
+    renderer.setAnimationLoop(renderer.defaultRenderLoop);
 
     this._control.enable();
     if (this._autoplay) {
@@ -618,26 +682,31 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
    * @returns {void}
    */
   public resize() {
-    this._renderer.resize();
+    const renderer = this._renderer;
+    renderer.resize();
 
-    const newSize = this._renderer.size;
+    const newSize = renderer.size;
     this._camera.resize(newSize);
     this._control.resize(newSize);
+
+    if (!renderer.threeRenderer.xr.isPresenting) {
+      // Prevent flickering on resize
+      renderer.defaultRenderLoop(0);
+    }
 
     this.trigger(EVENTS.RESIZE, { ...newSize, type: EVENTS.RESIZE, target: this });
   }
 
   /**
    * Load a new 3D model and replace it with the current one
-   * @param {string} src Source URL to fetch 3D model from
+   * @param {string | string[]} src Source URL to fetch 3D model from
    */
-  public async load(src: string) {
+  public async load(src: string | string[]) {
     if (this._initialized) {
-      const model = await this._loadModel(src);
+      await this._loadModel(src);
 
+      // Change the src later as an error can occur while loading the model
       this._src = src;
-
-      this._display(model);
     } else {
       this._src = src;
 
@@ -645,24 +714,17 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     }
   }
 
-  public async loadPlugins(...plugins: View3DPlugin[]) {
-    return Promise.all(plugins.map(plugin => plugin.init(this)));
-  }
-
-  private async _loadModel(src: string) {
-    const loader = new GLTFLoader(this);
-    const model = await loader.load(src);
-
-    this.trigger(EVENTS.LOAD, {
-      type: EVENTS.LOAD,
-      target: this,
-      model
-    });
-
-    return model;
-  }
-
-  private _display(model: Model): void {
+  /**
+   * Display the given model in the canvas
+   * @param {Model} model A model to display
+   * @param {object} options Options for displaying model
+   * @param {boolean} [options.resetCamera=true] Reset camera to default pose
+   */
+  public display(model: Model, {
+    resetCamera = true
+  }: Partial<{
+    resetCamera: boolean;
+  }> = {}): void {
     const renderer = this._renderer;
     const scene = this._scene;
     const camera = this._camera;
@@ -673,8 +735,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
     scene.add(model.scene);
     scene.shadowPlane.update(model);
 
-    camera.fit(model, this._center);
-    void camera.reset(0);
+    if (resetCamera) {
+      camera.fit(model, this._center);
+      void camera.reset(0);
+    }
 
     animator.reset();
     animator.setClips(model.animations);
@@ -685,10 +749,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
 
     this._model = model;
 
-    if (!inXR) {
-      renderer.stopAnimationLoop();
-      renderer.setAnimationLoop(renderer.defaultRenderLoop);
-    } else {
+    if (inXR) {
       const activeSession = this._arManager.activeSession;
 
       if (activeSession) {
@@ -701,6 +762,129 @@ class View3D extends Component<View3DEvents> implements OptionGetters<View3DOpti
       target: this,
       model
     });
+  }
+
+  /**
+   * Add new plugins to View3D
+   * @param {View3DPlugin[]} plugins Plugins to add
+   * @returns {Promise<void>} A promise that resolves when all plugins are initialized
+   */
+  public async loadPlugins(...plugins: View3DPlugin[]) {
+    await this._initPlugins(plugins);
+    this._plugins.push(...plugins);
+  }
+
+  /**
+   * Remove plugins from View3D
+   * @param {View3DPlugin[]} plugins Plugins to remove
+   * @returns {Promise<void>} A promise that resolves when all plugins are removed
+   */
+  public async removePlugins(...plugins: View3DPlugin[]) {
+    await Promise.all(plugins.map(plugin => plugin.teardown(this)));
+
+    plugins.forEach(plugin => {
+      const pluginIdx = this._plugins.indexOf(plugin);
+
+      if (pluginIdx < 0) return;
+
+      this._plugins.splice(pluginIdx, 1);
+    });
+  }
+
+  /**
+   * Take a screenshot of current rendered canvas image and download it
+   */
+  public screenshot(fileName = "screenshot") {
+    const canvas = this._renderer.canvas;
+    const imgURL = canvas.toDataURL("png");
+
+    const anchorEl = document.createElement("a");
+    anchorEl.href = imgURL;
+    anchorEl.download = fileName;
+    anchorEl.click();
+  }
+
+  private async _loadModel(src: string | string[]) {
+    const loader = new GLTFLoader(this);
+
+    if (Array.isArray(src)) {
+      const loaded = src.map(() => false);
+      const loadModels = src.map(async (srcLevel, level) => {
+        this.trigger(EVENTS.LOAD_START, {
+          type: EVENTS.LOAD_START,
+          target: this,
+          src: srcLevel,
+          level
+        });
+
+        const model = await loader.load(srcLevel);
+        const higherLevelLoaded = loaded.slice(level + 1).some(val => !!val);
+        const modelLoadedBefore = loaded.some(val => !!val);
+
+        this.trigger(EVENTS.LOAD, {
+          type: EVENTS.LOAD,
+          target: this,
+          model,
+          level
+        });
+
+        loaded[level] = true;
+
+        if (higherLevelLoaded) return;
+
+        this.display(model, {
+          resetCamera: !modelLoadedBefore
+        });
+      });
+
+      await Promise.race(loadModels);
+    } else {
+      this.trigger(EVENTS.LOAD_START, {
+        type: EVENTS.LOAD_START,
+        target: this,
+        src,
+        level: 0
+      });
+
+      const model = await loader.load(src);
+
+      this.trigger(EVENTS.LOAD, {
+        type: EVENTS.LOAD,
+        target: this,
+        model,
+        level: 0
+      });
+
+      this.display(model);
+    }
+  }
+
+  private _addEventHandlers(events: Partial<View3DEvents>) {
+    Object.keys(events).forEach((evtName: keyof typeof EVENT_TYPES) => {
+      this.on(evtName, events[evtName]);
+    });
+  }
+
+  private _addPosterImage() {
+    const poster = this._poster;
+    const rootEl = this._rootEl;
+
+    if (!poster) return;
+
+    const imgEl = document.createElement("img");
+    imgEl.className = DEFAULT_CLASS.POSTER;
+    imgEl.src = poster;
+
+    rootEl.appendChild(imgEl);
+
+    this.once(EVENTS.READY, () => {
+      if (imgEl.parentElement !== rootEl) return;
+      rootEl.removeChild(imgEl);
+    });
+  }
+
+  private async _initPlugins(plugins: View3DPlugin[]) {
+    await Promise.all(plugins.map(plugin => plugin.init(this)));
   }
 }
 

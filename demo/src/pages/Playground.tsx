@@ -1,31 +1,49 @@
 import React from "react";
 import clsx from "clsx";
-import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter";
+import ReactTooltip from "react-tooltip";
 import Swal from "sweetalert2";
 // @ts-ignore
 import Layout from "@theme/Layout";
 // @ts-ignore
 import styles from "./playground.module.css";
 
-import VanillaView3D, { GLTFLoader } from "../../../src";
-import ModelChange from "../components/playground/ModelChange";
-import EnvmapChange from "../components/playground/EnvmapChange";
+import VanillaView3D, { GLTFLoader, LoadingBar } from "../../../src";
+import ModelTab from "../components/playground/tab/ModelTab";
+import EnvironmentTab from "../components/playground/tab/EnvironmentTab";
+import DownloadTab from "../components/playground/tab/DownloadTab";
+import ModelInfo from "../components/playground/ModelInfo";
 import ResetIcon from "../../static/icon/reset.svg";
+
+const menus = [
+  {
+    name: "Model"
+  },
+  {
+    name: "Environment"
+  },
+  {
+    name: "Download"
+  }
+];
 
 class Playground extends React.Component<{}, {
   initialized: boolean;
   isLoading: boolean;
+  selectedMenu: number;
 }> {
-  private _view3D;
-  private _skyboxRef = React.createRef<HTMLInputElement>();
+  public originalModel;
+  private _view3D: VanillaView3D;
   private _loader;
+
+  public get view3D() { return this._view3D; }
 
   public constructor(props) {
     super(props);
 
     this.state = {
       initialized: false,
-      isLoading: false
+      isLoading: false,
+      selectedMenu: 0
     };
   }
 
@@ -35,7 +53,11 @@ class Playground extends React.Component<{}, {
     const view3D = new VanillaView3D("#playground-view3d", {
       src: "/egjs-view3d/model/cube.glb",
       skybox: "/egjs-view3d/texture/artist_workshop_1k.hdr",
-      autoplay: true
+      autoplay: true,
+      plugins: [new LoadingBar({ type: "top" })]
+    }).on("ready", () => {
+      this.originalModel = view3D.model;
+      this.setState({});
     });
 
     void GLTFLoader.setMeshoptDecoder("/egjs-view3d/lib/meshopt_decoder.js");
@@ -53,15 +75,19 @@ class Playground extends React.Component<{}, {
 
       if (hdri) {
         const hdriURL = URL.createObjectURL(e.files.get(hdri));
-        void this._onEnvmapChange(hdriURL);
+        void this.onEnvmapChange(hdriURL);
       } else {
-        void this._onFileChange(e.files);
+        void this.onFileChange(e.files);
       }
     });
   }
 
+  public componentDidUpdate() {
+    ReactTooltip.rebuild();
+  }
+
   public render() {
-    const { initialized, isLoading } = this.state;
+    const { initialized, isLoading, selectedMenu } = this.state;
 
     return <Layout>
       <div className={styles.playgroundRoot}>
@@ -76,67 +102,55 @@ class Playground extends React.Component<{}, {
           }
           <div id="playground-view3d" className={clsx("view3d-wrapper", styles.playground)}>
             <canvas className="view3d-canvas"></canvas>
-            <div className={clsx(styles.resetBtn, "button", "is-rounded")} onClick={() => { this._view3D.camera.reset(500); }}>
+            <div data-tip="Reset Camera" className={clsx(styles.resetBtn, "button", "is-rounded")} onClick={() => { void this._view3D.camera.reset(500); }}>
               <ResetIcon width="32" height="32" />
-              <div className={styles.tooltip}>Reset Camera</div>
             </div>
+            <ModelInfo playground={this} />
           </div>
         </div>
-        <aside className={clsx("menu", "p-4", styles.control)}>
-          <ModelChange onSelect={this._onModelSelect} onUpload={this._onFileChange} isLoading={isLoading} />
-          <EnvmapChange onChange={this._onEnvmapChange} onExposureChange={val => this._view3D.exposure = val} isLoading={isLoading} />
-          <div className="is-flex is-align-items-center mb-4">
-            <span className="mr-2">Show Skybox</span>
-            <input ref={this._skyboxRef} type="checkbox" defaultChecked={true} onChange={e => {
-              const view3D = this._view3D;
-              const root = view3D.scene.root;
-              const checked = e.currentTarget.checked;
-
-              if (checked) {
-                root.background = root.environment;
-              } else {
-                root.background = null;
-              }
-            }}></input>
+        <aside className={clsx(styles.control)}>
+          <div className={clsx(styles.asideMenu)}>
+            { menus.map((menu, menuIdx) => (
+              <div
+                key={menuIdx}
+                onClick={() => { this.setState({ selectedMenu: menuIdx }); }}
+                className={clsx(styles.asideMenuItem, menuIdx === selectedMenu ? styles.selected : "")}>
+                { menu.name }
+              </div>
+            )) }
           </div>
-          <button className="button" disabled={isLoading} onClick={this._downloadModel}>
-            <img className="mr-2" src="/egjs-view3d/icon/file_download_black.svg" />
-            <span>Download .glb</span>
-          </button>
+          <div className={clsx(styles.asideContent, "bulma-menu", "p-4")}>
+            {(() => {
+              if (selectedMenu === 0) {
+                return <ModelTab playground={this} isLoading={isLoading} onFileChange={this.onFileChange} />;
+              } else if (selectedMenu === 1) {
+                return <EnvironmentTab playground={this} isLoading={isLoading} onEnvmapChange={this.onEnvmapChange} />;
+              } else {
+                return <DownloadTab playground={this} isLoading={isLoading} />;
+              }
+            })()}
+          </div>
         </aside>
       </div>
+      <ReactTooltip effect="solid" />
     </Layout>;
   }
 
-  private _onModelSelect = async (e) => {
-    const view3D = this._view3D;
-    const selected = e.target.value;
-    if (!selected) return;
-
-    this.setState({ isLoading: true });
-
-    await view3D.load(selected);
-    view3D.autoPlayer.disable();
-
-    this.setState({
-      initialized: true,
-      isLoading: false
-    });
-  };
-
-  private _onFileChange = async (fileMap) => {
+  public onFileChange = async (fileMap) => {
     this.setState({ isLoading: true });
 
     try {
-      const view3D = this._view3D as any;
+      const view3D = this._view3D;
       const files = Array.from(fileMap) as Array<[string, File]>;
       const loader = this._loader;
       const model = await loader.loadFromFiles(files.map(([name, file]) => file));
 
-      view3D._src = model.src;
+      (view3D as any)._src = model.src;
 
-      view3D._display(model);
+      view3D.display(model);
       view3D.autoPlayer.disable();
+
+      this.originalModel = model;
 
       this.setState({
         initialized: true,
@@ -154,16 +168,18 @@ class Playground extends React.Component<{}, {
     }
   };
 
-  private _onEnvmapChange = async (url) => {
+  public onEnvmapChange = async (url) => {
     try {
       const view3D = this._view3D;
+      const wasSkyboxEnabled = view3D.scene.skybox.enabled;
 
       this.setState({ isLoading: true });
 
-      if (this._skyboxRef.current.checked) {
-        view3D.skybox = url;
-      } else {
-        view3D.envmap = url;
+      await view3D.scene.setSkybox(url);
+      (view3D as any)._skybox = url;
+
+      if (!wasSkyboxEnabled) {
+        view3D.scene.skybox.disable();
       }
     } catch (err) {
       void Swal.fire({
@@ -174,40 +190,6 @@ class Playground extends React.Component<{}, {
     } finally {
       this.setState({ isLoading: false });
       URL.revokeObjectURL(url);
-    }
-  };
-
-  private _downloadModel = () => {
-    try {
-      this.setState({ isLoading: true });
-
-      const origModel = this._view3D.model;
-
-      new GLTFExporter().parse(origModel.scene, gltf => {
-        const tempAnchorTag = document.createElement("a");
-
-        const blob = new Blob([gltf as ArrayBuffer]);
-        const url = URL.createObjectURL(blob);
-
-        const nameGuessRegex = /(\w+)\.\w+$/i;
-        const regexRes = nameGuessRegex.exec(origModel.src);
-        const modelName = (!regexRes || !regexRes[1])
-          ? "model"
-          : regexRes[1];
-
-        tempAnchorTag.href = url;
-        tempAnchorTag.download = `${modelName}.glb`;
-        tempAnchorTag.click();
-        URL.revokeObjectURL(url);
-      }, { binary: true, animations: origModel.animations, includeCustomExtensions: true });
-    } catch (err) {
-      void Swal.fire({
-        title: "Error!",
-        text: err.message,
-        icon: "error"
-      });
-    } finally {
-      this.setState({ isLoading: false });
     }
   };
 }
