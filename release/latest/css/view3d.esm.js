@@ -4,11 +4,12 @@ name: @egjs/view3d
 license: MIT
 author: NAVER Corp.
 repository: https://github.com/naver/egjs-view3d
-version: 2.0.0
+version: 2.1.0
 */
+import { Vector3, Vector2, WebGLRenderer, LinearToneMapping, sRGBEncoding, Clock, PCFSoftShadowMap, TextureLoader as TextureLoader$1, EquirectangularReflectionMapping, CubeTextureLoader, PlaneBufferGeometry, ShadowMaterial, Mesh, DirectionalLight, Sphere, Scene as Scene$1, PerspectiveCamera, WebGLCubeRenderTarget, RGBAFormat, CubeCamera, MeshStandardMaterial, BackSide, IcosahedronBufferGeometry, Color, Group, AnimationMixer, Quaternion, Plane, Matrix4, Ray, Euler, CanvasTexture, PlaneGeometry, MeshBasicMaterial, RingGeometry, CircleGeometry, Box3, Vector4, DefaultLoadingManager, LoadingManager, AmbientLight } from 'three';
 import Component from '@egjs/component';
-import { Vector3, Vector2, WebGLRenderer, LinearToneMapping, sRGBEncoding, Clock, PCFSoftShadowMap, TextureLoader as TextureLoader$1, CubeTextureLoader, PMREMGenerator, PlaneBufferGeometry, ShadowMaterial, Mesh, DirectionalLight, Sphere, Scene as Scene$1, Group, Color, PerspectiveCamera, AnimationMixer, Quaternion, Plane, Matrix4, Ray, Euler, CanvasTexture, PlaneGeometry, MeshBasicMaterial, RingGeometry, CircleGeometry, Box3, Vector4, LoadingManager } from 'three';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader';
+import { LightProbeGenerator } from 'three/examples/jsm/lights/LightProbeGenerator';
 import { GLTFLoader as GLTFLoader$1 } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader';
@@ -258,6 +259,7 @@ const AUTO = "auto";
  * Event type object with event name strings of {@link View3D}
  * @type {object}
  * @property {"ready"} READY {@link /docs/events/ready Ready event}
+ * @property {"loadStart"} LOAD_START {@link /docs/events/loadStart Load start event}
  * @property {"load"} LOAD {@link /docs/events/load Load event}
  * @property {"resize"} RESIZE {@link /docs/events/resize Resize event}
  * @property {"beforeRender"} BEFORE_RENDER {@link /docs/events/beforeRender Before render event}
@@ -276,6 +278,7 @@ const AUTO = "auto";
 
 const EVENTS = {
   READY: "ready",
+  LOAD_START: "loadStart",
   LOAD: "load",
   MODEL_CHANGE: "modelChange",
   RESIZE: "resize",
@@ -320,6 +323,9 @@ const EASING = {
       return n1 * (x -= 2.625 / d1) * x + 0.984375;
     }
   }
+};
+const DEFAULT_CLASS = {
+  POSTER: "view3d-poster"
 };
 /**
  * Available AR session types
@@ -399,6 +405,7 @@ class Renderer {
   constructor(view3D) {
     this._defaultRenderLoop = delta => {
       const view3D = this._view3D;
+      const threeRenderer = this._renderer;
       const {
         scene,
         camera,
@@ -416,9 +423,16 @@ class Renderer {
         delta: deltaMiliSec
       });
       camera.updatePosition();
+      threeRenderer.autoClear = false;
+      threeRenderer.clear();
 
-      this._renderer.render(scene.root, camera.threeCamera);
+      if (scene.skybox) {
+        scene.skybox.updateCamera();
+        threeRenderer.render(scene.skybox.scene, scene.skybox.camera);
+      }
 
+      threeRenderer.render(scene.root, camera.threeCamera);
+      threeRenderer.autoClear = true;
       view3D.trigger(EVENTS.RENDER, {
         type: EVENTS.RENDER,
         target: view3D,
@@ -437,6 +451,7 @@ class Renderer {
     renderer.toneMapping = LinearToneMapping;
     renderer.toneMappingExposure = view3D.exposure;
     renderer.outputEncoding = sRGBEncoding;
+    renderer.setClearColor(0x000000, 0);
     this._renderer = renderer;
     this._clock = new Clock(false);
     this.enableShadow();
@@ -590,8 +605,9 @@ class TextureLoader {
   loadEquirectagularTexture(url) {
     return new Promise((resolve, reject) => {
       const loader = new TextureLoader$1();
-      loader.load(url, skyboxTexture => {
-        resolve(this._equirectToCubemap(skyboxTexture));
+      loader.load(url, texture => {
+        texture.mapping = EquirectangularReflectionMapping;
+        resolve(texture);
       }, undefined, reject);
     });
   }
@@ -612,7 +628,6 @@ class TextureLoader {
   /**
    * Create new texture with given HDR(RGBE) image url
    * @param url image url
-   * @param isEquirectangular Whether to read this image as a equirectangular texture
    */
 
 
@@ -621,16 +636,10 @@ class TextureLoader {
       const loader = new RGBELoader();
       loader.setCrossOrigin("anonymous");
       loader.load(url, texture => {
-        resolve(this._equirectToCubemap(texture));
+        texture.mapping = EquirectangularReflectionMapping;
+        resolve(texture);
       }, undefined, reject);
     });
-  }
-
-  _equirectToCubemap(texture) {
-    const pmremGenerator = new PMREMGenerator(this._renderer.threeRenderer);
-    const hdrCubeRenderTarget = pmremGenerator.fromEquirectangular(texture);
-    pmremGenerator.compileCubemapShader();
-    return hdrCubeRenderTarget;
   }
 
 }
@@ -661,6 +670,8 @@ var GESTURE;
   GESTURE[GESTURE["PINCH"] = 16] = "PINCH";
 })(GESTURE || (GESTURE = {}));
 
+const CUSTOM_TEXTURE_LOD_EXTENSION = "EXT_View3D_texture_LOD";
+
 /*
  * Copyright (c) 2020 NAVER Corp.
  * egjs projects are licensed under the MIT license
@@ -682,6 +693,11 @@ const EVENTS$1 = {
   MOUSE_LEAVE: "mouseleave",
   LOAD: "load",
   ERROR: "error"
+};
+const CURSOR = {
+  GRAB: "grab",
+  GRABBING: "grabbing",
+  NONE: ""
 }; // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
 
 var MOUSE_BUTTON;
@@ -806,8 +822,23 @@ class ShadowPlane {
     return this._pitch;
   }
 
+  get radius() {
+    return this._light.shadow.radius;
+  }
+
   set opacity(val) {
     this._material.opacity = val;
+  }
+
+  set hardness(val) {
+    this._hardness = Math.min(val, this._maxHardness);
+
+    this._updateSoftnessLevel();
+  }
+
+  set radius(val) {
+    this._light.shadow.radius = val;
+    this._light.shadow.needsUpdate = true;
   }
 
   update(model) {
@@ -835,10 +866,14 @@ class ShadowPlane {
   }
 
   _updateSoftnessLevel() {
+    var _a;
+
     const light = this._light;
     const hardness = clamp(Math.floor(this._hardness), 1, this._maxHardness);
-    const shadowSize = Math.pow(2, hardness);
+    const shadowSize = Math.pow(2, Math.floor(hardness));
     light.shadow.mapSize.set(shadowSize, shadowSize);
+    (_a = light.shadow.map) === null || _a === void 0 ? void 0 : _a.dispose();
+    light.shadow.map = null;
   }
 
   _updatePlane(model) {
@@ -864,6 +899,121 @@ class ShadowPlane {
 
 }
 
+/**
+ * Skybox that can renders background in a different scene.
+ */
+
+class Skybox {
+  /** */
+  constructor(view3D) {
+    this._view3D = view3D;
+    this._scene = new Scene$1();
+    this._camera = new PerspectiveCamera();
+  }
+
+  get scene() {
+    return this._scene;
+  }
+
+  get camera() {
+    return this._camera;
+  }
+  /**
+   * Destroy skybox and release all memories
+   */
+
+
+  destroy() {
+    this._disposeOldSkybox();
+  }
+  /**
+   * Update current skybox camera to match main camera & apply rotation
+   */
+
+
+  updateCamera() {
+    const view3D = this._view3D;
+    const bgCam = this._camera;
+    const camera = view3D.camera;
+    const pivot = camera.currentPose.pivot;
+    bgCam.copy(camera.threeCamera);
+    bgCam.lookAt(pivot);
+    bgCam.updateProjectionMatrix();
+  }
+  /**
+   * Create blurred cubemap texture of the given texture and use that as the skybox
+   * @param {THREE.Texture} texture Equirect texture
+   * @returns {this}
+   */
+
+
+  useBlurredHDR(texture) {
+    this._disposeOldSkybox();
+
+    const threeRenderer = this._view3D.renderer.threeRenderer;
+    const bgScene = new Scene$1();
+    bgScene.background = texture; // To prevent exposure applied twice
+
+    const origExposure = threeRenderer.toneMappingExposure;
+    threeRenderer.toneMappingExposure = 1;
+    const cubeRenderTarget = new WebGLCubeRenderTarget(256, {
+      encoding: sRGBEncoding,
+      format: RGBAFormat
+    });
+    const cubeCamera = new CubeCamera(0.1, 1000, cubeRenderTarget);
+    cubeCamera.update(threeRenderer, bgScene);
+    const lightProbe = LightProbeGenerator.fromCubeRenderTarget(threeRenderer, cubeRenderTarget);
+    const skyboxMat = new MeshStandardMaterial({
+      side: BackSide
+    });
+    const geometry = new IcosahedronBufferGeometry(1, 4);
+    const skyboxScene = new Scene$1();
+    const skyboxMesh = new Mesh(geometry, skyboxMat);
+    const normals = geometry.getAttribute("normal");
+
+    for (let i = 0; i < normals.count; i++) {
+      normals.setXYZ(i, -normals.getX(i), -normals.getY(i), -normals.getZ(i));
+    }
+
+    skyboxScene.add(skyboxMesh);
+    skyboxScene.add(lightProbe);
+    cubeCamera.update(threeRenderer, skyboxScene);
+    threeRenderer.toneMappingExposure = origExposure;
+    this._scene.background = cubeRenderTarget.texture;
+    return this;
+  }
+  /**
+   * Use the given texture as a skybox scene background
+   * @param {THREE.Texture} texture A texture that compatible for scene background
+   * @returns {this}
+   */
+
+
+  useTexture(texture) {
+    this._scene.background = texture;
+    return this;
+  }
+  /**
+   * Use the given color as a skybox scene background
+   * @param {number | string} color A hexadecimal number or string that represents color
+   * @returns {this}
+   */
+
+
+  useColor(color) {
+    this._scene.background = new Color(color);
+    return this;
+  }
+
+  _disposeOldSkybox() {
+    const skyboxTexture = this._scene.background;
+    if (!skyboxTexture) return;
+    skyboxTexture.dispose();
+    this._scene.background = null;
+  }
+
+}
+
 /*
  * Copyright (c) 2020 NAVER Corp.
  * egjs projects are licensed under the MIT license
@@ -876,10 +1026,12 @@ class ShadowPlane {
 class Scene {
   /**
    * Create new Scene instance
+   * @param {View3D} view3D An instance of View3D
    */
   constructor(view3D) {
     this._view3D = view3D;
     this._root = new Scene$1();
+    this._skybox = null;
     this._userObjects = new Group();
     this._envObjects = new Group();
     this._fixedObjects = new Group();
@@ -900,6 +1052,7 @@ class Scene {
   }
   /**
    * Root {@link https://threejs.org/docs/#api/en/scenes/Scene THREE.Scene} object
+   * @readonly
    */
 
 
@@ -907,8 +1060,19 @@ class Scene {
     return this._root;
   }
   /**
+   * Skybox object for rendering background
+   * @type {Skybox}
+   * @readonly
+   */
+
+
+  get skybox() {
+    return this._skybox;
+  }
+  /**
    * Shadow plane & light
    * @type {ShadowPlane}
+   * @readonly
    */
 
 
@@ -917,6 +1081,7 @@ class Scene {
   }
   /**
    * Group that contains volatile user objects
+   * @readonly
    */
 
 
@@ -925,6 +1090,7 @@ class Scene {
   }
   /**
    * Group that contains non-volatile user objects
+   * @readonly
    */
 
 
@@ -933,6 +1099,7 @@ class Scene {
   }
   /**
    * Group that contains objects that View3D manages
+   * @readonly
    */
 
 
@@ -979,7 +1146,9 @@ class Scene {
   remove(object) {
     const objects = Array.isArray(object) ? object : [object];
 
-    this._root.remove(...objects);
+    this._userObjects.remove(...objects);
+
+    this._envObjects.remove(...objects);
   }
   /**
    * Set background of the scene.
@@ -990,15 +1159,17 @@ class Scene {
 
   setBackground(background) {
     return __awaiter(this, void 0, void 0, function* () {
-      const root = this._root;
+      const view3D = this._view3D;
+      const skybox = new Skybox(view3D);
+      this._skybox = skybox;
 
       if (typeof background === "number" || background.charAt(0) === "#") {
-        root.background = new Color(background);
+        skybox.useColor(background);
       } else {
         const textureLoader = new TextureLoader(this._view3D.renderer);
         const texture = yield textureLoader.load(background);
         texture.encoding = sRGBEncoding;
-        root.background = texture;
+        skybox.useTexture(texture);
       }
     });
   }
@@ -1010,16 +1181,29 @@ class Scene {
 
 
   setSkybox(url) {
+    var _a;
+
     return __awaiter(this, void 0, void 0, function* () {
       const root = this._root;
+      const view3D = this._view3D; // Destroy previous skybox
+
+      (_a = this._skybox) === null || _a === void 0 ? void 0 : _a.destroy();
 
       if (url) {
-        const textureLoader = new TextureLoader(this._view3D.renderer);
-        const renderTarget = yield textureLoader.loadHDRTexture(url);
-        root.background = renderTarget.texture;
-        root.environment = renderTarget.texture;
+        const textureLoader = new TextureLoader(view3D.renderer);
+        const texture = yield textureLoader.loadHDRTexture(url);
+        const skybox = new Skybox(view3D);
+
+        if (view3D.skyboxBlur) {
+          skybox.useBlurredHDR(texture);
+        } else {
+          skybox.useTexture(texture);
+        }
+
+        this._skybox = skybox;
+        root.environment = texture;
       } else {
-        root.background = null;
+        this._skybox = null;
         root.environment = null;
       }
     });
@@ -1035,8 +1219,8 @@ class Scene {
     return __awaiter(this, void 0, void 0, function* () {
       if (url) {
         const textureLoader = new TextureLoader(this._view3D.renderer);
-        const renderTarget = yield textureLoader.loadHDRTexture(url);
-        this._root.environment = renderTarget.texture;
+        const texture = yield textureLoader.loadHDRTexture(url);
+        this._root.environment = texture;
       } else {
         this._root.environment = null;
       }
@@ -1699,9 +1883,9 @@ class Camera {
 
     currentPose.yaw = circulate(currentPose.yaw, 0, 360);
     currentPose.pitch = clamp(currentPose.pitch, PITCH_RANGE.min, PITCH_RANGE.max);
-    currentPose.zoom = clamp(baseFov + currentPose.zoom, zoomRange.min, zoomRange.max) - baseFov;
+    currentPose.zoom = -(clamp(baseFov - currentPose.zoom, zoomRange.min, zoomRange.max) - baseFov);
     const newCamPos = getRotatedPosition(distance, currentPose.yaw, currentPose.pitch);
-    const fov = currentPose.zoom + baseFov;
+    const fov = baseFov - currentPose.zoom;
     newCamPos.add(currentPose.pivot);
     threeCamera.fov = fov;
     threeCamera.position.copy(newCamPos);
@@ -1714,7 +1898,6 @@ class Camera {
     const tanHalfHFov = Math.tan(toRadian(fov / 2));
     const tanHalfVFov = tanHalfHFov * Math.max(1, this._maxTanHalfHFov / tanHalfHFov / camera.aspect);
     this._baseFov = toDegree(2 * Math.atan(tanHalfVFov));
-    camera.updateProjectionMatrix();
   }
 
 }
@@ -1789,10 +1972,13 @@ class ModelAnimator {
   /**
    * Create new ModelAnimator instance
    */
-  constructor(root) {
-    this._mixer = new AnimationMixer(root);
+  constructor(view3D) {
+    this._view3D = view3D;
+    this._mixer = new AnimationMixer(view3D.scene.userObjects);
     this._clips = [];
     this._actions = [];
+    this._activeAnimationIdx = -1;
+    this._fadePromises = [];
   }
   /**
    * Three.js {@link https://threejs.org/docs/#api/en/animation/AnimationClip AnimationClip}s that stored
@@ -1805,7 +1991,7 @@ class ModelAnimator {
     return this._clips;
   }
   /**
-   * {@link https://threejs.org/docs/index.html#api/en/animation/AnimationMixer THREE.AnimationMixer} instance
+   * {@link https://threejs.org/docs/#api/en/animation/AnimationMixer THREE.AnimationMixer} instance
    * @type THREE.AnimationMixer
    * @readonly
    */
@@ -1813,6 +1999,58 @@ class ModelAnimator {
 
   get mixer() {
     return this._mixer;
+  }
+  /**
+   * An array of active {@link https://threejs.org/docs/#api/en/animation/AnimationAction AnimationAction}s
+   * @type THREE.AnimationAction
+   * @readonly
+   */
+
+
+  get actions() {
+    return this._actions;
+  }
+  /**
+   * Current length of animations
+   * @type {number}
+   * @readonly
+   */
+
+
+  get animationCount() {
+    return this._clips.length;
+  }
+  /**
+   * Infomation of the animation currently playing, `null` if there're no animation or stopped.
+   * @see {@link https://threejs.org/docs/#api/en/animation/AnimationClip AnimationClip}
+   * @type {THREE.AnimationClip | null}
+   */
+
+
+  get activeAnimation() {
+    var _a;
+
+    return (_a = this._clips[this._activeAnimationIdx]) !== null && _a !== void 0 ? _a : null;
+  }
+  /**
+   * An index of the animation currently playing.
+   * @type {number}
+   * @readonly
+   */
+
+
+  get activeAnimationIndex() {
+    return this._activeAnimationIdx;
+  }
+  /**
+   * An boolean value indicating whether the animations are paused
+   * @type {boolean}
+   * @readonly
+   */
+
+
+  get paused() {
+    return this._mixer.timeScale === 0;
   }
   /**
    * Store the given clips
@@ -1829,70 +2067,178 @@ class ModelAnimator {
   setClips(clips) {
     const mixer = this._mixer;
     this._clips = clips;
-    this._actions = clips.map(clip => mixer.clipAction(clip));
+    this._actions = clips.map(clip => {
+      const action = mixer.clipAction(clip);
+      action.setEffectiveWeight(0);
+      return action;
+    });
   }
   /**
    * Play one of the model's animation
-   * @param index Index of the animation to play
+   * @param {number} index Index of the animation to play
    * @returns {void}
    */
 
 
   play(index) {
     const action = this._actions[index];
+    if (!action) return;
+    this.stop(); // Stop all previous actions
 
-    if (action) {
-      action.play();
-    }
+    this._restoreTimeScale();
+
+    action.setEffectiveTimeScale(1);
+    action.setEffectiveWeight(1);
+    action.play();
+    this._activeAnimationIdx = index;
+
+    this._flushFadePromises();
   }
   /**
-   * Pause one of the model's animation
+   * Crossfade animation from one to another
+   * @param {number} index Index of the animation to crossfade to
+   * @param {number} duration Duration of the crossfade animation, in milisec
+   * @returns {Promise<boolean>} A promise that resolves boolean value that indicates whether the crossfade is fullfilled without any inference
+   */
+
+
+  crossFade(index, duration, {
+    synchronize = false
+  } = {}) {
+    var _a;
+
+    return __awaiter(this, void 0, void 0, function* () {
+      const view3D = this._view3D;
+      const mixer = this._mixer;
+      const actions = this._actions;
+      const activeAnimationIdx = this._activeAnimationIdx;
+      const endAction = actions[index];
+      const startAction = (_a = actions[activeAnimationIdx]) !== null && _a !== void 0 ? _a : endAction; // eslint-disable-next-line @typescript-eslint/naming-convention
+
+      const EVT_LOOP = "loop";
+
+      this._restoreTimeScale();
+
+      const doCrossfade = () => {
+        endAction.enabled = true;
+        endAction.setEffectiveTimeScale(1);
+        endAction.setEffectiveWeight(1);
+        endAction.time = 0;
+        endAction.play();
+        startAction.crossFadeTo(endAction, duration / 1000, true);
+        this._activeAnimationIdx = index;
+      };
+
+      if (synchronize) {
+        const onLoop = evt => {
+          if (evt.action === startAction) {
+            mixer.removeEventListener(EVT_LOOP, onLoop);
+            doCrossfade();
+          }
+        };
+
+        mixer.addEventListener(EVT_LOOP, onLoop);
+      } else {
+        doCrossfade();
+      }
+
+      this._flushFadePromises();
+
+      const fadePromise = new Promise(resolve => {
+        const onFrame = () => {
+          if (endAction.getEffectiveWeight() < 1) return;
+          view3D.off(EVENTS.BEFORE_RENDER, onFrame);
+          resolve(true);
+        };
+
+        view3D.on(EVENTS.BEFORE_RENDER, onFrame);
+
+        this._fadePromises.push({
+          listener: onFrame,
+          resolve
+        });
+      });
+      return fadePromise;
+    });
+  }
+  /**
+   * Fadeout active animation, and restore to the default pose
+   * @param {number} duration Duration of the crossfade animation, in milisec
+   * @returns {Promise<boolean>} A promise that resolves boolean value that indicates whether the fadeout is fullfilled without any inference
+   */
+
+
+  fadeOut(duration) {
+    return __awaiter(this, void 0, void 0, function* () {
+      const view3D = this._view3D;
+      const actions = this._actions;
+      const activeAction = actions[this._activeAnimationIdx];
+      if (!activeAction) return false;
+
+      this._flushFadePromises();
+
+      this._restoreTimeScale();
+
+      activeAction.fadeOut(duration / 1000);
+      this._activeAnimationIdx = -1;
+      const fadePromise = new Promise(resolve => {
+        const onFrame = () => {
+          if (activeAction.getEffectiveWeight() > 0) return;
+          view3D.off(EVENTS.BEFORE_RENDER, onFrame);
+          resolve(true);
+        };
+
+        view3D.on(EVENTS.BEFORE_RENDER, onFrame);
+
+        this._fadePromises.push({
+          listener: onFrame,
+          resolve
+        });
+      });
+      return fadePromise;
+    });
+  }
+  /**
+   * Pause all animations
    * If you want to stop animation completely, you should call {@link ModelAnimator#stop stop} instead
    * You should call {@link ModelAnimator#resume resume} to resume animation
-   * @param index Index of the animation to pause
    * @returns {void}
    */
 
 
-  pause(index) {
-    const action = this._actions[index];
-
-    if (action) {
-      action.timeScale = 0;
-    }
+  pause() {
+    this._mixer.timeScale = 0;
   }
   /**
-   * Resume one of the model's animation
+   * Resume all animations
    * This will play animation from the point when the animation is paused
-   * @param index Index of the animation to resume
    * @returns {void}
    */
 
 
-  resume(index) {
-    const action = this._actions[index];
-
-    if (action) {
-      action.timeScale = 1;
-    }
+  resume() {
+    this._restoreTimeScale();
   }
   /**
    * Fully stops one of the model's animation
-   * @param index Index of the animation to stop
    * @returns {void}
    */
 
 
-  stop(index) {
-    const action = this._actions[index];
-
-    if (action) {
+  stop() {
+    this._actions.forEach(action => {
       action.stop();
-    }
+      action.setEffectiveWeight(0);
+    });
+
+    this._activeAnimationIdx = -1;
+
+    this._flushFadePromises();
   }
   /**
    * Update animations
-   * @param delta number of seconds to play animations attached
+   * @param {number} delta number of seconds to play animations attached
+   * @internal
    * @returns {void}
    */
 
@@ -1908,9 +2254,27 @@ class ModelAnimator {
 
   reset() {
     const mixer = this._mixer;
+    this.stop();
     mixer.uncacheRoot(mixer.getRoot());
     this._clips = [];
     this._actions = [];
+  }
+
+  _restoreTimeScale() {
+    this._mixer.timeScale = 1;
+  }
+
+  _flushFadePromises() {
+    const view3D = this._view3D;
+    const fadePromises = this._fadePromises;
+    fadePromises.forEach(({
+      resolve,
+      listener
+    }) => {
+      resolve(false);
+      view3D.off(EVENTS.BEFORE_RENDER, listener);
+    });
+    this._fadePromises = [];
   }
 
 }
@@ -1968,9 +2332,11 @@ class Animation extends Component {
       const delta = this._getDeltaTime();
 
       const duration = this._duration;
-      this._time += delta;
-      const loopIncrease = Math.floor(this._time / duration);
-      this._time = circulate(this._time, 0, duration);
+      const repeat = this._repeat;
+      const prevTime = this._time;
+      const time = prevTime + delta;
+      const loopIncrease = Math.floor(time / duration);
+      this._time = this._loopCount >= repeat ? clamp(time, 0, duration) : circulate(time, 0, duration);
       const progress = this._time / duration;
       const progressEvent = {
         progress,
@@ -1981,7 +2347,7 @@ class Animation extends Component {
       for (let loopIdx = 0; loopIdx < loopIncrease; loopIdx++) {
         this._loopCount++;
 
-        if (this._loopCount > this._repeat) {
+        if (this._loopCount > repeat) {
           this.trigger("finish");
           this.stop();
           return;
@@ -4392,16 +4758,6 @@ class ARManager {
  * Copyright (c) 2020 NAVER Corp.
  * egjs projects are licensed under the MIT license
  */
-const CURSOR = {
-  GRAB: "grab",
-  GRABBING: "grabbing",
-  NONE: ""
-};
-
-/*
- * Copyright (c) 2020 NAVER Corp.
- * egjs projects are licensed under the MIT license
- */
 /**
  * Model's rotation control that supports both mouse & touch
  */
@@ -4415,7 +4771,9 @@ class RotateControl extends Component {
   constructor(view3D, {
     duration = ANIMATION_DURATION,
     easing = EASING$1,
-    scale = 1
+    scale = 1,
+    disablePitch = false,
+    disableYaw = false
   } = {}) {
     super();
     this._screenScale = new Vector2(0, 0);
@@ -4524,6 +4882,8 @@ class RotateControl extends Component {
     this._scale = scale;
     this._duration = duration;
     this._easing = easing;
+    this._disablePitch = disablePitch;
+    this._disableYaw = disableYaw;
     this._isFirstTouch = false;
     this._isScrolling = false;
     this._xMotion = new Motion({
@@ -4578,6 +4938,26 @@ class RotateControl extends Component {
   get easing() {
     return this._easing;
   }
+  /**
+   * Disable X-axis(pitch) rotation
+   * @type {boolean}
+   * @default false
+   */
+
+
+  get disablePitch() {
+    return this._disablePitch;
+  }
+  /**
+   * Disable Y-axis(yaw) rotation
+   * @type {boolean}
+   * @default false
+   */
+
+
+  get disableYaw() {
+    return this._disableYaw;
+  }
 
   set scale(val) {
     this._scale = val;
@@ -4614,9 +4994,17 @@ class RotateControl extends Component {
     const camera = this._view3D.camera;
     const xMotion = this._xMotion;
     const yMotion = this._yMotion;
+    const yawEnabled = !this._disableYaw;
+    const pitchEnabled = !this._disablePitch;
     const delta = new Vector2(xMotion.update(deltaTime), yMotion.update(deltaTime));
-    camera.yaw += delta.x;
-    camera.pitch += delta.y;
+
+    if (yawEnabled) {
+      camera.yaw += delta.x;
+    }
+
+    if (pitchEnabled) {
+      camera.pitch += delta.y;
+    }
   }
   /**
    * Resize control to match target size
@@ -5156,7 +5544,7 @@ class ZoomControl {
   update(deltaTime) {
     const camera = this._view3D.camera;
     const motion = this._motion;
-    camera.zoom -= motion.update(deltaTime);
+    camera.zoom += motion.update(deltaTime);
   } // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
 
@@ -5732,6 +6120,7 @@ class Model {
     src,
     scenes,
     animations = [],
+    json = {},
     fixSkinnedBbox = false,
     castShadow = true,
     receiveShadow = false
@@ -5743,6 +6132,7 @@ class Model {
     this._scene.add(...scenes);
 
     this._animations = animations;
+    this._json = json;
     this._bbox = this._getInitialBbox(fixSkinnedBbox); // Move to position where bbox.min.y = 0
 
     const offset = this._bbox.min.y;
@@ -5781,6 +6171,15 @@ class Model {
 
   get animations() {
     return this._animations;
+  }
+  /**
+   * JSON data of original glTF file
+   * @readonly
+   */
+
+
+  get json() {
+    return this._json;
   }
   /**
    * {@link https://threejs.org/docs/#api/en/objects/Mesh THREE.Mesh}es inside model if there's any.
@@ -5983,6 +6382,7 @@ class GLTFLoader {
       loader.setMeshoptDecoder(GLTFLoader.meshoptDecoder);
     }
 
+    loader.manager = DefaultLoadingManager;
     return new Promise((resolve, reject) => {
       try {
         loader.load(url, gltf => {
@@ -5990,10 +6390,13 @@ class GLTFLoader {
 
           resolve(model);
         }, evt => {
-          view3D.trigger(EVENTS.PROGRESS, Object.assign(Object.assign({}, evt), {
+          view3D.trigger(EVENTS.PROGRESS, {
+            type: EVENTS.PROGRESS,
             target: view3D,
-            type: EVENTS.PROGRESS
-          }));
+            lengthComputable: evt.lengthComputable,
+            loaded: evt.loaded,
+            total: evt.total
+          });
         }, err => {
           reject(err);
         });
@@ -6048,6 +6451,7 @@ class GLTFLoader {
       objectURLs.push(gltfURL);
       const manager = new LoadingManager();
       manager.setURLModifier(fileURL => {
+        if (/^data:.*,.*$/i.test(fileURL)) return fileURL;
         const fileNameResult = /[^\/|\\]+$/.exec(fileURL);
         const fileName = fileNameResult && fileNameResult[0] || "";
 
@@ -6074,10 +6478,78 @@ class GLTFLoader {
   }
 
   _parseToModel(gltf, src) {
-    const fixSkinnedBbox = this._view3D.fixSkinnedBbox;
+    const view3D = this._view3D;
+    const fixSkinnedBbox = view3D.fixSkinnedBbox;
+    gltf.scenes.forEach(scene => {
+      scene.traverse(obj => {
+        obj.frustumCulled = false;
+      });
+    });
+    const extensionsUsed = gltf.parser.json.extensionsUsed;
+
+    if (extensionsUsed && extensionsUsed.some(extension => extension === CUSTOM_TEXTURE_LOD_EXTENSION)) {
+      const maxTextureSize = view3D.renderer.threeRenderer.capabilities.maxTextureSize;
+      const meshes = [];
+      gltf.scenes.forEach(scene => {
+        scene.traverse(obj => {
+          if (obj.isMesh) {
+            meshes.push(obj);
+          }
+        });
+      });
+      const materials = meshes.reduce((allMaterials, mesh) => {
+        return [...allMaterials, ...(Array.isArray(mesh.material) ? mesh.material : [mesh.material])];
+      }, []);
+      const textures = materials.reduce((allTextures, material) => {
+        return [...allTextures, ...STANDARD_MAPS.filter(map => material[map]).map(mapName => material[mapName])];
+      }, []);
+      const associations = gltf.parser.associations;
+      const gltfJSON = gltf.parser.json;
+      const gltfTextures = textures.filter(texture => associations.has(texture)).map(texture => {
+        return gltfJSON.textures[associations.get(texture).textures];
+      });
+      const texturesByLevel = gltfTextures.reduce((levels, texture, texIdx) => {
+        if (!texture.extensions[CUSTOM_TEXTURE_LOD_EXTENSION]) return levels;
+        const currentTexture = textures[texIdx];
+        const lodLevels = texture.extensions[CUSTOM_TEXTURE_LOD_EXTENSION].levels;
+        lodLevels.forEach(({
+          index,
+          size
+        }, level) => {
+          if (size > maxTextureSize) return;
+
+          if (!levels[level]) {
+            levels[level] = [];
+          }
+
+          levels[level].push({
+            index,
+            texture: currentTexture
+          });
+        });
+        return levels;
+      }, []);
+      const loaded = texturesByLevel.map(() => false);
+      texturesByLevel.forEach((levelTextures, level) => __awaiter(this, void 0, void 0, function* () {
+        // Change textures when all texture of the level loaded
+        const texturesLoaded = yield Promise.all(levelTextures.map(({
+          index
+        }) => gltf.parser.getDependency("texture", index)));
+        const higherLevelLoaded = loaded.slice(level + 1).some(val => !!val);
+        loaded[level] = true;
+        if (higherLevelLoaded) return;
+        texturesLoaded.forEach((texture, index) => {
+          const origTexture = levelTextures[index].texture;
+          origTexture.image = texture.image;
+          origTexture.needsUpdate = true;
+        });
+      }));
+    }
+
     const model = new Model({
       src,
       scenes: gltf.scenes,
+      json: gltf.parser.json,
       animations: gltf.animations,
       fixSkinnedBbox
     });
@@ -6111,9 +6583,6 @@ class View3D extends Component {
     ktxPath = KTX_TRANSCODER_URL,
     meshoptPath = null,
     fixSkinnedBbox = false,
-    skybox = null,
-    envmap = null,
-    background = null,
     fov = AUTO,
     center = AUTO,
     yaw = 0,
@@ -6121,20 +6590,27 @@ class View3D extends Component {
     rotate = true,
     translate = true,
     zoom = true,
-    exposure = 1,
-    shadow = true,
     autoplay = false,
     scrollable = true,
     wheelScrollable = false,
     useGrabCursor = true,
+    skybox = null,
+    envmap = null,
+    background = null,
+    exposure = 1,
+    shadow = true,
+    skyboxBlur = false,
     webAR = true,
     sceneViewer = true,
     quickLook = true,
     arPriority = AR_PRIORITY,
+    poster = null,
     canvasSelector = "canvas",
     autoInit = true,
     autoResize = true,
-    useResizeObserver = true
+    useResizeObserver = true,
+    on = {},
+    plugins = []
   } = {}) {
     super();
     this._rootEl = getElement(root); // Bind options
@@ -6161,10 +6637,12 @@ class View3D extends Component {
     this._background = background;
     this._exposure = exposure;
     this._shadow = shadow;
+    this._skyboxBlur = skyboxBlur;
     this._webAR = webAR;
     this._sceneViewer = sceneViewer;
     this._quickLook = quickLook;
     this._arPriority = arPriority;
+    this._poster = poster;
     this._canvasSelector = canvasSelector;
     this._autoInit = autoInit;
     this._autoResize = autoResize;
@@ -6174,16 +6652,23 @@ class View3D extends Component {
     this._camera = new Camera(this);
     this._control = new OrbitControl(this);
     this._scene = new Scene(this);
-    this._animator = new ModelAnimator(this._scene.userObjects);
+    this._animator = new ModelAnimator(this);
     this._autoPlayer = new AutoPlayer(this, getObjectOption(autoplay));
     this._autoResizer = new AutoResizer(this);
     this._arManager = new ARManager(this);
     this._model = null;
     this._initialized = false;
+    this._plugins = plugins;
 
-    if (src && autoInit) {
-      void this.init();
-    }
+    this._addEventHandlers(on);
+
+    this._addPosterImage();
+
+    void this._initPlugins(plugins).then(() => {
+      if (src && autoInit) {
+        void this.init();
+      }
+    });
   } // Internal Components Getter
 
   /**
@@ -6286,6 +6771,16 @@ class View3D extends Component {
 
   get initialized() {
     return this._initialized;
+  }
+  /**
+   * Active plugins of view3D
+   * @type {View3DPlugin[]}
+   * @readonly
+   */
+
+
+  get plugins() {
+    return this._plugins;
   } // Options Getter
 
   /**
@@ -6526,6 +7021,16 @@ class View3D extends Component {
     return this._shadow;
   }
   /**
+   * Apply blur to the current skybox image.
+   * @type {boolean}
+   * @default false
+   */
+
+
+  get skyboxBlur() {
+    return this._skyboxBlur;
+  }
+  /**
    * Options for the WebXR-based AR session.
    * If `false` is given, it will disable WebXR-based AR session.
    * @type {boolean | WebARSessionOptions}
@@ -6571,6 +7076,16 @@ class View3D extends Component {
 
   get arPriority() {
     return this._arPriority;
+  }
+  /**
+   * A URL to the image that will be displayed before the 3D model is loaded.
+   * @type {string | null}
+   * @default null
+   */
+
+
+  get poster() {
+    return this._poster;
   }
   /**
    * CSS Selector for the canvas element.
@@ -6630,6 +7145,20 @@ class View3D extends Component {
     this._exposure = val;
   }
 
+  set skyboxBlur(val) {
+    this._skyboxBlur = val;
+    const scene = this._scene;
+    const origEnvmapTexture = scene.root.environment;
+
+    if (origEnvmapTexture && !!scene.skybox) {
+      if (val) {
+        scene.skybox.useBlurredHDR(origEnvmapTexture);
+      } else {
+        scene.skybox.useTexture(origEnvmapTexture);
+      }
+    }
+  }
+
   set useGrabCursor(val) {
     this._useGrabCursor = val;
 
@@ -6649,6 +7178,12 @@ class View3D extends Component {
     this._control.destroy();
 
     this._autoResizer.disable();
+
+    this._animator.reset();
+
+    this._plugins.forEach(plugin => plugin.teardown(this));
+
+    this._plugins = [];
   }
   /**
    * Initialize View3d & load 3D model
@@ -6668,6 +7203,7 @@ class View3D extends Component {
       }
 
       const scene = this._scene;
+      const renderer = this._renderer;
       const skybox = this._skybox;
       const envmap = this._envmap;
       const background = this._background;
@@ -6675,23 +7211,28 @@ class View3D extends Component {
 
       if (meshoptPath && !GLTFLoader.meshoptDecoder) {
         yield GLTFLoader.setMeshoptDecoder(meshoptPath);
-      }
+      } // Load & set skybox / envmap before displaying model
 
-      const tasks = [this._loadModel(this._src)]; // Load & set skybox / envmap before displaying model
 
-      if (skybox) {
-        tasks.push(scene.setSkybox(skybox));
-      } else if (envmap) {
-        tasks.push(scene.setEnvMap(envmap));
+      const hasEnvmap = skybox || envmap;
+
+      if (hasEnvmap) {
+        const tempLight = new AmbientLight();
+        scene.add(tempLight, false);
+        const loadEnv = skybox ? scene.setSkybox(skybox) : scene.setEnvMap(envmap);
+        void loadEnv.then(() => {
+          scene.remove(tempLight);
+        });
       }
 
       if (!skybox && background) {
-        tasks.push(scene.setBackground(background));
+        void scene.setBackground(background);
       }
 
-      const [model] = yield Promise.all(tasks);
+      yield this._loadModel(this._src); // Start rendering
 
-      this._display(model);
+      renderer.stopAnimationLoop();
+      renderer.setAnimationLoop(renderer.defaultRenderLoop);
 
       this._control.enable();
 
@@ -6713,13 +7254,18 @@ class View3D extends Component {
 
 
   resize() {
-    this._renderer.resize();
-
-    const newSize = this._renderer.size;
+    const renderer = this._renderer;
+    renderer.resize();
+    const newSize = renderer.size;
 
     this._camera.resize(newSize);
 
     this._control.resize(newSize);
+
+    if (!renderer.threeRenderer.xr.isPresenting) {
+      // Prevent flickering on resize
+      renderer.defaultRenderLoop(0);
+    }
 
     this.trigger(EVENTS.RESIZE, Object.assign(Object.assign({}, newSize), {
       type: EVENTS.RESIZE,
@@ -6728,44 +7274,33 @@ class View3D extends Component {
   }
   /**
    * Load a new 3D model and replace it with the current one
-   * @param {string} src Source URL to fetch 3D model from
+   * @param {string | string[]} src Source URL to fetch 3D model from
    */
 
 
   load(src) {
     return __awaiter(this, void 0, void 0, function* () {
       if (this._initialized) {
-        const model = yield this._loadModel(src);
-        this._src = src;
+        yield this._loadModel(src); // Change the src later as an error can occur while loading the model
 
-        this._display(model);
+        this._src = src;
       } else {
         this._src = src;
         yield this.init();
       }
     });
   }
+  /**
+   * Display the given model in the canvas
+   * @param {Model} model A model to display
+   * @param {object} options Options for displaying model
+   * @param {boolean} [options.resetCamera=true] Reset camera to default pose
+   */
 
-  loadPlugins(...plugins) {
-    return __awaiter(this, void 0, void 0, function* () {
-      return Promise.all(plugins.map(plugin => plugin.init(this)));
-    });
-  }
 
-  _loadModel(src) {
-    return __awaiter(this, void 0, void 0, function* () {
-      const loader = new GLTFLoader(this);
-      const model = yield loader.load(src);
-      this.trigger(EVENTS.LOAD, {
-        type: EVENTS.LOAD,
-        target: this,
-        model
-      });
-      return model;
-    });
-  }
-
-  _display(model) {
+  display(model, {
+    resetCamera = true
+  } = {}) {
     const renderer = this._renderer;
     const scene = this._scene;
     const camera = this._camera;
@@ -6774,8 +7309,12 @@ class View3D extends Component {
     scene.reset();
     scene.add(model.scene);
     scene.shadowPlane.update(model);
-    camera.fit(model, this._center);
-    void camera.reset(0);
+
+    if (resetCamera) {
+      camera.fit(model, this._center);
+      void camera.reset(0);
+    }
+
     animator.reset();
     animator.setClips(model.animations);
 
@@ -6785,10 +7324,7 @@ class View3D extends Component {
 
     this._model = model;
 
-    if (!inXR) {
-      renderer.stopAnimationLoop();
-      renderer.setAnimationLoop(renderer.defaultRenderLoop);
-    } else {
+    if (inXR) {
       const activeSession = this._arManager.activeSession;
 
       if (activeSession) {
@@ -6802,6 +7338,126 @@ class View3D extends Component {
       model
     });
   }
+  /**
+   * Add new plugins to View3D
+   * @param {View3DPlugin[]} plugins Plugins to add
+   * @returns {Promise<void>} A promise that resolves when all plugins are initialized
+   */
+
+
+  loadPlugins(...plugins) {
+    return __awaiter(this, void 0, void 0, function* () {
+      yield this._initPlugins(plugins);
+
+      this._plugins.push(...plugins);
+    });
+  }
+  /**
+   * Remove plugins from View3D
+   * @param {View3DPlugin[]} plugins Plugins to remove
+   * @returns {Promise<void>} A promise that resolves when all plugins are removed
+   */
+
+
+  removePlugins(...plugins) {
+    return __awaiter(this, void 0, void 0, function* () {
+      yield Promise.all(plugins.map(plugin => plugin.teardown(this)));
+      plugins.forEach(plugin => {
+        const pluginIdx = this._plugins.indexOf(plugin);
+
+        if (pluginIdx < 0) return;
+
+        this._plugins.splice(pluginIdx, 1);
+      });
+    });
+  }
+  /**
+   * Take a screenshot of current rendered canvas image and download it
+   */
+
+
+  screenshot(fileName = "screenshot") {
+    const canvas = this._renderer.canvas;
+    const imgURL = canvas.toDataURL("png");
+    const anchorEl = document.createElement("a");
+    anchorEl.href = imgURL;
+    anchorEl.download = fileName;
+    anchorEl.click();
+  }
+
+  _loadModel(src) {
+    return __awaiter(this, void 0, void 0, function* () {
+      const loader = new GLTFLoader(this);
+
+      if (Array.isArray(src)) {
+        const loaded = src.map(() => false);
+        const loadModels = src.map((srcLevel, level) => __awaiter(this, void 0, void 0, function* () {
+          this.trigger(EVENTS.LOAD_START, {
+            type: EVENTS.LOAD_START,
+            target: this,
+            src: srcLevel,
+            level
+          });
+          const model = yield loader.load(srcLevel);
+          const higherLevelLoaded = loaded.slice(level + 1).some(val => !!val);
+          const modelLoadedBefore = loaded.some(val => !!val);
+          this.trigger(EVENTS.LOAD, {
+            type: EVENTS.LOAD,
+            target: this,
+            model,
+            level
+          });
+          loaded[level] = true;
+          if (higherLevelLoaded) return;
+          this.display(model, {
+            resetCamera: !modelLoadedBefore
+          });
+        }));
+        yield Promise.race(loadModels);
+      } else {
+        this.trigger(EVENTS.LOAD_START, {
+          type: EVENTS.LOAD_START,
+          target: this,
+          src,
+          level: 0
+        });
+        const model = yield loader.load(src);
+        this.trigger(EVENTS.LOAD, {
+          type: EVENTS.LOAD,
+          target: this,
+          model,
+          level: 0
+        });
+        this.display(model);
+      }
+    });
+  }
+
+  _addEventHandlers(events) {
+    Object.keys(events).forEach(evtName => {
+      this.on(evtName, events[evtName]);
+    });
+  }
+
+  _addPosterImage() {
+    const poster = this._poster;
+    const rootEl = this._rootEl;
+    if (!poster) return;
+    const imgEl = document.createElement("img");
+    imgEl.className = DEFAULT_CLASS.POSTER;
+    imgEl.src = poster;
+    rootEl.appendChild(imgEl);
+    this.once(EVENTS.READY, () => {
+      if (imgEl.parentElement !== rootEl) return;
+      rootEl.removeChild(imgEl);
+    });
+  }
+
+  _initPlugins(plugins) {
+    return __awaiter(this, void 0, void 0, function* () {
+      yield Promise.all(plugins.map(plugin => plugin.init(this)));
+    });
+  }
 
 }
 /**
@@ -6811,25 +7467,7 @@ class View3D extends Component {
  */
 
 
-View3D.VERSION = "2.0.0";
-
-/* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
-
-/**
- * Plugin for View3D
- * @abstract
- */
-
-class View3DPlugin {
-  init(view3D) {
-    return __awaiter(this, void 0, void 0, function* () {});
-  }
-
-  teardown(view3D) {
-    return __awaiter(this, void 0, void 0, function* () {});
-  }
-
-}
+View3D.VERSION = "2.1.0";
 
 /*
  * "View In Ar" Icon from [Google Material Design Icons](https://github.com/google/material-design-icons)
@@ -6844,7 +7482,7 @@ var ARIcon = '<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0
  * User can enter AR sessions by clicking this.
  */
 
-class ARButton extends View3DPlugin {
+class ARButton {
   /**
    * Create new instance of ARButton
    * @param {object} [options={}] Options for the ARButton
@@ -6852,8 +7490,8 @@ class ARButton extends View3DPlugin {
    * @param {string} [options.unavailableText="AR is not available in this browser"] A text that will be shown on mouse hover when it's not available to enter the AR session.
    */
   constructor(options = {}) {
-    super();
     this._options = options;
+    this._button = null;
   }
 
   init(view3D) {
@@ -6862,23 +7500,37 @@ class ARButton extends View3DPlugin {
     });
   }
 
+  teardown(view3D) {
+    const button = this._button;
+    if (!button) return;
+
+    if (button.parentElement === view3D.rootEl) {
+      view3D.rootEl.removeChild(button);
+    }
+
+    this._button = null;
+  }
+
   _addButton(view3D) {
     return __awaiter(this, void 0, void 0, function* () {
       const {
         availableText = "View in AR",
-        unavailableText = "AR is not available in this browser"
+        unavailableText = "AR is not available in this browser",
+        buttonClass = "view3d-ar-button",
+        tooltipClass = "view3d-tooltip"
       } = this._options;
       const arAvailable = yield view3D.ar.isAvailable();
       const button = document.createElement("button");
       const tooltip = document.createElement("div");
       const tooltipText = document.createTextNode(arAvailable ? availableText : unavailableText);
-      button.classList.add("view3d-ar-button");
-      tooltip.classList.add("view3d-tooltip");
+      button.classList.add(buttonClass);
+      tooltip.classList.add(tooltipClass);
       button.disabled = true;
       button.innerHTML = ARIcon;
       button.appendChild(tooltip);
       tooltip.appendChild(tooltipText);
       view3D.rootEl.appendChild(button);
+      this._button = button;
 
       if (view3D.initialized) {
         yield this._setAvailable(view3D, button, arAvailable);
@@ -6917,13 +7569,12 @@ var CloseIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" wid
  * This will be automatically added on the overlayRoot of the {@link WebARSession}.
  */
 
-class AROverlay extends View3DPlugin {
+class AROverlay {
   /**
    * Create new instance of AROverlay
    * @param {object} [options={}] Options for the AROverlay
    */
   constructor(options = {}) {
-    super();
     this._options = options;
   }
 
@@ -6971,7 +7622,186 @@ class AROverlay extends View3DPlugin {
     });
   }
 
+  teardown() {// DO NOTHING
+  }
+
 }
+
+/**
+ * A plugin that displays loading bar while
+ */
+
+class LoadingBar {
+  /**
+   * Create new instance of Spinner
+   * @param {LoadingBarOptions} [options={}] Options for the Spinner
+   */
+  constructor(options = {}) {
+    this._startLoading = ({
+      target: view3D
+    }) => {
+      const {
+        type = "default",
+        loadingLabel = "Loading 3D Model...",
+        parsingLabel = "Parsing 3D Model...",
+        labelColor = "#ffffff",
+        barHeight = "10px",
+        barBackground = "#bbbbbb",
+        barForeground = "#3e8ed0",
+        overlayBackground = "rgba(0, 0, 0, 0.3)"
+      } = this._options;
+      const loadingOverlay = document.createElement("div");
+      const loadingWrapper = document.createElement("div");
+      const loadingLabelEl = document.createElement("div");
+      const loadingBar = document.createElement("div");
+      const loadingFiller = document.createElement("div");
+      loadingOverlay.classList.add("view3d-lb-overlay");
+      loadingWrapper.classList.add("view3d-lb-wrapper");
+      loadingBar.classList.add("view3d-lb-base");
+      loadingLabelEl.classList.add("view3d-lb-label");
+      loadingFiller.classList.add("view3d-lb-filler");
+      loadingBar.style.height = barHeight;
+      loadingOverlay.style.backgroundColor = overlayBackground;
+
+      if (type !== LoadingBar.TYPE.SPINNER) {
+        loadingBar.style.backgroundColor = barBackground;
+        loadingFiller.style.backgroundColor = barForeground;
+      } else {
+        loadingBar.classList.add("type-spinner");
+      }
+
+      if (type === LoadingBar.TYPE.TOP) {
+        loadingOverlay.classList.add("type-top");
+      }
+
+      loadingLabelEl.style.color = labelColor;
+      loadingLabelEl.innerText = loadingLabel;
+      loadingBar.appendChild(loadingFiller);
+      loadingWrapper.appendChild(loadingBar);
+      loadingWrapper.appendChild(loadingLabelEl);
+      loadingOverlay.appendChild(loadingWrapper);
+      view3D.rootEl.appendChild(loadingOverlay);
+
+      if (type !== LoadingBar.TYPE.SPINNER) {
+        const onProgress = evt => {
+          const percentage = 100 * (evt.loaded / evt.total);
+          loadingFiller.style.width = `${percentage.toFixed(2)}%`;
+
+          if (evt.loaded === evt.total) {
+            loadingLabelEl.innerText = parsingLabel;
+          }
+        };
+
+        view3D.on(EVENTS.PROGRESS, onProgress);
+        view3D.once(EVENTS.LOAD, () => {
+          view3D.off(EVENTS.PROGRESS, onProgress);
+        });
+      }
+
+      view3D.once(EVENTS.LOAD, () => {
+        this._removeOverlay(view3D);
+      });
+      this._overlay = loadingOverlay;
+    };
+
+    this._options = options;
+  }
+
+  init(view3D) {
+    return __awaiter(this, void 0, void 0, function* () {
+      view3D.on(EVENTS.LOAD_START, this._startLoading);
+    });
+  }
+
+  teardown(view3D) {
+    view3D.off(EVENTS.LOAD_START, this._startLoading);
+
+    this._removeOverlay(view3D);
+  }
+
+  _removeOverlay(view3D) {
+    const overlay = this._overlay;
+    if (!overlay) return;
+
+    if (overlay.parentElement === view3D.rootEl) {
+      view3D.rootEl.removeChild(overlay);
+    }
+
+    this._overlay = null;
+  }
+
+}
+/**
+ * Available styles of loading bar
+ */
+
+
+LoadingBar.TYPE = {
+  DEFAULT: "default",
+  TOP: "top",
+  SPINNER: "spinner"
+};
+
+/*
+ * Copyright (c) 2020 NAVER Corp.
+ * egjs projects are licensed under the MIT license
+ */
+// Collection of util functions that is individual to View3D
+
+/**
+ * Check whether View3D can be initialized without any issues.
+ * View3D supports browsers with es6+ support.
+ * @param {object} [features={}] Features to test
+ * @returns {boolean} A boolean value indicating whether View3D is avilable
+ */
+const isAvailable = ({
+  webGL = true,
+  fetch = true,
+  stream = true,
+  wasm = true
+} = {}) => {
+  if (webGL) {
+    const webglAvailable = checkWebGLAvailability();
+    if (!webglAvailable) return false;
+  }
+
+  if (fetch) {
+    const fetchAvailable = window && window.fetch;
+    if (!fetchAvailable) return false;
+  }
+
+  if (stream) {
+    const streamAvailable = window && window.ReadableStream;
+    if (!streamAvailable) return false;
+  }
+
+  if (wasm) {
+    const wasmAvailable = checkWASMAvailability();
+    if (!wasmAvailable) return false;
+  }
+
+  return true;
+};
+
+const checkWebGLAvailability = () => {
+  try {
+    const canvas = document.createElement("canvas");
+    return !!window.WebGLRenderingContext && !!(canvas.getContext("webgl") || canvas.getContext("experimental-webgl"));
+  } catch (e) {
+    return false;
+  }
+};
+
+const checkWASMAvailability = () => {
+  try {
+    if (typeof WebAssembly === "object" && typeof WebAssembly.instantiate === "function") {
+      const module = new WebAssembly.Module(Uint8Array.of(0x0, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00));
+      if (module instanceof WebAssembly.Module) return new WebAssembly.Instance(module) instanceof WebAssembly.Instance;
+    }
+  } catch (e) {
+    return false;
+  }
+};
 
 /*
  * Copyright (c) 2020 NAVER Corp.
@@ -6979,4 +7809,4 @@ class AROverlay extends View3DPlugin {
  */
 
 export default View3D;
-export { ARButton, ARManager, AROverlay, AR_SESSION_TYPE, AUTO, Animation, AnimationControl, AutoPlayer, AutoResizer, Camera, EASING, ERROR_CODES, EVENTS, GLTFLoader, Model, ModelAnimator, Motion, OrbitControl, Pose, QUICK_LOOK_APPLE_PAY_BUTTON_TYPE, QUICK_LOOK_CUSTOM_BANNER_SIZE, Renderer, RotateControl, SCENE_VIEWER_MODE, Scene, ShadowPlane, TextureLoader, TranslateControl, View3DError, ZoomControl };
+export { ARButton, ARManager, AROverlay, AR_SESSION_TYPE, AUTO, Animation, AnimationControl, AutoPlayer, AutoResizer, Camera, DEFAULT_CLASS, EASING, ERROR_CODES, EVENTS, GLTFLoader, LoadingBar, Model, ModelAnimator, Motion, OrbitControl, Pose, QUICK_LOOK_APPLE_PAY_BUTTON_TYPE, QUICK_LOOK_CUSTOM_BANNER_SIZE, Renderer, RotateControl, SCENE_VIEWER_MODE, Scene, ShadowPlane, Skybox, TextureLoader, TranslateControl, View3DError, ZoomControl, isAvailable };
