@@ -13,24 +13,29 @@ import Model from "./Model";
 
 /**
  * @interface
- * @param {number} [opacity=0.3] Opacity of the shadow.
- * @param {number} [mapSize=9]
+ * @param {number} [darkness=1] Darkness of the shadow.
+ * @param {number} [mapSize=9] Size of the shadow map. Texture of size (n * n) where n = 2 ^ (mapSize) will be used as shadow map. Should be an integer value.
+ * @param {number} [blur=3.5] Blurriness of the shadow.
+ * @param {number} [shadowScale=1] Scale of the shadow range. Using higher values will make shadow more even-textured.
+ * @param {number} [planeScale=2] Scale of the shadow plane. Use higher value if the shadow is clipped.
  */
 export interface ShadowOptions {
-  opacity: number;
+  darkness: number;
   mapSize: number;
-  baseScale: number;
   blur: number;
+  shadowScale: number;
+  planeScale: number;
 }
 
 /**
  * Helper class to easily add shadow plane under your 3D model
  */
 class ShadowPlane extends THREE.Object3D {
-  private _opacity: ShadowOptions["opacity"];
+  private _darkness: ShadowOptions["darkness"];
   private _mapSize: ShadowOptions["mapSize"];
-  private _baseScale: ShadowOptions["baseScale"];
   private _blur: ShadowOptions["blur"];
+  private _shadowScale: ShadowOptions["shadowScale"];
+  private _planeScale: ShadowOptions["planeScale"];
 
   private _view3D: View3D;
   private _shadowCamera: THREE.OrthographicCamera;
@@ -45,51 +50,78 @@ class ShadowPlane extends THREE.Object3D {
   private _blurPlane: THREE.Mesh;
 
   /**
-   * Shadow opacity, value can be between 0(invisible) and 1(solid)
+   * Darkness of the shadow.
    * @type {number}
-   * @default 0.3
+   * @default 1
    */
-  public get opacity() { return this._opacity; }
+  public get darkness() { return this._darkness; }
   /**
-   * Size of the shadow map. A size of n * n where n = 2 ^ (mapSize) will be used as shadow map texture
-   * A smaller value will show more blurry(softer) shadow
+   * Size of the shadow map. Texture of size (n * n) where n = 2 ^ (mapSize) will be used as shadow map. Should be an integer value.
    * @type {number}
    * @default 9
    */
   public get mapSize() { return this._mapSize; }
+  /**
+   * Blurriness of the shadow.
+   * @type {number}
+   * @default 3.5
+   */
+  public get blur() { return this._blur; }
+  /**
+   * Scale of the shadow range. Using higher values will make shadow more even-textured.
+   * @type {number}
+   * @default 1
+   */
+  public get shadowScale() { return this._shadowScale; }
+  /**
+   * Scale of the shadow plane. Use higher value if the shadow is clipped.
+   * @type {number}
+   * @default 2
+   */
+  public get planeScale() { return this._planeScale; }
 
   /**
    * Create new shadow plane
    * @param {object} options Options
-   * @param {number} [options.type="VSM"] Type of the shadow.
-   * @param {number} [options.opacity=0.3] Opacity of the shadow.
-   * @param {number} [options.yaw=0] Y-axis rotation of the light that casts shadow.
-   * @param {number} [options.pitch=0] X-axis rotation of the light that casts shadow.
-   * @param {number} [options.mapSize=9]
+   * @param {number} [options.darkness=1] Darkness of the shadow.
+   * @param {number} [options.mapSize=9] Size of the shadow map. Texture of size (n * n) where n = 2 ^ (mapSize) will be used as shadow map. Should be an integer value.
+   * @param {number} [options.blur=3.5] Blurriness of the shadow.
+   * @param {number} [options.shadowScale=1] Scale of the shadow range. Using higher values will make shadow more even-textured.
+   * @param {number} [options.planeScale=2] Scale of the shadow plane. Use higher value if the shadow is clipped.
    */
   public constructor(view3D: View3D, {
-    opacity = 1,
+    darkness = 1,
     mapSize = 9,
     blur = 3.5,
-    baseScale = 2
+    shadowScale = 1,
+    planeScale = 2
   }: Partial<ShadowOptions> = {}) {
     super();
 
     this._view3D = view3D;
-    this._opacity = opacity;
+    this._darkness = darkness;
     this._mapSize = mapSize;
-    this._baseScale = baseScale;
     this._blur = blur;
+    this._shadowScale = shadowScale;
+    this._planeScale = planeScale;
 
     const threeRenderer = view3D.renderer.threeRenderer;
-    const maxTextureSize = Math.min(Math.pow(2, mapSize), threeRenderer.capabilities.maxTextureSize);
+    const maxTextureSize = Math.min(Math.pow(2, Math.floor(mapSize)), threeRenderer.capabilities.maxTextureSize);
 
     this._renderTarget = new THREE.WebGLRenderTarget(maxTextureSize, maxTextureSize, { format: THREE.RGBAFormat });
     this._blurTarget = new THREE.WebGLRenderTarget(maxTextureSize, maxTextureSize, { format: THREE.RGBAFormat });
     this._renderTarget.texture.generateMipmaps = false;
     this._blurTarget.texture.generateMipmaps = false;
 
-    this._setup();
+    const shadowCamera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0);
+    shadowCamera.rotation.x = Math.PI / 2;
+    this._shadowCamera = shadowCamera;
+    this.add(shadowCamera);
+
+    const blurCamera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0);
+    this._blurCamera = blurCamera;
+
+    this._setupPlanes();
   }
 
   public updateDimensions(model: Model) {
@@ -170,13 +202,13 @@ class ShadowPlane extends THREE.Object3D {
 
   private _updateShadowCamera(model: Model) {
     const shadowCam = this._shadowCamera;
-    const baseScale = this._baseScale;
+    const baseScale = this._planeScale;
     const boundingSphere = model.bbox.getBoundingSphere(new THREE.Sphere());
     const radius = boundingSphere.radius;
     const camSize = baseScale * 2 * radius;
+    const shadowScale = this._shadowScale;
 
-    shadowCam.near = 0;
-    shadowCam.far = (model.bbox.max.y - model.bbox.min.y) / camSize;
+    shadowCam.far = shadowScale * (model.bbox.max.y - model.bbox.min.y) / camSize;
     shadowCam.rotation.set(Math.PI / 2, Math.PI, 0, "YXZ");
 
     this.position.copy(boundingSphere.center).setY(model.bbox.min.y);
@@ -185,25 +217,17 @@ class ShadowPlane extends THREE.Object3D {
     shadowCam.updateProjectionMatrix();
   }
 
-  private _setup() {
-    const shadowCamera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5);
-    shadowCamera.rotation.x = Math.PI / 2;
-    this._shadowCamera = shadowCamera;
-    this.add(shadowCamera);
-
-    const blurCamera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0);
-    this._blurCamera = blurCamera;
-
-    const geometry = new THREE.PlaneBufferGeometry();
+  private _setupPlanes() {
+    const planeGeometry = new THREE.PlaneBufferGeometry();
     const planeMat = new THREE.MeshBasicMaterial({
-      opacity: this._opacity,
+      opacity: this._darkness,
       transparent: true,
       side: THREE.BackSide,
       depthWrite: false,
       map: this._renderTarget.texture
     });
 
-    const plane = new THREE.Mesh(geometry, planeMat);
+    const plane = new THREE.Mesh(planeGeometry, planeMat);
     plane.renderOrder = 1;
     plane.scale.set(-1, -1, 1);
     plane.rotation.order = "YXZ";
@@ -211,7 +235,7 @@ class ShadowPlane extends THREE.Object3D {
     this._plane = plane;
     this.add(plane);
 
-    const blurPlane = new THREE.Mesh(geometry);
+    const blurPlane = new THREE.Mesh(planeGeometry);
     this._blurPlane = blurPlane;
 
     const depthMaterial = new THREE.MeshDepthMaterial();

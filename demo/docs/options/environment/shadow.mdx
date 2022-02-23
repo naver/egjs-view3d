@@ -15,63 +15,45 @@ You can also customize the shadow with the following properties.
 
 |Name|Type|Default|Description|
 |:---:|:---:|:---:|---|
-|opacity|number|0.3|Opacity of the shadow.|
-|hardness|number|6|Hardness of the shadow. Should be integer greater than 0, and lower the softer the shadow is.|
-|yaw|number|0|Y-axis rotation of the light that casts shadow.|
-|pitch|number|0|X-axis rotation of the light that casts shadow.|
+|darkness|number|1|Darkness of the shadow|
+|mapSize|number|9|Size of the shadow map. Texture of size (n * n) where n = 2 ^ (mapSize) will be used as shadow map. Should be an integer value|
+|blur|number|3.5|Blurriness of the shadow|
+|shadowScale|number|1|Scale of the shadow range. Using higher values will make shadow more even-textured|
+|planeScale|number|2|Scale of the shadow plane. Use higher value if the shadow is clipped|
 
 ## Examples
 <div className="columns">
   <div className="column">
     <View3D
-      src="/egjs-view3d/model/draco/trex.glb"
-      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
-      poster="/egjs-view3d/poster/alarm.png"
-      clickToLoad
-      fixSkinnedBbox
+      src="/egjs-view3d/model/RobotExpressive.glb"
+      envmap="/egjs-view3d/texture/sepulchral_chapel_rotunda_1k.hdr"
+      shadow={true}
       showExampleCode />
   </div>
   <div className="column">
     <View3D
-      src="/egjs-view3d/model/draco/alarm.glb"
-      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
-      poster="/egjs-view3d/poster/alarm.png"
-      clickToLoad
-      showExampleCode />
-  </div>
-</div>
-
-<div className="columns">
-  <div className="column">
-    <View3D
-      src="/egjs-view3d/model/draco/lucy.glb"
-      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
-      poster="/egjs-view3d/poster/alarm.png"
-      clickToLoad
-      showExampleCode />
-  </div>
-  <div className="column">
-    <View3D
-      src="/egjs-view3d/model/draco/trex.glb"
-      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
-      poster="/egjs-view3d/poster/alarm.png"
-      fixSkinnedBbox
-      clickToLoad
+      src="/egjs-view3d/model/RobotExpressive.glb"
+      envmap="/egjs-view3d/texture/sepulchral_chapel_rotunda_1k.hdr"
+      shadow={{
+        darkness: 0.3,
+        shadowScale: 10,
+        blur: 1
+      }}
       showExampleCode />
   </div>
 </div>
 
 <License items={[
   {
-    name: "Alarm Clock 01",
-    link: "https://polyhaven.com/a/alarm_clock_01",
-    author: "Poly Haven",
-    authorLink: "https://polyhaven.com/",
+    name: "RobotExpressive",
+    link: "https://github.com/mrdoob/three.js/tree/master/examples/models/gltf/RobotExpressive",
+    author: "Tomás Laulhé",
+    authorLink: "https://www.patreon.com/quaternius",
     license: "CC0"
   },
   {
-    name: "Artist Workshop",
-    link: "https://polyhaven.com/a/artist_workshop",
+    name: "Sepulchral Chapel Rotunda",
+    link: "https://polyhaven.com/a/sepulchral_chapel_rotunda",
     author: "Poly Haven",
     authorLink: "https://polyhaven.com/",
     license: "CC0"
