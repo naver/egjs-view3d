@@ -120,7 +120,7 @@ class Camera {
     this._threeCamera = new THREE.PerspectiveCamera();
     this._maxTanHalfHFov = 0;
 
-    this._defaultPose = new Pose(view3D.yaw, view3D.pitch, 0);
+    this._defaultPose = new Pose(view3D.yaw, view3D.pitch, view3D.initialZoom);
     this._currentPose = this._defaultPose.clone();
   }
 

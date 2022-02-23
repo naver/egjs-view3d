@@ -68,6 +68,7 @@ export interface View3DOptions {
   center: typeof AUTO | number[];
   yaw: number;
   pitch: number;
+  initialZoom: number;
   rotate: boolean | Partial<RotateControlOptions>;
   translate: boolean | Partial<TranslateControlOptions>;
   zoom: boolean | Partial<ZoomControlOptions>;
@@ -141,6 +142,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _center: View3DOptions["center"];
   private _yaw: View3DOptions["yaw"];
   private _pitch: View3DOptions["pitch"];
+  private _initialZoom: View3DOptions["initialZoom"];
   private _rotate: View3DOptions["rotate"];
   private _translate: View3DOptions["translate"];
   private _zoom: View3DOptions["zoom"];
@@ -304,6 +306,13 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    * @default 0
    */
   public get pitch() { return this._pitch; }
+  /**
+   * Initial zoom value.
+   * Positive value will make camera zoomed in and negative value will make camera zoomed out.
+   * @type {number}
+   * @default 0
+   */
+  public get initialZoom() { return this._initialZoom; }
   /**
    * Options for the {@link RotateControl}.
    * If `false` is given, it will disable the rotate control.
@@ -527,6 +536,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     center = AUTO,
     yaw = 0,
     pitch = 0,
+    initialZoom = 0,
     rotate = true,
     translate = true,
     zoom = true,
@@ -569,6 +579,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._center = center;
     this._yaw = yaw;
     this._pitch = pitch;
+    this._initialZoom = initialZoom;
     this._rotate = rotate;
     this._translate = translate;
     this._zoom = zoom;
