@@ -22,7 +22,7 @@ import AutoPlayer, { AutoplayOptions } from "./core/AutoPlayer";
 import { WebARSessionOptions } from "./xr/WebARSession";
 import { SceneViewerSessionOptions } from "./xr/SceneViewerSession";
 import { QuickLookSessionOptions } from "./xr/QuickLookSession";
-import { EVENTS, AUTO, AR_SESSION_TYPE, DEFAULT_CLASS } from "./const/external";
+import { EVENTS, AUTO, AR_SESSION_TYPE, DEFAULT_CLASS, TONE_MAPPING } from "./const/external";
 import * as DEFAULT from "./const/default";
 import ERROR from "./const/error";
 import * as EVENT_TYPES from "./type/event";
@@ -83,6 +83,7 @@ export interface View3DOptions {
   exposure: number;
   shadow: boolean | Partial<ShadowOptions>;
   skyboxBlur: boolean;
+  toneMapping: LiteralUnion<ValueOf<typeof TONE_MAPPING>, THREE.ToneMapping>;
 
   // AR
   webAR: boolean | Partial<WebARSessionOptions>;
@@ -154,6 +155,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _exposure: View3DOptions["exposure"];
   private _shadow: View3DOptions["shadow"];
   private _skyboxBlur: View3DOptions["skyboxBlur"];
+  private _toneMapping: View3DOptions["toneMapping"];
 
   private _webAR: View3DOptions["webAR"];
   private _sceneViewer: View3DOptions["sceneViewer"];
@@ -393,6 +395,13 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get skyboxBlur() { return this._skyboxBlur; }
   /**
+   * This is used to approximate the appearance of high dynamic range (HDR) on the low dynamic range medium of a standard computer monitor or mobile device's screen.
+   * @type {number}
+   * @see TONE_MAPPING
+   * @default THREE.LinearToneMapping
+   */
+  public get toneMapping() { return this._toneMapping; }
+  /**
    * Options for the WebXR-based AR session.
    * If `false` is given, it will disable WebXR-based AR session.
    * @type {boolean | WebARSessionOptions}
@@ -485,6 +494,11 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     }
   }
 
+  public set toneMapping(val: View3DOptions["toneMapping"]) {
+    this._toneMapping = val;
+    this._renderer.threeRenderer.toneMapping = val as THREE.ToneMapping;
+  }
+
   public set useGrabCursor(val: View3DOptions["useGrabCursor"]) {
     this._useGrabCursor = val;
     this._control.updateCursor();
@@ -526,6 +540,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     exposure = 1,
     shadow = true,
     skyboxBlur = false,
+    toneMapping = TONE_MAPPING.LINEAR,
     webAR = true,
     sceneViewer = true,
     quickLook = true,
@@ -568,6 +583,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._exposure = exposure;
     this._shadow = shadow;
     this._skyboxBlur = skyboxBlur;
+    this._toneMapping = toneMapping;
 
     this._webAR = webAR;
     this._sceneViewer = sceneViewer;

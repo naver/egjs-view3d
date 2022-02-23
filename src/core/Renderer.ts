@@ -70,7 +70,7 @@ class Renderer {
       preserveDrawingBuffer: true
     });
 
-    renderer.toneMapping = THREE.LinearToneMapping;
+    renderer.toneMapping = view3D.toneMapping as THREE.ToneMapping;
     renderer.toneMappingExposure = view3D.exposure;
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.setClearColor(0x000000, 0);

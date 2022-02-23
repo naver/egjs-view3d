@@ -2,10 +2,6 @@
  * Copyright (c) 2020 NAVER Corp.
  * egjs projects are licensed under the MIT license
  */
-import * as THREE from "three";
-
-import { SHADOW_TYPE } from "./external";
-
 // Constants that used internally
 
 // Texture map names that used in THREE#MeshStandardMaterial
@@ -42,9 +38,3 @@ export enum GESTURE {
 }
 
 export const CUSTOM_TEXTURE_LOD_EXTENSION = "EXT_View3D_texture_LOD";
-
-export const SHADOW_TYPE_MAP: { [key in keyof typeof SHADOW_TYPE]: THREE.ShadowMapType } = {
-  [SHADOW_TYPE.PCF_SOFT]: THREE.PCFSoftShadowMap,
-  [SHADOW_TYPE.PCF]: THREE.PCFShadowMap,
-  [SHADOW_TYPE.VSM]: THREE.VSMShadowMap
-};

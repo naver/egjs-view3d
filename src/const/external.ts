@@ -2,9 +2,14 @@
  * Copyright (c) 2020 NAVER Corp.
  * egjs projects are licensed under the MIT license
  */
+import * as THREE from "three";
 
 export { ERROR_CODES } from "./error";
 
+/**
+ * "auto"
+ * @type {"auto"}
+ */
 export const AUTO = "auto";
 
 /**
@@ -86,6 +91,22 @@ export const DEFAULT_CLASS = {
   POSTER: "view3d-poster",
   AR_OVERLAY: "view3d-ar-overlay"
 } as const;
+
+/**
+ * Possible values for the toneMapping option.
+ * This is used to approximate the appearance of high dynamic range (HDR) on the low dynamic range medium of a standard computer monitor or mobile device's screen.
+ * @type {object}
+ * @property {THREE.LinearToneMapping} LINEAR
+ * @property {THREE.ReinhardToneMapping} REINHARD
+ * @property {THREE.CineonToneMapping} CINEON
+ * @property {THREE.ACESFilmicToneMapping} ACES_FILMIC
+ */
+export const TONE_MAPPING = {
+  LINEAR: THREE.LinearToneMapping,
+  REINHARD: THREE.ReinhardToneMapping,
+  CINEON: THREE.CineonToneMapping,
+  ACES_FILMIC: THREE.ACESFilmicToneMapping
+};
 
 /**
  * Available AR session types
