@@ -1,4 +1,14 @@
-import { Camera, Model, OrbitControl, ModelAnimator, Renderer, Scene, ARManager, AutoPlayer } from "~/index";
+import * as THREE from "three";
+import {
+  Camera,
+  OrbitControl,
+  ModelAnimator,
+  Renderer,
+  Scene,
+  ARManager,
+  AutoPlayer,
+  TONE_MAPPING
+} from "~/index";
 import * as DEFAULT from "~/const/default";
 import { createView3D } from "../test-utils";
 
@@ -95,6 +105,13 @@ describe("View3D", () => {
     describe("skyboxBlur", () => {
       it("should have 'false' as a default value", async () => {
         expect((await createView3D()).skyboxBlur).to.be.false;
+      });
+    });
+
+    describe("toneMapping", () => {
+      it("should set THREE.LinearToneMapping as a default value", async () => {
+        expect((await createView3D()).toneMapping).to.equal(THREE.LinearToneMapping);
+        expect((await createView3D()).toneMapping).to.equal(TONE_MAPPING.LINEAR);
       });
     });
 

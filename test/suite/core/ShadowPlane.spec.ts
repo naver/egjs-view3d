@@ -11,9 +11,9 @@ describe("ShadowPlane", () => {
       expect(new ShadowPlane(view3D).root).to.be.instanceOf(THREE.Group);
     });
 
-    it("has 1 as default darkness", async () => {
+    it("has 0.3 as default darkness", async () => {
       const view3D = await createView3D();
-      expect(new ShadowPlane(view3D).darkness).to.equal(1);
+      expect(new ShadowPlane(view3D).darkness).to.equal(0.3);
     });
 
     it("has 9 as default mapSize", async () => {

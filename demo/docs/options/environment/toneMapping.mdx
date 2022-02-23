@@ -1,0 +1,26 @@
+---
+sidebar_position: 7
+---
+
+import View3D from "@site/src/components/View3D";
+import ToneMapping from "@site/src/components/demo/ToneMapping";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
+
+<OptionDescriptor type="number" defaultVal="TONE_MAPPING.LINEAR" />
+
+Apply tone mapping.
+This is used to approximate the appearance of high dynamic range (HDR) on the low dynamic range medium of a standard computer monitor or mobile device's screen.
+
+Available values are stored in [TONE_MAPPING](/docs/api/TONE_MAPPING)
+
+```js
+import View3D, { TONE_MAPPING } from "@egjs/view3d";
+
+new View3D("#el", {
+  toneMapping: TONE_MAPPING.ACES_FILMIC
+})
+```
+
+## Example
+<ToneMapping />
