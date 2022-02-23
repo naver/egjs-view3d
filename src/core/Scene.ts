@@ -90,7 +90,7 @@ class Scene {
     root.add(userObjects, envObjects, fixedObjects);
 
     if (view3D.shadow) {
-      fixedObjects.add(shadowPlane);
+      fixedObjects.add(shadowPlane.root);
     }
   }
 

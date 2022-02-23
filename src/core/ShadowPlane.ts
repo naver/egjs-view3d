@@ -30,7 +30,7 @@ export interface ShadowOptions {
 /**
  * Helper class to easily add shadow plane under your 3D model
  */
-class ShadowPlane extends THREE.Object3D {
+class ShadowPlane {
   private _darkness: ShadowOptions["darkness"];
   private _mapSize: ShadowOptions["mapSize"];
   private _blur: ShadowOptions["blur"];
@@ -38,6 +38,7 @@ class ShadowPlane extends THREE.Object3D {
   private _planeScale: ShadowOptions["planeScale"];
 
   private _view3D: View3D;
+  private _root: THREE.Group;
   private _shadowCamera: THREE.OrthographicCamera;
   private _blurCamera: THREE.OrthographicCamera;
 
@@ -48,6 +49,12 @@ class ShadowPlane extends THREE.Object3D {
   private _verticalBlurMaterial: THREE.ShaderMaterial;
   private _plane: THREE.Mesh;
   private _blurPlane: THREE.Mesh;
+
+  /**
+   * Root of the object
+   * @readonly
+   */
+  public get root() { return this._root; }
 
   /**
    * Darkness of the shadow.
@@ -96,8 +103,6 @@ class ShadowPlane extends THREE.Object3D {
     shadowScale = 1,
     planeScale = 2
   }: Partial<ShadowOptions> = {}) {
-    super();
-
     this._view3D = view3D;
     this._darkness = darkness;
     this._mapSize = mapSize;
@@ -108,6 +113,7 @@ class ShadowPlane extends THREE.Object3D {
     const threeRenderer = view3D.renderer.threeRenderer;
     const maxTextureSize = Math.min(Math.pow(2, Math.floor(mapSize)), threeRenderer.capabilities.maxTextureSize);
 
+    this._root = new THREE.Group();
     this._renderTarget = new THREE.WebGLRenderTarget(maxTextureSize, maxTextureSize, { format: THREE.RGBAFormat });
     this._blurTarget = new THREE.WebGLRenderTarget(maxTextureSize, maxTextureSize, { format: THREE.RGBAFormat });
     this._renderTarget.texture.generateMipmaps = false;
@@ -116,7 +122,7 @@ class ShadowPlane extends THREE.Object3D {
     const shadowCamera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0);
     shadowCamera.rotation.x = Math.PI / 2;
     this._shadowCamera = shadowCamera;
-    this.add(shadowCamera);
+    this._root.add(shadowCamera);
 
     const blurCamera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0);
     this._blurCamera = blurCamera;
@@ -125,7 +131,21 @@ class ShadowPlane extends THREE.Object3D {
   }
 
   public updateDimensions(model: Model) {
-    this._updateShadowCamera(model);
+    const root = this._root;
+    const shadowCam = this._shadowCamera;
+    const baseScale = this._planeScale;
+    const boundingSphere = model.bbox.getBoundingSphere(new THREE.Sphere());
+    const radius = boundingSphere.radius;
+    const camSize = baseScale * 2 * radius;
+    const shadowScale = this._shadowScale;
+
+    shadowCam.far = shadowScale * (model.bbox.max.y - model.bbox.min.y) / camSize;
+    shadowCam.rotation.set(Math.PI / 2, Math.PI, 0, "YXZ");
+
+    root.position.copy(boundingSphere.center).setY(model.bbox.min.y);
+    root.scale.setScalar(camSize);
+
+    shadowCam.updateProjectionMatrix();
   }
 
   public render() {
@@ -200,24 +220,8 @@ class ShadowPlane extends THREE.Object3D {
     blurPlane.visible = false;
   }
 
-  private _updateShadowCamera(model: Model) {
-    const shadowCam = this._shadowCamera;
-    const baseScale = this._planeScale;
-    const boundingSphere = model.bbox.getBoundingSphere(new THREE.Sphere());
-    const radius = boundingSphere.radius;
-    const camSize = baseScale * 2 * radius;
-    const shadowScale = this._shadowScale;
-
-    shadowCam.far = shadowScale * (model.bbox.max.y - model.bbox.min.y) / camSize;
-    shadowCam.rotation.set(Math.PI / 2, Math.PI, 0, "YXZ");
-
-    this.position.copy(boundingSphere.center).setY(model.bbox.min.y);
-    this.scale.setScalar(camSize);
-
-    shadowCam.updateProjectionMatrix();
-  }
-
   private _setupPlanes() {
+    const root = this._root;
     const planeGeometry = new THREE.PlaneBufferGeometry();
     const planeMat = new THREE.MeshBasicMaterial({
       opacity: this._darkness,
@@ -233,7 +237,7 @@ class ShadowPlane extends THREE.Object3D {
     plane.rotation.order = "YXZ";
     plane.rotation.x = Math.PI / 2;
     this._plane = plane;
-    this.add(plane);
+    root.add(plane);
 
     const blurPlane = new THREE.Mesh(planeGeometry);
     this._blurPlane = blurPlane;

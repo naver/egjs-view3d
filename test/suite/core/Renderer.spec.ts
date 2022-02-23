@@ -8,10 +8,6 @@ describe("Renderer", () => {
       expect((await createView3D()).renderer.threeRenderer).to.be.instanceOf(THREE.WebGLRenderer);
     });
 
-    it("should enable shadow by default", async () => {
-      expect((await createView3D()).renderer.threeRenderer.shadowMap.enabled).to.be.true;
-    });
-
     it("should create context on creation", async () => {
       expect((await createView3D()).renderer.context).to.be.instanceOf(WebGL2RenderingContext);
     });
@@ -35,24 +31,6 @@ describe("Renderer", () => {
     expect(prevSize.height).to.equal(300);
     expect(renderer.size.width).to.equal(400);
     expect(renderer.size.height).to.equal(600);
-  });
-
-  it("should disable shadow map on disabling shadow", async () => {
-    const renderer = (await createView3D()).renderer;
-    renderer.disableShadow();
-
-    expect(renderer.threeRenderer.shadowMap.enabled).to.be.false;
-  });
-
-  it("should enable shadow map on enabling shadow", async () => {
-    const renderer = (await createView3D()).renderer;
-
-    renderer.disableShadow();
-    const prevVal = renderer.threeRenderer.shadowMap.enabled;
-    renderer.enableShadow();
-
-    expect(prevVal).to.be.false;
-    expect(renderer.threeRenderer.shadowMap.enabled).to.be.true;
   });
 
   describe("render", () => {

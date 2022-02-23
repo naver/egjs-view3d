@@ -88,19 +88,6 @@ export const DEFAULT_CLASS = {
 } as const;
 
 /**
- * Available shadow types
- * @type {object}
- * @property {"PCF_SOFT"} PCF_SOFT A shadow that uses THREE.PCFSoftShadowMap as shadow map
- * @property {"PCF"} PCF A shadow that uses THREE.PCFShadowMap as shadow map
- * @property {"VSM"} VSM A shadow that uses THREE.VSMShadowMap as shadow map
- */
-export const SHADOW_TYPE = {
-  PCF_SOFT: "PCF_SOFT",
-  PCF: "PCF",
-  VSM: "VSM"
-} as const;
-
-/**
  * Available AR session types
  * @type {object}
  * @property {"WebXR"} WEBXR An AR session based on {@link https://developer.mozilla.org/en-US/docs/Web/API/WebXR_Device_API WebXR Device API}
