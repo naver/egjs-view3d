@@ -123,7 +123,11 @@ class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivE
             if (btn.classList.contains("is-loading")) return;
 
             btn.classList.add("is-loading");
-            void this._view3D.init();
+            try {
+              void this._view3D.init();
+            } catch (err) {
+              console.error("Fail", err);
+            }
           }}>
             <span className="icon is-medium">
               <DownloadIcon />

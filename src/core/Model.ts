@@ -98,19 +98,21 @@ class Model {
     this._src = src;
 
     // This guarantees model's root has identity matrix at creation
-    this._scene = new THREE.Group();
-    this._scene.add(...scenes);
+    const scene = new THREE.Group();
+    scene.add(...scenes);
 
     this._animations = animations;
     this._json = json;
-
-    this._bbox = this._getInitialBbox(fixSkinnedBbox);
+    this._scene = scene;
+    const bbox = this._getInitialBbox(fixSkinnedBbox);
 
     // Move to position where bbox.min.y = 0
-    const offset = this._bbox.min.y;
-    this._scene.translateY(-offset);
-    this._bbox.translate(new THREE.Vector3(0, -offset, 0));
+    const offset = bbox.min.y;
+    scene.translateY(-offset);
+    scene.updateMatrixWorld();
+    bbox.translate(new THREE.Vector3(0, -offset, 0));
 
+    this._bbox = bbox;
     this.castShadow = castShadow;
     this.receiveShadow = receiveShadow;
   }

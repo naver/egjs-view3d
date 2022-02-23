@@ -76,8 +76,28 @@ export const EASING = {
   }
 } as const;
 
+/**
+ * Default class names that View3D uses
+ * @type {object}
+ * @property {"view3d-poster"} POSTER A class name for poster element
+ * @property {"view3d-ar-overlay"} AR_OVERLAY A class name for AR overlay element
+ */
 export const DEFAULT_CLASS = {
-  POSTER: "view3d-poster"
+  POSTER: "view3d-poster",
+  AR_OVERLAY: "view3d-ar-overlay"
+} as const;
+
+/**
+ * Available shadow types
+ * @type {object}
+ * @property {"PCF_SOFT"} PCF_SOFT A shadow that uses THREE.PCFSoftShadowMap as shadow map
+ * @property {"PCF"} PCF A shadow that uses THREE.PCFShadowMap as shadow map
+ * @property {"VSM"} VSM A shadow that uses THREE.VSMShadowMap as shadow map
+ */
+export const SHADOW_TYPE = {
+  PCF_SOFT: "PCF_SOFT",
+  PCF: "PCF",
+  VSM: "VSM"
 } as const;
 
 /**

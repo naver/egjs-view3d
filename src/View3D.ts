@@ -580,6 +580,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._autoResize = autoResize;
     this._useResizeObserver = useResizeObserver;
 
+    this._model = null;
+    this._initialized = false;
+    this._plugins = plugins;
+
     // Create internal components
     this._renderer = new Renderer(this);
     this._camera = new Camera(this);
@@ -589,9 +593,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._autoPlayer = new AutoPlayer(this, getObjectOption(autoplay));
     this._autoResizer = new AutoResizer(this);
     this._arManager = new ARManager(this);
-    this._model = null;
-    this._initialized = false;
-    this._plugins = plugins;
 
     this._addEventHandlers(on);
     this._addPosterImage();
@@ -634,6 +635,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
     const scene = this._scene;
     const renderer = this._renderer;
+    const control = this._control;
     const skybox = this._skybox;
     const envmap = this._envmap;
     const background = this._background;
@@ -664,14 +666,14 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
     await this._loadModel(this._src);
 
-    // Start rendering
-    renderer.stopAnimationLoop();
-    renderer.setAnimationLoop(renderer.defaultRenderLoop);
-
-    this._control.enable();
+    control.enable();
     if (this._autoplay) {
       this._autoPlayer.enable();
     }
+
+    // Start rendering
+    renderer.stopAnimationLoop();
+    renderer.setAnimationLoop(renderer.defaultRenderLoop);
 
     this._initialized = true;
     this.trigger(EVENTS.READY, { type: EVENTS.READY, target: this });
@@ -733,7 +735,8 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
     scene.reset();
     scene.add(model.scene);
-    scene.shadowPlane.update(model);
+
+    scene.shadowPlane.updateDimensions(model);
 
     if (resetCamera) {
       camera.fit(model, this._center);

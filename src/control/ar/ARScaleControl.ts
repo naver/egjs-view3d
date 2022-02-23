@@ -157,7 +157,7 @@ class ARScaleControl implements ARControl {
     this._updateUIPosition(ctx);
   }
 
-  public update({ view3D, scene }: XRRenderContext, deltaTime: number) {
+  public update({ scene }: XRRenderContext, deltaTime: number) {
     if (!this._enabled || !this._active) return;
 
     const motion = this._motion;
@@ -167,7 +167,6 @@ class ARScaleControl implements ARControl {
     this._ui.updateScale(this._scaleMultiplier);
 
     scene.setModelScale(this._scaleMultiplier);
-    view3D.scene.shadowPlane.updateShadow(this._scaleMultiplier);
   }
 
   private _updateUIPosition({ view3D, scene, xrCam, vertical }: XRRenderContext) {

@@ -6,7 +6,6 @@
 import Component from "@egjs/component";
 
 import * as DEFAULT from "../const/default";
-import { EASING } from "../const/external";
 import { circulate, clamp } from "../utils";
 
 /**
@@ -65,7 +64,7 @@ class Animation extends Component<{
     context = window,
     repeat = 0,
     duration = DEFAULT.ANIMATION_DURATION,
-    easing = EASING.EASE_OUT_CUBIC
+    easing = DEFAULT.EASING
   }: Partial<{
     context: any;
     repeat: number;

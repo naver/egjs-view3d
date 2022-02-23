@@ -21,19 +21,45 @@ You can also customize the shadow with the following properties.
 |pitch|number|0|X-axis rotation of the light that casts shadow.|
 
 ## Examples
-### shadow: true (default)
-<View3D src="/egjs-view3d/model/draco/alarm.glb" shadow={true} envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" showExampleCode />
+<div className="columns">
+  <div className="column">
+    <View3D
+      src="/egjs-view3d/model/draco/trex.glb"
+      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+      poster="/egjs-view3d/poster/alarm.png"
+      clickToLoad
+      fixSkinnedBbox
+      showExampleCode />
+  </div>
+  <div className="column">
+    <View3D
+      src="/egjs-view3d/model/draco/alarm.glb"
+      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+      poster="/egjs-view3d/poster/alarm.png"
+      clickToLoad
+      showExampleCode />
+  </div>
+</div>
 
-### shadow: false
-<View3D src="/egjs-view3d/model/draco/alarm.glb" shadow={false} envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" showExampleCode />
-
-### Detailed
-<View3D src="/egjs-view3d/model/draco/alarm.glb" shadow={{
-  opacity: 1,
-  hardness: 12,
-  pitch: 50,
-  yaw: -30
-}} envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" showExampleCode />
+<div className="columns">
+  <div className="column">
+    <View3D
+      src="/egjs-view3d/model/draco/lucy.glb"
+      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+      poster="/egjs-view3d/poster/alarm.png"
+      clickToLoad
+      showExampleCode />
+  </div>
+  <div className="column">
+    <View3D
+      src="/egjs-view3d/model/draco/trex.glb"
+      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+      poster="/egjs-view3d/poster/alarm.png"
+      fixSkinnedBbox
+      clickToLoad
+      showExampleCode />
+  </div>
+</div>
 
 <License items={[
   {
