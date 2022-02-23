@@ -33,6 +33,18 @@ describe("Camera", () => {
       expect(camera.zoom).to.equal(0);
       expect(camera.pivot).to.deep.equal(new THREE.Vector3(0, 0, 0));
     });
+
+    it("should set default pose equal to View3D's yaw, pitch, initialZoom", async () => {
+      const camera = (await createView3D({
+        yaw: 1,
+        pitch: 2,
+        initialZoom: 3
+      })).camera;
+
+      expect(camera.defaultPose.yaw).to.equal(1);
+      expect(camera.defaultPose.pitch).to.equal(2);
+      expect(camera.defaultPose.zoom).to.equal(3);
+    });
   });
 
   describe("reset", () => {

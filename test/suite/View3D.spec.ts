@@ -151,6 +151,12 @@ describe("View3D", () => {
       });
     });
 
+    describe("initialZoom", () => {
+      it("should have 0 as a default value", async () => {
+        expect((await createView3D()).initialZoom).to.equal(0);
+      });
+    });
+
     describe("rotate", () => {
       it("should have true as a default value", async () => {
         expect((await createView3D()).rotate).to.be.true;
