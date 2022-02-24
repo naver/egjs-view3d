@@ -21,7 +21,7 @@ export const cleanup = () => {
   });
 };
 
-export const createView3D = async (options: Partial<View3DOptions> = {}): Promise<View3D> => {
+export const createView3D = async (options: Partial<View3DOptions & { children: HTMLElement[] }> = {}): Promise<View3D> => {
   const sandbox = createSandbox(`view3d-${Date.now()}`);
   const wrapper = document.createElement("div");
   const canvas = document.createElement("canvas");
@@ -32,11 +32,17 @@ export const createView3D = async (options: Partial<View3DOptions> = {}): Promis
   wrapper.appendChild(canvas);
   sandbox.appendChild(wrapper);
 
-  const view3D = new View3D(wrapper, options);
+  const { children = [], ...restOptions } = options;
+
+  children.forEach(el => {
+    wrapper.appendChild(el);
+  });
+
+  const view3D = new View3D(wrapper, restOptions);
 
   (window as any).instances.push(view3D);
 
-  if (!options.autoInit || !options.src) return view3D;
+  if (!restOptions.autoInit || !restOptions.src) return view3D;
 
   return new Promise(resolve => {
     view3D.once(EVENTS.READY, () => {

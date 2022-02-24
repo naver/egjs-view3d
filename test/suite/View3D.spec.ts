@@ -241,7 +241,7 @@ describe("View3D", () => {
       });
 
       it("should add img element as a child of root element if string is given", async () => {
-        const view3D = await createView3D({ poster: "SOME_URL", autoInit: false });
+        const view3D = await createView3D({ poster: "http://SOME_URL_THAT_DOESNT_EXIST", autoInit: false });
         const imgEl = view3D.rootEl.querySelector("img");
 
         expect(imgEl).not.to.be.null;
@@ -249,7 +249,7 @@ describe("View3D", () => {
       });
 
       it("should add img element with 'src' attribute same to the given string", async () => {
-        const posterURL = new URL("SOME_POSTER_URL", location.href);
+        const posterURL = new URL("/SOME_POSTER_URL", location.href);
         const view3D = await createView3D({ poster: posterURL.href, autoInit: false });
         const imgEl = view3D.rootEl.querySelector("img");
 
@@ -258,7 +258,7 @@ describe("View3D", () => {
       });
 
       it("should add img element which have 'view3d-poster' class in it", async () => {
-        const posterURL = "SOME_POSTER_URL";
+        const posterURL = "/SOME_POSTER_URL";
         const view3D = await createView3D({ poster: posterURL, autoInit: false });
         const imgEl = view3D.rootEl.querySelector("img");
 
@@ -267,7 +267,7 @@ describe("View3D", () => {
       });
 
       it("should add img element which should be removed after initialization", async () => {
-        const posterURL = "SOME_POSTER_URL";
+        const posterURL = "/SOME_POSTER_URL";
         const view3D = await createView3D({ poster: posterURL, autoInit: false });
         const imgEl = view3D.rootEl.querySelector("img");
 
@@ -277,6 +277,45 @@ describe("View3D", () => {
         await view3D.load("/cube.glb");
 
         expect(imgEl.parentElement).to.be.null;
+      });
+
+      it("can accept HTMLElement inside view3D wrapper", async () => {
+        const sampleEl = document.createElement("div");
+        const view3D = await createView3D({ src: "/cube.glb", poster: sampleEl, autoInit: false });
+        view3D.rootEl.appendChild(sampleEl);
+
+        try {
+          await view3D.init();
+        } catch {
+          // should not throw
+          expect(false).to.be.true;
+        }
+      });
+
+      it("should remove HTMLElement given after init", async () => {
+        const sampleEl = document.createElement("div");
+        const view3D = await createView3D({ src: "/cube.glb", poster: sampleEl, autoInit: false, children: [sampleEl] });
+        sampleEl.id = "sample-poster-el";
+
+        const inDocumentBeforeInit = !!document.querySelector("#sample-poster-el");
+        await view3D.init();
+        const inDocumentAfterInit = !!document.querySelector("#sample-poster-el");
+
+        expect(inDocumentBeforeInit).to.be.true;
+        expect(inDocumentAfterInit).to.be.false;
+      });
+
+      it("should remove HTMLElement matching the given CSS string after init", async () => {
+        const sampleEl = document.createElement("div");
+        sampleEl.id = "poster-el-id";
+        const view3D = await createView3D({ src: "/cube.glb", poster: "#poster-el-id", autoInit: false, children: [sampleEl] });
+
+        const inDocumentBeforeInit = !!document.querySelector("#poster-el-id");
+        await view3D.init();
+        const inDocumentAfterInit = !!document.querySelector("#poster-el-id");
+
+        expect(inDocumentBeforeInit).to.be.true;
+        expect(inDocumentAfterInit).to.be.false;
       });
     });
 
