@@ -13,7 +13,7 @@ import Model from "./Model";
 
 /**
  * @interface
- * @param {number} [darkness=0.3] Darkness of the shadow.
+ * @param {number} [darkness=0.5] Darkness of the shadow.
  * @param {number} [mapSize=9] Size of the shadow map. Texture of size (n * n) where n = 2 ^ (mapSize) will be used as shadow map. Should be an integer value.
  * @param {number} [blur=3.5] Blurriness of the shadow.
  * @param {number} [shadowScale=1] Scale of the shadow range. Using higher values will make shadow more even-textured.
@@ -59,7 +59,7 @@ class ShadowPlane {
   /**
    * Darkness of the shadow.
    * @type {number}
-   * @default 0.3
+   * @default 0.5
    */
   public get darkness() { return this._darkness; }
   /**
@@ -90,14 +90,14 @@ class ShadowPlane {
   /**
    * Create new shadow plane
    * @param {object} options Options
-   * @param {number} [options.darkness=0.3] Darkness of the shadow.
+   * @param {number} [options.darkness=0.5] Darkness of the shadow.
    * @param {number} [options.mapSize=9] Size of the shadow map. Texture of size (n * n) where n = 2 ^ (mapSize) will be used as shadow map. Should be an integer value.
    * @param {number} [options.blur=3.5] Blurriness of the shadow.
    * @param {number} [options.shadowScale=1] Scale of the shadow range. Using higher values will make shadow more even-textured.
    * @param {number} [options.planeScale=2] Scale of the shadow plane. Use higher value if the shadow is clipped.
    */
   public constructor(view3D: View3D, {
-    darkness = 0.3,
+    darkness = 0.5,
     mapSize = 9,
     blur = 3.5,
     shadowScale = 1,

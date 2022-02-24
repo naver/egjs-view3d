@@ -4,6 +4,9 @@
  */
 
 import * as THREE from "three";
+import { Vector3 } from "three";
+
+import { TypedArray } from "../type/utils";
 
 /**
  * Data class for loaded 3d model
@@ -167,17 +170,22 @@ class Model {
       skeleton.update();
       const boneMatricies = skeleton.boneMatrices;
 
+      const skinWeightScale = (skinWeights.normalized && ArrayBuffer.isView(skinWeights.array))
+        ? 1 / (Math.pow(2, 8 * (skinWeights.array as TypedArray).BYTES_PER_ELEMENT) - 1)
+        : 1;
+
       const finalMatrix = new THREE.Matrix4();
       for (let posIdx = 0; posIdx < positions.count; posIdx++) {
         finalMatrix.identity();
 
+        const pos = new Vector3().fromBufferAttribute(positions, posIdx);
         const skinned = new THREE.Vector4();
         skinned.set(0, 0, 0, 0);
         const skinVertex = new THREE.Vector4();
         skinVertex.set(
-          positions.getX(posIdx),
-          positions.getY(posIdx),
-          positions.getZ(posIdx),
+          pos.x,
+          pos.y,
+          pos.z,
           1,
         ).applyMatrix4(mesh.bindMatrix);
 
@@ -186,7 +194,7 @@ class Model {
           skinWeights.getY(posIdx),
           skinWeights.getZ(posIdx),
           skinWeights.getW(posIdx)
-        ];
+        ].map(weight => weight * skinWeightScale);
 
         const indicies = [
           skinIndicies.getX(posIdx),
@@ -202,10 +210,6 @@ class Model {
 
         const transformed = new THREE.Vector3().fromArray(skinned.applyMatrix4(mesh.bindMatrixInverse).toArray());
         transformed.applyMatrix4(mesh.matrixWorld);
-
-        // if (Math.abs(transformed.x) > 10000) {
-        //   console.log(transformed, mesh.bindMatrixInverse, skinned);
-        // }
 
         bbox.expandByPoint(transformed);
       }
