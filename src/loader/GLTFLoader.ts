@@ -237,7 +237,7 @@ class GLTFLoader {
 
       texturesByLevel.forEach(async (levelTextures, level) => {
         // Change textures when all texture of the level loaded
-        const texturesLoaded = await Promise.all(levelTextures.map(({ index }) => gltf.parser.getDependency("texture", index) as Promise<THREE.Texture>))
+        const texturesLoaded = await Promise.all(levelTextures.map(({ index }) => gltf.parser.getDependency("texture", index) as Promise<THREE.Texture>));
         const higherLevelLoaded = loaded.slice(level + 1).some(val => !!val);
 
         loaded[level] = true;

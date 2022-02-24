@@ -27,7 +27,7 @@ import * as DEFAULT from "./const/default";
 import ERROR from "./const/error";
 import * as EVENT_TYPES from "./type/event";
 import { View3DPlugin } from "./plugin";
-import { getElement, getObjectOption } from "./utils";
+import { getElement, getObjectOption, isCSSSelector, isElement } from "./utils";
 import { LiteralUnion, OptionGetters, ValueOf } from "./type/utils";
 import { GLTFLoader } from "./loader";
 
@@ -93,7 +93,7 @@ export interface View3DOptions {
   arPriority: Array<ValueOf<typeof AR_SESSION_TYPE>>;
 
   // Others
-  poster: string | null;
+  poster: string | HTMLElement | null;
   canvasSelector: string;
   autoInit: boolean;
   autoResize: boolean;
@@ -442,8 +442,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get arPriority() { return this._arPriority; }
   /**
-   * A URL to the image that will be displayed before the 3D model is loaded.
-   * @type {string | null}
+   * Poster image that will be displayed before the 3D model is loaded.
+   * If `string` URL is given, View3D will temporarily show poster image element with that url as src before the first model is loaded
+   * If `string` CSS selector of DOM element inside view3d-wrapper or `HTMLElement` is given, View3D will remove that element after the first model is loaded
+   * @type {string | HTMLElement | null}
    * @default null
    */
   public get poster() { return this._poster; }
@@ -901,15 +903,37 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
     if (!poster) return;
 
-    const imgEl = document.createElement("img");
-    imgEl.className = DEFAULT_CLASS.POSTER;
-    imgEl.src = poster;
+    const isPosterEl = isElement(poster);
+    let posterEl: HTMLElement;
 
-    rootEl.appendChild(imgEl);
+    if (isPosterEl || isCSSSelector(poster)) {
+      const elCandidate = isPosterEl ? poster : rootEl.querySelector(poster as any);
+
+      if (!elCandidate) {
+        throw new View3DError(ERROR.MESSAGES.ELEMENT_NOT_FOUND(poster as string), ERROR.CODES.ELEMENT_NOT_FOUND);
+      }
+
+      posterEl = elCandidate as HTMLElement;
+    } else {
+      const imgEl = document.createElement("img");
+      imgEl.className = DEFAULT_CLASS.POSTER;
+      imgEl.src = poster;
+
+      rootEl.appendChild(imgEl);
+
+      posterEl = imgEl;
+
+      this.once(EVENTS.READY, () => {
+        if (imgEl.parentElement !== rootEl) return;
+        rootEl.removeChild(imgEl);
+      });
+    }
 
     this.once(EVENTS.READY, () => {
-      if (imgEl.parentElement !== rootEl) return;
-      rootEl.removeChild(imgEl);
+      if (!posterEl.parentElement) return;
+
+      // Remove that element from the parent element
+      posterEl.parentElement.removeChild(posterEl);
     });
   }
 
