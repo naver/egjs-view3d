@@ -1,24 +1,19 @@
 <!DOCTYPE html>
 <head>
+  <link rel="stylesheet" href="../../css/view3d-bundle.css" />
   <style>
-    .view3d-wrapper {
-      position: relative;
+    .view3d-area {
       width: 400px;
       height: 400px;
-    }
-    .view3d-canvas {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
     }
   </style>
   <script src="../../dist/view3d.pkgd.js"></script>
 </head>
 <body>
-  <div class="view3d-wrapper">
-    <canvas class="view3d-canvas"></canvas>
+  <div class="view3d-area">
+    <div class="view3d-wrapper view3d-1by1">
+      <canvas class="view3d-canvas"></canvas>
+    </div>
   </div>
   <script src="./index.js"></script>
 </body>

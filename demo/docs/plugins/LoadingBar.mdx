@@ -39,7 +39,7 @@ Without it, they won't be displayed correctly.
         envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
         poster="/egjs-view3d/poster/payphone.png"
         autoInit={false}
-        showLoadingBar />
+        showLoadingBar={{ type: "default" }} />
       <button className="button" onClick={() => { refs[0].current.view3D.init(); }}>Load</button>
     </div>
     <div className="column">
@@ -50,7 +50,7 @@ Without it, they won't be displayed correctly.
         envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
         poster="/egjs-view3d/poster/alarm.png"
         autoInit={false}
-        showLoadingBar="top" />
+        showLoadingBar={{ type: "top" }} />
       <button className="button" onClick={() => { refs[1].current.view3D.init(); }}>Load</button>
     </div>
     <div className="column">
@@ -61,7 +61,7 @@ Without it, they won't be displayed correctly.
         envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
         poster="/egjs-view3d/poster/watch.png"
         autoInit={false}
-        showLoadingBar="spinner" />
+        showLoadingBar={{ type: "spinner" }} />
       <button className="button" onClick={() => { refs[2].current.view3D.init(); }}>Load</button>
     </div>
   </div>
@@ -76,10 +76,12 @@ Without it, they won't be displayed correctly.
 |loadingLabel|string|"Loading 3D Model..."|A text to display while loading 3D model.|
 |parsingLabel|string|"Parsing 3D Model..."|A text to display while parsing the model after loading is done.|
 |labelColor|string|"#ffffff"|A text color in CSS string|
+|barWidth|string|"70%"|Loading bar's width in CSS string. This is only applicable for type "default"|
 |barHeight|string|"10px"|Loading bar's height in CSS string|
-|barBackground|string|"#bbbbbb"|Loading bar's background color in CSS string|
+|barBackground|string|"#bbbbbb"|Loading bar's background color in CSS string. This is not applicable to type "spinner"|
 |barForeground|string|"#3e8ed0"|Loading bar's foreground color in CSS string|
-|overlayBackground|string|"rgba(0, 0, 0, 0.3)"|Overlay's background color in CSS string|
+|spinnerWidth|string|"30%"|Spinner's width in CSS string. This is only applicable for type "spinner"|
+|overlayBackground|string|"rgba(0, 0, 0, 0.3)"|Overlay's background color in CSS string. This is not applicable to type "top"|
 
 <License items={[
   {

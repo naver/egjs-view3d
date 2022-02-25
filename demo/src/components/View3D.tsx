@@ -2,7 +2,7 @@ import React from "react";
 import clsx from "clsx";
 import Swal from "sweetalert2";
 import * as THREE from "three";
-import VanillaView3D, { View3DOptions, ARButton, AROverlay, LoadingBar, View3DPlugin } from "../../../src";
+import VanillaView3D, { View3DOptions, ARButton, AROverlay, LoadingBar, View3DPlugin, LoadingBarOptions } from "../../../src";
 import DownloadIcon from "../../static/icon/file_download_black.svg";
 
 import OptionExample from "./OptionExample";
@@ -12,7 +12,7 @@ interface DemoOptions extends Partial<View3DOptions> {
   className: string;
   clickToLoad: boolean;
   showARButton: boolean;
-  showLoadingBar: boolean | string;
+  showLoadingBar: LoadingBarOptions | null;
   showBbox: boolean;
   showExampleCode: boolean | string[];
   showEventsTriggered: null | string[];
@@ -26,7 +26,7 @@ class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivE
     className: "",
     clickToLoad: false,
     showARButton: false,
-    showLoadingBar: false,
+    showLoadingBar: null,
     showBbox: false,
     showExampleCode: false,
     showEventsTriggered: null,
@@ -67,10 +67,7 @@ class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivE
     }
 
     if (showLoadingBar) {
-      const type = typeof showLoadingBar === "string"
-        ? showLoadingBar as any
-        : "default";
-      plugins.push(new LoadingBar({ type }));
+      plugins.push(new LoadingBar(showLoadingBar));
     }
 
     const options = {

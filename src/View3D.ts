@@ -916,7 +916,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     } else {
       const imgEl = document.createElement("img");
       imgEl.className = DEFAULT_CLASS.POSTER;
-      imgEl.src = poster;
+      imgEl.src = poster as string;
 
       rootEl.appendChild(imgEl);
 

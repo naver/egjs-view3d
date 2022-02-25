@@ -11,8 +11,6 @@
   &.type-top
     height: auto
     background-color: transparent !important
-    .view3d-lb-wrapper
-      width: 100%
     .view3d-lb-label
       display: none
     .view3d-lb-base
@@ -22,26 +20,24 @@
 
 .view3d-lb-wrapper
   position: relative
+  width: 100%
 
 .view3d-lb-base
-  width: 140%
-  margin-left: -20%
+  margin-left: auto
+  margin-right: auto
   border-radius: 9999px
   overflow: hidden
   position: relative
   margin-bottom: 5px
   &.type-spinner
-    width: 70%
     height: 0
-    padding-top: 70%
-    margin-left: 15%
     background-color: transparent
     transition: all 500ms
     .view3d-lb-filler
       background-color: transparent
-      border: 15px solid #3e8ed0
+      border-style: solid
       width: 100%
-      border-left-color: transparent
+      box-sizing: border-box
       animation: view3d-lb-spin 1.2s linear infinite
 
 .view3d-lb-filler
