@@ -3,15 +3,13 @@
  * egjs projects are licensed under the MIT license
  */
 
-// Collection of util functions that is individual to View3D
-
 /**
  * Check whether View3D can be initialized without any issues.
  * View3D supports browsers with es6+ support.
  * @param {object} [features={}] Features to test
  * @returns {boolean} A boolean value indicating whether View3D is avilable
  */
-export const isAvailable = ({
+const isAvailable = ({
   webGL = true,
   fetch = true,
   stream = true,
@@ -67,3 +65,5 @@ const checkWASMAvailability = () => {
     return false;
   }
 };
+
+export default isAvailable;
