@@ -10,13 +10,37 @@ You can handle it with the `code` value of the error.
 See [Error Codes](/docs/api/ERROR_CODES) that can be thrown.
 
 ```ts
-import View3D, { ERROR_CODES } from "@egjs/view3d";
+import View3D, { View3DError, ERROR_CODES } from "@egjs/view3d";
 
 try {
   const view3d = new View3D("#wrapper");
 } catch (err) {
-  if (err.code === ERROR_CODES.ELEMENT_NOT_FOUND) {
-    console.error("Element not found");
+  if (err instanceof View3DError && err.code === ERROR_CODES.ELEMENT_NOT_FOUND) {
+    // Element(#wrapper) not found
   }
 }
+```
+
+## Handling model load error
+When the 3D model fails to load/parse, [loadError](/docs/events/loadError) event will be triggered, and FlickingError will be thrown with code `MODEL_FAIL_TO_LOAD`.
+
+As loading 3D models is asynchronous, it can't be catched when creating instance.
+Instead, you can use the option [autoInit](/docs/options/miscellaneous/autoInit) and [init](/docs/api/View3D#init) method to catch the error.
+
+```ts
+import View3D, { View3DError, EVENTS, ERROR_CODES } from "@egjs/view3d";
+
+const view3D = new View3D("#wrapper", { src: "URL_THAT_DOESN'T_EXIST", autoInit: true });
+
+view3D.on(EVENTS.LOAD_ERROR, evt => {
+  // This will show the actual error instance
+  console.log(evt.error);
+});
+
+view3D.init()
+  .catch(err => {
+    if (err instanceof View3DError && err.code === ERROR_CODES.MODEL_FAIL_TO_LOAD) {
+      // Model failed to load
+    }
+  });
 ```

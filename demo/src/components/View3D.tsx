@@ -1,5 +1,6 @@
 import React from "react";
 import clsx from "clsx";
+import Swal from "sweetalert2";
 import * as THREE from "three";
 import VanillaView3D, { View3DOptions, ARButton, AROverlay, LoadingBar, View3DPlugin } from "../../../src";
 import DownloadIcon from "../../static/icon/file_download_black.svg";
@@ -77,22 +78,28 @@ class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivE
       plugins,
       autoInit: clickToLoad ? false : restProps.autoInit
     };
-    const view3D = new VanillaView3D(this._rootRef.current, options);
-    view3D.on("ready", () => {
-      this.setState({
-        initialized: true
+
+    try {
+      const view3D = new VanillaView3D(this._rootRef.current, options);
+
+      view3D.on("ready", () => {
+        this.setState({
+          initialized: true
+        });
       });
-    });
 
-    this._view3D = view3D;
+      this._view3D = view3D;
 
-    if (showBbox) {
-      view3D.once("modelChange", ({ model }) => {
-        const modelBbox = model.bbox.clone().applyMatrix4(model.scene.matrixWorld);
-        const boxHelper = new THREE.Box3Helper(modelBbox, new THREE.Color(0x00ffff));
+      if (showBbox) {
+        view3D.once("modelChange", ({ model }) => {
+          const modelBbox = model.bbox.clone().applyMatrix4(model.scene.matrixWorld);
+          const boxHelper = new THREE.Box3Helper(modelBbox, new THREE.Color(0x00ffff));
 
-        view3D.scene.add(boxHelper);
-      });
+          view3D.scene.add(boxHelper);
+        });
+      }
+    } catch (err) {
+      console.log(err);
     }
   }
 
@@ -123,7 +130,14 @@ class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivE
             if (btn.classList.contains("is-loading")) return;
 
             btn.classList.add("is-loading");
-            void this._view3D.init();
+            void this._view3D.init().catch(err => {
+              void Swal.fire({
+                title: "Error!",
+                text: err.message,
+                icon: "error"
+              });
+              this.setState({ initialized: true });
+            });
           }}>
             <span className="icon is-medium">
               <DownloadIcon />

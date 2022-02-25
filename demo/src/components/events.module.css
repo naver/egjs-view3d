@@ -18,6 +18,18 @@
   border-radius: 10px;
 }
 
+.tagContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tagWrapper {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .arrow,
 .tags {
   display: inline-block !important;

@@ -39,6 +39,7 @@ export interface View3DEvents {
   [EVENTS.READY]: EVENT_TYPES.ReadyEvent;
   [EVENTS.LOAD_START]: EVENT_TYPES.LoadStartEvent;
   [EVENTS.LOAD]: EVENT_TYPES.LoadEvent;
+  [EVENTS.LOAD_ERROR]: EVENT_TYPES.LoadErrorEvent;
   [EVENTS.MODEL_CHANGE]: EVENT_TYPES.ModelChangeEvent;
   [EVENTS.RESIZE]: EVENT_TYPES.ResizeEvent;
   [EVENTS.BEFORE_RENDER]: EVENT_TYPES.BeforeRenderEvent;
@@ -626,12 +627,13 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._addEventHandlers(on);
     this._addPosterImage();
 
-    void this._initPlugins(plugins)
-      .then(() => {
-        if (src && autoInit) {
-          void this.init();
-        }
-      });
+    void (async () => {
+      await this._initPlugins(plugins);
+
+      if (src && autoInit) {
+        await this.init();
+      }
+    })();
   }
 
   /**
@@ -841,53 +843,50 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
     if (Array.isArray(src)) {
       const loaded = src.map(() => false);
-      const loadModels = src.map(async (srcLevel, level) => {
-        this.trigger(EVENTS.LOAD_START, {
-          type: EVENTS.LOAD_START,
-          target: this,
-          src: srcLevel,
-          level
-        });
-
-        const model = await loader.load(srcLevel);
-        const higherLevelLoaded = loaded.slice(level + 1).some(val => !!val);
-        const modelLoadedBefore = loaded.some(val => !!val);
-
-        this.trigger(EVENTS.LOAD, {
-          type: EVENTS.LOAD,
-          target: this,
-          model,
-          level
-        });
-
-        loaded[level] = true;
-
-        if (higherLevelLoaded) return;
-
-        this.display(model, {
-          resetCamera: !modelLoadedBefore
-        });
-      });
+      const loadModels = src.map((srcLevel, level) => this._loadSingleModel(loader, srcLevel, level, loaded));
 
       await Promise.race(loadModels);
     } else {
-      this.trigger(EVENTS.LOAD_START, {
-        type: EVENTS.LOAD_START,
-        target: this,
-        src,
-        level: 0
-      });
+      await this._loadSingleModel(loader, src, 0, [false]);
+    }
+  }
 
+  private async _loadSingleModel(loader: GLTFLoader, src: string, level: number, loaded: boolean[]) {
+    this.trigger(EVENTS.LOAD_START, {
+      type: EVENTS.LOAD_START,
+      target: this,
+      src,
+      level
+    });
+
+    try {
       const model = await loader.load(src);
+      const higherLevelLoaded = loaded.slice(level + 1).some(val => !!val);
+      const modelLoadedBefore = loaded.some(val => !!val);
 
       this.trigger(EVENTS.LOAD, {
         type: EVENTS.LOAD,
         target: this,
         model,
-        level: 0
+        level
       });
 
-      this.display(model);
+      loaded[level] = true;
+
+      if (higherLevelLoaded) return;
+
+      this.display(model, {
+        resetCamera: !modelLoadedBefore
+      });
+    } catch (error) {
+      this.trigger(EVENTS.LOAD_ERROR, {
+        type: EVENTS.LOAD_ERROR,
+        target: this,
+        level: 0,
+        error
+      });
+
+      throw new View3DError(ERROR.MESSAGES.MODEL_FAIL_TO_LOAD(src), ERROR.CODES.MODEL_FAIL_TO_LOAD);
     }
   }
 

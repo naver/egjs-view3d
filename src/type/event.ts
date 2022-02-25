@@ -52,6 +52,22 @@ export interface LoadEvent {
 }
 
 /**
+ * An event that fires when the 3D model fails to load / parse
+ * @event View3D#loadError
+ * @type {object}
+ * @property {string} type The type of event.
+ * @property {View3D} target An instance of View3D that triggered this event.
+ * @property {number} level A level of model when loading multiple models at once, an integer starting from 0.
+ * @property {Error} error An actual error instance that throwed when loading/parsing the model.
+ */
+export interface LoadErrorEvent {
+  type: string;
+  target: View3D;
+  level: number;
+  error: Error;
+}
+
+/**
  * An event that fires when the 3D Model is loaded and displayed on the canvas.
  * @event View3D#modelChange
  * @type {object}

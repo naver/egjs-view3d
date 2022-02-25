@@ -1,0 +1,39 @@
+---
+sidebar_position: 3
+---
+
+import View3D from "@site/src/components/View3D";
+import License from "@site/src/components/License";
+
+An event that fires when the 3D model fails to load / parse.
+
+|Property|Type|Description|
+|:---:|:---:|---|
+|type|string|The type of event|
+|target|[View3D](/docs/api/View3D)|An instance of View3D that triggered this event|
+|level|number|A level of model when loading multiple models at once, an integer starting from 0|
+|error|Error|An actual error instance that throwed when loading/parsing the model|
+
+<View3D
+  src="/egjs-view3d/model/NOT_A_MODEL.glb"
+  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+  poster="/egjs-view3d/poster/alarm.png"
+  clickToLoad
+  showEventsTriggered={["ready", "load", "loadStart", "loadError", "modelChange"]} />
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

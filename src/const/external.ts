@@ -18,6 +18,7 @@ export const AUTO = "auto";
  * @property {"ready"} READY {@link /docs/events/ready Ready event}
  * @property {"loadStart"} LOAD_START {@link /docs/events/loadStart Load start event}
  * @property {"load"} LOAD {@link /docs/events/load Load event}
+ * @property {"loadError"} LOAD_ERROR {@link /docs/events/loadError Load error event}
  * @property {"resize"} RESIZE {@link /docs/events/resize Resize event}
  * @property {"beforeRender"} BEFORE_RENDER {@link /docs/events/beforeRender Before render event}
  * @property {"render"} RENDER {@link /docs/events/render Render event}
@@ -36,6 +37,7 @@ export const EVENTS = {
   READY: "ready",
   LOAD_START: "loadStart",
   LOAD: "load",
+  LOAD_ERROR: "loadError",
   MODEL_CHANGE: "modelChange",
   RESIZE: "resize",
   BEFORE_RENDER: "beforeRender",
