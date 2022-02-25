@@ -38,15 +38,15 @@ describe("Skybox", () => {
     });
   });
 
-  describe("enable", () => {
-    it("should set disabled to true", async () => {
+  describe("disable", () => {
+    it("should set disabled to false", async () => {
       const view3D = await createView3D();
       const skybox = new Skybox(view3D);
 
       skybox.enable();
       skybox.disable();
 
-      expect(skybox.enabled).to.be.true;
+      expect(skybox.enabled).to.be.false;
     });
   });
 

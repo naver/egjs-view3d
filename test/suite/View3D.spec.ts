@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import {
+  View3DError,
   Camera,
   OrbitControl,
   ModelAnimator,
@@ -7,7 +8,9 @@ import {
   Scene,
   ARManager,
   AutoPlayer,
-  TONE_MAPPING
+  TONE_MAPPING,
+  ERROR_CODES,
+  EVENTS
 } from "~/index";
 import * as DEFAULT from "~/const/default";
 import { createView3D } from "../test-utils";
@@ -340,6 +343,47 @@ describe("View3D", () => {
     describe("useResizeObserver", () => {
       it("should have true as a default value", async () => {
         expect((await createView3D()).useResizeObserver).to.be.true;
+      });
+    });
+  });
+
+  describe("init", () => {
+    it("should throw model load failure when the given URL fails to load", async () => {
+      const view3D = await createView3D({ src: "SOME_WRONG_URL", autoInit: false });
+
+      try {
+        await view3D.init();
+        // should not reach here
+        expect(true).to.be.false;
+      } catch (err) {
+        expect(err).to.be.instanceOf(View3DError);
+        expect(err.code).to.equal(ERROR_CODES.MODEL_FAIL_TO_LOAD);
+      }
+    });
+
+    it("should trigger loadError event when the given URL fails to load", async () => {
+      const view3D = await createView3D({ src: "SOME_WRONG_URL", autoInit: false });
+      const loadErrorSpy = Cypress.sinon.spy();
+      view3D.on(EVENTS.LOAD_ERROR, loadErrorSpy);
+
+      await view3D.init().catch(() => void 0);
+
+      expect(loadErrorSpy.calledOnce).to.be.true;
+    });
+
+    it("should trigger loadError event for every failed model load", async () => {
+      const view3D = await createView3D({ src: ["SOME_WRONG_URL", "SOME_WRONG_URL2"], autoInit: false });
+      const loadErrorSpy = Cypress.sinon.spy();
+      view3D.on(EVENTS.LOAD_ERROR, loadErrorSpy);
+
+      await view3D.init().catch(() => void 0);
+
+      return new Promise(resolve => {
+        // Flush all microtasks
+        requestAnimationFrame(() => {
+          expect(loadErrorSpy.callCount).to.equal(2);
+          resolve();
+        });
       });
     });
   });
