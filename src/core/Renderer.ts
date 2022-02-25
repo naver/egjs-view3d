@@ -135,7 +135,7 @@ class Renderer {
     threeRenderer.autoClear = false;
     threeRenderer.clear();
 
-    if (scene.skybox) {
+    if (scene.skybox && scene.skybox.enabled) {
       scene.skybox.updateCamera();
       threeRenderer.render(scene.skybox.scene, scene.skybox.camera);
     }

@@ -70,11 +70,18 @@ class Playground extends React.Component<{}, {
     const dropzone = new SimpleDropzone(pageWrapper, fileInput);
 
     dropzone.on("drop", e => {
-      const fileNames = [...e.files.keys()];
-      const hdri = fileNames.find(name => /\.hdr$/i.test(name));
+      const files = e.files as Map<string, any>;
+      let hdriFileName = null;
+      // For somewhat reason "fileNames = [...files.keys()]" becomes "fileNames = files.keys()" on build
+      for (const [name] of files) {
+        if (/.hdr$/i.test(name)) {
+          hdriFileName = name;
+          break;
+        }
+      }
 
-      if (hdri) {
-        const hdriURL = URL.createObjectURL(e.files.get(hdri));
+      if (hdriFileName) {
+        const hdriURL = URL.createObjectURL(e.files.get(hdriFileName));
         void this.onEnvmapChange(hdriURL);
       } else {
         void this.onFileChange(e.files);
