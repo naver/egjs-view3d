@@ -14,6 +14,7 @@ An event that fires before loading a 3D model.
 |model|[Model](/docs/api/Model)|A new model that loaded|
 |src|string|A source URL of the model to load|
 |level|number|A level of model when loading multiple models at once, an integer starting from 0|
+|maxLevel|number|Maximum level of models loading|
 
 <View3D
     src={[
@@ -23,6 +24,7 @@ An event that fires before loading a 3D model.
   envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
   poster="/egjs-view3d/poster/plant.png"
   clickToLoad
+  showExampleCode
   showEventsTriggered={["ready", "load", "loadStart", "modelChange"]} />
 
 <License items={[

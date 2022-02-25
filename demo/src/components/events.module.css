@@ -18,16 +18,11 @@
   border-radius: 10px;
 }
 
-.tagContainer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .tagWrapper {
   display: inline-flex;
   justify-content: center;
   align-items: center;
+  vertical-align: top;
 }
 
 .arrow,

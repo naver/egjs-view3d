@@ -37,8 +37,8 @@ class EventsList extends React.Component<{
     return <div className={styles.overlay}>
       <div className={styles.events}>
         <div className="button is-white is-outlined" style={{ pointerEvents: "none" }}>Events Triggered</div>
-        <div className={clsx(styles.tagContainer, events.length > 0 ? "mt-2" : "")}>
-          { events.map((evt, idx) => (<span key={idx} className={styles.tagWrapper}>
+        <div className={events.length > 0 ? "mt-2" : ""}>
+          { events.map((evt, idx) => (<span key={idx} className={clsx(styles.tagWrapper, "mb-2")}>
             { idx > 0 && <RightArrowIcon className={clsx(styles.arrow)} /> }
             <span className={clsx(styles.tags, "bulma-tags", "has-addons", "mb-0")} key={idx}>
               <span className="bulma-tag mb-0 is-medium is-dark">{ evt.name }</span>
