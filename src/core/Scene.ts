@@ -152,7 +152,7 @@ class Scene {
     if (typeof background === "number" || background.charAt(0) === "#") {
       skybox.useColor(background);
     } else {
-      const textureLoader = new TextureLoader(this._view3D.renderer);
+      const textureLoader = new TextureLoader(view3D);
       const texture = await textureLoader.load(background);
 
       texture.encoding = THREE.sRGBEncoding;
@@ -174,7 +174,7 @@ class Scene {
     this._skybox?.destroy();
 
     if (url) {
-      const textureLoader = new TextureLoader(view3D.renderer);
+      const textureLoader = new TextureLoader(view3D);
       const texture = await textureLoader.loadHDRTexture(url);
       const skybox = new Skybox(view3D);
 
@@ -199,7 +199,8 @@ class Scene {
    */
   public async setEnvMap(url: string | null): Promise<void> {
     if (url) {
-      const textureLoader = new TextureLoader(this._view3D.renderer);
+      const view3D = this._view3D;
+      const textureLoader = new TextureLoader(view3D);
       const texture = await textureLoader.loadHDRTexture(url);
 
       this._root.environment = texture;

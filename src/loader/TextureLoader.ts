@@ -6,20 +6,21 @@
 import * as THREE from "three";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
 
-import Renderer from "../core/Renderer";
+import View3D from "../View3D";
+import { createLoadingContext } from "../utils";
+
+import Loader from "./Loader";
 
 /**
  * Texture loader
  */
-class TextureLoader {
-  private _renderer: Renderer;
-
+class TextureLoader extends Loader {
   /**
    * Create new TextureLoader instance
-   * @param renderer {@link Renderer} instance of View3D
+   * @param {View3D} view3D An instance of View3D
    */
-  public constructor(renderer: Renderer) {
-    this._renderer = renderer;
+  public constructor(view3D: View3D) {
+    super(view3D);
   }
 
   /**
@@ -28,39 +29,17 @@ class TextureLoader {
    * @param url url to fetch image
    */
   public load(url: string): Promise<THREE.Texture> {
+    const view3D = this._view3D;
+
     return new Promise((resolve, reject) => {
       const loader = new THREE.TextureLoader();
-      loader.load(url, resolve, undefined, reject);
-    });
-  }
+      const loadingContext = createLoadingContext(view3D, url);
 
-  /**
-   * Create new {@link https://threejs.org/docs/#api/en/renderers/WebGLCubeRenderTarget WebGLCubeRenderTarget} with given equirectangular image url
-   * Be sure that equirectangular image has height of power of 2, as it will be resized if it isn't
-   * @param url url to fetch equirectangular image
-   * @returns WebGLCubeRenderTarget created
-   */
-  public loadEquirectagularTexture(url: string): Promise<THREE.Texture> {
-    return new Promise((resolve, reject) => {
-      const loader = new THREE.TextureLoader();
-
-      loader.load(url, texture => {
-        texture.mapping = THREE.EquirectangularReflectionMapping;
-        resolve(texture);
-      }, undefined, reject);
-    });
-  }
-
-  /**
-   * Create new {@link https://threejs.org/docs/#api/en/textures/CubeTexture CubeTexture} with given cubemap image urls
-   * Image order should be: px, nx, py, ny, pz, nz
-   * @param urls cubemap image urls
-   * @returns CubeTexture created
-   */
-  public loadCubeTexture(urls: string[]): Promise<THREE.CubeTexture> {
-    return new Promise((resolve, reject) => {
-      const loader = new THREE.CubeTextureLoader();
-      loader.load(urls, resolve, undefined, reject);
+      loader.setCrossOrigin("anonymous");
+      loader.load(url, resolve, evt => this._onLoadingProgress(evt, url, loadingContext), err => {
+        loadingContext.initialized = true;
+        reject(err);
+      });
     });
   }
 
@@ -69,15 +48,21 @@ class TextureLoader {
    * @param url image url
    */
   public loadHDRTexture(url: string): Promise<THREE.Texture> {
+    const view3D = this._view3D;
+
     return new Promise((resolve, reject) => {
       const loader = new RGBELoader();
+      const loadingContext = createLoadingContext(view3D, url);
 
       loader.setCrossOrigin("anonymous");
       loader.load(url, texture => {
         texture.mapping = THREE.EquirectangularReflectionMapping;
 
         resolve(texture);
-      }, undefined, reject);
+      }, evt => this._onLoadingProgress(evt, url, loadingContext), err => {
+        loadingContext.initialized = true;
+        reject(err);
+      });
     });
   }
 }

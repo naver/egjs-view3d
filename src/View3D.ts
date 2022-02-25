@@ -40,6 +40,7 @@ export interface View3DEvents {
   [EVENTS.LOAD_START]: EVENT_TYPES.LoadStartEvent;
   [EVENTS.LOAD]: EVENT_TYPES.LoadEvent;
   [EVENTS.LOAD_ERROR]: EVENT_TYPES.LoadErrorEvent;
+  [EVENTS.LOAD_FINISH]: EVENT_TYPES.LoadFinishEvent;
   [EVENTS.MODEL_CHANGE]: EVENT_TYPES.ModelChangeEvent;
   [EVENTS.RESIZE]: EVENT_TYPES.ResizeEvent;
   [EVENTS.BEFORE_RENDER]: EVENT_TYPES.BeforeRenderEvent;
@@ -130,6 +131,13 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _rootEl: HTMLElement;
   private _plugins: View3DPlugin[];
   private _initialized: boolean;
+  private _loadingContext: Array<{
+    src: string;
+    loaded: number;
+    total: number;
+    lengthComputable: boolean;
+    initialized: boolean;
+  }>;
 
   // Options
   private _src: View3DOptions["src"];
@@ -234,6 +242,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    * @readonly
    */
   public get initialized() { return this._initialized; }
+  /**
+   * An array of loading status of assets.
+   * @type {object[]}
+   * @internal
+   */
+  public get loadingContext() { return this._loadingContext; }
   /**
    * Active plugins of view3D
    * @type {View3DPlugin[]}
@@ -612,6 +626,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
     this._model = null;
     this._initialized = false;
+    this._loadingContext = [];
     this._plugins = plugins;
 
     // Create internal components
@@ -671,6 +686,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     const envmap = this._envmap;
     const background = this._background;
     const meshoptPath = this._meshoptPath;
+    const tasks: Array<Promise<any>> = [];
 
     if (meshoptPath && !GLTFLoader.meshoptDecoder) {
       await GLTFLoader.setMeshoptDecoder(meshoptPath);
@@ -686,16 +702,21 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
         ? scene.setSkybox(skybox)
         : scene.setEnvMap(envmap);
 
-      void loadEnv.then(() => {
+      tasks.push(loadEnv.then(() => {
         scene.remove(tempLight);
-      });
+      }));
     }
 
     if (!skybox && background) {
-      void scene.setBackground(background);
+      tasks.push(scene.setBackground(background));
     }
 
-    await this._loadModel(this._src);
+    const loadModel = this._loadModel(this._src);
+    tasks.push(...loadModel);
+
+    void this._resetLoadingContextOnFinish(tasks);
+
+    await Promise.race(loadModel);
 
     control.enable();
     if (this._autoplay) {
@@ -736,7 +757,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public async load(src: string | string[]) {
     if (this._initialized) {
-      await this._loadModel(src);
+      const loadModel = this._loadModel(src);
+      void this._resetLoadingContextOnFinish(loadModel);
+
+      await Promise.race(loadModel);
 
       // Change the src later as an error can occur while loading the model
       this._src = src;
@@ -838,25 +862,28 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     anchorEl.click();
   }
 
-  private async _loadModel(src: string | string[]) {
+  private _loadModel(src: string | string[]): Array<Promise<void>> {
     const loader = new GLTFLoader(this);
 
     if (Array.isArray(src)) {
       const loaded = src.map(() => false);
       const loadModels = src.map((srcLevel, level) => this._loadSingleModel(loader, srcLevel, level, loaded));
 
-      await Promise.race(loadModels);
+      return loadModels;
     } else {
-      await this._loadSingleModel(loader, src, 0, [false]);
+      return [this._loadSingleModel(loader, src, 0, [false])];
     }
   }
 
   private async _loadSingleModel(loader: GLTFLoader, src: string, level: number, loaded: boolean[]) {
+    const maxLevel = loaded.length - 1;
+
     this.trigger(EVENTS.LOAD_START, {
       type: EVENTS.LOAD_START,
       target: this,
       src,
-      level
+      level,
+      maxLevel
     });
 
     try {
@@ -868,7 +895,8 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
         type: EVENTS.LOAD,
         target: this,
         model,
-        level
+        level,
+        maxLevel
       });
 
       loaded[level] = true;
@@ -882,7 +910,8 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
       this.trigger(EVENTS.LOAD_ERROR, {
         type: EVENTS.LOAD_ERROR,
         target: this,
-        level: 0,
+        level,
+        maxLevel,
         error
       });
 
@@ -938,6 +967,16 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
   private async _initPlugins(plugins: View3DPlugin[]) {
     await Promise.all(plugins.map(plugin => plugin.init(this)));
+  }
+
+  private async _resetLoadingContextOnFinish(tasks: Array<Promise<any>>) {
+    void Promise.all(tasks).then(() => {
+      this.trigger(EVENTS.LOAD_FINISH, {
+        type: EVENTS.LOAD_FINISH,
+        target: this
+      });
+      this._loadingContext = [];
+    });
   }
 }
 

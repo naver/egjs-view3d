@@ -4,7 +4,7 @@
  */
 import View3D from "../View3D";
 import { EVENTS } from "../const/external";
-import { LoadProgressEvent, LoadStartEvent } from "../type/event";
+import { LoadStartEvent } from "../type/event";
 import { ValueOf } from "../type/utils";
 
 import View3DPlugin from "./View3DPlugin";
@@ -69,7 +69,9 @@ class LoadingBar implements View3DPlugin {
     this._removeOverlay(view3D);
   }
 
-  private _startLoading = ({ target: view3D }: LoadStartEvent) => {
+  private _startLoading = ({ target: view3D, level }: LoadStartEvent) => {
+    if (level !== 0) return;
+
     const {
       type = "default",
       loadingLabel = "Loading 3D Model...",
@@ -125,24 +127,36 @@ class LoadingBar implements View3DPlugin {
     view3D.rootEl.appendChild(loadingOverlay);
 
     if (type !== LoadingBar.TYPE.SPINNER) {
-      const onProgress = (evt: LoadProgressEvent) => {
-        const percentage = 100 * (evt.loaded / evt.total);
+      const onProgress = () => {
+        if (!view3D.loadingContext.every(ctx => ctx.initialized)) return;
+
+        const [loaded, total] = view3D.loadingContext
+          .filter(ctx => ctx.lengthComputable)
+          .reduce((values, ctx) => {
+            values[0] += ctx.loaded;
+            values[1] += ctx.total;
+            return values;
+          }, [0, 0]);
+
+        if (total <= 0) return;
+
+        const percentage = 100 * (loaded / total);
 
         loadingFiller.style.width = `${percentage.toFixed(2)}%`;
 
-        if (evt.loaded === evt.total) {
+        if (loaded === total) {
           loadingLabelEl.innerText = parsingLabel;
         }
       };
 
       view3D.on(EVENTS.PROGRESS, onProgress);
 
-      view3D.once(EVENTS.LOAD, () => {
+      view3D.once(EVENTS.LOAD_FINISH, () => {
         view3D.off(EVENTS.PROGRESS, onProgress);
       });
     }
 
-    view3D.once(EVENTS.LOAD, () => {
+    view3D.once(EVENTS.LOAD_FINISH, () => {
       this._removeOverlay(view3D);
     });
 

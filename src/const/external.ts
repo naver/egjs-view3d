@@ -38,6 +38,7 @@ export const EVENTS = {
   LOAD_START: "loadStart",
   LOAD: "load",
   LOAD_ERROR: "loadError",
+  LOAD_FINISH: "loadFinish",
   MODEL_CHANGE: "modelChange",
   RESIZE: "resize",
   BEFORE_RENDER: "beforeRender",
