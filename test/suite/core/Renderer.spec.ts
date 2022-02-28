@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-import { createView3D } from "../../test-utils";
+import { createView3D, wait } from "../../test-utils";
 
 describe("Renderer", () => {
   describe("default values", () => {
@@ -31,6 +31,25 @@ describe("Renderer", () => {
     expect(prevSize.height).to.equal(300);
     expect(renderer.size.width).to.equal(400);
     expect(renderer.size.height).to.equal(600);
+  });
+
+  describe("setAnimationLoop", () => {
+    it("should cap maximum time delta to view3D.maxTimeDelta", async () => {
+      const view3D = await createView3D();
+      view3D.renderer.threeRenderer.setAnimationLoop = async (callback) => {
+        callback(0);
+        await wait(1000); // 1s
+        callback(1000);
+      };
+
+      const loopSpy = Cypress.sinon.spy();
+      view3D.renderer.setAnimationLoop(loopSpy);
+
+      await wait(1500);
+
+      expect(loopSpy.callCount).to.equal(2);
+      expect(loopSpy.lastCall.args[0]).to.equal(1 / 30);
+    });
   });
 
   describe("render", () => {
