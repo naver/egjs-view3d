@@ -170,14 +170,9 @@ class WebARSession implements ARSession {
     hitTest.init(session);
 
     const onSessionEnd = async () => {
-      const overlayEl = domOverlay.root;
-
       control.destroy(session);
       arScene.destroy(view3D);
 
-      if (!this.overlayRoot && overlayEl) {
-        view3D.rootEl.removeChild(overlayEl);
-      }
       domOverlay.destroy();
 
       // Restore original values

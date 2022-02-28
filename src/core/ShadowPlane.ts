@@ -151,10 +151,20 @@ class ShadowPlane {
   public render() {
     this._plane.visible = false;
 
-    const { scene, renderer } = this._view3D;
+    const view3D = this._view3D;
+    const { renderer, ar } = view3D;
     const shadowCamera = this._shadowCamera;
-    const sceneRoot = scene.root;
     const threeRenderer = renderer.threeRenderer;
+
+    const scene = ar.activeSession
+      ? ar.activeSession.arScene
+      : view3D.scene;
+
+    // disable XR for offscreen rendering
+    const xrEnabled = threeRenderer.xr.enabled;
+    threeRenderer.xr.enabled = false;
+
+    const sceneRoot = scene.root;
     const initialBackground = sceneRoot.background;
     sceneRoot.background = null;
 
@@ -180,6 +190,7 @@ class ShadowPlane {
     this._blurShadow(this._blur * 0.4);
 
     // reset and render the normal scene
+    threeRenderer.xr.enabled = xrEnabled;
     threeRenderer.setRenderTarget(null);
     threeRenderer.setClearAlpha(initialClearAlpha);
     sceneRoot.background = initialBackground;
