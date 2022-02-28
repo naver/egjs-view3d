@@ -102,6 +102,7 @@ export interface View3DOptions {
   useResizeObserver: boolean;
   on: Partial<View3DEvents>;
   plugins: View3DPlugin[];
+  maxDeltaTime: number;
 }
 
 /**
@@ -178,6 +179,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _autoInit: View3DOptions["autoInit"];
   private _autoResize: View3DOptions["autoResize"];
   private _useResizeObserver: View3DOptions["useResizeObserver"];
+  private _maxDeltaTime: View3DOptions["maxDeltaTime"];
 
   // Internal Components Getter
   /**
@@ -490,6 +492,14 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    * @default true
    */
   public get useResizeObserver() { return this._useResizeObserver; }
+  /**
+   * Maximum delta time in any given frame
+   * This can prevent a long frame hitch / lag
+   * The default value is 0.33333...(30 fps). Set this value to `Infinity` to disable
+   * @type {number}
+   * @default 0.333333...
+   */
+  public get maxDeltaTime() { return this._maxDeltaTime; }
 
   public set skybox(val: View3DOptions["skybox"]) {
     void this._scene.setSkybox(val);
@@ -528,6 +538,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   public set useGrabCursor(val: View3DOptions["useGrabCursor"]) {
     this._useGrabCursor = val;
     this._control.updateCursor();
+  }
+
+  public set maxDeltaTime(val: View3DOptions["maxDeltaTime"]) {
+    this._maxDeltaTime = val;
   }
 
   /**
@@ -578,7 +592,8 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     autoResize = true,
     useResizeObserver = true,
     on = {},
-    plugins = []
+    plugins = [],
+    maxDeltaTime = 1 / 30
   }: Partial<View3DOptions> = {}) {
     super();
 
@@ -628,6 +643,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._initialized = false;
     this._loadingContext = [];
     this._plugins = plugins;
+    this._maxDeltaTime = maxDeltaTime;
 
     // Create internal components
     this._renderer = new Renderer(this);

@@ -94,9 +94,12 @@ class Renderer {
   }
 
   public setAnimationLoop(callback: (delta: number, frame?: THREE.XRFrame) => void): void {
-    this._clock.start();
+    const view3D = this._view3D;
+    const clock = this._clock;
+
+    clock.start();
     this._renderer.setAnimationLoop((timestamp: number, frame?: THREE.XRFrame) => {
-      const delta = this._clock.getDelta();
+      const delta = Math.min(clock.getDelta(), view3D.maxDeltaTime);
       callback(delta, frame);
     });
   }
