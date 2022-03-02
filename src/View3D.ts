@@ -22,13 +22,13 @@ import AutoPlayer, { AutoplayOptions } from "./core/AutoPlayer";
 import { WebARSessionOptions } from "./xr/WebARSession";
 import { SceneViewerSessionOptions } from "./xr/SceneViewerSession";
 import { QuickLookSessionOptions } from "./xr/QuickLookSession";
-import { EVENTS, AUTO, AR_SESSION_TYPE, DEFAULT_CLASS } from "./const/external";
+import { EVENTS, AUTO, AR_SESSION_TYPE, DEFAULT_CLASS, TONE_MAPPING } from "./const/external";
 import * as DEFAULT from "./const/default";
 import ERROR from "./const/error";
 import * as EVENT_TYPES from "./type/event";
 import { View3DPlugin } from "./plugin";
-import { getElement, getObjectOption } from "./utils";
-import { OptionGetters, ValueOf } from "./type/utils";
+import { getElement, getObjectOption, isCSSSelector, isElement } from "./utils";
+import { LiteralUnion, OptionGetters, ValueOf } from "./type/utils";
 import { GLTFLoader } from "./loader";
 
 /**
@@ -39,6 +39,8 @@ export interface View3DEvents {
   [EVENTS.READY]: EVENT_TYPES.ReadyEvent;
   [EVENTS.LOAD_START]: EVENT_TYPES.LoadStartEvent;
   [EVENTS.LOAD]: EVENT_TYPES.LoadEvent;
+  [EVENTS.LOAD_ERROR]: EVENT_TYPES.LoadErrorEvent;
+  [EVENTS.LOAD_FINISH]: EVENT_TYPES.LoadFinishEvent;
   [EVENTS.MODEL_CHANGE]: EVENT_TYPES.ModelChangeEvent;
   [EVENTS.RESIZE]: EVENT_TYPES.ResizeEvent;
   [EVENTS.BEFORE_RENDER]: EVENT_TYPES.BeforeRenderEvent;
@@ -68,6 +70,7 @@ export interface View3DOptions {
   center: typeof AUTO | number[];
   yaw: number;
   pitch: number;
+  initialZoom: number;
   rotate: boolean | Partial<RotateControlOptions>;
   translate: boolean | Partial<TranslateControlOptions>;
   zoom: boolean | Partial<ZoomControlOptions>;
@@ -83,6 +86,7 @@ export interface View3DOptions {
   exposure: number;
   shadow: boolean | Partial<ShadowOptions>;
   skyboxBlur: boolean;
+  toneMapping: LiteralUnion<ValueOf<typeof TONE_MAPPING>, THREE.ToneMapping>;
 
   // AR
   webAR: boolean | Partial<WebARSessionOptions>;
@@ -91,13 +95,14 @@ export interface View3DOptions {
   arPriority: Array<ValueOf<typeof AR_SESSION_TYPE>>;
 
   // Others
-  poster: string | null;
+  poster: string | HTMLElement | null;
   canvasSelector: string;
   autoInit: boolean;
   autoResize: boolean;
   useResizeObserver: boolean;
   on: Partial<View3DEvents>;
   plugins: View3DPlugin[];
+  maxDeltaTime: number;
 }
 
 /**
@@ -127,6 +132,13 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _rootEl: HTMLElement;
   private _plugins: View3DPlugin[];
   private _initialized: boolean;
+  private _loadingContext: Array<{
+    src: string;
+    loaded: number;
+    total: number;
+    lengthComputable: boolean;
+    initialized: boolean;
+  }>;
 
   // Options
   private _src: View3DOptions["src"];
@@ -140,6 +152,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _center: View3DOptions["center"];
   private _yaw: View3DOptions["yaw"];
   private _pitch: View3DOptions["pitch"];
+  private _initialZoom: View3DOptions["initialZoom"];
   private _rotate: View3DOptions["rotate"];
   private _translate: View3DOptions["translate"];
   private _zoom: View3DOptions["zoom"];
@@ -154,6 +167,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _exposure: View3DOptions["exposure"];
   private _shadow: View3DOptions["shadow"];
   private _skyboxBlur: View3DOptions["skyboxBlur"];
+  private _toneMapping: View3DOptions["toneMapping"];
 
   private _webAR: View3DOptions["webAR"];
   private _sceneViewer: View3DOptions["sceneViewer"];
@@ -165,6 +179,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _autoInit: View3DOptions["autoInit"];
   private _autoResize: View3DOptions["autoResize"];
   private _useResizeObserver: View3DOptions["useResizeObserver"];
+  private _maxDeltaTime: View3DOptions["maxDeltaTime"];
 
   // Internal Components Getter
   /**
@@ -229,6 +244,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    * @readonly
    */
   public get initialized() { return this._initialized; }
+  /**
+   * An array of loading status of assets.
+   * @type {object[]}
+   * @internal
+   */
+  public get loadingContext() { return this._loadingContext; }
   /**
    * Active plugins of view3D
    * @type {View3DPlugin[]}
@@ -302,6 +323,13 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    * @default 0
    */
   public get pitch() { return this._pitch; }
+  /**
+   * Initial zoom value.
+   * Positive value will make camera zoomed in and negative value will make camera zoomed out.
+   * @type {number}
+   * @default 0
+   */
+  public get initialZoom() { return this._initialZoom; }
   /**
    * Options for the {@link RotateControl}.
    * If `false` is given, it will disable the rotate control.
@@ -393,6 +421,13 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get skyboxBlur() { return this._skyboxBlur; }
   /**
+   * This is used to approximate the appearance of high dynamic range (HDR) on the low dynamic range medium of a standard computer monitor or mobile device's screen.
+   * @type {number}
+   * @see TONE_MAPPING
+   * @default THREE.LinearToneMapping
+   */
+  public get toneMapping() { return this._toneMapping; }
+  /**
    * Options for the WebXR-based AR session.
    * If `false` is given, it will disable WebXR-based AR session.
    * @type {boolean | WebARSessionOptions}
@@ -424,8 +459,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get arPriority() { return this._arPriority; }
   /**
-   * A URL to the image that will be displayed before the 3D model is loaded.
-   * @type {string | null}
+   * Poster image that will be displayed before the 3D model is loaded.
+   * If `string` URL is given, View3D will temporarily show poster image element with that url as src before the first model is loaded
+   * If `string` CSS selector of DOM element inside view3d-wrapper or `HTMLElement` is given, View3D will remove that element after the first model is loaded
+   * @type {string | HTMLElement | null}
    * @default null
    */
   public get poster() { return this._poster; }
@@ -455,6 +492,14 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    * @default true
    */
   public get useResizeObserver() { return this._useResizeObserver; }
+  /**
+   * Maximum delta time in any given frame
+   * This can prevent a long frame hitch / lag
+   * The default value is 0.33333...(30 fps). Set this value to `Infinity` to disable
+   * @type {number}
+   * @default 0.333333...
+   */
+  public get maxDeltaTime() { return this._maxDeltaTime; }
 
   public set skybox(val: View3DOptions["skybox"]) {
     void this._scene.setSkybox(val);
@@ -485,9 +530,18 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     }
   }
 
+  public set toneMapping(val: View3DOptions["toneMapping"]) {
+    this._toneMapping = val;
+    this._renderer.threeRenderer.toneMapping = val as THREE.ToneMapping;
+  }
+
   public set useGrabCursor(val: View3DOptions["useGrabCursor"]) {
     this._useGrabCursor = val;
     this._control.updateCursor();
+  }
+
+  public set maxDeltaTime(val: View3DOptions["maxDeltaTime"]) {
+    this._maxDeltaTime = val;
   }
 
   /**
@@ -513,6 +567,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     center = AUTO,
     yaw = 0,
     pitch = 0,
+    initialZoom = 0,
     rotate = true,
     translate = true,
     zoom = true,
@@ -526,6 +581,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     exposure = 1,
     shadow = true,
     skyboxBlur = false,
+    toneMapping = TONE_MAPPING.LINEAR,
     webAR = true,
     sceneViewer = true,
     quickLook = true,
@@ -536,7 +592,8 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     autoResize = true,
     useResizeObserver = true,
     on = {},
-    plugins = []
+    plugins = [],
+    maxDeltaTime = 1 / 30
   }: Partial<View3DOptions> = {}) {
     super();
 
@@ -554,6 +611,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._center = center;
     this._yaw = yaw;
     this._pitch = pitch;
+    this._initialZoom = initialZoom;
     this._rotate = rotate;
     this._translate = translate;
     this._zoom = zoom;
@@ -568,6 +626,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._exposure = exposure;
     this._shadow = shadow;
     this._skyboxBlur = skyboxBlur;
+    this._toneMapping = toneMapping;
 
     this._webAR = webAR;
     this._sceneViewer = sceneViewer;
@@ -580,6 +639,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._autoResize = autoResize;
     this._useResizeObserver = useResizeObserver;
 
+    this._model = null;
+    this._initialized = false;
+    this._loadingContext = [];
+    this._plugins = plugins;
+    this._maxDeltaTime = maxDeltaTime;
+
     // Create internal components
     this._renderer = new Renderer(this);
     this._camera = new Camera(this);
@@ -589,19 +654,17 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._autoPlayer = new AutoPlayer(this, getObjectOption(autoplay));
     this._autoResizer = new AutoResizer(this);
     this._arManager = new ARManager(this);
-    this._model = null;
-    this._initialized = false;
-    this._plugins = plugins;
 
     this._addEventHandlers(on);
     this._addPosterImage();
 
-    void this._initPlugins(plugins)
-      .then(() => {
-        if (src && autoInit) {
-          void this.init();
-        }
-      });
+    void (async () => {
+      await this._initPlugins(plugins);
+
+      if (src && autoInit) {
+        await this.init();
+      }
+    })();
   }
 
   /**
@@ -634,10 +697,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
     const scene = this._scene;
     const renderer = this._renderer;
+    const control = this._control;
     const skybox = this._skybox;
     const envmap = this._envmap;
     const background = this._background;
     const meshoptPath = this._meshoptPath;
+    const tasks: Array<Promise<any>> = [];
 
     if (meshoptPath && !GLTFLoader.meshoptDecoder) {
       await GLTFLoader.setMeshoptDecoder(meshoptPath);
@@ -653,25 +718,30 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
         ? scene.setSkybox(skybox)
         : scene.setEnvMap(envmap);
 
-      void loadEnv.then(() => {
+      tasks.push(loadEnv.then(() => {
         scene.remove(tempLight);
-      });
+      }));
     }
 
     if (!skybox && background) {
-      void scene.setBackground(background);
+      tasks.push(scene.setBackground(background));
     }
 
-    await this._loadModel(this._src);
+    const loadModel = this._loadModel(this._src);
+    tasks.push(...loadModel);
+
+    void this._resetLoadingContextOnFinish(tasks);
+
+    await Promise.race(loadModel);
+
+    control.enable();
+    if (this._autoplay) {
+      this._autoPlayer.enable();
+    }
 
     // Start rendering
     renderer.stopAnimationLoop();
     renderer.setAnimationLoop(renderer.defaultRenderLoop);
-
-    this._control.enable();
-    if (this._autoplay) {
-      this._autoPlayer.enable();
-    }
 
     this._initialized = true;
     this.trigger(EVENTS.READY, { type: EVENTS.READY, target: this });
@@ -703,7 +773,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public async load(src: string | string[]) {
     if (this._initialized) {
-      await this._loadModel(src);
+      const loadModel = this._loadModel(src);
+      void this._resetLoadingContextOnFinish(loadModel);
+
+      await Promise.race(loadModel);
 
       // Change the src later as an error can occur while loading the model
       this._src = src;
@@ -733,7 +806,8 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
     scene.reset();
     scene.add(model.scene);
-    scene.shadowPlane.update(model);
+
+    scene.shadowPlane.updateDimensions(model);
 
     if (resetCamera) {
       camera.fit(model, this._center);
@@ -804,58 +878,60 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     anchorEl.click();
   }
 
-  private async _loadModel(src: string | string[]) {
+  private _loadModel(src: string | string[]): Array<Promise<void>> {
     const loader = new GLTFLoader(this);
 
     if (Array.isArray(src)) {
       const loaded = src.map(() => false);
-      const loadModels = src.map(async (srcLevel, level) => {
-        this.trigger(EVENTS.LOAD_START, {
-          type: EVENTS.LOAD_START,
-          target: this,
-          src: srcLevel,
-          level
-        });
+      const loadModels = src.map((srcLevel, level) => this._loadSingleModel(loader, srcLevel, level, loaded));
 
-        const model = await loader.load(srcLevel);
-        const higherLevelLoaded = loaded.slice(level + 1).some(val => !!val);
-        const modelLoadedBefore = loaded.some(val => !!val);
-
-        this.trigger(EVENTS.LOAD, {
-          type: EVENTS.LOAD,
-          target: this,
-          model,
-          level
-        });
-
-        loaded[level] = true;
-
-        if (higherLevelLoaded) return;
-
-        this.display(model, {
-          resetCamera: !modelLoadedBefore
-        });
-      });
-
-      await Promise.race(loadModels);
+      return loadModels;
     } else {
-      this.trigger(EVENTS.LOAD_START, {
-        type: EVENTS.LOAD_START,
-        target: this,
-        src,
-        level: 0
-      });
+      return [this._loadSingleModel(loader, src, 0, [false])];
+    }
+  }
 
+  private async _loadSingleModel(loader: GLTFLoader, src: string, level: number, loaded: boolean[]) {
+    const maxLevel = loaded.length - 1;
+
+    this.trigger(EVENTS.LOAD_START, {
+      type: EVENTS.LOAD_START,
+      target: this,
+      src,
+      level,
+      maxLevel
+    });
+
+    try {
       const model = await loader.load(src);
+      const higherLevelLoaded = loaded.slice(level + 1).some(val => !!val);
+      const modelLoadedBefore = loaded.some(val => !!val);
 
       this.trigger(EVENTS.LOAD, {
         type: EVENTS.LOAD,
         target: this,
         model,
-        level: 0
+        level,
+        maxLevel
       });
 
-      this.display(model);
+      loaded[level] = true;
+
+      if (higherLevelLoaded) return;
+
+      this.display(model, {
+        resetCamera: !modelLoadedBefore
+      });
+    } catch (error) {
+      this.trigger(EVENTS.LOAD_ERROR, {
+        type: EVENTS.LOAD_ERROR,
+        target: this,
+        level,
+        maxLevel,
+        error
+      });
+
+      throw new View3DError(ERROR.MESSAGES.MODEL_FAIL_TO_LOAD(src), ERROR.CODES.MODEL_FAIL_TO_LOAD);
     }
   }
 
@@ -871,20 +947,52 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
     if (!poster) return;
 
-    const imgEl = document.createElement("img");
-    imgEl.className = DEFAULT_CLASS.POSTER;
-    imgEl.src = poster;
+    const isPosterEl = isElement(poster);
+    let posterEl: HTMLElement;
 
-    rootEl.appendChild(imgEl);
+    if (isPosterEl || isCSSSelector(poster)) {
+      const elCandidate = isPosterEl ? poster : rootEl.querySelector(poster as any);
+
+      if (!elCandidate) {
+        throw new View3DError(ERROR.MESSAGES.ELEMENT_NOT_FOUND(poster as string), ERROR.CODES.ELEMENT_NOT_FOUND);
+      }
+
+      posterEl = elCandidate as HTMLElement;
+    } else {
+      const imgEl = document.createElement("img");
+      imgEl.className = DEFAULT_CLASS.POSTER;
+      imgEl.src = poster as string;
+
+      rootEl.appendChild(imgEl);
+
+      posterEl = imgEl;
+
+      this.once(EVENTS.READY, () => {
+        if (imgEl.parentElement !== rootEl) return;
+        rootEl.removeChild(imgEl);
+      });
+    }
 
     this.once(EVENTS.READY, () => {
-      if (imgEl.parentElement !== rootEl) return;
-      rootEl.removeChild(imgEl);
+      if (!posterEl.parentElement) return;
+
+      // Remove that element from the parent element
+      posterEl.parentElement.removeChild(posterEl);
     });
   }
 
   private async _initPlugins(plugins: View3DPlugin[]) {
     await Promise.all(plugins.map(plugin => plugin.init(this)));
+  }
+
+  private async _resetLoadingContextOnFinish(tasks: Array<Promise<any>>) {
+    void Promise.all(tasks).then(() => {
+      this.trigger(EVENTS.LOAD_FINISH, {
+        type: EVENTS.LOAD_FINISH,
+        target: this
+      });
+      this._loadingContext = [];
+    });
   }
 }
 

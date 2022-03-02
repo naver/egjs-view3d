@@ -70,14 +70,13 @@ class Renderer {
       preserveDrawingBuffer: true
     });
 
-    renderer.toneMapping = THREE.LinearToneMapping;
+    renderer.toneMapping = view3D.toneMapping as THREE.ToneMapping;
     renderer.toneMappingExposure = view3D.exposure;
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.setClearColor(0x000000, 0);
 
     this._renderer = renderer;
     this._clock = new THREE.Clock(false);
-    this.enableShadow();
   }
 
   /**
@@ -95,9 +94,12 @@ class Renderer {
   }
 
   public setAnimationLoop(callback: (delta: number, frame?: THREE.XRFrame) => void): void {
-    this._clock.start();
+    const view3D = this._view3D;
+    const clock = this._clock;
+
+    clock.start();
     this._renderer.setAnimationLoop((timestamp: number, frame?: THREE.XRFrame) => {
-      const delta = this._clock.getDelta();
+      const delta = Math.min(clock.getDelta(), view3D.maxDeltaTime);
       callback(delta, frame);
     });
   }
@@ -106,25 +108,6 @@ class Renderer {
     this._clock.stop();
     // See https://threejs.org/docs/#api/en/renderers/WebGLRenderer.setAnimationLoop
     this._renderer.setAnimationLoop(null);
-  }
-
-  /**
-   * Enable shadow map
-   */
-  public enableShadow() {
-    const threeRenderer = this._renderer;
-
-    threeRenderer.shadowMap.enabled = true;
-    threeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  }
-
-  /**
-   * Disable shadow map
-   */
-  public disableShadow() {
-    const threeRenderer = this._renderer;
-
-    threeRenderer.shadowMap.enabled = false;
   }
 
   private _defaultRenderLoop = (delta: number) => {
@@ -155,11 +138,12 @@ class Renderer {
     threeRenderer.autoClear = false;
     threeRenderer.clear();
 
-    if (scene.skybox) {
+    if (scene.skybox && scene.skybox.enabled) {
       scene.skybox.updateCamera();
       threeRenderer.render(scene.skybox.scene, scene.skybox.camera);
     }
 
+    scene.shadowPlane.render();
     threeRenderer.render(scene.root, camera.threeCamera);
     threeRenderer.autoClear = true;
 

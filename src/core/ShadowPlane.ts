@@ -4,201 +4,272 @@
  */
 
 import * as THREE from "three";
+import { HorizontalBlurShader } from "three/examples/jsm/shaders/HorizontalBlurShader";
+import { VerticalBlurShader } from "three/examples/jsm/shaders/VerticalBlurShader";
 
 import View3D from "../View3D";
-import { MAX_SAFE_INTEGER } from "../const/browser";
-import { clamp, getRotatedPosition } from "../utils";
-import { OptionGetters } from "../type/utils";
 
 import Model from "./Model";
 
 /**
  * @interface
- * @param {number} [opacity=0.3] Opacity of the shadow.
- * @param {number} [hardness=6] Hardness of the shadow. Should be integer greater than 0, and lower the softer the shadow is.
- * @param {number} [yaw=0] Y-axis rotation of the light that casts shadow.
- * @param {number} [pitch=0] X-axis rotation of the light that casts shadow.
+ * @param {number} [darkness=0.5] Darkness of the shadow.
+ * @param {number} [mapSize=9] Size of the shadow map. Texture of size (n * n) where n = 2 ^ (mapSize) will be used as shadow map. Should be an integer value.
+ * @param {number} [blur=3.5] Blurriness of the shadow.
+ * @param {number} [shadowScale=1] Scale of the shadow range. Using higher values will make shadow more even-textured.
+ * @param {number} [planeScale=2] Scale of the shadow plane. Use higher value if the shadow is clipped.
  */
 export interface ShadowOptions {
-  opacity: number;
-  hardness: number;
-  yaw: number;
-  pitch: number;
+  darkness: number;
+  mapSize: number;
+  blur: number;
+  shadowScale: number;
+  planeScale: number;
 }
 
 /**
  * Helper class to easily add shadow plane under your 3D model
  */
-class ShadowPlane implements OptionGetters<ShadowOptions> {
-  private _hardness: ShadowOptions["hardness"];
-  private _yaw: ShadowOptions["yaw"];
-  private _pitch: ShadowOptions["pitch"];
+class ShadowPlane {
+  private _darkness: ShadowOptions["darkness"];
+  private _mapSize: ShadowOptions["mapSize"];
+  private _blur: ShadowOptions["blur"];
+  private _shadowScale: ShadowOptions["shadowScale"];
+  private _planeScale: ShadowOptions["planeScale"];
 
-  private _geometry: THREE.PlaneGeometry;
-  private _material: THREE.Material;
-  private _mesh: THREE.Mesh;
-  private _light: THREE.DirectionalLight;
-  private _maxHardness: number;
-  private _modelRadius: number;
-  private _baseLightPos: THREE.Vector3;
+  private _view3D: View3D;
+  private _root: THREE.Group;
+  private _shadowCamera: THREE.OrthographicCamera;
+  private _blurCamera: THREE.OrthographicCamera;
+
+  private _renderTarget: THREE.WebGLRenderTarget;
+  private _blurTarget: THREE.WebGLRenderTarget;
+  private _depthMaterial: THREE.MeshDepthMaterial;
+  private _horizontalBlurMaterial: THREE.ShaderMaterial;
+  private _verticalBlurMaterial: THREE.ShaderMaterial;
+  private _plane: THREE.Mesh;
+  private _blurPlane: THREE.Mesh;
 
   /**
-   * Shadow plane mesh
-   * @type {THREE.Mesh}
+   * Root of the object
    * @readonly
    */
-  public get mesh() { return this._mesh; }
-  /**
-   * Shadow light
-   * @type {THREE.DirectionalLight}
-   * @readonly
-   */
-  public get light() { return this._light; }
+  public get root() { return this._root; }
 
   /**
-   * Shadow opacity, value can be between 0(invisible) and 1(solid)
+   * Darkness of the shadow.
    * @type {number}
-   * @default 0.3
+   * @default 0.5
    */
-  public get opacity() { return this._material.opacity; }
+  public get darkness() { return this._darkness; }
   /**
-   * Hardness of the shadow. Should be integer greater than 0, and lower the softer the shadow is.
+   * Size of the shadow map. Texture of size (n * n) where n = 2 ^ (mapSize) will be used as shadow map. Should be an integer value.
    * @type {number}
-   * @default 6
+   * @default 9
    */
-  public get hardness() { return this._hardness; }
+  public get mapSize() { return this._mapSize; }
   /**
-   * Y-axis rotation of the shadow.
+   * Blurriness of the shadow.
    * @type {number}
-   * @default 0
+   * @default 3.5
    */
-  public get yaw() { return this._yaw; }
+  public get blur() { return this._blur; }
   /**
-   * X-axis rotation of the shadow.
+   * Scale of the shadow range. Using higher values will make shadow more even-textured.
    * @type {number}
-   * @default 0
+   * @default 1
    */
-  public get pitch() { return this._pitch; }
-
-  public get radius() { return this._light.shadow.radius; }
-
-  public set opacity(val: number) {
-    this._material.opacity = val;
-  }
-
-  public set hardness(val: number) {
-    this._hardness = Math.min(val, this._maxHardness);
-    this._updateSoftnessLevel();
-  }
-
-  public set radius(val: number) {
-    this._light.shadow.radius = val;
-    this._light.shadow.needsUpdate = true;
-  }
+  public get shadowScale() { return this._shadowScale; }
+  /**
+   * Scale of the shadow plane. Use higher value if the shadow is clipped.
+   * @type {number}
+   * @default 2
+   */
+  public get planeScale() { return this._planeScale; }
 
   /**
    * Create new shadow plane
    * @param {object} options Options
-   * @param {number} [options.opacity=0.3] Opacity of the shadow.
-   * @param {number} [options.hardness=6] Hardness of the shadow. Should be integer greater than 0, and lower the softer the shadow is.
-   * @param {number} [options.yaw=0] Y-axis rotation of the light that casts shadow.
-   * @param {number} [options.pitch=0] X-axis rotation of the light that casts shadow.
+   * @param {number} [options.darkness=0.5] Darkness of the shadow.
+   * @param {number} [options.mapSize=9] Size of the shadow map. Texture of size (n * n) where n = 2 ^ (mapSize) will be used as shadow map. Should be an integer value.
+   * @param {number} [options.blur=3.5] Blurriness of the shadow.
+   * @param {number} [options.shadowScale=1] Scale of the shadow range. Using higher values will make shadow more even-textured.
+   * @param {number} [options.planeScale=2] Scale of the shadow plane. Use higher value if the shadow is clipped.
    */
   public constructor(view3D: View3D, {
-    opacity = 0.3,
-    hardness = 6,
-    yaw = 0,
-    pitch = 0
+    darkness = 0.5,
+    mapSize = 9,
+    blur = 3.5,
+    shadowScale = 1,
+    planeScale = 2
   }: Partial<ShadowOptions> = {}) {
-    this._hardness = hardness;
-    this._yaw = yaw;
-    this._pitch = pitch;
+    this._view3D = view3D;
+    this._darkness = darkness;
+    this._mapSize = mapSize;
+    this._blur = blur;
+    this._shadowScale = shadowScale;
+    this._planeScale = planeScale;
 
-    this._geometry = new THREE.PlaneBufferGeometry(2, 2);
-    this._material = new THREE.ShadowMaterial({ opacity, fog: false });
-    this._mesh = new THREE.Mesh(this._geometry, this._material);
-    this._light = new THREE.DirectionalLight();
-    this._baseLightPos = new THREE.Vector3();
-    this._modelRadius = 0;
+    const threeRenderer = view3D.renderer.threeRenderer;
+    const maxTextureSize = Math.min(Math.pow(2, Math.floor(mapSize)), threeRenderer.capabilities.maxTextureSize);
 
-    const mesh = this._mesh;
-    mesh.rotateX(-Math.PI / 2);
-    mesh.scale.setScalar(2 ** 32 - 1);
-    mesh.receiveShadow = true;
-    mesh.castShadow = false;
-    mesh.name = "ShadowPlane-Mesh";
+    this._root = new THREE.Group();
+    this._renderTarget = new THREE.WebGLRenderTarget(maxTextureSize, maxTextureSize, { format: THREE.RGBAFormat });
+    this._blurTarget = new THREE.WebGLRenderTarget(maxTextureSize, maxTextureSize, { format: THREE.RGBAFormat });
+    this._renderTarget.texture.generateMipmaps = false;
+    this._blurTarget.texture.generateMipmaps = false;
 
-    const light = this._light;
+    const shadowCamera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0);
+    shadowCamera.rotation.x = Math.PI / 2;
+    this._shadowCamera = shadowCamera;
+    this._root.add(shadowCamera);
 
-    light.intensity = 0;
-    light.target = mesh;
-    light.castShadow = true;
-    light.name = "ShadowPlane-Light";
+    const blurCamera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0);
+    this._blurCamera = blurCamera;
 
-    const maxTexSize = view3D.renderer.threeRenderer.capabilities.maxTextureSize;
-    this._maxHardness = Math.round(Math.log(maxTexSize) / Math.log(2));
-
-    this._updateSoftnessLevel();
+    this._setupPlanes();
   }
 
-  public update(model: Model) {
-    this._updatePlane(model);
-    this._updateLightPosition(model);
-    this.updateShadow();
-  }
+  public updateDimensions(model: Model) {
+    const root = this._root;
+    const shadowCam = this._shadowCamera;
+    const baseScale = this._planeScale;
+    const boundingSphere = model.bbox.getBoundingSphere(new THREE.Sphere());
+    const radius = boundingSphere.radius;
+    const camSize = baseScale * 2 * radius;
+    const shadowScale = this._shadowScale;
 
-  public updateShadow(worldScale: number = 1) {
-    const light = this._light;
-    const scale = 1.5;
-    const shadowCam = light.shadow.camera;
-    const radius = this._modelRadius;
+    shadowCam.far = shadowScale * (model.bbox.max.y - model.bbox.min.y) / camSize;
+    shadowCam.rotation.set(Math.PI / 2, Math.PI, 0, "YXZ");
 
-    light.position.copy(this._baseLightPos.clone().multiplyScalar(worldScale));
-
-    const camSize = scale * worldScale * radius;
-
-    shadowCam.near = 0;
-    shadowCam.far = MAX_SAFE_INTEGER;
-    shadowCam.left = -camSize;
-    shadowCam.right = camSize;
-    shadowCam.top = camSize;
-    shadowCam.bottom = -camSize;
+    root.position.copy(boundingSphere.center).setY(model.bbox.min.y);
+    root.scale.setScalar(camSize);
 
     shadowCam.updateProjectionMatrix();
   }
 
-  private _updateSoftnessLevel() {
-    const light = this._light;
+  public render() {
+    this._plane.visible = false;
 
-    const hardness = clamp(Math.floor(this._hardness), 1, this._maxHardness);
-    const shadowSize = Math.pow(2, Math.floor(hardness));
+    const view3D = this._view3D;
+    const { renderer, ar } = view3D;
+    const shadowCamera = this._shadowCamera;
+    const threeRenderer = renderer.threeRenderer;
 
-    light.shadow.mapSize.set(shadowSize, shadowSize);
-    light.shadow.map?.dispose();
-    (light.shadow as any).map = null;
+    const scene = ar.activeSession
+      ? ar.activeSession.arScene
+      : view3D.scene;
+
+    // disable XR for offscreen rendering
+    const xrEnabled = threeRenderer.xr.enabled;
+    threeRenderer.xr.enabled = false;
+
+    const sceneRoot = scene.root;
+    const initialBackground = sceneRoot.background;
+    sceneRoot.background = null;
+
+    // force the depthMaterial to everything
+    sceneRoot.overrideMaterial = this._depthMaterial;
+
+    // set renderer clear alpha
+    const initialClearAlpha = threeRenderer.getClearAlpha();
+    threeRenderer.setClearAlpha(0);
+
+    // render to the render target to get the depths
+    threeRenderer.setRenderTarget(this._renderTarget);
+    threeRenderer.clear();
+    threeRenderer.render(sceneRoot, shadowCamera);
+
+    // and reset the override material
+    sceneRoot.overrideMaterial = null;
+
+    this._blurShadow(this._blur);
+
+    // a second pass to reduce the artifacts
+    // (0.4 is the minimum blur amout so that the artifacts are gone)
+    this._blurShadow(this._blur * 0.4);
+
+    // reset and render the normal scene
+    threeRenderer.xr.enabled = xrEnabled;
+    threeRenderer.setRenderTarget(null);
+    threeRenderer.setClearAlpha(initialClearAlpha);
+    sceneRoot.background = initialBackground;
+
+    this._plane.visible = true;
   }
 
-  private _updatePlane(model: Model) {
-    const mesh = this._mesh;
-    const modelBbox = model.bbox;
-    const boxPoints = [modelBbox.min.x, modelBbox.min.z, modelBbox.max.x, modelBbox.max.z]
-      .map(val => Math.abs(val));
+  private _blurShadow(amount: number) {
+    const { renderer } = this._view3D;
+    const blurCamera = this._blurCamera;
+    const threeRenderer = renderer.threeRenderer;
+    const blurPlane = this._blurPlane;
+    const renderTarget = this._renderTarget;
+    const blurTarget = this._blurTarget;
+    const horizontalBlurMaterial = this._horizontalBlurMaterial;
+    const verticalBlurMaterial = this._verticalBlurMaterial;
 
-    const maxXZ = Math.max(...boxPoints);
+    blurPlane.visible = true;
 
-    mesh.scale.setScalar(100 * maxXZ);
+    // blur horizontally and draw in the renderTargetBlur
+    horizontalBlurMaterial.uniforms.tDiffuse.value = renderTarget.texture;
+    horizontalBlurMaterial.uniforms.h.value = amount * 1 / 256;
+    horizontalBlurMaterial.needsUpdate = true;
+    blurPlane.material = horizontalBlurMaterial;
+
+    threeRenderer.setRenderTarget(blurTarget);
+    threeRenderer.render(blurPlane, blurCamera);
+
+    // blur vertically and draw in the main renderTarget
+    verticalBlurMaterial.uniforms.tDiffuse.value = blurTarget.texture;
+    verticalBlurMaterial.uniforms.v.value = amount * 1 / 256;
+    verticalBlurMaterial.needsUpdate = true;
+    blurPlane.material = verticalBlurMaterial;
+
+    threeRenderer.setRenderTarget(renderTarget);
+    threeRenderer.render(blurPlane, blurCamera);
+
+    blurPlane.visible = false;
   }
 
-  private _updateLightPosition(model: Model) {
-    const yaw = this._yaw;
-    const pitch = this._pitch;
-    const boundingSphere = model.bbox.getBoundingSphere(new THREE.Sphere());
-    const radius = boundingSphere.radius;
+  private _setupPlanes() {
+    const root = this._root;
+    const planeGeometry = new THREE.PlaneBufferGeometry();
+    const planeMat = new THREE.MeshBasicMaterial({
+      opacity: this._darkness,
+      transparent: true,
+      side: THREE.BackSide,
+      depthWrite: false,
+      map: this._renderTarget.texture
+    });
 
-    // Added AR hover height(0.1) as offset
-    const newPosition = getRotatedPosition(2 * radius + 0.1, yaw, 90 - pitch);
-    this._baseLightPos.copy(newPosition);
-    this._modelRadius = radius;
+    const plane = new THREE.Mesh(planeGeometry, planeMat);
+    plane.renderOrder = 1;
+    plane.scale.set(-1, -1, 1);
+    plane.rotation.order = "YXZ";
+    plane.rotation.x = Math.PI / 2;
+    this._plane = plane;
+    root.add(plane);
+
+    const blurPlane = new THREE.Mesh(planeGeometry);
+    this._blurPlane = blurPlane;
+
+    const depthMaterial = new THREE.MeshDepthMaterial();
+    depthMaterial.onBeforeCompile = shader => {
+      shader.fragmentShader = `
+        ${shader.fragmentShader.replace(
+    "gl_FragColor = vec4( vec3( 1.0 - fragCoordZ ), opacity );",
+    "gl_FragColor = vec4( vec3( 0.0 ), ( 1.0 - fragCoordZ ) * opacity );"
+  )}`;
+    };
+    this._depthMaterial = depthMaterial;
+
+    const horizontalBlurMaterial = new THREE.ShaderMaterial(HorizontalBlurShader);
+    horizontalBlurMaterial.depthTest = false;
+    this._horizontalBlurMaterial = horizontalBlurMaterial;
+
+    const verticalBlurMaterial = new THREE.ShaderMaterial(VerticalBlurShader);
+    verticalBlurMaterial.depthTest = false;
+    this._verticalBlurMaterial = verticalBlurMaterial;
   }
 }
 

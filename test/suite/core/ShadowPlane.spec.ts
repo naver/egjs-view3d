@@ -6,60 +6,38 @@ import { createView3D } from "test-utils";
 
 describe("ShadowPlane", () => {
   describe("default properties", () => {
-    it("should have plane mesh on it", async () => {
+    it("should have root on it", async () => {
       const view3D = await createView3D();
-      expect(new ShadowPlane(view3D).mesh).to.be.instanceOf(THREE.Mesh);
+      expect(new ShadowPlane(view3D).root).to.be.instanceOf(THREE.Group);
     });
 
-    it("should have light on it", async () => {
+    it("has 0.5 as default darkness", async () => {
       const view3D = await createView3D();
-      expect(new ShadowPlane(view3D).light).to.be.instanceOf(THREE.Light);
+      expect(new ShadowPlane(view3D).darkness).to.equal(0.5);
     });
 
-    it("has 0.3 as default opacity", async () => {
+    it("has 9 as default mapSize", async () => {
       const view3D = await createView3D();
-      expect(new ShadowPlane(view3D).opacity).to.equal(0.3);
+      expect(new ShadowPlane(view3D).mapSize).to.equal(9);
     });
 
-    it("has 6 as default hardness", async () => {
+    it("has 3.5 as default light blur", async () => {
       const view3D = await createView3D();
-      expect(new ShadowPlane(view3D).hardness).to.equal(6);
+      expect(new ShadowPlane(view3D).blur).to.equal(3.5);
     });
 
-    it("has 0 as default light yaw", async () => {
+    it("has 1 as default shadowScale", async () => {
       const view3D = await createView3D();
-      expect(new ShadowPlane(view3D).yaw).to.equal(0);
+      expect(new ShadowPlane(view3D).shadowScale).to.equal(1);
     });
 
-    it("has 0 as default light pitch", async () => {
+    it("has 2 as default planeScale", async () => {
       const view3D = await createView3D();
-      expect(new ShadowPlane(view3D).pitch).to.equal(0);
-    });
-  });
-
-  describe("options", () => {
-    it("can change opacity", async () => {
-      const view3D = await createView3D();
-      expect(new ShadowPlane(view3D, { opacity: 0.5 }).opacity).to.equal(0.5);
-    });
-
-    it("can change hardness", async () => {
-      const view3D = await createView3D();
-      expect(new ShadowPlane(view3D, { hardness: 12 }).hardness).to.equal(12);
-    });
-
-    it("can change yaw", async () => {
-      const view3D = await createView3D();
-      expect(new ShadowPlane(view3D, { yaw: 180 }).yaw).to.equal(180);
-    });
-
-    it("can change pitch", async () => {
-      const view3D = await createView3D();
-      expect(new ShadowPlane(view3D, { pitch: 45 }).pitch).to.equal(45);
+      expect(new ShadowPlane(view3D).planeScale).to.equal(2);
     });
   });
 
-  describe("fitting to a model", () => {
+  describe("updateDimensions", () => {
     it("should be placed near at model's min-y", async () => {
       const view3D = await createView3D();
       const plane = new ShadowPlane(view3D);
@@ -69,9 +47,9 @@ describe("ShadowPlane", () => {
         .translateY(1);
       const model = new Model({ src: "", scenes: [obj], animations: [] });
 
-      plane.update(model);
+      plane.updateDimensions(model);
 
-      expect(plane.mesh.position.y).closeTo(model.bbox.min.y, 0.0001);
+      expect(plane.root.position.y).closeTo(model.bbox.min.y, 0.0001);
     });
   });
 });

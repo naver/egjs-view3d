@@ -2,8 +2,6 @@
  * Copyright (c) 2020 NAVER Corp.
  * egjs projects are licensed under the MIT license
  */
-
-import Pose from "../core/Pose";
 import { Range } from "../type/utils";
 
 import { AR_SESSION_TYPE, EASING as EASING_CONST } from "./external";
@@ -18,7 +16,6 @@ export const ANIMATION_RANGE: Readonly<Range> = {
 
 // Camera
 export const FOV = 45;
-export const CAMERA_POSE: Readonly<Pose> = new Pose(0, 15, 0, [0, 0, 0]);
 export const INFINITE_RANGE: Readonly<Range> = {
   min: -Infinity, max: Infinity
 };

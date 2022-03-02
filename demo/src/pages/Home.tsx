@@ -20,6 +20,7 @@ class Home extends React.Component {
       envmap: "/egjs-view3d/texture/artist_workshop_1k.hdr",
       zoom: false,
       pitch: 25,
+      shadow: { darkness: 0.5 },
       autoplay: { canInterrupt: false }
     });
   }

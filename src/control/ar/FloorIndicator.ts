@@ -50,10 +50,8 @@ class FloorIndicator {
     const deg10 = Math.PI / 18;
 
     const ringGeomtry = new THREE.RingGeometry(0.975, 1, 150, 1, -6 * deg10, 30 * deg10);
-    const reticleGeometry = new THREE.CircleGeometry(0.1, 30, 0, Math.PI * 2);
 
     ringGeomtry.rotateX(-Math.PI / 2);
-    reticleGeometry.rotateX(-Math.PI / 2);
 
     const arrowGeometry = new THREE.RingGeometry(0.96, 1.015, 30, 1, 25 * deg10, 4 * deg10);
 
@@ -86,16 +84,14 @@ class FloorIndicator {
     });
 
     const ring = new THREE.Mesh(ringGeomtry, dimmedMaterial);
-    const reticle = new THREE.Mesh(reticleGeometry, dimmedMaterial);
     const arrow = new THREE.Mesh(arrowGeometry, highlightMaterial);
     const merged = new THREE.Group();
 
-    merged.add(ring, reticle, arrow);
+    merged.add(ring, arrow);
     merged.position.setY(0.0001); // Set Y higher than shadow plane
 
     this._mesh = merged;
     this._ring = ring;
-    this._reticle = reticle;
     this._arrow = arrow;
     this._animator = new Motion({ duration: fadeoutDuration });
     this._opacityRange = {

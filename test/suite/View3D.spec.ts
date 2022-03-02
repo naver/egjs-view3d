@@ -1,4 +1,17 @@
-import { Camera, Model, OrbitControl, ModelAnimator, Renderer, Scene, ARManager, AutoPlayer } from "~/index";
+import * as THREE from "three";
+import {
+  View3DError,
+  Camera,
+  OrbitControl,
+  ModelAnimator,
+  Renderer,
+  Scene,
+  ARManager,
+  AutoPlayer,
+  TONE_MAPPING,
+  ERROR_CODES,
+  EVENTS
+} from "~/index";
 import * as DEFAULT from "~/const/default";
 import { createView3D } from "../test-utils";
 
@@ -98,6 +111,13 @@ describe("View3D", () => {
       });
     });
 
+    describe("toneMapping", () => {
+      it("should set THREE.LinearToneMapping as a default value", async () => {
+        expect((await createView3D()).toneMapping).to.equal(THREE.LinearToneMapping);
+        expect((await createView3D()).toneMapping).to.equal(TONE_MAPPING.LINEAR);
+      });
+    });
+
     describe("envmap", () => {
       it("should have 'null' as a default value", async () => {
         expect((await createView3D()).envmap).to.be.null;
@@ -131,6 +151,12 @@ describe("View3D", () => {
     describe("pitch", () => {
       it("should have 0 as a default value", async () => {
         expect((await createView3D()).pitch).to.equal(0);
+      });
+    });
+
+    describe("initialZoom", () => {
+      it("should have 0 as a default value", async () => {
+        expect((await createView3D()).initialZoom).to.equal(0);
       });
     });
 
@@ -218,7 +244,7 @@ describe("View3D", () => {
       });
 
       it("should add img element as a child of root element if string is given", async () => {
-        const view3D = await createView3D({ poster: "SOME_URL", autoInit: false });
+        const view3D = await createView3D({ poster: "http://SOME_URL_THAT_DOESNT_EXIST", autoInit: false });
         const imgEl = view3D.rootEl.querySelector("img");
 
         expect(imgEl).not.to.be.null;
@@ -226,7 +252,7 @@ describe("View3D", () => {
       });
 
       it("should add img element with 'src' attribute same to the given string", async () => {
-        const posterURL = new URL("SOME_POSTER_URL", location.href);
+        const posterURL = new URL("/SOME_POSTER_URL", location.href);
         const view3D = await createView3D({ poster: posterURL.href, autoInit: false });
         const imgEl = view3D.rootEl.querySelector("img");
 
@@ -235,7 +261,7 @@ describe("View3D", () => {
       });
 
       it("should add img element which have 'view3d-poster' class in it", async () => {
-        const posterURL = "SOME_POSTER_URL";
+        const posterURL = "/SOME_POSTER_URL";
         const view3D = await createView3D({ poster: posterURL, autoInit: false });
         const imgEl = view3D.rootEl.querySelector("img");
 
@@ -244,7 +270,7 @@ describe("View3D", () => {
       });
 
       it("should add img element which should be removed after initialization", async () => {
-        const posterURL = "SOME_POSTER_URL";
+        const posterURL = "/SOME_POSTER_URL";
         const view3D = await createView3D({ poster: posterURL, autoInit: false });
         const imgEl = view3D.rootEl.querySelector("img");
 
@@ -254,6 +280,45 @@ describe("View3D", () => {
         await view3D.load("/cube.glb");
 
         expect(imgEl.parentElement).to.be.null;
+      });
+
+      it("can accept HTMLElement inside view3D wrapper", async () => {
+        const sampleEl = document.createElement("div");
+        const view3D = await createView3D({ src: "/cube.glb", poster: sampleEl, autoInit: false });
+        view3D.rootEl.appendChild(sampleEl);
+
+        try {
+          await view3D.init();
+        } catch {
+          // should not throw
+          expect(false).to.be.true;
+        }
+      });
+
+      it("should remove HTMLElement given after init", async () => {
+        const sampleEl = document.createElement("div");
+        const view3D = await createView3D({ src: "/cube.glb", poster: sampleEl, autoInit: false, children: [sampleEl] });
+        sampleEl.id = "sample-poster-el";
+
+        const inDocumentBeforeInit = !!document.querySelector("#sample-poster-el");
+        await view3D.init();
+        const inDocumentAfterInit = !!document.querySelector("#sample-poster-el");
+
+        expect(inDocumentBeforeInit).to.be.true;
+        expect(inDocumentAfterInit).to.be.false;
+      });
+
+      it("should remove HTMLElement matching the given CSS string after init", async () => {
+        const sampleEl = document.createElement("div");
+        sampleEl.id = "poster-el-id";
+        const view3D = await createView3D({ src: "/cube.glb", poster: "#poster-el-id", autoInit: false, children: [sampleEl] });
+
+        const inDocumentBeforeInit = !!document.querySelector("#poster-el-id");
+        await view3D.init();
+        const inDocumentAfterInit = !!document.querySelector("#poster-el-id");
+
+        expect(inDocumentBeforeInit).to.be.true;
+        expect(inDocumentAfterInit).to.be.false;
       });
     });
 
@@ -278,6 +343,53 @@ describe("View3D", () => {
     describe("useResizeObserver", () => {
       it("should have true as a default value", async () => {
         expect((await createView3D()).useResizeObserver).to.be.true;
+      });
+    });
+
+    describe("maxDeltaTime", () => {
+      it("should have 1 / 30 as a default value", async () => {
+        expect((await createView3D()).maxDeltaTime).to.equal(1 / 30);
+      });
+    });
+  });
+
+  describe("init", () => {
+    it("should throw model load failure when the given URL fails to load", async () => {
+      const view3D = await createView3D({ src: "SOME_WRONG_URL", autoInit: false });
+
+      try {
+        await view3D.init();
+        // should not reach here
+        expect(true).to.be.false;
+      } catch (err) {
+        expect(err).to.be.instanceOf(View3DError);
+        expect(err.code).to.equal(ERROR_CODES.MODEL_FAIL_TO_LOAD);
+      }
+    });
+
+    it("should trigger loadError event when the given URL fails to load", async () => {
+      const view3D = await createView3D({ src: "SOME_WRONG_URL", autoInit: false });
+      const loadErrorSpy = Cypress.sinon.spy();
+      view3D.on(EVENTS.LOAD_ERROR, loadErrorSpy);
+
+      await view3D.init().catch(() => void 0);
+
+      expect(loadErrorSpy.calledOnce).to.be.true;
+    });
+
+    it("should trigger loadError event for every failed model load", async () => {
+      const view3D = await createView3D({ src: ["SOME_WRONG_URL", "SOME_WRONG_URL2"], autoInit: false });
+      const loadErrorSpy = Cypress.sinon.spy();
+      view3D.on(EVENTS.LOAD_ERROR, loadErrorSpy);
+
+      await view3D.init().catch(() => void 0);
+
+      return new Promise(resolve => {
+        // Flush all microtasks
+        requestAnimationFrame(() => {
+          expect(loadErrorSpy.callCount).to.equal(2);
+          resolve();
+        });
       });
     });
   });

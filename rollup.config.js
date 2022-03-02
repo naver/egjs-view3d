@@ -5,6 +5,8 @@ const { babel } = require("@rollup/plugin-babel");
 
 export const name = "View3D";
 export const fileName = "view3d";
+const helperName = "View3D.Helper"
+
 const external = {
   three: "THREE",
   "@egjs/component": "Component",
@@ -12,7 +14,9 @@ const external = {
   "three/examples/jsm/loaders/RGBELoader": "RGBELoader",
   "three/examples/jsm/loaders/DRACOLoader": "DRACOLoader",
   "three/examples/jsm/loaders/KTX2Loader": "KTX2Loader",
-  "three/examples/jsm/lights/LightProbeGenerator": "LightProbeGenerator"
+  "three/examples/jsm/lights/LightProbeGenerator": "LightProbeGenerator",
+  "three/examples/jsm/shaders/HorizontalBlurShader": "HorizontalBlurShader",
+  "three/examples/jsm/shaders/VerticalBlurShader": "VerticalBlurShader"
 };
 const tsconfig = "tsconfig.build.json";
 const plugins = [
@@ -28,7 +32,11 @@ const common = {
   sourcemap: false,
   tsconfig,
   plugins
-}
+};
+const helperCommon = {
+  sourcemap: false,
+  tsconfig: "tsconfig.build-es5.json"
+};
 
 export default buildHelper([
   {
@@ -74,5 +82,30 @@ export default buildHelper([
     exports: "named",
     external,
     ...common
+  },
+  {
+    name: helperName,
+    input: "./src/helper/index.umd.ts",
+    output: "./dist/helper.js",
+    format: "umd",
+    external,
+    ...helperCommon
+  },
+  {
+    name: helperName,
+    input: "./src/helper/index.umd.ts",
+    output: "./dist/helper.min.js",
+    format: "umd",
+    external,
+    uglify: true,
+    ...helperCommon
+  },
+  {
+    input: "./src/helper/index.ts",
+    output: "./dist/helper.esm.js",
+    format: "esm",
+    exports: "named",
+    external,
+    ...helperCommon
   }
 ]);

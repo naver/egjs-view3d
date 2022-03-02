@@ -3,6 +3,7 @@ sidebar_position: 1
 ---
 
 import View3D from "@site/src/components/View3D";
+import Poster from "@site/src/components/demo/Poster";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
 import License from "@site/src/components/License";
 
@@ -24,6 +25,9 @@ See [Setup Script & Styles](/docs/quick-start#setup-script--styles) guide page f
   envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
   poster="/egjs-view3d/poster/alarm.png"
   showExampleCode />
+
+### HTMLElement as poster
+<Poster />
 
 ### Blur amount
 We use `1em` as CSS blur filter's value, so blurring amount can be changed by changing CSS `font-size` of `.view3d-poster` element.

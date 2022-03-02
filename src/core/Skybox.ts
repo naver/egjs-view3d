@@ -10,15 +10,18 @@ class Skybox {
   private _view3D: View3D;
   private _scene: THREE.Scene;
   private _camera: THREE.PerspectiveCamera;
+  private _enabled: boolean;
 
   public get scene() { return this._scene; }
   public get camera() { return this._camera; }
+  public get enabled() { return this._enabled; }
 
   /** */
   public constructor(view3D: View3D) {
     this._view3D = view3D;
     this._scene = new THREE.Scene();
     this._camera = new THREE.PerspectiveCamera();
+    this._enabled = true;
   }
 
   /**
@@ -26,6 +29,20 @@ class Skybox {
    */
   public destroy() {
     this._disposeOldSkybox();
+  }
+
+  /**
+   * Enable skybox rendering
+   */
+  public enable() {
+    this._enabled = true;
+  }
+
+  /**
+   * Disable skybox rendering
+   */
+  public disable() {
+    this._enabled = false;
   }
 
   /**

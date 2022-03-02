@@ -1,15 +1,11 @@
 import * as THREE from "three";
 
-import { createView3D } from "../../test-utils";
+import { createView3D, wait } from "../../test-utils";
 
 describe("Renderer", () => {
   describe("default values", () => {
     it("should return threeRenderer as THREE.WebGLRenderer", async () => {
       expect((await createView3D()).renderer.threeRenderer).to.be.instanceOf(THREE.WebGLRenderer);
-    });
-
-    it("should enable shadow by default", async () => {
-      expect((await createView3D()).renderer.threeRenderer.shadowMap.enabled).to.be.true;
     });
 
     it("should create context on creation", async () => {
@@ -37,22 +33,23 @@ describe("Renderer", () => {
     expect(renderer.size.height).to.equal(600);
   });
 
-  it("should disable shadow map on disabling shadow", async () => {
-    const renderer = (await createView3D()).renderer;
-    renderer.disableShadow();
+  describe("setAnimationLoop", () => {
+    it("should cap maximum time delta to view3D.maxTimeDelta", async () => {
+      const view3D = await createView3D();
+      view3D.renderer.threeRenderer.setAnimationLoop = async (callback) => {
+        callback(0);
+        await wait(1000); // 1s
+        callback(1000);
+      };
 
-    expect(renderer.threeRenderer.shadowMap.enabled).to.be.false;
-  });
+      const loopSpy = Cypress.sinon.spy();
+      view3D.renderer.setAnimationLoop(loopSpy);
 
-  it("should enable shadow map on enabling shadow", async () => {
-    const renderer = (await createView3D()).renderer;
+      await wait(1500);
 
-    renderer.disableShadow();
-    const prevVal = renderer.threeRenderer.shadowMap.enabled;
-    renderer.enableShadow();
-
-    expect(prevVal).to.be.false;
-    expect(renderer.threeRenderer.shadowMap.enabled).to.be.true;
+      expect(loopSpy.callCount).to.equal(2);
+      expect(loopSpy.lastCall.args[0]).to.equal(1 / 30);
+    });
   });
 
   describe("render", () => {

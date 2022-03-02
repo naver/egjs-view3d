@@ -144,6 +144,7 @@ class WebARSession implements ARSession {
    */
   public async enter() {
     const view3D = this._view3D;
+    const scene = view3D.scene;
     const arScene = this._arScene;
     const renderer = view3D.renderer;
     const threeRenderer = renderer.threeRenderer;
@@ -169,16 +170,10 @@ class WebARSession implements ARSession {
     hitTest.init(session);
 
     const onSessionEnd = async () => {
-      const overlayEl = domOverlay.root;
-
       control.destroy(session);
       arScene.destroy(view3D);
 
-      if (!this.overlayRoot && overlayEl) {
-        view3D.rootEl.removeChild(overlayEl);
-      }
       domOverlay.destroy();
-      view3D.scene.shadowPlane.updateShadow();
 
       // Restore original values
       threeRenderer.setPixelRatio(originalPixelRatio);
@@ -237,6 +232,7 @@ class WebARSession implements ARSession {
       } else {
         control.update(ctx);
         view3D.animator.update(delta);
+        scene.shadowPlane.render();
         threeRenderer.render(arScene.root, xrCam);
       }
 

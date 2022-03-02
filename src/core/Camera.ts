@@ -23,8 +23,8 @@ class Camera {
   private _threeCamera: THREE.PerspectiveCamera;
   private _distance: number = 0;
   private _baseFov: number = 45;
-  private _defaultPose: Pose = DEFAULT.CAMERA_POSE;
-  private _currentPose: Pose = this._defaultPose.clone();
+  private _defaultPose: Pose;
+  private _currentPose: Pose;
   private _maxTanHalfHFov: number;
 
   /**
@@ -40,7 +40,7 @@ class Camera {
    * @readonly
    * @type {Pose}
    */
-  public get defaultPose(): Readonly<Pose> { return this._defaultPose; }
+  public get defaultPose(): Pose { return this._defaultPose; }
 
   /**
    * Camera's current pose value
@@ -120,7 +120,7 @@ class Camera {
     this._threeCamera = new THREE.PerspectiveCamera();
     this._maxTanHalfHFov = 0;
 
-    this._defaultPose = new Pose(view3D.yaw, view3D.pitch, 0);
+    this._defaultPose = new Pose(view3D.yaw, view3D.pitch, view3D.initialZoom);
     this._currentPose = this._defaultPose.clone();
   }
 

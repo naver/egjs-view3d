@@ -2,9 +2,14 @@
  * Copyright (c) 2020 NAVER Corp.
  * egjs projects are licensed under the MIT license
  */
+import * as THREE from "three";
 
 export { ERROR_CODES } from "./error";
 
+/**
+ * "auto"
+ * @type {"auto"}
+ */
 export const AUTO = "auto";
 
 /**
@@ -13,6 +18,7 @@ export const AUTO = "auto";
  * @property {"ready"} READY {@link /docs/events/ready Ready event}
  * @property {"loadStart"} LOAD_START {@link /docs/events/loadStart Load start event}
  * @property {"load"} LOAD {@link /docs/events/load Load event}
+ * @property {"loadError"} LOAD_ERROR {@link /docs/events/loadError Load error event}
  * @property {"resize"} RESIZE {@link /docs/events/resize Resize event}
  * @property {"beforeRender"} BEFORE_RENDER {@link /docs/events/beforeRender Before render event}
  * @property {"render"} RENDER {@link /docs/events/render Render event}
@@ -31,6 +37,8 @@ export const EVENTS = {
   READY: "ready",
   LOAD_START: "loadStart",
   LOAD: "load",
+  LOAD_ERROR: "loadError",
+  LOAD_FINISH: "loadFinish",
   MODEL_CHANGE: "modelChange",
   RESIZE: "resize",
   BEFORE_RENDER: "beforeRender",
@@ -76,9 +84,32 @@ export const EASING = {
   }
 } as const;
 
+/**
+ * Default class names that View3D uses
+ * @type {object}
+ * @property {"view3d-poster"} POSTER A class name for poster element
+ * @property {"view3d-ar-overlay"} AR_OVERLAY A class name for AR overlay element
+ */
 export const DEFAULT_CLASS = {
-  POSTER: "view3d-poster"
+  POSTER: "view3d-poster",
+  AR_OVERLAY: "view3d-ar-overlay"
 } as const;
+
+/**
+ * Possible values for the toneMapping option.
+ * This is used to approximate the appearance of high dynamic range (HDR) on the low dynamic range medium of a standard computer monitor or mobile device's screen.
+ * @type {object}
+ * @property {THREE.LinearToneMapping} LINEAR
+ * @property {THREE.ReinhardToneMapping} REINHARD
+ * @property {THREE.CineonToneMapping} CINEON
+ * @property {THREE.ACESFilmicToneMapping} ACES_FILMIC
+ */
+export const TONE_MAPPING = {
+  LINEAR: THREE.LinearToneMapping,
+  REINHARD: THREE.ReinhardToneMapping,
+  CINEON: THREE.CineonToneMapping,
+  ACES_FILMIC: THREE.ACESFilmicToneMapping
+};
 
 /**
  * Available AR session types

@@ -10,16 +10,18 @@ import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader";
 
 import View3D from "../View3D";
 import Model from "../core/Model";
-import { EVENTS } from "../const/external";
 import { CUSTOM_TEXTURE_LOD_EXTENSION, STANDARD_MAPS } from "../const/internal";
+import { createLoadingContext } from "../utils";
+
+import Loader from "./Loader";
 
 const dracoLoader = new DRACOLoader();
 const ktx2Loader = new KTX2Loader();
 
 /**
- * GLTFLoader
+ * glTF/glb 3D model loader
  */
-class GLTFLoader {
+class GLTFLoader extends Loader {
   public static async setMeshoptDecoder(meshoptPath: string) {
     return new Promise<void>((resolve, reject) => {
       const scriptTag = document.createElement("script");
@@ -43,14 +45,14 @@ class GLTFLoader {
 
   public static meshoptDecoder: any;
 
-  private _view3D: View3D;
   private _loader: ThreeGLTFLoader;
 
   /**
    * Create a new instance of GLTFLoader
    */
   public constructor(view3D: View3D) {
-    this._view3D = view3D;
+    super(view3D);
+
     this._loader = new ThreeGLTFLoader();
 
     const loader = this._loader;
@@ -68,6 +70,7 @@ class GLTFLoader {
   public load(url: string): Promise<Model> {
     const view3D = this._view3D;
     const loader = this._loader;
+    const loadingContext = createLoadingContext(view3D, url);
 
     dracoLoader.setDecoderPath(view3D.dracoPath);
     ktx2Loader.setTranscoderPath(view3D.ktxPath);
@@ -83,15 +86,8 @@ class GLTFLoader {
         loader.load(url, gltf => {
           const model = this._parseToModel(gltf, url);
           resolve(model);
-        }, evt => {
-          view3D.trigger(EVENTS.PROGRESS, {
-            type: EVENTS.PROGRESS,
-            target: view3D,
-            lengthComputable: evt.lengthComputable,
-            loaded: evt.loaded,
-            total: evt.total
-          });
-        }, err => {
+        }, evt => this._onLoadingProgress(evt, url, loadingContext), err => {
+          loadingContext.initialized = true;
           reject(err);
         });
       } catch (err) {
@@ -161,12 +157,15 @@ class GLTFLoader {
         return fileURL;
       });
 
+      const loadingContext = createLoadingContext(view3D, gltfURL);
+
       loader.manager = manager;
       loader.load(gltfURL, gltf => {
         const model = this._parseToModel(gltf, gltfFile.name);
         resolve(model);
         revokeURLs();
-      }, undefined, err => {
+      }, evt => this._onLoadingProgress(evt, gltfURL, loadingContext), err => {
+        loadingContext.initialized = true;
         reject(err);
         revokeURLs();
       });
@@ -237,7 +236,7 @@ class GLTFLoader {
 
       texturesByLevel.forEach(async (levelTextures, level) => {
         // Change textures when all texture of the level loaded
-        const texturesLoaded = await Promise.all(levelTextures.map(({ index }) => gltf.parser.getDependency("texture", index) as Promise<THREE.Texture>))
+        const texturesLoaded = await Promise.all(levelTextures.map(({ index }) => gltf.parser.getDependency("texture", index) as Promise<THREE.Texture>));
         const higherLevelLoaded = loaded.slice(level + 1).some(val => !!val);
 
         loaded[level] = true;

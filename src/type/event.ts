@@ -25,14 +25,16 @@ export interface ReadyEvent {
  * @type {object}
  * @property {string} type The type of event.
  * @property {View3D} target An instance of View3D that triggered this event.
- * @property {Model} src A source URL of the model to load.
+ * @property {string} src A source URL of the model to load.
  * @property {number} level A level of model when loading multiple models at once, an integer starting from 0.
+ * @property {number} maxLevel Maximum level of models loading.
  */
 export interface LoadStartEvent {
   type: string;
   target: View3D;
   src: string;
   level: number;
+  maxLevel: number;
 }
 
 /**
@@ -43,12 +45,44 @@ export interface LoadStartEvent {
  * @property {View3D} target An instance of View3D that triggered this event.
  * @property {Model} model A new model that loaded.
  * @property {number} level A level of model when loading multiple models at once, an integer starting from 0.
+ * @property {number} maxLevel Maximum level of models loading.
  */
 export interface LoadEvent {
   type: string;
   target: View3D;
   model: Model;
   level: number;
+  maxLevel: number;
+}
+
+/**
+ * An event that fires when the 3D model fails to load / parse
+ * @event View3D#loadError
+ * @type {object}
+ * @property {string} type The type of event.
+ * @property {View3D} target An instance of View3D that triggered this event.
+ * @property {number} level A level of model when loading multiple models at once, an integer starting from 0.
+ * @property {number} maxLevel Maximum level of models loading.
+ * @property {Error} error An actual error instance that throwed when loading/parsing the model.
+ */
+export interface LoadErrorEvent {
+  type: string;
+  target: View3D;
+  level: number;
+  maxLevel: number;
+  error: Error;
+}
+
+/**
+ * An event that fires when all assets in a single load sequence(i.e. View3D's init, load) are finished to load
+ * @event View3D#loadFinish
+ * @type {object}
+ * @property {string} type The type of event.
+ * @property {View3D} target An instance of View3D that triggered this event.
+ */
+export interface LoadFinishEvent {
+  type: string;
+  target: View3D;
 }
 
 /**
@@ -110,7 +144,7 @@ export interface RenderEvent {
 }
 
 /**
- * An event that fires while the 3D model is loading.
+ * An event that fires while assets are loading.
  * This extends the native {@link https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent ProgressEvent}
  * To get `total` bytes, you should serve the 3D model with the `Content-Length` header.
  * @see https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent
@@ -118,6 +152,7 @@ export interface RenderEvent {
  * @type {object}
  * @property {string} type The type of event.
  * @property {View3D} target An instance of View3D that triggered this event.
+ * @property {string} src A source URL of the asset
  * @property {boolean} lengthComputable A boolean flag indicating if the total work to be done, and the amount of work already done, by the underlying process is calculable. In other words, it tells if the progress is measurable or not.
  * @property {number} loaded A 64-bit unsigned integer value indicating the amount of work already performed by the underlying process. The ratio of work done can be calculated by dividing total by the value of this property. When downloading a resource using HTTP, this only counts the body of the HTTP message, and doesn't include headers and other overhead.
  * @property {number} total A 64-bit unsigned integer representing the total amount of work that the underlying process is in the progress of performing. When downloading a resource using HTTP, this is the Content-Length (the size of the body of the message), and doesn't include the headers and other overhead.
@@ -125,6 +160,7 @@ export interface RenderEvent {
 export interface LoadProgressEvent {
   type: string;
   target: View3D;
+  src: string;
   lengthComputable: boolean;
   loaded: number;
   total: number;

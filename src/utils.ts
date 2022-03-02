@@ -5,14 +5,18 @@
 
 import * as THREE from "three";
 
+import View3D from "./View3D";
 import View3DError from "./core/View3DError";
 import ERROR from "./const/error";
 import { NoBoolean } from "./type/utils";
 
+export const isString = (val: any): val is string => typeof val === "string";
+export const isElement = (val: any): val is Element => !!val && val.nodeType === Node.ELEMENT_NODE;
+
 export const getNullableElement = (el: HTMLElement | string | null, parent?: HTMLElement): HTMLElement | null => {
   let targetEl: HTMLElement | null = null;
 
-  if (typeof el === "string") {
+  if (isString(el)) {
     const parentEl = parent ? parent : document;
     const queryResult = parentEl.querySelector(el);
 
@@ -21,7 +25,7 @@ export const getNullableElement = (el: HTMLElement | string | null, parent?: HTM
     }
 
     targetEl = queryResult as HTMLElement;
-  } else if (el && el.nodeType === Node.ELEMENT_NODE) {
+  } else if (isElement(el)) {
     targetEl = el;
   }
 
@@ -46,6 +50,20 @@ export const findCanvas = (root: HTMLElement, selector: string): HTMLCanvasEleme
   }
 
   return canvas;
+};
+
+export const isCSSSelector = (val: any) => {
+  if (!isString(val)) return false;
+
+  const dummyEl = document.createDocumentFragment();
+
+  try {
+    dummyEl.querySelector(val);
+  } catch {
+    return false;
+  }
+
+  return true;
 };
 
 export const range = (end: number): number[] => {
@@ -182,4 +200,18 @@ export const getRotatedPosition = (distance: number, yawDeg: number, pitchDeg: n
   newPos.z = newPos.z * Math.cos(-yaw);
 
   return newPos;
+};
+
+export const createLoadingContext = (view3D: View3D, src: string): View3D["loadingContext"][0] => {
+  const context = {
+    src,
+    loaded: 0,
+    total: 0,
+    lengthComputable: false,
+    initialized: false
+  };
+
+  view3D.loadingContext.push(context);
+
+  return context;
 };

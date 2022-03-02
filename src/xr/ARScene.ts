@@ -7,6 +7,7 @@ import * as THREE from "three";
 
 import View3D from "../View3D";
 import Model from "../core/Model";
+
 class ARScene {
   private _root: THREE.Scene;
   private _modelRoot: THREE.Group;
