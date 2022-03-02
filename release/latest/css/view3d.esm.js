@@ -4,7 +4,7 @@ name: @egjs/view3d
 license: MIT
 author: NAVER Corp.
 repository: https://github.com/naver/egjs-view3d
-version: 2.2.0
+version: 2.2.1
 */
 import { Vector3, Vector2, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, WebGLRenderer, sRGBEncoding, Clock, TextureLoader as TextureLoader$1, EquirectangularReflectionMapping, Group, WebGLRenderTarget, RGBAFormat, OrthographicCamera, Sphere, PlaneBufferGeometry, MeshBasicMaterial, BackSide, Mesh, MeshDepthMaterial, ShaderMaterial, Scene as Scene$1, PerspectiveCamera, WebGLCubeRenderTarget, CubeCamera, MeshStandardMaterial, IcosahedronBufferGeometry, Color, AnimationMixer, Quaternion, Plane, Matrix4, Ray, Euler, CanvasTexture, PlaneGeometry, RingGeometry, Box3, Vector4, DefaultLoadingManager, LoadingManager, AmbientLight } from 'three';
 import Component from '@egjs/component';
@@ -7668,7 +7668,7 @@ class View3D extends Component {
  */
 
 
-View3D.VERSION = "2.2.0";
+View3D.VERSION = "2.2.1";
 
 /*
  * "View In Ar" Icon from [Google Material Design Icons](https://github.com/google/material-design-icons)
