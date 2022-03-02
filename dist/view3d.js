@@ -4,7 +4,7 @@ name: @egjs/view3d
 license: MIT
 author: NAVER Corp.
 repository: https://github.com/naver/egjs-view3d
-version: 2.2.0
+version: 2.2.1
 */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('three'), require('@egjs/component'), require('three/examples/jsm/loaders/RGBELoader'), require('three/examples/jsm/shaders/HorizontalBlurShader'), require('three/examples/jsm/shaders/VerticalBlurShader'), require('three/examples/jsm/lights/LightProbeGenerator'), require('three/examples/jsm/loaders/GLTFLoader'), require('three/examples/jsm/loaders/DRACOLoader'), require('three/examples/jsm/loaders/KTX2Loader')) :
@@ -7664,7 +7664,7 @@ version: 2.2.0
    */
 
 
-  View3D.VERSION = "2.2.0";
+  View3D.VERSION = "2.2.1";
 
   /*
    * "View In Ar" Icon from [Google Material Design Icons](https://github.com/google/material-design-icons)

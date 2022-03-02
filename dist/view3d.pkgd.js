@@ -4,7 +4,7 @@ name: @egjs/view3d
 license: MIT
 author: NAVER Corp.
 repository: https://github.com/naver/egjs-view3d
-version: 2.2.0
+version: 2.2.1
 */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -15163,7 +15163,7 @@ version: 2.2.0
    */
 
 
-  View3D.VERSION = "2.2.0";
+  View3D.VERSION = "2.2.1";
 
   /*
    * "View In Ar" Icon from [Google Material Design Icons](https://github.com/google/material-design-icons)
