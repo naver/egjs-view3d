@@ -4,13 +4,13 @@ name: @egjs/view3d
 license: MIT
 author: NAVER Corp.
 repository: https://github.com/naver/egjs-view3d
-version: 2.1.0
+version: 2.2.0
 */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('three'), require('@egjs/component'), require('three/examples/jsm/loaders/RGBELoader'), require('three/examples/jsm/lights/LightProbeGenerator'), require('three/examples/jsm/loaders/GLTFLoader'), require('three/examples/jsm/loaders/DRACOLoader'), require('three/examples/jsm/loaders/KTX2Loader')) :
-  typeof define === 'function' && define.amd ? define(['three', '@egjs/component', 'three/examples/jsm/loaders/RGBELoader', 'three/examples/jsm/lights/LightProbeGenerator', 'three/examples/jsm/loaders/GLTFLoader', 'three/examples/jsm/loaders/DRACOLoader', 'three/examples/jsm/loaders/KTX2Loader'], factory) :
-  (global = global || self, global.View3D = factory(global.THREE, global.Component, global.RGBELoader, global.LightProbeGenerator, global.GLTFLoader, global.DRACOLoader, global.KTX2Loader));
-}(this, (function (THREE, Component, RGBELoader, LightProbeGenerator, GLTFLoader$1, DRACOLoader, KTX2Loader) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('three'), require('@egjs/component'), require('three/examples/jsm/loaders/RGBELoader'), require('three/examples/jsm/shaders/HorizontalBlurShader'), require('three/examples/jsm/shaders/VerticalBlurShader'), require('three/examples/jsm/lights/LightProbeGenerator'), require('three/examples/jsm/loaders/GLTFLoader'), require('three/examples/jsm/loaders/DRACOLoader'), require('three/examples/jsm/loaders/KTX2Loader')) :
+  typeof define === 'function' && define.amd ? define(['three', '@egjs/component', 'three/examples/jsm/loaders/RGBELoader', 'three/examples/jsm/shaders/HorizontalBlurShader', 'three/examples/jsm/shaders/VerticalBlurShader', 'three/examples/jsm/lights/LightProbeGenerator', 'three/examples/jsm/loaders/GLTFLoader', 'three/examples/jsm/loaders/DRACOLoader', 'three/examples/jsm/loaders/KTX2Loader'], factory) :
+  (global = global || self, global.View3D = factory(global.THREE, global.Component, global.RGBELoader, global.HorizontalBlurShader, global.VerticalBlurShader, global.LightProbeGenerator, global.GLTFLoader, global.DRACOLoader, global.KTX2Loader));
+}(this, (function (THREE, Component, RGBELoader, HorizontalBlurShader, VerticalBlurShader, LightProbeGenerator, GLTFLoader$1, DRACOLoader, KTX2Loader) { 'use strict';
 
   /*
    * Copyright (c) 2020 NAVER Corp.
@@ -60,18 +60,20 @@ version: 2.1.0
     PROVIDE_WIDTH_OR_HEIGHT: 5,
     FORMAT_NOT_SUPPORTED: 6,
     FILE_NOT_SUPPORTED: 7,
-    NOT_INITIALIZED: 8
+    NOT_INITIALIZED: 8,
+    MODEL_FAIL_TO_LOAD: 9
   };
   const MESSAGES = {
     WRONG_TYPE: (val, types) => `${typeof val} is not a ${types.map(type => `"${type}"`).join(" or ")}.`,
     ELEMENT_NOT_FOUND: query => `Element with selector "${query}" not found.`,
-    CANVAS_NOT_FOUND: "The canvas element was not found inside the given root element",
+    CANVAS_NOT_FOUND: "The canvas element was not found inside the given root element.",
     WEBGL_NOT_SUPPORTED: "WebGL is not supported on this browser.",
-    PROVIDE_SRC_FIRST: "\"src\" should be provided before initialization",
+    PROVIDE_SRC_FIRST: "\"src\" should be provided before initialization.",
     PROVIDE_WIDTH_OR_HEIGHT: "Either width or height should be given.",
-    FORMAT_NOT_SUPPORTED: format => `Given format "${format}" is not supported or invalid`,
+    FORMAT_NOT_SUPPORTED: format => `Given format "${format}" is not supported or invalid.`,
     FILE_NOT_SUPPORTED: src => `Given file "${src}" is not supported.`,
-    NOT_INITIALIZED: "View3D is not initialized yet"
+    NOT_INITIALIZED: "View3D is not initialized yet.",
+    MODEL_FAIL_TO_LOAD: url => `Failed to load/parse the 3D model with the given url: "${url}". Check "loadError" event for actual error instance.`
   };
   var ERROR = {
     CODES: ERROR_CODES,
@@ -82,10 +84,12 @@ version: 2.1.0
    * Copyright (c) 2020 NAVER Corp.
    * egjs projects are licensed under the MIT license
    */
+  const isString = val => typeof val === "string";
+  const isElement = val => !!val && val.nodeType === Node.ELEMENT_NODE;
   const getNullableElement = (el, parent) => {
     let targetEl = null;
 
-    if (typeof el === "string") {
+    if (isString(el)) {
       const parentEl = parent ? parent : document;
       const queryResult = parentEl.querySelector(el);
 
@@ -94,7 +98,7 @@ version: 2.1.0
       }
 
       targetEl = queryResult;
-    } else if (el && el.nodeType === Node.ELEMENT_NODE) {
+    } else if (isElement(el)) {
       targetEl = el;
     }
 
@@ -117,6 +121,18 @@ version: 2.1.0
     }
 
     return canvas;
+  };
+  const isCSSSelector = val => {
+    if (!isString(val)) return false;
+    const dummyEl = document.createDocumentFragment();
+
+    try {
+      dummyEl.querySelector(val);
+    } catch (_a) {
+      return false;
+    }
+
+    return true;
   };
   const toRadian = x => {
     return x * Math.PI / 180;
@@ -191,6 +207,17 @@ version: 2.1.0
     newPos.z = newPos.z * Math.cos(-yaw);
     return newPos;
   };
+  const createLoadingContext = (view3D, src) => {
+    const context = {
+      src,
+      loaded: 0,
+      total: 0,
+      lengthComputable: false,
+      initialized: false
+    };
+    view3D.loadingContext.push(context);
+    return context;
+  };
 
   /*! *****************************************************************************
   Copyright (c) Microsoft Corporation.
@@ -252,6 +279,11 @@ version: 2.1.0
    * Copyright (c) 2020 NAVER Corp.
    * egjs projects are licensed under the MIT license
    */
+  /**
+   * "auto"
+   * @type {"auto"}
+   */
+
   const AUTO = "auto";
   /**
    * Event type object with event name strings of {@link View3D}
@@ -259,6 +291,7 @@ version: 2.1.0
    * @property {"ready"} READY {@link /docs/events/ready Ready event}
    * @property {"loadStart"} LOAD_START {@link /docs/events/loadStart Load start event}
    * @property {"load"} LOAD {@link /docs/events/load Load event}
+   * @property {"loadError"} LOAD_ERROR {@link /docs/events/loadError Load error event}
    * @property {"resize"} RESIZE {@link /docs/events/resize Resize event}
    * @property {"beforeRender"} BEFORE_RENDER {@link /docs/events/beforeRender Before render event}
    * @property {"render"} RENDER {@link /docs/events/render Render event}
@@ -278,6 +311,8 @@ version: 2.1.0
     READY: "ready",
     LOAD_START: "loadStart",
     LOAD: "load",
+    LOAD_ERROR: "loadError",
+    LOAD_FINISH: "loadFinish",
     MODEL_CHANGE: "modelChange",
     RESIZE: "resize",
     BEFORE_RENDER: "beforeRender",
@@ -322,8 +357,32 @@ version: 2.1.0
       }
     }
   };
+  /**
+   * Default class names that View3D uses
+   * @type {object}
+   * @property {"view3d-poster"} POSTER A class name for poster element
+   * @property {"view3d-ar-overlay"} AR_OVERLAY A class name for AR overlay element
+   */
+
   const DEFAULT_CLASS = {
-    POSTER: "view3d-poster"
+    POSTER: "view3d-poster",
+    AR_OVERLAY: "view3d-ar-overlay"
+  };
+  /**
+   * Possible values for the toneMapping option.
+   * This is used to approximate the appearance of high dynamic range (HDR) on the low dynamic range medium of a standard computer monitor or mobile device's screen.
+   * @type {object}
+   * @property {THREE.LinearToneMapping} LINEAR
+   * @property {THREE.ReinhardToneMapping} REINHARD
+   * @property {THREE.CineonToneMapping} CINEON
+   * @property {THREE.ACESFilmicToneMapping} ACES_FILMIC
+   */
+
+  const TONE_MAPPING = {
+    LINEAR: THREE.LinearToneMapping,
+    REINHARD: THREE.ReinhardToneMapping,
+    CINEON: THREE.CineonToneMapping,
+    ACES_FILMIC: THREE.ACESFilmicToneMapping
   };
   /**
    * Available AR session types
@@ -424,11 +483,12 @@ version: 2.1.0
         threeRenderer.autoClear = false;
         threeRenderer.clear();
 
-        if (scene.skybox) {
+        if (scene.skybox && scene.skybox.enabled) {
           scene.skybox.updateCamera();
           threeRenderer.render(scene.skybox.scene, scene.skybox.camera);
         }
 
+        scene.shadowPlane.render();
         threeRenderer.render(scene.root, camera.threeCamera);
         threeRenderer.autoClear = true;
         view3D.trigger(EVENTS.RENDER, {
@@ -446,13 +506,12 @@ version: 2.1.0
         antialias: true,
         preserveDrawingBuffer: true
       });
-      renderer.toneMapping = THREE.LinearToneMapping;
+      renderer.toneMapping = view3D.toneMapping;
       renderer.toneMappingExposure = view3D.exposure;
       renderer.outputEncoding = THREE.sRGBEncoding;
       renderer.setClearColor(0x000000, 0);
       this._renderer = renderer;
       this._clock = new THREE.Clock(false);
-      this.enableShadow();
     }
     /**
      * {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement HTMLCanvasElement} given when creating View3D instance
@@ -526,11 +585,12 @@ version: 2.1.0
     }
 
     setAnimationLoop(callback) {
-      this._clock.start();
+      const view3D = this._view3D;
+      const clock = this._clock;
+      clock.start();
 
       this._renderer.setAnimationLoop((timestamp, frame) => {
-        const delta = this._clock.getDelta();
-
+        const delta = Math.min(clock.getDelta(), view3D.maxDeltaTime);
         callback(delta, frame);
       });
     }
@@ -541,24 +601,32 @@ version: 2.1.0
 
       this._renderer.setAnimationLoop(null);
     }
-    /**
-     * Enable shadow map
-     */
 
+  }
 
-    enableShadow() {
-      const threeRenderer = this._renderer;
-      threeRenderer.shadowMap.enabled = true;
-      threeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    }
-    /**
-     * Disable shadow map
-     */
+  /**
+   * Base class for all loaders that View3D uses
+   */
 
+  class Loader {
+    constructor(view3D) {
+      this._onLoadingProgress = (evt, src, context) => {
+        const view3D = this._view3D;
+        context.initialized = true;
+        context.lengthComputable = evt.lengthComputable;
+        context.loaded = evt.loaded;
+        context.total = evt.total;
+        view3D.trigger(EVENTS.PROGRESS, {
+          type: EVENTS.PROGRESS,
+          target: view3D,
+          src,
+          lengthComputable: evt.lengthComputable,
+          loaded: evt.loaded,
+          total: evt.total
+        });
+      };
 
-    disableShadow() {
-      const threeRenderer = this._renderer;
-      threeRenderer.shadowMap.enabled = false;
+      this._view3D = view3D;
     }
 
   }
@@ -571,13 +639,13 @@ version: 2.1.0
    * Texture loader
    */
 
-  class TextureLoader {
+  class TextureLoader extends Loader {
     /**
      * Create new TextureLoader instance
-     * @param renderer {@link Renderer} instance of View3D
+     * @param {View3D} view3D An instance of View3D
      */
-    constructor(renderer) {
-      this._renderer = renderer;
+    constructor(view3D) {
+      super(view3D);
     }
     /**
      * Create new {@link https://threejs.org/docs/index.html#api/en/textures/Texture Texture} with given url
@@ -587,40 +655,15 @@ version: 2.1.0
 
 
     load(url) {
+      const view3D = this._view3D;
       return new Promise((resolve, reject) => {
         const loader = new THREE.TextureLoader();
-        loader.load(url, resolve, undefined, reject);
-      });
-    }
-    /**
-     * Create new {@link https://threejs.org/docs/#api/en/renderers/WebGLCubeRenderTarget WebGLCubeRenderTarget} with given equirectangular image url
-     * Be sure that equirectangular image has height of power of 2, as it will be resized if it isn't
-     * @param url url to fetch equirectangular image
-     * @returns WebGLCubeRenderTarget created
-     */
-
-
-    loadEquirectagularTexture(url) {
-      return new Promise((resolve, reject) => {
-        const loader = new THREE.TextureLoader();
-        loader.load(url, texture => {
-          texture.mapping = THREE.EquirectangularReflectionMapping;
-          resolve(texture);
-        }, undefined, reject);
-      });
-    }
-    /**
-     * Create new {@link https://threejs.org/docs/#api/en/textures/CubeTexture CubeTexture} with given cubemap image urls
-     * Image order should be: px, nx, py, ny, pz, nz
-     * @param urls cubemap image urls
-     * @returns CubeTexture created
-     */
-
-
-    loadCubeTexture(urls) {
-      return new Promise((resolve, reject) => {
-        const loader = new THREE.CubeTextureLoader();
-        loader.load(urls, resolve, undefined, reject);
+        const loadingContext = createLoadingContext(view3D, url);
+        loader.setCrossOrigin("anonymous");
+        loader.load(url, resolve, evt => this._onLoadingProgress(evt, url, loadingContext), err => {
+          loadingContext.initialized = true;
+          reject(err);
+        });
       });
     }
     /**
@@ -630,13 +673,18 @@ version: 2.1.0
 
 
     loadHDRTexture(url) {
+      const view3D = this._view3D;
       return new Promise((resolve, reject) => {
         const loader = new RGBELoader.RGBELoader();
+        const loadingContext = createLoadingContext(view3D, url);
         loader.setCrossOrigin("anonymous");
         loader.load(url, texture => {
           texture.mapping = THREE.EquirectangularReflectionMapping;
           resolve(texture);
-        }, undefined, reject);
+        }, evt => this._onLoadingProgress(evt, url, loadingContext), err => {
+          loadingContext.initialized = true;
+          reject(err);
+        });
       });
     }
 
@@ -674,44 +722,6 @@ version: 2.1.0
    * Copyright (c) 2020 NAVER Corp.
    * egjs projects are licensed under the MIT license
    */
-  // Browser related constants
-  const IS_IOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
-  const IS_ANDROID = () => /android/i.test(navigator.userAgent);
-  const EVENTS$1 = {
-    MOUSE_DOWN: "mousedown",
-    MOUSE_MOVE: "mousemove",
-    MOUSE_UP: "mouseup",
-    TOUCH_START: "touchstart",
-    TOUCH_MOVE: "touchmove",
-    TOUCH_END: "touchend",
-    WHEEL: "wheel",
-    RESIZE: "resize",
-    CONTEXT_MENU: "contextmenu",
-    MOUSE_ENTER: "mouseenter",
-    MOUSE_LEAVE: "mouseleave",
-    LOAD: "load",
-    ERROR: "error"
-  };
-  const CURSOR = {
-    GRAB: "grab",
-    GRABBING: "grabbing",
-    NONE: ""
-  }; // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
-
-  var MOUSE_BUTTON;
-
-  (function (MOUSE_BUTTON) {
-    MOUSE_BUTTON[MOUSE_BUTTON["LEFT"] = 0] = "LEFT";
-    MOUSE_BUTTON[MOUSE_BUTTON["MIDDLE"] = 1] = "MIDDLE";
-    MOUSE_BUTTON[MOUSE_BUTTON["RIGHT"] = 2] = "RIGHT";
-  })(MOUSE_BUTTON || (MOUSE_BUTTON = {}));
-
-  const MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || 9007199254740991;
-
-  /*
-   * Copyright (c) 2020 NAVER Corp.
-   * egjs projects are licensed under the MIT license
-   */
   /**
    * Helper class to easily add shadow plane under your 3D model
    */
@@ -720,179 +730,226 @@ version: 2.1.0
     /**
      * Create new shadow plane
      * @param {object} options Options
-     * @param {number} [options.opacity=0.3] Opacity of the shadow.
-     * @param {number} [options.hardness=6] Hardness of the shadow. Should be integer greater than 0, and lower the softer the shadow is.
-     * @param {number} [options.yaw=0] Y-axis rotation of the light that casts shadow.
-     * @param {number} [options.pitch=0] X-axis rotation of the light that casts shadow.
+     * @param {number} [options.darkness=0.5] Darkness of the shadow.
+     * @param {number} [options.mapSize=9] Size of the shadow map. Texture of size (n * n) where n = 2 ^ (mapSize) will be used as shadow map. Should be an integer value.
+     * @param {number} [options.blur=3.5] Blurriness of the shadow.
+     * @param {number} [options.shadowScale=1] Scale of the shadow range. Using higher values will make shadow more even-textured.
+     * @param {number} [options.planeScale=2] Scale of the shadow plane. Use higher value if the shadow is clipped.
      */
     constructor(view3D, {
-      opacity = 0.3,
-      hardness = 6,
-      yaw = 0,
-      pitch = 0
+      darkness = 0.5,
+      mapSize = 9,
+      blur = 3.5,
+      shadowScale = 1,
+      planeScale = 2
     } = {}) {
-      this._hardness = hardness;
-      this._yaw = yaw;
-      this._pitch = pitch;
-      this._geometry = new THREE.PlaneBufferGeometry(2, 2);
-      this._material = new THREE.ShadowMaterial({
-        opacity,
-        fog: false
+      this._view3D = view3D;
+      this._darkness = darkness;
+      this._mapSize = mapSize;
+      this._blur = blur;
+      this._shadowScale = shadowScale;
+      this._planeScale = planeScale;
+      const threeRenderer = view3D.renderer.threeRenderer;
+      const maxTextureSize = Math.min(Math.pow(2, Math.floor(mapSize)), threeRenderer.capabilities.maxTextureSize);
+      this._root = new THREE.Group();
+      this._renderTarget = new THREE.WebGLRenderTarget(maxTextureSize, maxTextureSize, {
+        format: THREE.RGBAFormat
       });
-      this._mesh = new THREE.Mesh(this._geometry, this._material);
-      this._light = new THREE.DirectionalLight();
-      this._baseLightPos = new THREE.Vector3();
-      this._modelRadius = 0;
-      const mesh = this._mesh;
-      mesh.rotateX(-Math.PI / 2);
-      mesh.scale.setScalar(Math.pow(2, 32) - 1);
-      mesh.receiveShadow = true;
-      mesh.castShadow = false;
-      mesh.name = "ShadowPlane-Mesh";
-      const light = this._light;
-      light.intensity = 0;
-      light.target = mesh;
-      light.castShadow = true;
-      light.name = "ShadowPlane-Light";
-      const maxTexSize = view3D.renderer.threeRenderer.capabilities.maxTextureSize;
-      this._maxHardness = Math.round(Math.log(maxTexSize) / Math.log(2));
+      this._blurTarget = new THREE.WebGLRenderTarget(maxTextureSize, maxTextureSize, {
+        format: THREE.RGBAFormat
+      });
+      this._renderTarget.texture.generateMipmaps = false;
+      this._blurTarget.texture.generateMipmaps = false;
+      const shadowCamera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0);
+      shadowCamera.rotation.x = Math.PI / 2;
+      this._shadowCamera = shadowCamera;
 
-      this._updateSoftnessLevel();
+      this._root.add(shadowCamera);
+
+      const blurCamera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0);
+      this._blurCamera = blurCamera;
+
+      this._setupPlanes();
     }
     /**
-     * Shadow plane mesh
-     * @type {THREE.Mesh}
+     * Root of the object
      * @readonly
      */
 
 
-    get mesh() {
-      return this._mesh;
+    get root() {
+      return this._root;
     }
     /**
-     * Shadow light
-     * @type {THREE.DirectionalLight}
-     * @readonly
-     */
-
-
-    get light() {
-      return this._light;
-    }
-    /**
-     * Shadow opacity, value can be between 0(invisible) and 1(solid)
+     * Darkness of the shadow.
      * @type {number}
-     * @default 0.3
+     * @default 0.5
      */
 
 
-    get opacity() {
-      return this._material.opacity;
+    get darkness() {
+      return this._darkness;
     }
     /**
-     * Hardness of the shadow. Should be integer greater than 0, and lower the softer the shadow is.
+     * Size of the shadow map. Texture of size (n * n) where n = 2 ^ (mapSize) will be used as shadow map. Should be an integer value.
      * @type {number}
-     * @default 6
+     * @default 9
      */
 
 
-    get hardness() {
-      return this._hardness;
+    get mapSize() {
+      return this._mapSize;
     }
     /**
-     * Y-axis rotation of the shadow.
+     * Blurriness of the shadow.
      * @type {number}
-     * @default 0
+     * @default 3.5
      */
 
 
-    get yaw() {
-      return this._yaw;
+    get blur() {
+      return this._blur;
     }
     /**
-     * X-axis rotation of the shadow.
+     * Scale of the shadow range. Using higher values will make shadow more even-textured.
      * @type {number}
-     * @default 0
+     * @default 1
      */
 
 
-    get pitch() {
-      return this._pitch;
+    get shadowScale() {
+      return this._shadowScale;
+    }
+    /**
+     * Scale of the shadow plane. Use higher value if the shadow is clipped.
+     * @type {number}
+     * @default 2
+     */
+
+
+    get planeScale() {
+      return this._planeScale;
     }
 
-    get radius() {
-      return this._light.shadow.radius;
-    }
-
-    set opacity(val) {
-      this._material.opacity = val;
-    }
-
-    set hardness(val) {
-      this._hardness = Math.min(val, this._maxHardness);
-
-      this._updateSoftnessLevel();
-    }
-
-    set radius(val) {
-      this._light.shadow.radius = val;
-      this._light.shadow.needsUpdate = true;
-    }
-
-    update(model) {
-      this._updatePlane(model);
-
-      this._updateLightPosition(model);
-
-      this.updateShadow();
-    }
-
-    updateShadow(worldScale = 1) {
-      const light = this._light;
-      const scale = 1.5;
-      const shadowCam = light.shadow.camera;
-      const radius = this._modelRadius;
-      light.position.copy(this._baseLightPos.clone().multiplyScalar(worldScale));
-      const camSize = scale * worldScale * radius;
-      shadowCam.near = 0;
-      shadowCam.far = MAX_SAFE_INTEGER;
-      shadowCam.left = -camSize;
-      shadowCam.right = camSize;
-      shadowCam.top = camSize;
-      shadowCam.bottom = -camSize;
+    updateDimensions(model) {
+      const root = this._root;
+      const shadowCam = this._shadowCamera;
+      const baseScale = this._planeScale;
+      const boundingSphere = model.bbox.getBoundingSphere(new THREE.Sphere());
+      const radius = boundingSphere.radius;
+      const camSize = baseScale * 2 * radius;
+      const shadowScale = this._shadowScale;
+      shadowCam.far = shadowScale * (model.bbox.max.y - model.bbox.min.y) / camSize;
+      shadowCam.rotation.set(Math.PI / 2, Math.PI, 0, "YXZ");
+      root.position.copy(boundingSphere.center).setY(model.bbox.min.y);
+      root.scale.setScalar(camSize);
       shadowCam.updateProjectionMatrix();
     }
 
-    _updateSoftnessLevel() {
-      var _a;
+    render() {
+      this._plane.visible = false;
+      const view3D = this._view3D;
+      const {
+        renderer,
+        ar
+      } = view3D;
+      const shadowCamera = this._shadowCamera;
+      const threeRenderer = renderer.threeRenderer;
+      const scene = ar.activeSession ? ar.activeSession.arScene : view3D.scene; // disable XR for offscreen rendering
 
-      const light = this._light;
-      const hardness = clamp(Math.floor(this._hardness), 1, this._maxHardness);
-      const shadowSize = Math.pow(2, Math.floor(hardness));
-      light.shadow.mapSize.set(shadowSize, shadowSize);
-      (_a = light.shadow.map) === null || _a === void 0 ? void 0 : _a.dispose();
-      light.shadow.map = null;
+      const xrEnabled = threeRenderer.xr.enabled;
+      threeRenderer.xr.enabled = false;
+      const sceneRoot = scene.root;
+      const initialBackground = sceneRoot.background;
+      sceneRoot.background = null; // force the depthMaterial to everything
+
+      sceneRoot.overrideMaterial = this._depthMaterial; // set renderer clear alpha
+
+      const initialClearAlpha = threeRenderer.getClearAlpha();
+      threeRenderer.setClearAlpha(0); // render to the render target to get the depths
+
+      threeRenderer.setRenderTarget(this._renderTarget);
+      threeRenderer.clear();
+      threeRenderer.render(sceneRoot, shadowCamera); // and reset the override material
+
+      sceneRoot.overrideMaterial = null;
+
+      this._blurShadow(this._blur); // a second pass to reduce the artifacts
+      // (0.4 is the minimum blur amout so that the artifacts are gone)
+
+
+      this._blurShadow(this._blur * 0.4); // reset and render the normal scene
+
+
+      threeRenderer.xr.enabled = xrEnabled;
+      threeRenderer.setRenderTarget(null);
+      threeRenderer.setClearAlpha(initialClearAlpha);
+      sceneRoot.background = initialBackground;
+      this._plane.visible = true;
     }
 
-    _updatePlane(model) {
-      const mesh = this._mesh;
-      const modelBbox = model.bbox;
-      const boxPoints = [modelBbox.min.x, modelBbox.min.z, modelBbox.max.x, modelBbox.max.z].map(val => Math.abs(val));
-      const maxXZ = Math.max(...boxPoints);
-      mesh.scale.setScalar(100 * maxXZ);
+    _blurShadow(amount) {
+      const {
+        renderer
+      } = this._view3D;
+      const blurCamera = this._blurCamera;
+      const threeRenderer = renderer.threeRenderer;
+      const blurPlane = this._blurPlane;
+      const renderTarget = this._renderTarget;
+      const blurTarget = this._blurTarget;
+      const horizontalBlurMaterial = this._horizontalBlurMaterial;
+      const verticalBlurMaterial = this._verticalBlurMaterial;
+      blurPlane.visible = true; // blur horizontally and draw in the renderTargetBlur
+
+      horizontalBlurMaterial.uniforms.tDiffuse.value = renderTarget.texture;
+      horizontalBlurMaterial.uniforms.h.value = amount * 1 / 256;
+      horizontalBlurMaterial.needsUpdate = true;
+      blurPlane.material = horizontalBlurMaterial;
+      threeRenderer.setRenderTarget(blurTarget);
+      threeRenderer.render(blurPlane, blurCamera); // blur vertically and draw in the main renderTarget
+
+      verticalBlurMaterial.uniforms.tDiffuse.value = blurTarget.texture;
+      verticalBlurMaterial.uniforms.v.value = amount * 1 / 256;
+      verticalBlurMaterial.needsUpdate = true;
+      blurPlane.material = verticalBlurMaterial;
+      threeRenderer.setRenderTarget(renderTarget);
+      threeRenderer.render(blurPlane, blurCamera);
+      blurPlane.visible = false;
     }
 
-    _updateLightPosition(model) {
-      const yaw = this._yaw;
-      const pitch = this._pitch;
-      const boundingSphere = model.bbox.getBoundingSphere(new THREE.Sphere());
-      const radius = boundingSphere.radius; // Added AR hover height(0.1) as offset
+    _setupPlanes() {
+      const root = this._root;
+      const planeGeometry = new THREE.PlaneBufferGeometry();
+      const planeMat = new THREE.MeshBasicMaterial({
+        opacity: this._darkness,
+        transparent: true,
+        side: THREE.BackSide,
+        depthWrite: false,
+        map: this._renderTarget.texture
+      });
+      const plane = new THREE.Mesh(planeGeometry, planeMat);
+      plane.renderOrder = 1;
+      plane.scale.set(-1, -1, 1);
+      plane.rotation.order = "YXZ";
+      plane.rotation.x = Math.PI / 2;
+      this._plane = plane;
+      root.add(plane);
+      const blurPlane = new THREE.Mesh(planeGeometry);
+      this._blurPlane = blurPlane;
+      const depthMaterial = new THREE.MeshDepthMaterial();
 
-      const newPosition = getRotatedPosition(2 * radius + 0.1, yaw, 90 - pitch);
+      depthMaterial.onBeforeCompile = shader => {
+        shader.fragmentShader = `
+        ${shader.fragmentShader.replace("gl_FragColor = vec4( vec3( 1.0 - fragCoordZ ), opacity );", "gl_FragColor = vec4( vec3( 0.0 ), ( 1.0 - fragCoordZ ) * opacity );")}`;
+      };
 
-      this._baseLightPos.copy(newPosition);
-
-      this._modelRadius = radius;
+      this._depthMaterial = depthMaterial;
+      const horizontalBlurMaterial = new THREE.ShaderMaterial(HorizontalBlurShader.HorizontalBlurShader);
+      horizontalBlurMaterial.depthTest = false;
+      this._horizontalBlurMaterial = horizontalBlurMaterial;
+      const verticalBlurMaterial = new THREE.ShaderMaterial(VerticalBlurShader.VerticalBlurShader);
+      verticalBlurMaterial.depthTest = false;
+      this._verticalBlurMaterial = verticalBlurMaterial;
     }
 
   }
@@ -907,6 +964,7 @@ version: 2.1.0
       this._view3D = view3D;
       this._scene = new THREE.Scene();
       this._camera = new THREE.PerspectiveCamera();
+      this._enabled = true;
     }
 
     get scene() {
@@ -916,6 +974,10 @@ version: 2.1.0
     get camera() {
       return this._camera;
     }
+
+    get enabled() {
+      return this._enabled;
+    }
     /**
      * Destroy skybox and release all memories
      */
@@ -923,6 +985,22 @@ version: 2.1.0
 
     destroy() {
       this._disposeOldSkybox();
+    }
+    /**
+     * Enable skybox rendering
+     */
+
+
+    enable() {
+      this._enabled = true;
+    }
+    /**
+     * Disable skybox rendering
+     */
+
+
+    disable() {
+      this._enabled = false;
     }
     /**
      * Update current skybox camera to match main camera & apply rotation
@@ -1045,7 +1123,7 @@ version: 2.1.0
       root.add(userObjects, envObjects, fixedObjects);
 
       if (view3D.shadow) {
-        fixedObjects.add(shadowPlane.mesh, shadowPlane.light);
+        fixedObjects.add(shadowPlane.root);
       }
     }
     /**
@@ -1164,7 +1242,7 @@ version: 2.1.0
         if (typeof background === "number" || background.charAt(0) === "#") {
           skybox.useColor(background);
         } else {
-          const textureLoader = new TextureLoader(this._view3D.renderer);
+          const textureLoader = new TextureLoader(view3D);
           const texture = yield textureLoader.load(background);
           texture.encoding = THREE.sRGBEncoding;
           skybox.useTexture(texture);
@@ -1188,7 +1266,7 @@ version: 2.1.0
         (_a = this._skybox) === null || _a === void 0 ? void 0 : _a.destroy();
 
         if (url) {
-          const textureLoader = new TextureLoader(view3D.renderer);
+          const textureLoader = new TextureLoader(view3D);
           const texture = yield textureLoader.loadHDRTexture(url);
           const skybox = new Skybox(view3D);
 
@@ -1216,7 +1294,8 @@ version: 2.1.0
     setEnvMap(url) {
       return __awaiter(this, void 0, void 0, function* () {
         if (url) {
-          const textureLoader = new TextureLoader(this._view3D.renderer);
+          const view3D = this._view3D;
+          const textureLoader = new TextureLoader(view3D);
           const texture = yield textureLoader.loadHDRTexture(url);
           this._root.environment = texture;
         } else {
@@ -1249,51 +1328,6 @@ version: 2.1.0
 
   }
 
-  /*
-   * Copyright (c) 2020 NAVER Corp.
-   * egjs projects are licensed under the MIT license
-   */
-  /**
-   * Data class of camera's pose
-   */
-
-  class Pose {
-    /**
-     * Create new instance of pose
-     * @param {number} yaw yaw
-     * @param {number} pitch pitch
-     * @param {number} zoom zoom
-     * @param {number[]} pivot pivot
-     * @example
-     * ```ts
-     * import { THREE, Pose } from "@egjs/view3d";
-     *
-     * const pose = new Pose(180, 45, 150, [5, -1, 3]);
-     * ```
-     */
-    constructor(yaw, pitch, zoom, pivot = [0, 0, 0]) {
-      this.yaw = yaw;
-      this.pitch = pitch;
-      this.zoom = zoom;
-      this.pivot = new THREE.Vector3().fromArray(pivot);
-    }
-    /**
-     * Clone this pose
-     * @returns Cloned pose
-     */
-
-
-    clone() {
-      return new Pose(this.yaw, this.pitch, this.zoom, this.pivot.toArray());
-    }
-
-  }
-
-  /*
-   * Copyright (c) 2020 NAVER Corp.
-   * egjs projects are licensed under the MIT license
-   */
-
   const EASING$1 = EASING.EASE_OUT_CUBIC;
   const ANIMATION_DURATION = 300;
   const ANIMATION_LOOP = false;
@@ -1303,7 +1337,6 @@ version: 2.1.0
   }; // Camera
 
   const FOV = 45;
-  const CAMERA_POSE = new Pose(0, 15, 0, [0, 0, 0]);
   const INFINITE_RANGE = {
     min: -Infinity,
     max: Infinity
@@ -1606,6 +1639,46 @@ version: 2.1.0
    * egjs projects are licensed under the MIT license
    */
   /**
+   * Data class of camera's pose
+   */
+
+  class Pose {
+    /**
+     * Create new instance of pose
+     * @param {number} yaw yaw
+     * @param {number} pitch pitch
+     * @param {number} zoom zoom
+     * @param {number[]} pivot pivot
+     * @example
+     * ```ts
+     * import { THREE, Pose } from "@egjs/view3d";
+     *
+     * const pose = new Pose(180, 45, 150, [5, -1, 3]);
+     * ```
+     */
+    constructor(yaw, pitch, zoom, pivot = [0, 0, 0]) {
+      this.yaw = yaw;
+      this.pitch = pitch;
+      this.zoom = zoom;
+      this.pivot = new THREE.Vector3().fromArray(pivot);
+    }
+    /**
+     * Clone this pose
+     * @returns Cloned pose
+     */
+
+
+    clone() {
+      return new Pose(this.yaw, this.pitch, this.zoom, this.pivot.toArray());
+    }
+
+  }
+
+  /*
+   * Copyright (c) 2020 NAVER Corp.
+   * egjs projects are licensed under the MIT license
+   */
+  /**
    * Camera that renders the scene of View3D
    */
 
@@ -1617,12 +1690,10 @@ version: 2.1.0
     constructor(view3D) {
       this._distance = 0;
       this._baseFov = 45;
-      this._defaultPose = CAMERA_POSE;
-      this._currentPose = this._defaultPose.clone();
       this._view3D = view3D;
       this._threeCamera = new THREE.PerspectiveCamera();
       this._maxTanHalfHFov = 0;
-      this._defaultPose = new Pose(view3D.yaw, view3D.pitch, 0);
+      this._defaultPose = new Pose(view3D.yaw, view3D.pitch, view3D.initialZoom);
       this._currentPose = this._defaultPose.clone();
     }
     /**
@@ -1899,6 +1970,42 @@ version: 2.1.0
     }
 
   }
+
+  /*
+   * Copyright (c) 2020 NAVER Corp.
+   * egjs projects are licensed under the MIT license
+   */
+  // Browser related constants
+  const IS_IOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+  const IS_ANDROID = () => /android/i.test(navigator.userAgent);
+  const EVENTS$1 = {
+    MOUSE_DOWN: "mousedown",
+    MOUSE_MOVE: "mousemove",
+    MOUSE_UP: "mouseup",
+    TOUCH_START: "touchstart",
+    TOUCH_MOVE: "touchmove",
+    TOUCH_END: "touchend",
+    WHEEL: "wheel",
+    RESIZE: "resize",
+    CONTEXT_MENU: "contextmenu",
+    MOUSE_ENTER: "mouseenter",
+    MOUSE_LEAVE: "mouseleave",
+    LOAD: "load",
+    ERROR: "error"
+  };
+  const CURSOR = {
+    GRAB: "grab",
+    GRABBING: "grabbing",
+    NONE: ""
+  }; // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
+
+  var MOUSE_BUTTON;
+
+  (function (MOUSE_BUTTON) {
+    MOUSE_BUTTON[MOUSE_BUTTON["LEFT"] = 0] = "LEFT";
+    MOUSE_BUTTON[MOUSE_BUTTON["MIDDLE"] = 1] = "MIDDLE";
+    MOUSE_BUTTON[MOUSE_BUTTON["RIGHT"] = 2] = "RIGHT";
+  })(MOUSE_BUTTON || (MOUSE_BUTTON = {}));
 
   /*
    * Copyright (c) 2020 NAVER Corp.
@@ -2322,7 +2429,7 @@ version: 2.1.0
       context = window,
       repeat = 0,
       duration = ANIMATION_DURATION,
-      easing = EASING.EASE_OUT_CUBIC
+      easing = EASING$1
     } = {}) {
       super();
 
@@ -3181,7 +3288,6 @@ version: 2.1.0
     }
 
     update({
-      view3D,
       scene
     }, deltaTime) {
       if (!this._enabled || !this._active) return;
@@ -3192,7 +3298,6 @@ version: 2.1.0
       this._ui.updateScale(this._scaleMultiplier);
 
       scene.setModelScale(this._scaleMultiplier);
-      view3D.scene.shadowPlane.updateShadow(this._scaleMultiplier);
     }
 
     _updateUIPosition({
@@ -3231,9 +3336,7 @@ version: 2.1.0
     } = {}) {
       const deg10 = Math.PI / 18;
       const ringGeomtry = new THREE.RingGeometry(0.975, 1, 150, 1, -6 * deg10, 30 * deg10);
-      const reticleGeometry = new THREE.CircleGeometry(0.1, 30, 0, Math.PI * 2);
       ringGeomtry.rotateX(-Math.PI / 2);
-      reticleGeometry.rotateX(-Math.PI / 2);
       const arrowGeometry = new THREE.RingGeometry(0.96, 1.015, 30, 1, 25 * deg10, 4 * deg10); // Create little triangle in ring
 
       const {
@@ -3262,15 +3365,13 @@ version: 2.1.0
         color: 0xffffff
       });
       const ring = new THREE.Mesh(ringGeomtry, dimmedMaterial);
-      const reticle = new THREE.Mesh(reticleGeometry, dimmedMaterial);
       const arrow = new THREE.Mesh(arrowGeometry, highlightMaterial);
       const merged = new THREE.Group();
-      merged.add(ring, reticle, arrow);
+      merged.add(ring, arrow);
       merged.position.setY(0.0001); // Set Y higher than shadow plane
 
       this._mesh = merged;
       this._ring = ring;
-      this._reticle = reticle;
       this._arrow = arrow;
       this._animator = new Motion({
         duration: fadeoutDuration
@@ -4199,6 +4300,7 @@ version: 2.1.0
     enter() {
       return __awaiter(this, void 0, void 0, function* () {
         const view3D = this._view3D;
+        const scene = view3D.scene;
         const arScene = this._arScene;
         const renderer = view3D.renderer;
         const threeRenderer = renderer.threeRenderer;
@@ -4221,16 +4323,9 @@ version: 2.1.0
         hitTest.init(session);
 
         const onSessionEnd = () => __awaiter(this, void 0, void 0, function* () {
-          const overlayEl = domOverlay.root;
           control.destroy(session);
           arScene.destroy(view3D);
-
-          if (!this.overlayRoot && overlayEl) {
-            view3D.rootEl.removeChild(overlayEl);
-          }
-
-          domOverlay.destroy();
-          view3D.scene.shadowPlane.updateShadow(); // Restore original values
+          domOverlay.destroy(); // Restore original values
 
           threeRenderer.setPixelRatio(originalPixelRatio); // Restore render loop
 
@@ -4286,6 +4381,7 @@ version: 2.1.0
           } else {
             control.update(ctx);
             view3D.animator.update(delta);
+            scene.shadowPlane.render();
             threeRenderer.render(arScene.root, xrCam);
           }
 
@@ -6125,20 +6221,20 @@ version: 2.1.0
     }) {
       this._src = src; // This guarantees model's root has identity matrix at creation
 
-      this._scene = new THREE.Group();
-
-      this._scene.add(...scenes);
-
+      const scene = new THREE.Group();
+      scene.add(...scenes);
       this._animations = animations;
       this._json = json;
-      this._bbox = this._getInitialBbox(fixSkinnedBbox); // Move to position where bbox.min.y = 0
+      this._scene = scene;
 
-      const offset = this._bbox.min.y;
+      const bbox = this._getInitialBbox(fixSkinnedBbox); // Move to position where bbox.min.y = 0
 
-      this._scene.translateY(-offset);
 
-      this._bbox.translate(new THREE.Vector3(0, -offset, 0));
-
+      const offset = bbox.min.y;
+      scene.translateY(-offset);
+      scene.updateMatrixWorld();
+      bbox.translate(new THREE.Vector3(0, -offset, 0));
+      this._bbox = bbox;
       this.castShadow = castShadow;
       this.receiveShadow = receiveShadow;
     }
@@ -6272,25 +6368,24 @@ version: 2.1.0
         const skeleton = mesh.skeleton;
         skeleton.update();
         const boneMatricies = skeleton.boneMatrices;
+        const skinWeightScale = skinWeights.normalized && ArrayBuffer.isView(skinWeights.array) ? 1 / (Math.pow(2, 8 * skinWeights.array.BYTES_PER_ELEMENT) - 1) : 1;
         const finalMatrix = new THREE.Matrix4();
 
         for (let posIdx = 0; posIdx < positions.count; posIdx++) {
           finalMatrix.identity();
+          const pos = new THREE.Vector3().fromBufferAttribute(positions, posIdx);
           const skinned = new THREE.Vector4();
           skinned.set(0, 0, 0, 0);
           const skinVertex = new THREE.Vector4();
-          skinVertex.set(positions.getX(posIdx), positions.getY(posIdx), positions.getZ(posIdx), 1).applyMatrix4(mesh.bindMatrix);
-          const weights = [skinWeights.getX(posIdx), skinWeights.getY(posIdx), skinWeights.getZ(posIdx), skinWeights.getW(posIdx)];
+          skinVertex.set(pos.x, pos.y, pos.z, 1).applyMatrix4(mesh.bindMatrix);
+          const weights = [skinWeights.getX(posIdx), skinWeights.getY(posIdx), skinWeights.getZ(posIdx), skinWeights.getW(posIdx)].map(weight => weight * skinWeightScale);
           const indicies = [skinIndicies.getX(posIdx), skinIndicies.getY(posIdx), skinIndicies.getZ(posIdx), skinIndicies.getW(posIdx)];
           weights.forEach((weight, index) => {
             const boneMatrix = new THREE.Matrix4().fromArray(boneMatricies, indicies[index] * 16);
             skinned.add(skinVertex.clone().applyMatrix4(boneMatrix).multiplyScalar(weight));
           });
           const transformed = new THREE.Vector3().fromArray(skinned.applyMatrix4(mesh.bindMatrixInverse).toArray());
-          transformed.applyMatrix4(mesh.matrixWorld); // if (Math.abs(transformed.x) > 10000) {
-          //   console.log(transformed, mesh.bindMatrixInverse, skinned);
-          // }
-
+          transformed.applyMatrix4(mesh.matrixWorld);
           bbox.expandByPoint(transformed);
         }
       });
@@ -6328,15 +6423,15 @@ version: 2.1.0
   const dracoLoader = new DRACOLoader.DRACOLoader();
   const ktx2Loader = new KTX2Loader.KTX2Loader();
   /**
-   * GLTFLoader
+   * glTF/glb 3D model loader
    */
 
-  class GLTFLoader {
+  class GLTFLoader extends Loader {
     /**
      * Create a new instance of GLTFLoader
      */
     constructor(view3D) {
-      this._view3D = view3D;
+      super(view3D);
       this._loader = new GLTFLoader$1.GLTFLoader();
       const loader = this._loader;
       loader.setCrossOrigin("anonymous");
@@ -6373,6 +6468,7 @@ version: 2.1.0
     load(url) {
       const view3D = this._view3D;
       const loader = this._loader;
+      const loadingContext = createLoadingContext(view3D, url);
       dracoLoader.setDecoderPath(view3D.dracoPath);
       ktx2Loader.setTranscoderPath(view3D.ktxPath);
 
@@ -6387,15 +6483,8 @@ version: 2.1.0
             const model = this._parseToModel(gltf, url);
 
             resolve(model);
-          }, evt => {
-            view3D.trigger(EVENTS.PROGRESS, {
-              type: EVENTS.PROGRESS,
-              target: view3D,
-              lengthComputable: evt.lengthComputable,
-              loaded: evt.loaded,
-              total: evt.total
-            });
-          }, err => {
+          }, evt => this._onLoadingProgress(evt, url, loadingContext), err => {
+            loadingContext.initialized = true;
             reject(err);
           });
         } catch (err) {
@@ -6462,13 +6551,15 @@ version: 2.1.0
 
           return fileURL;
         });
+        const loadingContext = createLoadingContext(view3D, gltfURL);
         loader.manager = manager;
         loader.load(gltfURL, gltf => {
           const model = this._parseToModel(gltf, gltfFile.name);
 
           resolve(model);
           revokeURLs();
-        }, undefined, err => {
+        }, evt => this._onLoadingProgress(evt, gltfURL, loadingContext), err => {
+          loadingContext.initialized = true;
           reject(err);
           revokeURLs();
         });
@@ -6585,6 +6676,7 @@ version: 2.1.0
       center = AUTO,
       yaw = 0,
       pitch = 0,
+      initialZoom = 0,
       rotate = true,
       translate = true,
       zoom = true,
@@ -6598,6 +6690,7 @@ version: 2.1.0
       exposure = 1,
       shadow = true,
       skyboxBlur = false,
+      toneMapping = TONE_MAPPING.LINEAR,
       webAR = true,
       sceneViewer = true,
       quickLook = true,
@@ -6608,7 +6701,8 @@ version: 2.1.0
       autoResize = true,
       useResizeObserver = true,
       on = {},
-      plugins = []
+      plugins = [],
+      maxDeltaTime = 1 / 30
     } = {}) {
       super();
       this._rootEl = getElement(root); // Bind options
@@ -6623,6 +6717,7 @@ version: 2.1.0
       this._center = center;
       this._yaw = yaw;
       this._pitch = pitch;
+      this._initialZoom = initialZoom;
       this._rotate = rotate;
       this._translate = translate;
       this._zoom = zoom;
@@ -6636,6 +6731,7 @@ version: 2.1.0
       this._exposure = exposure;
       this._shadow = shadow;
       this._skyboxBlur = skyboxBlur;
+      this._toneMapping = toneMapping;
       this._webAR = webAR;
       this._sceneViewer = sceneViewer;
       this._quickLook = quickLook;
@@ -6644,7 +6740,12 @@ version: 2.1.0
       this._canvasSelector = canvasSelector;
       this._autoInit = autoInit;
       this._autoResize = autoResize;
-      this._useResizeObserver = useResizeObserver; // Create internal components
+      this._useResizeObserver = useResizeObserver;
+      this._model = null;
+      this._initialized = false;
+      this._loadingContext = [];
+      this._plugins = plugins;
+      this._maxDeltaTime = maxDeltaTime; // Create internal components
 
       this._renderer = new Renderer(this);
       this._camera = new Camera(this);
@@ -6654,19 +6755,18 @@ version: 2.1.0
       this._autoPlayer = new AutoPlayer(this, getObjectOption(autoplay));
       this._autoResizer = new AutoResizer(this);
       this._arManager = new ARManager(this);
-      this._model = null;
-      this._initialized = false;
-      this._plugins = plugins;
 
       this._addEventHandlers(on);
 
       this._addPosterImage();
 
-      void this._initPlugins(plugins).then(() => {
+      void (() => __awaiter(this, void 0, void 0, function* () {
+        yield this._initPlugins(plugins);
+
         if (src && autoInit) {
-          void this.init();
+          yield this.init();
         }
-      });
+      }))();
     } // Internal Components Getter
 
     /**
@@ -6769,6 +6869,16 @@ version: 2.1.0
 
     get initialized() {
       return this._initialized;
+    }
+    /**
+     * An array of loading status of assets.
+     * @type {object[]}
+     * @internal
+     */
+
+
+    get loadingContext() {
+      return this._loadingContext;
     }
     /**
      * Active plugins of view3D
@@ -6885,6 +6995,17 @@ version: 2.1.0
 
     get pitch() {
       return this._pitch;
+    }
+    /**
+     * Initial zoom value.
+     * Positive value will make camera zoomed in and negative value will make camera zoomed out.
+     * @type {number}
+     * @default 0
+     */
+
+
+    get initialZoom() {
+      return this._initialZoom;
     }
     /**
      * Options for the {@link RotateControl}.
@@ -7029,6 +7150,17 @@ version: 2.1.0
       return this._skyboxBlur;
     }
     /**
+     * This is used to approximate the appearance of high dynamic range (HDR) on the low dynamic range medium of a standard computer monitor or mobile device's screen.
+     * @type {number}
+     * @see TONE_MAPPING
+     * @default THREE.LinearToneMapping
+     */
+
+
+    get toneMapping() {
+      return this._toneMapping;
+    }
+    /**
      * Options for the WebXR-based AR session.
      * If `false` is given, it will disable WebXR-based AR session.
      * @type {boolean | WebARSessionOptions}
@@ -7076,8 +7208,10 @@ version: 2.1.0
       return this._arPriority;
     }
     /**
-     * A URL to the image that will be displayed before the 3D model is loaded.
-     * @type {string | null}
+     * Poster image that will be displayed before the 3D model is loaded.
+     * If `string` URL is given, View3D will temporarily show poster image element with that url as src before the first model is loaded
+     * If `string` CSS selector of DOM element inside view3d-wrapper or `HTMLElement` is given, View3D will remove that element after the first model is loaded
+     * @type {string | HTMLElement | null}
      * @default null
      */
 
@@ -7127,6 +7261,18 @@ version: 2.1.0
     get useResizeObserver() {
       return this._useResizeObserver;
     }
+    /**
+     * Maximum delta time in any given frame
+     * This can prevent a long frame hitch / lag
+     * The default value is 0.33333...(30 fps). Set this value to `Infinity` to disable
+     * @type {number}
+     * @default 0.333333...
+     */
+
+
+    get maxDeltaTime() {
+      return this._maxDeltaTime;
+    }
 
     set skybox(val) {
       void this._scene.setSkybox(val);
@@ -7157,10 +7303,19 @@ version: 2.1.0
       }
     }
 
+    set toneMapping(val) {
+      this._toneMapping = val;
+      this._renderer.threeRenderer.toneMapping = val;
+    }
+
     set useGrabCursor(val) {
       this._useGrabCursor = val;
 
       this._control.updateCursor();
+    }
+
+    set maxDeltaTime(val) {
+      this._maxDeltaTime = val;
     }
     /**
      * Destroy View3D instance and remove all events attached to it
@@ -7202,10 +7357,12 @@ version: 2.1.0
 
         const scene = this._scene;
         const renderer = this._renderer;
+        const control = this._control;
         const skybox = this._skybox;
         const envmap = this._envmap;
         const background = this._background;
         const meshoptPath = this._meshoptPath;
+        const tasks = [];
 
         if (meshoptPath && !GLTFLoader.meshoptDecoder) {
           yield GLTFLoader.setMeshoptDecoder(meshoptPath);
@@ -7218,26 +7375,29 @@ version: 2.1.0
           const tempLight = new THREE.AmbientLight();
           scene.add(tempLight, false);
           const loadEnv = skybox ? scene.setSkybox(skybox) : scene.setEnvMap(envmap);
-          void loadEnv.then(() => {
+          tasks.push(loadEnv.then(() => {
             scene.remove(tempLight);
-          });
+          }));
         }
 
         if (!skybox && background) {
-          void scene.setBackground(background);
+          tasks.push(scene.setBackground(background));
         }
 
-        yield this._loadModel(this._src); // Start rendering
+        const loadModel = this._loadModel(this._src);
 
-        renderer.stopAnimationLoop();
-        renderer.setAnimationLoop(renderer.defaultRenderLoop);
-
-        this._control.enable();
+        tasks.push(...loadModel);
+        void this._resetLoadingContextOnFinish(tasks);
+        yield Promise.race(loadModel);
+        control.enable();
 
         if (this._autoplay) {
           this._autoPlayer.enable();
-        }
+        } // Start rendering
 
+
+        renderer.stopAnimationLoop();
+        renderer.setAnimationLoop(renderer.defaultRenderLoop);
         this._initialized = true;
         this.trigger(EVENTS.READY, {
           type: EVENTS.READY,
@@ -7279,7 +7439,10 @@ version: 2.1.0
     load(src) {
       return __awaiter(this, void 0, void 0, function* () {
         if (this._initialized) {
-          yield this._loadModel(src); // Change the src later as an error can occur while loading the model
+          const loadModel = this._loadModel(src);
+
+          void this._resetLoadingContextOnFinish(loadModel);
+          yield Promise.race(loadModel); // Change the src later as an error can occur while loading the model
 
           this._src = src;
         } else {
@@ -7306,7 +7469,7 @@ version: 2.1.0
       const inXR = renderer.threeRenderer.xr.isPresenting;
       scene.reset();
       scene.add(model.scene);
-      scene.shadowPlane.update(model);
+      scene.shadowPlane.updateDimensions(model);
 
       if (resetCamera) {
         camera.fit(model, this._center);
@@ -7384,49 +7547,53 @@ version: 2.1.0
     }
 
     _loadModel(src) {
-      return __awaiter(this, void 0, void 0, function* () {
-        const loader = new GLTFLoader(this);
+      const loader = new GLTFLoader(this);
 
-        if (Array.isArray(src)) {
-          const loaded = src.map(() => false);
-          const loadModels = src.map((srcLevel, level) => __awaiter(this, void 0, void 0, function* () {
-            this.trigger(EVENTS.LOAD_START, {
-              type: EVENTS.LOAD_START,
-              target: this,
-              src: srcLevel,
-              level
-            });
-            const model = yield loader.load(srcLevel);
-            const higherLevelLoaded = loaded.slice(level + 1).some(val => !!val);
-            const modelLoadedBefore = loaded.some(val => !!val);
-            this.trigger(EVENTS.LOAD, {
-              type: EVENTS.LOAD,
-              target: this,
-              model,
-              level
-            });
-            loaded[level] = true;
-            if (higherLevelLoaded) return;
-            this.display(model, {
-              resetCamera: !modelLoadedBefore
-            });
-          }));
-          yield Promise.race(loadModels);
-        } else {
-          this.trigger(EVENTS.LOAD_START, {
-            type: EVENTS.LOAD_START,
-            target: this,
-            src,
-            level: 0
-          });
+      if (Array.isArray(src)) {
+        const loaded = src.map(() => false);
+        const loadModels = src.map((srcLevel, level) => this._loadSingleModel(loader, srcLevel, level, loaded));
+        return loadModels;
+      } else {
+        return [this._loadSingleModel(loader, src, 0, [false])];
+      }
+    }
+
+    _loadSingleModel(loader, src, level, loaded) {
+      return __awaiter(this, void 0, void 0, function* () {
+        const maxLevel = loaded.length - 1;
+        this.trigger(EVENTS.LOAD_START, {
+          type: EVENTS.LOAD_START,
+          target: this,
+          src,
+          level,
+          maxLevel
+        });
+
+        try {
           const model = yield loader.load(src);
+          const higherLevelLoaded = loaded.slice(level + 1).some(val => !!val);
+          const modelLoadedBefore = loaded.some(val => !!val);
           this.trigger(EVENTS.LOAD, {
             type: EVENTS.LOAD,
             target: this,
             model,
-            level: 0
+            level,
+            maxLevel
           });
-          this.display(model);
+          loaded[level] = true;
+          if (higherLevelLoaded) return;
+          this.display(model, {
+            resetCamera: !modelLoadedBefore
+          });
+        } catch (error) {
+          this.trigger(EVENTS.LOAD_ERROR, {
+            type: EVENTS.LOAD_ERROR,
+            target: this,
+            level,
+            maxLevel,
+            error
+          });
+          throw new View3DError(ERROR.MESSAGES.MODEL_FAIL_TO_LOAD(src), ERROR.CODES.MODEL_FAIL_TO_LOAD);
         }
       });
     }
@@ -7441,19 +7608,51 @@ version: 2.1.0
       const poster = this._poster;
       const rootEl = this._rootEl;
       if (!poster) return;
-      const imgEl = document.createElement("img");
-      imgEl.className = DEFAULT_CLASS.POSTER;
-      imgEl.src = poster;
-      rootEl.appendChild(imgEl);
+      const isPosterEl = isElement(poster);
+      let posterEl;
+
+      if (isPosterEl || isCSSSelector(poster)) {
+        const elCandidate = isPosterEl ? poster : rootEl.querySelector(poster);
+
+        if (!elCandidate) {
+          throw new View3DError(ERROR.MESSAGES.ELEMENT_NOT_FOUND(poster), ERROR.CODES.ELEMENT_NOT_FOUND);
+        }
+
+        posterEl = elCandidate;
+      } else {
+        const imgEl = document.createElement("img");
+        imgEl.className = DEFAULT_CLASS.POSTER;
+        imgEl.src = poster;
+        rootEl.appendChild(imgEl);
+        posterEl = imgEl;
+        this.once(EVENTS.READY, () => {
+          if (imgEl.parentElement !== rootEl) return;
+          rootEl.removeChild(imgEl);
+        });
+      }
+
       this.once(EVENTS.READY, () => {
-        if (imgEl.parentElement !== rootEl) return;
-        rootEl.removeChild(imgEl);
+        if (!posterEl.parentElement) return; // Remove that element from the parent element
+
+        posterEl.parentElement.removeChild(posterEl);
       });
     }
 
     _initPlugins(plugins) {
       return __awaiter(this, void 0, void 0, function* () {
         yield Promise.all(plugins.map(plugin => plugin.init(this)));
+      });
+    }
+
+    _resetLoadingContextOnFinish(tasks) {
+      return __awaiter(this, void 0, void 0, function* () {
+        void Promise.all(tasks).then(() => {
+          this.trigger(EVENTS.LOAD_FINISH, {
+            type: EVENTS.LOAD_FINISH,
+            target: this
+          });
+          this._loadingContext = [];
+        });
       });
     }
 
@@ -7465,7 +7664,7 @@ version: 2.1.0
    */
 
 
-  View3D.VERSION = "2.1.0";
+  View3D.VERSION = "2.2.0";
 
   /*
    * "View In Ar" Icon from [Google Material Design Icons](https://github.com/google/material-design-icons)
@@ -7636,16 +7835,20 @@ version: 2.1.0
      */
     constructor(options = {}) {
       this._startLoading = ({
-        target: view3D
+        target: view3D,
+        level
       }) => {
+        if (level !== 0) return;
         const {
           type = "default",
           loadingLabel = "Loading 3D Model...",
           parsingLabel = "Parsing 3D Model...",
           labelColor = "#ffffff",
+          barWidth = "70%",
           barHeight = "10px",
           barBackground = "#bbbbbb",
           barForeground = "#3e8ed0",
+          spinnerWidth = "30%",
           overlayBackground = "rgba(0, 0, 0, 0.3)"
         } = this._options;
         const loadingOverlay = document.createElement("div");
@@ -7658,18 +7861,25 @@ version: 2.1.0
         loadingBar.classList.add("view3d-lb-base");
         loadingLabelEl.classList.add("view3d-lb-label");
         loadingFiller.classList.add("view3d-lb-filler");
-        loadingBar.style.height = barHeight;
         loadingOverlay.style.backgroundColor = overlayBackground;
 
         if (type !== LoadingBar.TYPE.SPINNER) {
+          loadingBar.style.height = barHeight;
           loadingBar.style.backgroundColor = barBackground;
           loadingFiller.style.backgroundColor = barForeground;
         } else {
           loadingBar.classList.add("type-spinner");
+          loadingBar.style.width = spinnerWidth;
+          loadingBar.style.paddingTop = spinnerWidth;
+          loadingFiller.style.borderWidth = barHeight;
+          loadingFiller.style.borderColor = barForeground;
+          loadingFiller.style.borderLeftColor = "transparent";
         }
 
         if (type === LoadingBar.TYPE.TOP) {
           loadingOverlay.classList.add("type-top");
+        } else if (type === LoadingBar.TYPE.DEFAULT) {
+          loadingBar.style.width = barWidth;
         }
 
         loadingLabelEl.style.color = labelColor;
@@ -7681,22 +7891,29 @@ version: 2.1.0
         view3D.rootEl.appendChild(loadingOverlay);
 
         if (type !== LoadingBar.TYPE.SPINNER) {
-          const onProgress = evt => {
-            const percentage = 100 * (evt.loaded / evt.total);
+          const onProgress = () => {
+            if (!view3D.loadingContext.every(ctx => ctx.initialized)) return;
+            const [loaded, total] = view3D.loadingContext.filter(ctx => ctx.lengthComputable).reduce((values, ctx) => {
+              values[0] += ctx.loaded;
+              values[1] += ctx.total;
+              return values;
+            }, [0, 0]);
+            if (total <= 0) return;
+            const percentage = 100 * (loaded / total);
             loadingFiller.style.width = `${percentage.toFixed(2)}%`;
 
-            if (evt.loaded === evt.total) {
+            if (loaded === total) {
               loadingLabelEl.innerText = parsingLabel;
             }
           };
 
           view3D.on(EVENTS.PROGRESS, onProgress);
-          view3D.once(EVENTS.LOAD, () => {
+          view3D.once(EVENTS.LOAD_FINISH, () => {
             view3D.off(EVENTS.PROGRESS, onProgress);
           });
         }
 
-        view3D.once(EVENTS.LOAD, () => {
+        view3D.once(EVENTS.LOAD_FINISH, () => {
           this._removeOverlay(view3D);
         });
         this._overlay = loadingOverlay;
@@ -7744,67 +7961,6 @@ version: 2.1.0
    * Copyright (c) 2020 NAVER Corp.
    * egjs projects are licensed under the MIT license
    */
-  // Collection of util functions that is individual to View3D
-
-  /**
-   * Check whether View3D can be initialized without any issues.
-   * View3D supports browsers with es6+ support.
-   * @param {object} [features={}] Features to test
-   * @returns {boolean} A boolean value indicating whether View3D is avilable
-   */
-  const isAvailable = ({
-    webGL = true,
-    fetch = true,
-    stream = true,
-    wasm = true
-  } = {}) => {
-    if (webGL) {
-      const webglAvailable = checkWebGLAvailability();
-      if (!webglAvailable) return false;
-    }
-
-    if (fetch) {
-      const fetchAvailable = window && window.fetch;
-      if (!fetchAvailable) return false;
-    }
-
-    if (stream) {
-      const streamAvailable = window && window.ReadableStream;
-      if (!streamAvailable) return false;
-    }
-
-    if (wasm) {
-      const wasmAvailable = checkWASMAvailability();
-      if (!wasmAvailable) return false;
-    }
-
-    return true;
-  };
-
-  const checkWebGLAvailability = () => {
-    try {
-      const canvas = document.createElement("canvas");
-      return !!window.WebGLRenderingContext && !!(canvas.getContext("webgl") || canvas.getContext("experimental-webgl"));
-    } catch (e) {
-      return false;
-    }
-  };
-
-  const checkWASMAvailability = () => {
-    try {
-      if (typeof WebAssembly === "object" && typeof WebAssembly.instantiate === "function") {
-        const module = new WebAssembly.Module(Uint8Array.of(0x0, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00));
-        if (module instanceof WebAssembly.Module) return new WebAssembly.Instance(module) instanceof WebAssembly.Instance;
-      }
-    } catch (e) {
-      return false;
-    }
-  };
-
-  /*
-   * Copyright (c) 2020 NAVER Corp.
-   * egjs projects are licensed under the MIT license
-   */
 
   var modules = {
     __proto__: null,
@@ -7837,12 +7993,12 @@ version: 2.1.0
     EVENTS: EVENTS,
     EASING: EASING,
     DEFAULT_CLASS: DEFAULT_CLASS,
+    TONE_MAPPING: TONE_MAPPING,
     AR_SESSION_TYPE: AR_SESSION_TYPE,
     SCENE_VIEWER_MODE: SCENE_VIEWER_MODE,
     QUICK_LOOK_APPLE_PAY_BUTTON_TYPE: QUICK_LOOK_APPLE_PAY_BUTTON_TYPE,
     QUICK_LOOK_CUSTOM_BANNER_SIZE: QUICK_LOOK_CUSTOM_BANNER_SIZE,
-    ERROR_CODES: ERROR_CODES,
-    isAvailable: isAvailable
+    ERROR_CODES: ERROR_CODES
   };
 
   /*
