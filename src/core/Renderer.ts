@@ -90,7 +90,7 @@ class Renderer {
     if (renderer.xr.isPresenting) return;
 
     renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(canvas.offsetWidth, canvas.offsetHeight, false);
+    renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
   }
 
   public setAnimationLoop(callback: (delta: number, frame?: THREE.XRFrame) => void): void {

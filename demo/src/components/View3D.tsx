@@ -76,27 +76,23 @@ class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivE
       autoInit: clickToLoad ? false : restProps.autoInit
     };
 
-    try {
-      const view3D = new VanillaView3D(this._rootRef.current, options);
+    const view3D = new VanillaView3D(this._rootRef.current, options);
 
-      view3D.on("ready", () => {
-        this.setState({
-          initialized: true
-        });
+    view3D.on("ready", () => {
+      this.setState({
+        initialized: true
       });
+    });
 
-      this._view3D = view3D;
+    this._view3D = view3D;
 
-      if (showBbox) {
-        view3D.once("modelChange", ({ model }) => {
-          const modelBbox = model.bbox.clone().applyMatrix4(model.scene.matrixWorld);
-          const boxHelper = new THREE.Box3Helper(modelBbox, new THREE.Color(0x00ffff));
+    if (showBbox) {
+      view3D.once("modelChange", ({ model }) => {
+        const modelBbox = model.bbox.clone().applyMatrix4(model.scene.matrixWorld);
+        const boxHelper = new THREE.Box3Helper(modelBbox, new THREE.Color(0x00ffff));
 
-          view3D.scene.add(boxHelper);
-        });
-      }
-    } catch (err) {
-      console.log(err);
+        view3D.scene.add(boxHelper);
+      });
     }
   }
 
@@ -118,7 +114,7 @@ class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivE
       }, {});
 
     return <>
-      <div ref={this._rootRef} className={clsx(className, "view3d-wrapper", "view3d-square", "mb-2")} style={style}>
+      <div ref={this._rootRef} className={clsx(className, "view3d-wrapper", "view3d-1by1", "mb-2")} style={style}>
         <canvas className="view3d-canvas"></canvas>
         { clickToLoad && <div className={clsx({ "view3d-overlay": true, "hidden": initialized })}>
           <div className="button is-medium" onClick={e => {

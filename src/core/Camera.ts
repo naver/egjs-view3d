@@ -209,15 +209,19 @@ class Camera {
       ? new THREE.Vector3().fromArray(center)
       : bbox.getCenter(new THREE.Vector3());
 
-    const maxDistToCenterSquared = model.reduceVertices((dist, vertice) => {
-      return Math.max(dist, vertice.distanceToSquared(modelCenter));
-    }, 0);
+    const maxDistToCenterSquared = center === AUTO
+      ? new THREE.Vector3().subVectors(bbox.max, bbox.min).lengthSq() / 4
+      : model.reduceVertices((dist, vertice) => {
+        return Math.max(dist, vertice.distanceToSquared(modelCenter));
+      }, 0);
+
     const maxDistToCenter = Math.sqrt(maxDistToCenterSquared);
     const effectiveCamDist = maxDistToCenter / Math.sin(toRadian(hfov / 2));
 
     const maxTanHalfHFov = model.reduceVertices((res, vertex) => {
       const distToCenter = new THREE.Vector3().subVectors(vertex, modelCenter);
-      const radiusXZ = Math.sqrt(distToCenter.x * distToCenter.x + distToCenter.z * distToCenter.z);
+      const radiusXZ = Math.hypot(distToCenter.x, distToCenter.z);
+
       return Math.max(res, radiusXZ / (effectiveCamDist - Math.abs(distToCenter.y)));
     }, 0);
 
