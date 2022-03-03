@@ -1,14 +1,33 @@
 import ZoomControl from "~/control/ZoomControl";
-import View3DError from "~/core/View3DError";
-import ERROR from "~/const/error";
 import * as BROWSER from "~/const/browser";
+import * as DEFAULT from "~/const/default";
 import { createView3D } from "../../test-utils";
 
 describe("ZoomControl", () => {
   describe("Initial state", () => {
-    it("should have scale value as 1", async () => {
+    it("should have 1 as default scale", async () => {
       const view3D = await createView3D();
       expect(new ZoomControl(view3D).scale).to.equal(1);
+    });
+
+    it("should have 300 as default duration", async () => {
+      const view3D = await createView3D();
+      expect(new ZoomControl(view3D).duration).to.equal(300);
+    });
+
+    it("should have 1 as default minimum fov", async () => {
+      const view3D = await createView3D();
+      expect(new ZoomControl(view3D).minFov).to.equal(1);
+    });
+
+    it("should have 'auto' as default maximum fov", async () => {
+      const view3D = await createView3D();
+      expect(new ZoomControl(view3D).maxFov).to.equal("auto");
+    });
+
+    it("should have 'DEFAULT.EASING' as default easing", async () => {
+      const view3D = await createView3D();
+      expect(new ZoomControl(view3D).easing).to.equal(DEFAULT.EASING);
     });
 
     it("is not enabled by default", async () => {
@@ -20,10 +39,10 @@ describe("ZoomControl", () => {
   describe("Destroy", () => {
     it("should call disable when destroying", async () => {
       const view3D = await createView3D();
-      const distanceControl = new ZoomControl(view3D);
-      const disableSpy = Cypress.sinon.spy(distanceControl, "disable");
+      const zoomControl = new ZoomControl(view3D);
+      const disableSpy = Cypress.sinon.spy(zoomControl, "disable");
 
-      distanceControl.destroy();
+      zoomControl.destroy();
 
       expect(disableSpy.calledOnce).to.be.true;
     });
@@ -32,10 +51,10 @@ describe("ZoomControl", () => {
   describe("Enabling Control", () => {
     it("should add touch/wheel event listeners", async () => {
       const view3D = await createView3D();
-      const distanceControl = new ZoomControl(view3D);
+      const zoomControl = new ZoomControl(view3D);
       const addEventSpy = Cypress.sinon.spy(view3D.renderer.canvas, "addEventListener");
 
-      distanceControl.enable();
+      zoomControl.enable();
 
       const listenersShouldBeAdded = new Set([BROWSER.EVENTS.TOUCH_MOVE, BROWSER.EVENTS.TOUCH_END, BROWSER.EVENTS.WHEEL]);
       const listenersAdded = addEventSpy.args.map(args => args[0]); // Take the first argument(event name) only
@@ -46,22 +65,22 @@ describe("ZoomControl", () => {
 
     it("should return enabled as true after enabling it", async () => {
       const view3D = await createView3D();
-      const distanceControl = new ZoomControl(view3D);
+      const zoomControl = new ZoomControl(view3D);
 
-      distanceControl.enable();
+      zoomControl.enable();
 
-      expect(distanceControl.enabled).to.be.true;
+      expect(zoomControl.enabled).to.be.true;
     });
   });
 
   describe("Disabling Control", () => {
     it("should remove all relevant event listeners", async () => {
       const view3D = await createView3D();
-      const distanceControl = new ZoomControl(view3D);
+      const zoomControl = new ZoomControl(view3D);
       const removeEventSpy = Cypress.sinon.spy(view3D.renderer.canvas, "removeEventListener");
 
-      distanceControl.enable(); // It should be enabled first
-      distanceControl.disable();
+      zoomControl.enable(); // It should be enabled first
+      zoomControl.disable();
 
       const listenersShouldBeRemoved = new Set([
         BROWSER.EVENTS.TOUCH_START, BROWSER.EVENTS.TOUCH_MOVE, BROWSER.EVENTS.TOUCH_END, BROWSER.EVENTS.WHEEL
@@ -73,43 +92,78 @@ describe("ZoomControl", () => {
 
     it("should return enabled as false after disabling it", async () => {
       const view3D = await createView3D();
-      const distanceControl = new ZoomControl(view3D);
+      const zoomControl = new ZoomControl(view3D);
 
-      distanceControl.enable();
-      distanceControl.disable();
+      zoomControl.enable();
+      zoomControl.disable();
 
-      expect(distanceControl.enabled).to.be.false;
+      expect(zoomControl.enabled).to.be.false;
     });
   });
 
   describe("Changing scale", () => {
     it("should permit positive value", async () => {
       const view3D = await createView3D();
-      const distanceControl = new ZoomControl(view3D);
+      const zoomControl = new ZoomControl(view3D);
       const newScale = 4;
 
-      distanceControl.scale = newScale;
+      zoomControl.scale = newScale;
 
-      expect(distanceControl.scale).to.equal(newScale);
+      expect(zoomControl.scale).to.equal(newScale);
     });
 
     it("should permit 0", async () => {
       const view3D = await createView3D();
-      const distanceControl = new ZoomControl(view3D);
+      const zoomControl = new ZoomControl(view3D);
 
-      distanceControl.scale = 0;
+      zoomControl.scale = 0;
 
-      expect(distanceControl.scale).to.equal(0);
+      expect(zoomControl.scale).to.equal(0);
     });
 
     it("should permit negative value", async () => {
       const view3D = await createView3D();
-      const distanceControl = new ZoomControl(view3D);
+      const zoomControl = new ZoomControl(view3D);
       const newScale = -4;
 
-      distanceControl.scale = newScale;
+      zoomControl.scale = newScale;
 
-      expect(distanceControl.scale).to.equal(newScale);
+      expect(zoomControl.scale).to.equal(newScale);
+    });
+  });
+
+  describe("updateRange", () => {
+    it("should update its range.max to camera's baseFov + 45 if maxFov is 'auto'", async () => {
+      const view3D = await createView3D();
+      const zoomControl = new ZoomControl(view3D);
+
+      const baseFovStub = Cypress.sinon.stub(view3D.camera, "baseFov");
+      baseFovStub.get(() => 45);
+      zoomControl.updateRange();
+
+      expect(zoomControl.range.max).to.equal(90);
+    });
+
+    it("should not exceed 175 when setting range.max", async () => {
+      const view3D = await createView3D();
+      const zoomControl = new ZoomControl(view3D);
+
+      const baseFovStub = Cypress.sinon.stub(view3D.camera, "baseFov");
+      baseFovStub.get(() => 180 - 45);
+      zoomControl.updateRange();
+
+      expect(zoomControl.range.max).to.equal(175);
+    });
+
+    it("should not change range.max if it's given as maxFov", async () => {
+      const view3D = await createView3D();
+      const zoomControl = new ZoomControl(view3D, { maxFov: 45 });
+
+      const baseFovStub = Cypress.sinon.stub(view3D.camera, "baseFov");
+      baseFovStub.get(() => 45);
+      zoomControl.updateRange();
+
+      expect(zoomControl.range.max).to.equal(45);
     });
   });
 });
