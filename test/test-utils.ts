@@ -42,7 +42,7 @@ export const createView3D = async (options: Partial<View3DOptions & { children: 
 
   (window as any).instances.push(view3D);
 
-  if (!restOptions.autoInit || !restOptions.src) return view3D;
+  if (!view3D.autoInit || !view3D.src) return view3D;
 
   return new Promise(resolve => {
     view3D.once(EVENTS.READY, () => {

@@ -346,6 +346,12 @@ describe("View3D", () => {
       });
     });
 
+    describe("maintainSize", () => {
+      it("should have false as a default value", async () => {
+        expect((await createView3D()).maintainSize).to.be.false;
+      });
+    });
+
     describe("maxDeltaTime", () => {
       it("should have 1 / 30 as a default value", async () => {
         expect((await createView3D()).maxDeltaTime).to.equal(1 / 30);
