@@ -100,6 +100,7 @@ export interface View3DOptions {
   autoInit: boolean;
   autoResize: boolean;
   useResizeObserver: boolean;
+  maintainSize: boolean;
   on: Partial<View3DEvents>;
   plugins: View3DPlugin[];
   maxDeltaTime: number;
@@ -179,6 +180,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _autoInit: View3DOptions["autoInit"];
   private _autoResize: View3DOptions["autoResize"];
   private _useResizeObserver: View3DOptions["useResizeObserver"];
+  private _maintainSize: View3DOptions["maintainSize"];
   private _maxDeltaTime: View3DOptions["maxDeltaTime"];
 
   // Internal Components Getter
@@ -493,6 +495,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get useResizeObserver() { return this._useResizeObserver; }
   /**
+   * Whether to retain 3D model's visual size on canvas resize
+   * @type {boolean}
+   * @default false
+   */
+  public get maintainSize() { return this._maintainSize; }
+  /**
    * Maximum delta time in any given frame
    * This can prevent a long frame hitch / lag
    * The default value is 0.33333...(30 fps). Set this value to `Infinity` to disable
@@ -591,6 +599,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     autoInit = true,
     autoResize = true,
     useResizeObserver = true,
+    maintainSize = false,
     on = {},
     plugins = [],
     maxDeltaTime = 1 / 30
@@ -638,6 +647,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._autoInit = autoInit;
     this._autoResize = autoResize;
     this._useResizeObserver = useResizeObserver;
+    this._maintainSize = maintainSize;
 
     this._model = null;
     this._initialized = false;
@@ -691,10 +701,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
       throw new View3DError(ERROR.MESSAGES.PROVIDE_SRC_FIRST, ERROR.CODES.PROVIDE_SRC_FIRST);
     }
 
-    if (this._autoResize) {
-      this._autoResizer.enable();
-    }
-
     const scene = this._scene;
     const renderer = this._renderer;
     const control = this._control;
@@ -703,6 +709,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     const background = this._background;
     const meshoptPath = this._meshoptPath;
     const tasks: Array<Promise<any>> = [];
+
+    if (this._autoResize) {
+      this._autoResizer.enable();
+    } else {
+      this.resize();
+    }
 
     if (meshoptPath && !GLTFLoader.meshoptDecoder) {
       await GLTFLoader.setMeshoptDecoder(meshoptPath);
@@ -753,10 +765,11 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public resize() {
     const renderer = this._renderer;
+    const prevSize = this._initialized ? renderer.size : null;
     renderer.resize();
 
     const newSize = renderer.size;
-    this._camera.resize(newSize);
+    this._camera.resize(newSize, prevSize);
     this._control.resize(newSize);
 
     if (!renderer.threeRenderer.xr.isPresenting) {

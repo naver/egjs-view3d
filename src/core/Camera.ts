@@ -178,18 +178,30 @@ class Camera {
    * @param {number} [size.height] New height
    * @returns {void}
    */
-  public resize({ width, height }: { width: number; height: number }): void {
-    const cam = this._threeCamera;
+  public resize(
+    { width, height }: { width: number; height: number },
+    prevSize: { width: number; height: number } | null = null
+  ): void {
+    const { control, fov, maintainSize } = this._view3D;
+    const threeCamera = this._threeCamera;
     const aspect = width / height;
-    const fov = this._view3D.fov;
 
-    cam.aspect = aspect;
+    threeCamera.aspect = aspect;
 
     if (fov === AUTO) {
-      this._applyEffectiveFov(DEFAULT.FOV);
+      if (!maintainSize || prevSize == null) {
+        this._applyEffectiveFov(DEFAULT.FOV);
+      } else {
+        const heightRatio = height / prevSize.height;
+        const tanHalfBaseFov = Math.tan(toRadian(this._baseFov / 2));
+
+        this._baseFov = toDegree(2 * Math.atan(heightRatio * tanHalfBaseFov));
+      }
     } else {
       this._baseFov = fov;
     }
+
+    control.zoom.updateRange();
   }
 
   /**
