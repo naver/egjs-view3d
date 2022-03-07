@@ -52,6 +52,7 @@ class TextureLoader extends Loader {
 
     return new Promise((resolve, reject) => {
       const loader = new RGBELoader();
+      loader.type = THREE.FloatType;
       const loadingContext = createLoadingContext(view3D, url);
 
       loader.setCrossOrigin("anonymous");

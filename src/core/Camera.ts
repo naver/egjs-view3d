@@ -92,8 +92,6 @@ class Camera {
    */
   public get fov() { return this._threeCamera.fov; }
 
-  public get pose() { return this._currentPose; }
-
   /**
    * Camera's frustum width
    * @type number
