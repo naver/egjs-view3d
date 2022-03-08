@@ -10,6 +10,7 @@ import View3DError from "./core/View3DError";
 import ERROR from "./const/error";
 import { NoBoolean } from "./type/utils";
 
+export const isNumber = (val: any): val is number => typeof val === "number";
 export const isString = (val: any): val is string => typeof val === "string";
 export const isElement = (val: any): val is Element => !!val && val.nodeType === Node.ELEMENT_NODE;
 
@@ -74,17 +75,9 @@ export const range = (end: number): number[] => {
   return Array.apply(0, Array(end)).map((undef, idx) => idx);
 };
 
-export const toRadian = (x: number) => {
-  return x * Math.PI / 180;
-};
-
-export const toDegree = (x: number) => {
-  return x * 180 / Math.PI;
-};
-
-export const clamp = (x: number, min: number, max: number) => {
-  return Math.max(Math.min(x, max), min);
-};
+export const toRadian = (x: number) => x * Math.PI / 180;
+export const toDegree = (x: number) => x * 180 / Math.PI;
+export const clamp = (x: number, min: number, max: number) => Math.max(Math.min(x, max), min);
 
 export const findIndex = <T>(target: T, list: T[]) => {
   let index = -1;
@@ -98,7 +91,7 @@ export const findIndex = <T>(target: T, list: T[]) => {
 };
 
 // Linear interpolation between a and b
-export const mix = (a: number, b: number, t: number) => {
+export const lerp = (a: number, b: number, t: number) => {
   return a * (1 - t) + b * t;
 };
 

@@ -70,7 +70,10 @@ export interface View3DOptions {
   center: typeof AUTO | number[];
   yaw: number;
   pitch: number;
-  initialZoom: number;
+  initialZoom: number | {
+    axis: "x" | "y" | "z";
+    ratio: number;
+  };
   rotate: boolean | Partial<RotateControlOptions>;
   translate: boolean | Partial<TranslateControlOptions>;
   zoom: boolean | Partial<ZoomControlOptions>;
@@ -327,7 +330,9 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   public get pitch() { return this._pitch; }
   /**
    * Initial zoom value.
-   * Positive value will make camera zoomed in and negative value will make camera zoomed out.
+   * If `number` is given, positive value will make camera zoomed in and negative value will make camera zoomed out.
+   * If `object` is given, it will fit model's bounding box's front / side face to the given ratio of the canvas height / width.
+   * For example, `{ axis: "y", ratio: 0.5 }` will set the zoom of the camera so that the height of the model to 50% of the height of the canvas.
    * @type {number}
    * @default 0
    */

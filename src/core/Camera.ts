@@ -7,7 +7,7 @@ import * as THREE from "three";
 
 import View3D from "../View3D";
 import AnimationControl from "../control/AnimationControl";
-import { toRadian, clamp, circulate, toDegree, getRotatedPosition } from "../utils";
+import { toRadian, clamp, circulate, toDegree, getRotatedPosition, isNumber } from "../utils";
 import * as DEFAULT from "../const/default";
 import { AUTO, EVENTS } from "../const/external";
 import { BeforeRenderEvent } from "../type/event";
@@ -118,7 +118,9 @@ class Camera {
     this._threeCamera = new THREE.PerspectiveCamera();
     this._maxTanHalfHFov = 0;
 
-    this._defaultPose = new Pose(view3D.yaw, view3D.pitch, view3D.initialZoom);
+    const initialZoom = isNumber(view3D.initialZoom) ? view3D.initialZoom : 0;
+
+    this._defaultPose = new Pose(view3D.yaw, view3D.pitch, initialZoom);
     this._currentPose = this._defaultPose.clone();
   }
 
@@ -249,6 +251,24 @@ class Camera {
     camera.near = (effectiveCamDist - maxDistToCenter) * 0.1;
     camera.far = (effectiveCamDist + maxDistToCenter) * 10;
     control.zoom.updateRange();
+
+    if (!isNumber(view3D.initialZoom)) {
+      const baseFov = this._baseFov;
+      const modelBbox = model.bbox;
+      const alignAxis = view3D.initialZoom.axis;
+      const targetRatio = view3D.initialZoom.ratio;
+      const bboxDiff = new THREE.Vector3().subVectors(modelBbox.max, modelBbox.min);
+      const axisDiff = bboxDiff[alignAxis];
+      const newViewHeight = alignAxis === "y"
+        ? axisDiff / targetRatio
+        : axisDiff / (targetRatio * camera.aspect);
+      const camDist = alignAxis !== "z"
+        ? effectiveCamDist - bboxDiff.z / 2
+        : effectiveCamDist - bboxDiff.x / 2;
+      const newFov = toDegree(2 * Math.atan(newViewHeight / (2 * camDist)));
+
+      defaultPose.zoom = baseFov - newFov;
+    }
   }
 
   /**
