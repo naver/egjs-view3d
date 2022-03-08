@@ -7,6 +7,7 @@ import * as THREE from "three";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
 
 import View3D from "../View3D";
+import * as BROWSER from "../const/browser";
 import { createLoadingContext } from "../utils";
 
 import Loader from "./Loader";
@@ -35,7 +36,7 @@ class TextureLoader extends Loader {
       const loader = new THREE.TextureLoader();
       const loadingContext = createLoadingContext(view3D, url);
 
-      loader.setCrossOrigin("anonymous");
+      loader.setCrossOrigin(BROWSER.ANONYMOUS);
       loader.load(url, resolve, evt => this._onLoadingProgress(evt, url, loadingContext), err => {
         loadingContext.initialized = true;
         reject(err);
@@ -49,13 +50,16 @@ class TextureLoader extends Loader {
    */
   public loadHDRTexture(url: string): Promise<THREE.Texture> {
     const view3D = this._view3D;
+    const isWebGL2 = view3D.renderer.threeRenderer.capabilities.isWebGL2;
 
     return new Promise((resolve, reject) => {
       const loader = new RGBELoader();
-      loader.type = THREE.FloatType;
+      if (!isWebGL2) {
+        loader.type = THREE.FloatType;
+      }
       const loadingContext = createLoadingContext(view3D, url);
 
-      loader.setCrossOrigin("anonymous");
+      loader.setCrossOrigin(BROWSER.ANONYMOUS);
       loader.load(url, texture => {
         texture.mapping = THREE.EquirectangularReflectionMapping;
 
