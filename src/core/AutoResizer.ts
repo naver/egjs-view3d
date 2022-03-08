@@ -27,10 +27,14 @@ class AutoResizer {
     }
 
     if (view3d.useResizeObserver && !!window.ResizeObserver) {
-      const resizeObserver = new ResizeObserver(this._onResize);
+      const canvasEl = view3d.renderer.canvas;
+      const canvasBbox = canvasEl.getBoundingClientRect();
+      const resizeImmediate = canvasBbox.width !== 0 || canvasBbox.height !== 0;
+
+      const resizeObserver = new ResizeObserver(resizeImmediate ? this._skipFirstResize : this._onResize);
 
       // This will automatically call `resize` for the first time
-      resizeObserver.observe(view3d.renderer.canvas);
+      resizeObserver.observe(canvasEl);
 
       this._resizeObserver = resizeObserver;
     } else {
@@ -62,6 +66,20 @@ class AutoResizer {
   private _onResize = () => {
     this._view3d.resize();
   };
+
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  private _skipFirstResize = (() => {
+    let isFirstResize = true;
+
+    return (() => {
+      if (isFirstResize) {
+        isFirstResize = false;
+
+        return;
+      }
+      this._onResize();
+    });
+  })();
 }
 
 export default AutoResizer;

@@ -193,9 +193,10 @@ class Camera {
         this._applyEffectiveFov(DEFAULT.FOV);
       } else {
         const heightRatio = height / prevSize.height;
-        const tanHalfBaseFov = Math.tan(toRadian(this._baseFov / 2));
+        const currentZoom = this._currentPose.zoom;
+        const tanHalfFov = Math.tan(toRadian((this._baseFov - currentZoom) / 2));
 
-        this._baseFov = toDegree(2 * Math.atan(heightRatio * tanHalfBaseFov));
+        this._baseFov = toDegree(2 * Math.atan(heightRatio * tanHalfFov)) + currentZoom;
       }
     } else {
       this._baseFov = fov;

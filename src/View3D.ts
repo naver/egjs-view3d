@@ -714,10 +714,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     const meshoptPath = this._meshoptPath;
     const tasks: Array<Promise<any>> = [];
 
+    this.resize();
+
     if (this._autoResize) {
       this._autoResizer.enable();
-    } else {
-      this.resize();
     }
 
     if (meshoptPath && !GLTFLoader.meshoptDecoder) {
