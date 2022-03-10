@@ -36,11 +36,6 @@ class Model {
    */
   public get animations() { return this._animations; }
   /**
-   * JSON data of original glTF file
-   * @readonly
-   */
-  public get json() { return this._json; }
-  /**
    * {@link https://threejs.org/docs/#api/en/objects/Mesh THREE.Mesh}es inside model if there's any.
    * @readonly
    */
@@ -86,7 +81,6 @@ class Model {
     src,
     scenes,
     animations = [],
-    json = {},
     fixSkinnedBbox = false,
     castShadow = true,
     receiveShadow = false
@@ -94,19 +88,16 @@ class Model {
     src: string;
     scenes: THREE.Object3D[];
     animations?: THREE.AnimationClip[];
-    json?: any; // Original json of the glTF file
     fixSkinnedBbox?: boolean;
     castShadow?: boolean;
     receiveShadow?: boolean;
   }) {
     this._src = src;
 
-    // This guarantees model's root has identity matrix at creation
     const scene = new THREE.Group();
     scene.add(...scenes);
 
     this._animations = animations;
-    this._json = json;
     this._scene = scene;
     const bbox = this._getInitialBbox(fixSkinnedBbox);
 

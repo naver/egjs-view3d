@@ -16,7 +16,7 @@ import Model from "./Model";
  * @param {number} [darkness=0.5] Darkness of the shadow.
  * @param {number} [mapSize=9] Size of the shadow map. Texture of size (n * n) where n = 2 ^ (mapSize) will be used as shadow map. Should be an integer value.
  * @param {number} [blur=3.5] Blurriness of the shadow.
- * @param {number} [shadowScale=1] Scale of the shadow range. Using higher values will make shadow more even-textured.
+ * @param {number} [shadowScale=1] Scale of the shadow range. This usually means which height of the 3D model shadow will be affected by.
  * @param {number} [planeScale=2] Scale of the shadow plane. Use higher value if the shadow is clipped.
  */
 export interface ShadowOptions {
@@ -87,13 +87,30 @@ class ShadowPlane {
    */
   public get planeScale() { return this._planeScale; }
 
+  public set darkness(val: ShadowOptions["darkness"]) {
+    (this._plane.material as THREE.MeshBasicMaterial).opacity = val;
+    this._darkness = val;
+  }
+
+  public set blur(val: ShadowOptions["blur"]) {
+    this._blur = val;
+  }
+
+  public set shadowScale(val: ShadowOptions["shadowScale"]) {
+    this._shadowScale = val;
+    const model = this._view3D.model;
+    if (model) {
+      this.updateDimensions(model);
+    }
+  }
+
   /**
    * Create new shadow plane
    * @param {object} options Options
    * @param {number} [options.darkness=0.5] Darkness of the shadow.
    * @param {number} [options.mapSize=9] Size of the shadow map. Texture of size (n * n) where n = 2 ^ (mapSize) will be used as shadow map. Should be an integer value.
    * @param {number} [options.blur=3.5] Blurriness of the shadow.
-   * @param {number} [options.shadowScale=1] Scale of the shadow range. Using higher values will make shadow more even-textured.
+   * @param {number} [options.shadowScale=1] Scale of the shadow range. This usually means which height of the 3D model shadow will be affected by.
    * @param {number} [options.planeScale=2] Scale of the shadow plane. Use higher value if the shadow is clipped.
    */
   public constructor(view3D: View3D, {

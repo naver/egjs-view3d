@@ -50,11 +50,10 @@ class TextureLoader extends Loader {
    */
   public loadHDRTexture(url: string): Promise<THREE.Texture> {
     const view3D = this._view3D;
-    const isWebGL2 = view3D.renderer.threeRenderer.capabilities.isWebGL2;
 
     return new Promise((resolve, reject) => {
       const loader = new RGBELoader();
-      if (!isWebGL2) {
+      if (!view3D.renderer.capabilities.halfFloat) {
         loader.type = THREE.FloatType;
       }
       const loadingContext = createLoadingContext(view3D, url);

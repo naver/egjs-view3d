@@ -37,6 +37,8 @@ class ARButton implements View3DPlugin {
    * @param {object} [options={}] Options for the ARButton
    * @param {string} [options.availableText="View in AR"] A text that will be shown on mouse hover when it's available to enter the AR session.
    * @param {string} [options.unavailableText="AR is not available in this browser"] A text that will be shown on mouse hover when it's not available to enter the AR session.
+   * @param {string} [options.buttonClass="view3d-ar-button"] A class that will be applied to the button element.
+   * @param {string} [options.tooltipClass="view3d-tooltip"] A class that will be applied to the tooltip element.
    */
   public constructor(options: Partial<ARButtonOptions> = {}) {
     this._options = options;
