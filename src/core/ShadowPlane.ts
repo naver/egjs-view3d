@@ -193,6 +193,7 @@ class ShadowPlane {
     threeRenderer.setClearAlpha(0);
 
     // render to the render target to get the depths
+    const prevRenderTarget = threeRenderer.getRenderTarget();
     threeRenderer.setRenderTarget(this._renderTarget);
     threeRenderer.clear();
     threeRenderer.render(sceneRoot, shadowCamera);
@@ -208,7 +209,7 @@ class ShadowPlane {
 
     // reset and render the normal scene
     threeRenderer.xr.enabled = xrEnabled;
-    threeRenderer.setRenderTarget(null);
+    threeRenderer.setRenderTarget(prevRenderTarget);
     threeRenderer.setClearAlpha(initialClearAlpha);
     sceneRoot.background = initialBackground;
 
