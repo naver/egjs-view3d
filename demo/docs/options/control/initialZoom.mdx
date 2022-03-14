@@ -6,10 +6,24 @@ import View3D from "@site/src/components/View3D";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
 import License from "@site/src/components/License";
 
-<OptionDescriptor type="number" defaultVal="0" />
+<OptionDescriptor type="number | object" defaultVal="0" />
 
 Initial zoom value.
-Positive value will make camera zoomed in and negative value will make camera zoomed out.
+If `number` is given, positive value will make camera zoomed in and negative value will make camera zoomed out.
+If `object` is given, it will fit model's bounding box's front / side face to the given ratio of the canvas height / width.
+For example, `{ axis: "y", ratio: 0.5 }` will set the zoom of the camera so that the height of the model to 50% of the height of the canvas.
+See the below table/examples for details
+
+|property|type|description|
+|:---:|:---:|---|
+|axis|"x" \| "y" \| "z"|An bounding box's axis to apply ratio|
+|ratio|number|description|
+
+|axis|canvas side to apply ratio|base bounding box side|
+|:---:|:---:|:---:|
+|x|width|front|
+|y|height|front|
+|z|width|side|
 
 ## Example
 <div className="columns">
@@ -17,14 +31,63 @@ Positive value will make camera zoomed in and negative value will make camera zo
     <View3D
       src="/egjs-view3d/model/draco/alarm.glb"
       envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+      poster="/egjs-view3d/poster/alarm.png"
       initialZoom={0}
+      clickToLoad
       showExampleCode />
   </div>
   <div className="column">
     <View3D
       src="/egjs-view3d/model/draco/alarm.glb"
       envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+      poster="/egjs-view3d/poster/alarm.png"
       initialZoom={15}
+      clickToLoad
+      showExampleCode />
+  </div>
+</div>
+<div className="columns">
+  <div className="column">
+    <View3D
+      src="/egjs-view3d/model/draco/alarm.glb"
+      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+      poster="/egjs-view3d/poster/alarm.png"
+      initialZoom={{ axis: "y", ratio: 1 }}
+      clickToLoad
+      showBbox
+      showExampleCode />
+  </div>
+  <div className="column">
+    <View3D
+      src="/egjs-view3d/model/draco/alarm.glb"
+      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+      poster="/egjs-view3d/poster/alarm.png"
+      initialZoom={{ axis: "x", ratio: 1 }}
+      clickToLoad
+      showBbox
+      showExampleCode />
+  </div>
+</div>
+<div className="columns">
+  <div className="column">
+    <View3D
+      src="/egjs-view3d/model/draco/alarm.glb"
+      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+      poster="/egjs-view3d/poster/alarm.png"
+      initialZoom={{ axis: "z", ratio: 1 }}
+      yaw={90}
+      clickToLoad
+      showBbox
+      showExampleCode />
+  </div>
+  <div className="column">
+    <View3D
+      src="/egjs-view3d/model/draco/alarm.glb"
+      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+      poster="/egjs-view3d/poster/alarm.png"
+      initialZoom={{ axis: "y", ratio: 0.5 }}
+      clickToLoad
+      showBbox
       showExampleCode />
   </div>
 </div>

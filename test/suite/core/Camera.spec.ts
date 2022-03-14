@@ -92,5 +92,32 @@ describe("Camera", () => {
 
       expect(threeCamera.aspect).to.equal(2);
     });
+
+    it("should update renderHeight proportionally if `maintainSize` is true", async () => {
+      const view3D = (await createView3D({
+        src: "/cube.glb",
+        maintainSize: true
+      }));
+      const camera = view3D.camera;
+      const prevHeight = view3D.renderer.size.height;
+      const prevRenderHeight = camera.renderHeight;
+
+      // Width doesn't matter
+      camera.resize(new THREE.Vector2(1000, prevHeight * 2), view3D.renderer.size);
+      camera.updatePosition();
+      const newRenderHeight1 = camera.renderHeight;
+
+      camera.resize(new THREE.Vector2(400, prevHeight * 3), new THREE.Vector2(1000, prevHeight * 2));
+      camera.updatePosition();
+      const newRenderHeight2 = camera.renderHeight;
+
+      camera.resize(new THREE.Vector2(600, prevHeight / 5), new THREE.Vector2(400, prevHeight * 3));
+      camera.updatePosition();
+      const newRenderHeight3 = camera.renderHeight;
+
+      expect(newRenderHeight1).to.be.closeTo(prevRenderHeight * 2, 0.000001);
+      expect(newRenderHeight2).to.be.closeTo(prevRenderHeight * 3, 0.000001);
+      expect(newRenderHeight3).to.be.closeTo(prevRenderHeight / 5, 0.000001);
+    });
   });
 });

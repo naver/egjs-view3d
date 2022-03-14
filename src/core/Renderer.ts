@@ -17,6 +17,7 @@ class Renderer {
   private _renderer: THREE.WebGLRenderer;
   private _canvas: HTMLCanvasElement;
   private _clock: THREE.Clock;
+  private _halfFloatAvailable: boolean;
 
   /**
    * {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement HTMLCanvasElement} given when creating View3D instance
@@ -56,6 +57,19 @@ class Renderer {
   }
 
   /**
+   * An object containing details about the capabilities of the current RenderingContext.
+   * Merged with three.js WebGLRenderer's capabilities.
+   */
+  public get capabilities() {
+    const renderer = this._renderer;
+
+    return {
+      ...renderer.capabilities,
+      halfFloat: this._halfFloatAvailable
+    };
+  }
+
+  /**
    * Create new Renderer instance
    * @param canvas \<canvas\> element to render 3d model
    */
@@ -75,6 +89,33 @@ class Renderer {
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.setClearColor(0x000000, 0);
 
+    if (renderer.capabilities.isWebGL2) {
+      this._halfFloatAvailable = true;
+    } else {
+      const gl = renderer.getContext();
+      const texture = gl.createTexture();
+
+      try {
+        const data = new Uint16Array(4);
+        const ext = gl.getExtension("OES_texture_half_float");
+
+        if (!ext) {
+          this._halfFloatAvailable = false;
+        } else {
+          gl.bindTexture(gl.TEXTURE_2D, texture);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, ext.HALF_FLOAT_OES, data);
+
+          const err = gl.getError();
+
+          this._halfFloatAvailable = err === gl.NO_ERROR;
+        }
+      } catch (err) {
+        this._halfFloatAvailable = false;
+      }
+
+      gl.deleteTexture(texture);
+    }
+
     this._renderer = renderer;
     this._clock = new THREE.Clock(false);
   }
@@ -90,7 +131,7 @@ class Renderer {
     if (renderer.xr.isPresenting) return;
 
     renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(canvas.offsetWidth, canvas.offsetHeight, false);
+    renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
   }
 
   public setAnimationLoop(callback: (delta: number, frame?: THREE.XRFrame) => void): void {

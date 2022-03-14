@@ -7,7 +7,7 @@ import View3D from "../View3D";
 import Pose from "../core/Pose";
 import Motion from "../core/Motion";
 import * as DEFAULT from "../const/default";
-import { mix, circulate } from "../utils";
+import { lerp, circulate } from "../utils";
 
 import CameraControl from "./CameraControl";
 
@@ -101,9 +101,9 @@ class AnimationControl implements CameraControl {
     // Progress that easing is applied
     const progress = motion.val;
 
-    camera.yaw = mix(from.yaw, to.yaw, progress);
-    camera.pitch = mix(from.pitch, to.pitch, progress);
-    camera.zoom = mix(from.zoom, to.zoom, progress);
+    camera.yaw = lerp(from.yaw, to.yaw, progress);
+    camera.pitch = lerp(from.pitch, to.pitch, progress);
+    camera.zoom = lerp(from.zoom, to.zoom, progress);
     camera.pivot = from.pivot.clone().lerp(to.pivot, progress);
 
     if (progress >= 1) {

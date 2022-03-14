@@ -122,7 +122,14 @@ class ZoomControl implements CameraControl, OptionGetters<ZoomControlOptions> {
     this._easing = easing;
 
     this._range = { min: minFov, max: maxFov === AUTO ? 180 : maxFov };
-    this._motion = new Motion({ duration, easing });
+    this._motion = new Motion({
+      duration,
+      easing,
+      range: {
+        min: -Infinity,
+        max: Infinity
+      }
+    });
   }
 
   /**
@@ -191,9 +198,7 @@ class ZoomControl implements CameraControl, OptionGetters<ZoomControlOptions> {
    * @returns {void}
    */
   public sync(): void {
-    const camera = this._view3D.camera;
-
-    this._motion.reset(camera.zoom);
+    this._motion.reset(0);
   }
 
   /**
@@ -203,16 +208,12 @@ class ZoomControl implements CameraControl, OptionGetters<ZoomControlOptions> {
   public updateRange(): void {
     const max = this._maxFov;
     const range = this._range;
-    const motion = this._motion;
     const { camera } = this._view3D;
     const baseFov = camera.baseFov;
 
     if (max === AUTO) {
       range.max = Math.min(baseFov + 45, 175);
     }
-
-    motion.range.min = range.min - baseFov;
-    motion.range.max = range.max - baseFov;
   }
 
   private _onWheel = (evt: WheelEvent) => {

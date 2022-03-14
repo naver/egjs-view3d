@@ -70,7 +70,10 @@ export interface View3DOptions {
   center: typeof AUTO | number[];
   yaw: number;
   pitch: number;
-  initialZoom: number;
+  initialZoom: number | {
+    axis: "x" | "y" | "z";
+    ratio: number;
+  };
   rotate: boolean | Partial<RotateControlOptions>;
   translate: boolean | Partial<TranslateControlOptions>;
   zoom: boolean | Partial<ZoomControlOptions>;
@@ -100,6 +103,7 @@ export interface View3DOptions {
   autoInit: boolean;
   autoResize: boolean;
   useResizeObserver: boolean;
+  maintainSize: boolean;
   on: Partial<View3DEvents>;
   plugins: View3DPlugin[];
   maxDeltaTime: number;
@@ -179,6 +183,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _autoInit: View3DOptions["autoInit"];
   private _autoResize: View3DOptions["autoResize"];
   private _useResizeObserver: View3DOptions["useResizeObserver"];
+  private _maintainSize: View3DOptions["maintainSize"];
   private _maxDeltaTime: View3DOptions["maxDeltaTime"];
 
   // Internal Components Getter
@@ -325,7 +330,9 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   public get pitch() { return this._pitch; }
   /**
    * Initial zoom value.
-   * Positive value will make camera zoomed in and negative value will make camera zoomed out.
+   * If `number` is given, positive value will make camera zoomed in and negative value will make camera zoomed out.
+   * If `object` is given, it will fit model's bounding box's front / side face to the given ratio of the canvas height / width.
+   * For example, `{ axis: "y", ratio: 0.5 }` will set the zoom of the camera so that the height of the model to 50% of the height of the canvas.
    * @type {number}
    * @default 0
    */
@@ -493,6 +500,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get useResizeObserver() { return this._useResizeObserver; }
   /**
+   * Whether to retain 3D model's visual size on canvas resize
+   * @type {boolean}
+   * @default false
+   */
+  public get maintainSize() { return this._maintainSize; }
+  /**
    * Maximum delta time in any given frame
    * This can prevent a long frame hitch / lag
    * The default value is 0.33333...(30 fps). Set this value to `Infinity` to disable
@@ -540,9 +553,8 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._control.updateCursor();
   }
 
-  public set maxDeltaTime(val: View3DOptions["maxDeltaTime"]) {
-    this._maxDeltaTime = val;
-  }
+  public set maxDeltaTime(val: View3DOptions["maxDeltaTime"]) { this._maxDeltaTime = val; }
+  public set maintainSize(val: View3DOptions["maintainSize"]) { this._maintainSize = val; }
 
   /**
    * Creates new View3D instance.
@@ -591,6 +603,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     autoInit = true,
     autoResize = true,
     useResizeObserver = true,
+    maintainSize = false,
     on = {},
     plugins = [],
     maxDeltaTime = 1 / 30
@@ -638,6 +651,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._autoInit = autoInit;
     this._autoResize = autoResize;
     this._useResizeObserver = useResizeObserver;
+    this._maintainSize = maintainSize;
 
     this._model = null;
     this._initialized = false;
@@ -691,10 +705,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
       throw new View3DError(ERROR.MESSAGES.PROVIDE_SRC_FIRST, ERROR.CODES.PROVIDE_SRC_FIRST);
     }
 
-    if (this._autoResize) {
-      this._autoResizer.enable();
-    }
-
     const scene = this._scene;
     const renderer = this._renderer;
     const control = this._control;
@@ -703,6 +713,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     const background = this._background;
     const meshoptPath = this._meshoptPath;
     const tasks: Array<Promise<any>> = [];
+
+    this.resize();
+
+    if (this._autoResize) {
+      this._autoResizer.enable();
+    }
 
     if (meshoptPath && !GLTFLoader.meshoptDecoder) {
       await GLTFLoader.setMeshoptDecoder(meshoptPath);
@@ -753,10 +769,11 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public resize() {
     const renderer = this._renderer;
+    const prevSize = this._initialized ? renderer.size : null;
     renderer.resize();
 
     const newSize = renderer.size;
-    this._camera.resize(newSize);
+    this._camera.resize(newSize, prevSize);
     this._control.resize(newSize);
 
     if (!renderer.threeRenderer.xr.isPresenting) {

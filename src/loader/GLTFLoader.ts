@@ -162,12 +162,12 @@ class GLTFLoader extends Loader {
       loader.manager = manager;
       loader.load(gltfURL, gltf => {
         const model = this._parseToModel(gltf, gltfFile.name);
-        resolve(model);
         revokeURLs();
+        resolve(model);
       }, evt => this._onLoadingProgress(evt, gltfURL, loadingContext), err => {
         loadingContext.initialized = true;
-        reject(err);
         revokeURLs();
+        reject(err);
       });
     });
   }
@@ -254,7 +254,6 @@ class GLTFLoader extends Loader {
     const model = new Model({
       src,
       scenes: gltf.scenes,
-      json: gltf.parser.json,
       animations: gltf.animations,
       fixSkinnedBbox
     });

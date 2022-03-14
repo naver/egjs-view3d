@@ -1,8 +1,7 @@
 import * as THREE from "three";
 
-import { cleanup, createSandbox } from "../test-utils";
+import { createSandbox } from "../test-utils";
 
-import View3DError from "~/core/View3DError";
 import {
   getNullableElement,
   range,
@@ -10,7 +9,7 @@ import {
   clamp,
   findIndex,
   getElement,
-  mix,
+  lerp,
   circulate,
   merge,
   getBoxPoints,
@@ -156,29 +155,29 @@ describe("Utils", () => {
     });
   });
 
-  describe("mix", () => {
+  describe("lerp", () => {
     it("should return a if t = 0", () => {
-      expect(mix(1, 2, 0)).to.equal(1);
-      expect(mix(3, 5, 0)).to.equal(3);
-      expect(mix(-1, 0, 0)).to.equal(-1);
-      expect(mix(0, 2, 0)).to.equal(0);
-      expect(mix(4, -2, 0)).to.equal(4);
+      expect(lerp(1, 2, 0)).to.equal(1);
+      expect(lerp(3, 5, 0)).to.equal(3);
+      expect(lerp(-1, 0, 0)).to.equal(-1);
+      expect(lerp(0, 2, 0)).to.equal(0);
+      expect(lerp(4, -2, 0)).to.equal(4);
     });
 
     it("should return b if t = 1", () => {
-      expect(mix(1, 2, 1)).to.equal(2);
-      expect(mix(3, 5, 1)).to.equal(5);
-      expect(mix(-1, 0, 1)).to.equal(0);
-      expect(mix(0, 2, 1)).to.equal(2);
-      expect(mix(4, -2, 1)).to.equal(-2);
+      expect(lerp(1, 2, 1)).to.equal(2);
+      expect(lerp(3, 5, 1)).to.equal(5);
+      expect(lerp(-1, 0, 1)).to.equal(0);
+      expect(lerp(0, 2, 1)).to.equal(2);
+      expect(lerp(4, -2, 1)).to.equal(-2);
     });
 
     it("should return (a + b) / 2 if t = 0.5", () => {
-      expect(mix(1, 2, 0.5)).to.equal(1.5);
-      expect(mix(3, 5, 0.5)).to.equal(4);
-      expect(mix(-1, 0, 0.5)).to.equal(-0.5);
-      expect(mix(0, 2, 0.5)).to.equal(1);
-      expect(mix(4, -2, 0.5)).to.equal(1);
+      expect(lerp(1, 2, 0.5)).to.equal(1.5);
+      expect(lerp(3, 5, 0.5)).to.equal(4);
+      expect(lerp(-1, 0, 0.5)).to.equal(-0.5);
+      expect(lerp(0, 2, 0.5)).to.equal(1);
+      expect(lerp(4, -2, 0.5)).to.equal(1);
     });
   });
 

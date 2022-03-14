@@ -3,7 +3,7 @@
  * egjs projects are licensed under the MIT license
  */
 
-import { clamp, mix, circulate } from "../utils";
+import { clamp, lerp, circulate } from "../utils";
 import * as DEFAULT from "../const/default";
 import { Range } from "../type/utils";
 
@@ -70,7 +70,7 @@ class Motion {
       : clamp(nextProgress, 0, 1);
 
     const easedProgress = this._easing(this._progress);
-    this._val = mix(start, end, easedProgress);
+    this._val = lerp(start, end, easedProgress);
 
     if (!loop && this._progress >= 1) {
       this._activated = false;

@@ -7,7 +7,7 @@ import * as THREE from "three";
 
 import View3D from "../View3D";
 import AnimationControl from "../control/AnimationControl";
-import { toRadian, clamp, circulate, toDegree, getRotatedPosition } from "../utils";
+import { toRadian, clamp, circulate, toDegree, getRotatedPosition, isNumber } from "../utils";
 import * as DEFAULT from "../const/default";
 import { AUTO, EVENTS } from "../const/external";
 import { BeforeRenderEvent } from "../type/event";
@@ -92,8 +92,6 @@ class Camera {
    */
   public get fov() { return this._threeCamera.fov; }
 
-  public get pose() { return this._currentPose; }
-
   /**
    * Camera's frustum width
    * @type number
@@ -120,7 +118,9 @@ class Camera {
     this._threeCamera = new THREE.PerspectiveCamera();
     this._maxTanHalfHFov = 0;
 
-    this._defaultPose = new Pose(view3D.yaw, view3D.pitch, view3D.initialZoom);
+    const initialZoom = isNumber(view3D.initialZoom) ? view3D.initialZoom : 0;
+
+    this._defaultPose = new Pose(view3D.yaw, view3D.pitch, initialZoom);
     this._currentPose = this._defaultPose.clone();
   }
 
@@ -178,18 +178,31 @@ class Camera {
    * @param {number} [size.height] New height
    * @returns {void}
    */
-  public resize({ width, height }: { width: number; height: number }): void {
-    const cam = this._threeCamera;
+  public resize(
+    { width, height }: { width: number; height: number },
+    prevSize: { width: number; height: number } | null = null
+  ): void {
+    const { control, fov, maintainSize } = this._view3D;
+    const threeCamera = this._threeCamera;
     const aspect = width / height;
-    const fov = this._view3D.fov;
 
-    cam.aspect = aspect;
+    threeCamera.aspect = aspect;
 
     if (fov === AUTO) {
-      this._applyEffectiveFov(DEFAULT.FOV);
+      if (!maintainSize || prevSize == null) {
+        this._applyEffectiveFov(DEFAULT.FOV);
+      } else {
+        const heightRatio = height / prevSize.height;
+        const currentZoom = this._currentPose.zoom;
+        const tanHalfFov = Math.tan(toRadian((this._baseFov - currentZoom) / 2));
+
+        this._baseFov = toDegree(2 * Math.atan(heightRatio * tanHalfFov)) + currentZoom;
+      }
     } else {
       this._baseFov = fov;
     }
+
+    control.zoom.updateRange();
   }
 
   /**
@@ -209,15 +222,19 @@ class Camera {
       ? new THREE.Vector3().fromArray(center)
       : bbox.getCenter(new THREE.Vector3());
 
-    const maxDistToCenterSquared = model.reduceVertices((dist, vertice) => {
-      return Math.max(dist, vertice.distanceToSquared(modelCenter));
-    }, 0);
+    const maxDistToCenterSquared = center === AUTO
+      ? new THREE.Vector3().subVectors(bbox.max, bbox.min).lengthSq() / 4
+      : model.reduceVertices((dist, vertice) => {
+        return Math.max(dist, vertice.distanceToSquared(modelCenter));
+      }, 0);
+
     const maxDistToCenter = Math.sqrt(maxDistToCenterSquared);
     const effectiveCamDist = maxDistToCenter / Math.sin(toRadian(hfov / 2));
 
     const maxTanHalfHFov = model.reduceVertices((res, vertex) => {
       const distToCenter = new THREE.Vector3().subVectors(vertex, modelCenter);
-      const radiusXZ = Math.sqrt(distToCenter.x * distToCenter.x + distToCenter.z * distToCenter.z);
+      const radiusXZ = Math.hypot(distToCenter.x, distToCenter.z);
+
       return Math.max(res, radiusXZ / (effectiveCamDist - Math.abs(distToCenter.y)));
     }, 0);
 
@@ -235,6 +252,24 @@ class Camera {
     camera.near = (effectiveCamDist - maxDistToCenter) * 0.1;
     camera.far = (effectiveCamDist + maxDistToCenter) * 10;
     control.zoom.updateRange();
+
+    if (!isNumber(view3D.initialZoom)) {
+      const baseFov = this._baseFov;
+      const modelBbox = model.bbox;
+      const alignAxis = view3D.initialZoom.axis;
+      const targetRatio = view3D.initialZoom.ratio;
+      const bboxDiff = new THREE.Vector3().subVectors(modelBbox.max, modelBbox.min);
+      const axisDiff = bboxDiff[alignAxis];
+      const newViewHeight = alignAxis === "y"
+        ? axisDiff / targetRatio
+        : axisDiff / (targetRatio * camera.aspect);
+      const camDist = alignAxis !== "z"
+        ? effectiveCamDist - bboxDiff.z / 2
+        : effectiveCamDist - bboxDiff.x / 2;
+      const newFov = toDegree(2 * Math.atan(newViewHeight / (2 * camDist)));
+
+      defaultPose.zoom = baseFov - newFov;
+    }
   }
 
   /**
