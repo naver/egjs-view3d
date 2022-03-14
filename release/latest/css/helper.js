@@ -4,7 +4,7 @@ name: @egjs/view3d
 license: MIT
 author: NAVER Corp.
 repository: https://github.com/naver/egjs-view3d
-version: 2.2.1
+version: 2.3.0
 */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -69,8 +69,11 @@ version: 2.2.1
   var checkWASMAvailability = function () {
     try {
       if (typeof WebAssembly === "object" && typeof WebAssembly.instantiate === "function") {
-        var module_1 = new WebAssembly.Module(Uint8Array.of(0x0, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00));
-        if (module_1 instanceof WebAssembly.Module) return new WebAssembly.Instance(module_1) instanceof WebAssembly.Instance;
+        var wasmModule = new WebAssembly.Module(Uint8Array.of(0x0, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00));
+
+        if (wasmModule instanceof WebAssembly.Module) {
+          return new WebAssembly.Instance(wasmModule) instanceof WebAssembly.Instance;
+        }
       }
     } catch (e) {
       return false;

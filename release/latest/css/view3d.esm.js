@@ -4,9 +4,9 @@ name: @egjs/view3d
 license: MIT
 author: NAVER Corp.
 repository: https://github.com/naver/egjs-view3d
-version: 2.2.1
+version: 2.3.0
 */
-import { Vector3, Vector2, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, WebGLRenderer, sRGBEncoding, Clock, TextureLoader as TextureLoader$1, EquirectangularReflectionMapping, Group, WebGLRenderTarget, RGBAFormat, OrthographicCamera, Sphere, PlaneBufferGeometry, MeshBasicMaterial, BackSide, Mesh, MeshDepthMaterial, ShaderMaterial, Scene as Scene$1, PerspectiveCamera, WebGLCubeRenderTarget, CubeCamera, MeshStandardMaterial, IcosahedronBufferGeometry, Color, AnimationMixer, Quaternion, Plane, Matrix4, Ray, Euler, CanvasTexture, PlaneGeometry, RingGeometry, Box3, Vector4, DefaultLoadingManager, LoadingManager, AmbientLight } from 'three';
+import { Vector3, Vector2, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, WebGLRenderer, sRGBEncoding, Clock, TextureLoader as TextureLoader$1, FloatType, EquirectangularReflectionMapping, Group, WebGLRenderTarget, RGBAFormat, OrthographicCamera, Sphere, PlaneBufferGeometry, MeshBasicMaterial, BackSide, Mesh, MeshDepthMaterial, ShaderMaterial, Scene as Scene$1, PerspectiveCamera, WebGLCubeRenderTarget, CubeCamera, MeshStandardMaterial, IcosahedronBufferGeometry, Color, AnimationMixer, Quaternion, Plane, Matrix4, Ray, Euler, CanvasTexture, PlaneGeometry, RingGeometry, Box3, Vector4, DefaultLoadingManager, LoadingManager, AmbientLight } from 'three';
 import Component from '@egjs/component';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader';
 import { HorizontalBlurShader } from 'three/examples/jsm/shaders/HorizontalBlurShader';
@@ -144,6 +144,7 @@ var ERROR = {
  * Copyright (c) 2020 NAVER Corp.
  * egjs projects are licensed under the MIT license
  */
+const isNumber = val => typeof val === "number";
 const isString = val => typeof val === "string";
 const isElement = val => !!val && val.nodeType === Node.ELEMENT_NODE;
 const getNullableElement = (el, parent) => {
@@ -194,17 +195,11 @@ const isCSSSelector = val => {
 
   return true;
 };
-const toRadian = x => {
-  return x * Math.PI / 180;
-};
-const toDegree = x => {
-  return x * 180 / Math.PI;
-};
-const clamp = (x, min, max) => {
-  return Math.max(Math.min(x, max), min);
-};
+const toRadian = x => x * Math.PI / 180;
+const toDegree = x => x * 180 / Math.PI;
+const clamp = (x, min, max) => Math.max(Math.min(x, max), min);
 
-const mix = (a, b, t) => {
+const lerp = (a, b, t) => {
   return a * (1 - t) + b * t;
 };
 const circulate = (val, min, max) => {
@@ -514,6 +509,32 @@ class Renderer {
     renderer.toneMappingExposure = view3D.exposure;
     renderer.outputEncoding = sRGBEncoding;
     renderer.setClearColor(0x000000, 0);
+
+    if (renderer.capabilities.isWebGL2) {
+      this._halfFloatAvailable = true;
+    } else {
+      const gl = renderer.getContext();
+      const texture = gl.createTexture();
+
+      try {
+        const data = new Uint16Array(4);
+        const ext = gl.getExtension("OES_texture_half_float");
+
+        if (!ext) {
+          this._halfFloatAvailable = false;
+        } else {
+          gl.bindTexture(gl.TEXTURE_2D, texture);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, ext.HALF_FLOAT_OES, data);
+          const err = gl.getError();
+          this._halfFloatAvailable = err === gl.NO_ERROR;
+        }
+      } catch (err) {
+        this._halfFloatAvailable = false;
+      }
+
+      gl.deleteTexture(texture);
+    }
+
     this._renderer = renderer;
     this._clock = new Clock(false);
   }
@@ -575,6 +596,18 @@ class Renderer {
     };
   }
   /**
+   * An object containing details about the capabilities of the current RenderingContext.
+   * Merged with three.js WebGLRenderer's capabilities.
+   */
+
+
+  get capabilities() {
+    const renderer = this._renderer;
+    return Object.assign(Object.assign({}, renderer.capabilities), {
+      halfFloat: this._halfFloatAvailable
+    });
+  }
+  /**
    * Resize the renderer based on current canvas width / height
    * @returns {void}
    */
@@ -585,7 +618,7 @@ class Renderer {
     const canvas = this._canvas;
     if (renderer.xr.isPresenting) return;
     renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(canvas.offsetWidth, canvas.offsetHeight, false);
+    renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
   }
 
   setAnimationLoop(callback) {
@@ -607,6 +640,43 @@ class Renderer {
   }
 
 }
+
+/*
+ * Copyright (c) 2020 NAVER Corp.
+ * egjs projects are licensed under the MIT license
+ */
+// Browser related constants
+const IS_IOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+const IS_ANDROID = () => /android/i.test(navigator.userAgent);
+const EVENTS$1 = {
+  MOUSE_DOWN: "mousedown",
+  MOUSE_MOVE: "mousemove",
+  MOUSE_UP: "mouseup",
+  TOUCH_START: "touchstart",
+  TOUCH_MOVE: "touchmove",
+  TOUCH_END: "touchend",
+  WHEEL: "wheel",
+  RESIZE: "resize",
+  CONTEXT_MENU: "contextmenu",
+  MOUSE_ENTER: "mouseenter",
+  MOUSE_LEAVE: "mouseleave",
+  LOAD: "load",
+  ERROR: "error"
+};
+const CURSOR = {
+  GRAB: "grab",
+  GRABBING: "grabbing",
+  NONE: ""
+}; // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
+
+var MOUSE_BUTTON;
+
+(function (MOUSE_BUTTON) {
+  MOUSE_BUTTON[MOUSE_BUTTON["LEFT"] = 0] = "LEFT";
+  MOUSE_BUTTON[MOUSE_BUTTON["MIDDLE"] = 1] = "MIDDLE";
+  MOUSE_BUTTON[MOUSE_BUTTON["RIGHT"] = 2] = "RIGHT";
+})(MOUSE_BUTTON || (MOUSE_BUTTON = {}));
+const ANONYMOUS = "anonymous";
 
 /**
  * Base class for all loaders that View3D uses
@@ -663,7 +733,7 @@ class TextureLoader extends Loader {
     return new Promise((resolve, reject) => {
       const loader = new TextureLoader$1();
       const loadingContext = createLoadingContext(view3D, url);
-      loader.setCrossOrigin("anonymous");
+      loader.setCrossOrigin(ANONYMOUS);
       loader.load(url, resolve, evt => this._onLoadingProgress(evt, url, loadingContext), err => {
         loadingContext.initialized = true;
         reject(err);
@@ -680,8 +750,13 @@ class TextureLoader extends Loader {
     const view3D = this._view3D;
     return new Promise((resolve, reject) => {
       const loader = new RGBELoader();
+
+      if (!view3D.renderer.capabilities.halfFloat) {
+        loader.type = FloatType;
+      }
+
       const loadingContext = createLoadingContext(view3D, url);
-      loader.setCrossOrigin("anonymous");
+      loader.setCrossOrigin(ANONYMOUS);
       loader.load(url, texture => {
         texture.mapping = EquirectangularReflectionMapping;
         resolve(texture);
@@ -737,7 +812,7 @@ class ShadowPlane {
    * @param {number} [options.darkness=0.5] Darkness of the shadow.
    * @param {number} [options.mapSize=9] Size of the shadow map. Texture of size (n * n) where n = 2 ^ (mapSize) will be used as shadow map. Should be an integer value.
    * @param {number} [options.blur=3.5] Blurriness of the shadow.
-   * @param {number} [options.shadowScale=1] Scale of the shadow range. Using higher values will make shadow more even-textured.
+   * @param {number} [options.shadowScale=1] Scale of the shadow range. This usually means which height of the 3D model shadow will be affected by.
    * @param {number} [options.planeScale=2] Scale of the shadow plane. Use higher value if the shadow is clipped.
    */
   constructor(view3D, {
@@ -835,6 +910,24 @@ class ShadowPlane {
     return this._planeScale;
   }
 
+  set darkness(val) {
+    this._plane.material.opacity = val;
+    this._darkness = val;
+  }
+
+  set blur(val) {
+    this._blur = val;
+  }
+
+  set shadowScale(val) {
+    this._shadowScale = val;
+    const model = this._view3D.model;
+
+    if (model) {
+      this.updateDimensions(model);
+    }
+  }
+
   updateDimensions(model) {
     const root = this._root;
     const shadowCam = this._shadowCamera;
@@ -872,6 +965,7 @@ class ShadowPlane {
     const initialClearAlpha = threeRenderer.getClearAlpha();
     threeRenderer.setClearAlpha(0); // render to the render target to get the depths
 
+    const prevRenderTarget = threeRenderer.getRenderTarget();
     threeRenderer.setRenderTarget(this._renderTarget);
     threeRenderer.clear();
     threeRenderer.render(sceneRoot, shadowCamera); // and reset the override material
@@ -886,7 +980,7 @@ class ShadowPlane {
 
 
     threeRenderer.xr.enabled = xrEnabled;
-    threeRenderer.setRenderTarget(null);
+    threeRenderer.setRenderTarget(prevRenderTarget);
     threeRenderer.setClearAlpha(initialClearAlpha);
     sceneRoot.background = initialBackground;
     this._plane.visible = true;
@@ -1440,7 +1534,7 @@ class Motion {
 
     const easedProgress = this._easing(this._progress);
 
-    this._val = mix(start, end, easedProgress);
+    this._val = lerp(start, end, easedProgress);
 
     if (!loop && this._progress >= 1) {
       this._activated = false;
@@ -1573,9 +1667,9 @@ class AnimationControl {
     motion.update(deltaTime); // Progress that easing is applied
 
     const progress = motion.val;
-    camera.yaw = mix(from.yaw, to.yaw, progress);
-    camera.pitch = mix(from.pitch, to.pitch, progress);
-    camera.zoom = mix(from.zoom, to.zoom, progress);
+    camera.yaw = lerp(from.yaw, to.yaw, progress);
+    camera.pitch = lerp(from.pitch, to.pitch, progress);
+    camera.zoom = lerp(from.zoom, to.zoom, progress);
     camera.pivot = from.pivot.clone().lerp(to.pivot, progress);
 
     if (progress >= 1) {
@@ -1697,7 +1791,8 @@ class Camera {
     this._view3D = view3D;
     this._threeCamera = new PerspectiveCamera();
     this._maxTanHalfHFov = 0;
-    this._defaultPose = new Pose(view3D.yaw, view3D.pitch, view3D.initialZoom);
+    const initialZoom = isNumber(view3D.initialZoom) ? view3D.initialZoom : 0;
+    this._defaultPose = new Pose(view3D.yaw, view3D.pitch, initialZoom);
     this._currentPose = this._defaultPose.clone();
   }
   /**
@@ -1792,10 +1887,6 @@ class Camera {
   get fov() {
     return this._threeCamera.fov;
   }
-
-  get pose() {
-    return this._currentPose;
-  }
   /**
    * Camera's frustum width
    * @type number
@@ -1886,17 +1977,30 @@ class Camera {
   resize({
     width,
     height
-  }) {
-    const cam = this._threeCamera;
+  }, prevSize = null) {
+    const {
+      control,
+      fov,
+      maintainSize
+    } = this._view3D;
+    const threeCamera = this._threeCamera;
     const aspect = width / height;
-    const fov = this._view3D.fov;
-    cam.aspect = aspect;
+    threeCamera.aspect = aspect;
 
     if (fov === AUTO) {
-      this._applyEffectiveFov(FOV);
+      if (!maintainSize || prevSize == null) {
+        this._applyEffectiveFov(FOV);
+      } else {
+        const heightRatio = height / prevSize.height;
+        const currentZoom = this._currentPose.zoom;
+        const tanHalfFov = Math.tan(toRadian((this._baseFov - currentZoom) / 2));
+        this._baseFov = toDegree(2 * Math.atan(heightRatio * tanHalfFov)) + currentZoom;
+      }
     } else {
       this._baseFov = fov;
     }
+
+    control.zoom.updateRange();
   }
   /**
    * Fit camera frame to the given model
@@ -1912,14 +2016,14 @@ class Camera {
     const fov = view3D.fov;
     const hfov = fov === AUTO ? FOV : fov;
     const modelCenter = Array.isArray(center) ? new Vector3().fromArray(center) : bbox.getCenter(new Vector3());
-    const maxDistToCenterSquared = model.reduceVertices((dist, vertice) => {
+    const maxDistToCenterSquared = center === AUTO ? new Vector3().subVectors(bbox.max, bbox.min).lengthSq() / 4 : model.reduceVertices((dist, vertice) => {
       return Math.max(dist, vertice.distanceToSquared(modelCenter));
     }, 0);
     const maxDistToCenter = Math.sqrt(maxDistToCenterSquared);
     const effectiveCamDist = maxDistToCenter / Math.sin(toRadian(hfov / 2));
     const maxTanHalfHFov = model.reduceVertices((res, vertex) => {
       const distToCenter = new Vector3().subVectors(vertex, modelCenter);
-      const radiusXZ = Math.sqrt(distToCenter.x * distToCenter.x + distToCenter.z * distToCenter.z);
+      const radiusXZ = Math.hypot(distToCenter.x, distToCenter.z);
       return Math.max(res, radiusXZ / (effectiveCamDist - Math.abs(distToCenter.y)));
     }, 0);
 
@@ -1937,6 +2041,19 @@ class Camera {
     camera.near = (effectiveCamDist - maxDistToCenter) * 0.1;
     camera.far = (effectiveCamDist + maxDistToCenter) * 10;
     control.zoom.updateRange();
+
+    if (!isNumber(view3D.initialZoom)) {
+      const baseFov = this._baseFov;
+      const modelBbox = model.bbox;
+      const alignAxis = view3D.initialZoom.axis;
+      const targetRatio = view3D.initialZoom.ratio;
+      const bboxDiff = new Vector3().subVectors(modelBbox.max, modelBbox.min);
+      const axisDiff = bboxDiff[alignAxis];
+      const newViewHeight = alignAxis === "y" ? axisDiff / targetRatio : axisDiff / (targetRatio * camera.aspect);
+      const camDist = alignAxis !== "z" ? effectiveCamDist - bboxDiff.z / 2 : effectiveCamDist - bboxDiff.x / 2;
+      const newFov = toDegree(2 * Math.atan(newViewHeight / (2 * camDist)));
+      defaultPose.zoom = baseFov - newFov;
+    }
   }
   /**
    * Update camera position base on the {@link Camera#currentPose currentPose} value
@@ -1979,48 +2096,25 @@ class Camera {
  * Copyright (c) 2020 NAVER Corp.
  * egjs projects are licensed under the MIT license
  */
-// Browser related constants
-const IS_IOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
-const IS_ANDROID = () => /android/i.test(navigator.userAgent);
-const EVENTS$1 = {
-  MOUSE_DOWN: "mousedown",
-  MOUSE_MOVE: "mousemove",
-  MOUSE_UP: "mouseup",
-  TOUCH_START: "touchstart",
-  TOUCH_MOVE: "touchmove",
-  TOUCH_END: "touchend",
-  WHEEL: "wheel",
-  RESIZE: "resize",
-  CONTEXT_MENU: "contextmenu",
-  MOUSE_ENTER: "mouseenter",
-  MOUSE_LEAVE: "mouseleave",
-  LOAD: "load",
-  ERROR: "error"
-};
-const CURSOR = {
-  GRAB: "grab",
-  GRABBING: "grabbing",
-  NONE: ""
-}; // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
-
-var MOUSE_BUTTON;
-
-(function (MOUSE_BUTTON) {
-  MOUSE_BUTTON[MOUSE_BUTTON["LEFT"] = 0] = "LEFT";
-  MOUSE_BUTTON[MOUSE_BUTTON["MIDDLE"] = 1] = "MIDDLE";
-  MOUSE_BUTTON[MOUSE_BUTTON["RIGHT"] = 2] = "RIGHT";
-})(MOUSE_BUTTON || (MOUSE_BUTTON = {}));
-
-/*
- * Copyright (c) 2020 NAVER Corp.
- * egjs projects are licensed under the MIT license
- */
 
 class AutoResizer {
   constructor(view3d) {
     this._onResize = () => {
       this._view3d.resize();
-    };
+    }; // eslint-disable-next-line @typescript-eslint/member-ordering
+
+
+    this._skipFirstResize = (() => {
+      let isFirstResize = true;
+      return () => {
+        if (isFirstResize) {
+          isFirstResize = false;
+          return;
+        }
+
+        this._onResize();
+      };
+    })();
 
     this._view3d = view3d;
     this._enabled = false;
@@ -2039,9 +2133,12 @@ class AutoResizer {
     }
 
     if (view3d.useResizeObserver && !!window.ResizeObserver) {
-      const resizeObserver = new ResizeObserver(this._onResize); // This will automatically call `resize` for the first time
+      const canvasEl = view3d.renderer.canvas;
+      const canvasBbox = canvasEl.getBoundingClientRect();
+      const resizeImmediate = canvasBbox.width !== 0 || canvasBbox.height !== 0;
+      const resizeObserver = new ResizeObserver(resizeImmediate ? this._skipFirstResize : this._onResize); // This will automatically call `resize` for the first time
 
-      resizeObserver.observe(view3d.renderer.canvas);
+      resizeObserver.observe(canvasEl);
       this._resizeObserver = resizeObserver;
     } else {
       view3d.resize();
@@ -5543,7 +5640,11 @@ class ZoomControl {
     };
     this._motion = new Motion({
       duration,
-      easing
+      easing,
+      range: {
+        min: -Infinity,
+        max: Infinity
+      }
     });
   }
   /**
@@ -5694,9 +5795,7 @@ class ZoomControl {
 
 
   sync() {
-    const camera = this._view3D.camera;
-
-    this._motion.reset(camera.zoom);
+    this._motion.reset(0);
   }
   /**
    * Update fov range by the camera's current fov value
@@ -5707,7 +5806,6 @@ class ZoomControl {
   updateRange() {
     const max = this._maxFov;
     const range = this._range;
-    const motion = this._motion;
     const {
       camera
     } = this._view3D;
@@ -5716,9 +5814,6 @@ class ZoomControl {
     if (max === AUTO) {
       range.max = Math.min(baseFov + 45, 175);
     }
-
-    motion.range.min = range.min - baseFov;
-    motion.range.max = range.max - baseFov;
   }
 
 }
@@ -6218,17 +6313,14 @@ class Model {
     src,
     scenes,
     animations = [],
-    json = {},
     fixSkinnedBbox = false,
     castShadow = true,
     receiveShadow = false
   }) {
-    this._src = src; // This guarantees model's root has identity matrix at creation
-
+    this._src = src;
     const scene = new Group();
     scene.add(...scenes);
     this._animations = animations;
-    this._json = json;
     this._scene = scene;
 
     const bbox = this._getInitialBbox(fixSkinnedBbox); // Move to position where bbox.min.y = 0
@@ -6238,6 +6330,7 @@ class Model {
     scene.translateY(-offset);
     scene.updateMatrixWorld();
     bbox.translate(new Vector3(0, -offset, 0));
+    this._fixSkinnedBbox = fixSkinnedBbox;
     this._bbox = bbox;
     this.castShadow = castShadow;
     this.receiveShadow = receiveShadow;
@@ -6269,15 +6362,6 @@ class Model {
 
   get animations() {
     return this._animations;
-  }
-  /**
-   * JSON data of original glTF file
-   * @readonly
-   */
-
-
-  get json() {
-    return this._json;
   }
   /**
    * {@link https://threejs.org/docs/#api/en/objects/Mesh THREE.Mesh}es inside model if there's any.
@@ -6327,6 +6411,10 @@ class Model {
     const meshes = this.meshes;
     meshes.forEach(mesh => mesh.receiveShadow = val);
   }
+  /**
+   * Executes a user-supplied "reducer" callback function on each vertex of the model, in order, passing in the return value from the calculation on the preceding element.
+   */
+
 
   reduceVertices(callbackfn, initialVal) {
     const meshes = this.meshes;
@@ -6338,10 +6426,16 @@ class Model {
       if (!position) return;
       mesh.updateMatrixWorld();
 
-      for (let idx = 0; idx < position.count; idx++) {
-        const vertex = new Vector3().fromBufferAttribute(position, idx);
-        vertex.applyMatrix4(mesh.matrixWorld);
-        result = callbackfn(result, vertex);
+      if (this._fixSkinnedBbox && mesh.isSkinnedMesh) {
+        this._forEachSkinnedVertices(mesh, vertex => {
+          result = callbackfn(result, vertex);
+        });
+      } else {
+        for (let idx = 0; idx < position.count; idx++) {
+          const vertex = new Vector3().fromBufferAttribute(position, idx);
+          vertex.applyMatrix4(mesh.matrixWorld);
+          result = callbackfn(result, vertex);
+        }
       }
     });
     return result;
@@ -6365,33 +6459,7 @@ class Model {
         return;
       }
 
-      const geometry = mesh.geometry;
-      const positions = geometry.attributes.position;
-      const skinIndicies = geometry.attributes.skinIndex;
-      const skinWeights = geometry.attributes.skinWeight;
-      const skeleton = mesh.skeleton;
-      skeleton.update();
-      const boneMatricies = skeleton.boneMatrices;
-      const skinWeightScale = skinWeights.normalized && ArrayBuffer.isView(skinWeights.array) ? 1 / (Math.pow(2, 8 * skinWeights.array.BYTES_PER_ELEMENT) - 1) : 1;
-      const finalMatrix = new Matrix4();
-
-      for (let posIdx = 0; posIdx < positions.count; posIdx++) {
-        finalMatrix.identity();
-        const pos = new Vector3().fromBufferAttribute(positions, posIdx);
-        const skinned = new Vector4();
-        skinned.set(0, 0, 0, 0);
-        const skinVertex = new Vector4();
-        skinVertex.set(pos.x, pos.y, pos.z, 1).applyMatrix4(mesh.bindMatrix);
-        const weights = [skinWeights.getX(posIdx), skinWeights.getY(posIdx), skinWeights.getZ(posIdx), skinWeights.getW(posIdx)].map(weight => weight * skinWeightScale);
-        const indicies = [skinIndicies.getX(posIdx), skinIndicies.getY(posIdx), skinIndicies.getZ(posIdx), skinIndicies.getW(posIdx)];
-        weights.forEach((weight, index) => {
-          const boneMatrix = new Matrix4().fromArray(boneMatricies, indicies[index] * 16);
-          skinned.add(skinVertex.clone().applyMatrix4(boneMatrix).multiplyScalar(weight));
-        });
-        const transformed = new Vector3().fromArray(skinned.applyMatrix4(mesh.bindMatrixInverse).toArray());
-        transformed.applyMatrix4(mesh.matrixWorld);
-        bbox.expandByPoint(transformed);
-      }
+      this._forEachSkinnedVertices(mesh, vertex => bbox.expandByPoint(vertex));
     });
     return bbox;
   }
@@ -6416,6 +6484,32 @@ class Model {
 
   _hasSkinnedMesh() {
     return this._getAllMeshes().some(mesh => mesh.isSkinnedMesh);
+  }
+
+  _forEachSkinnedVertices(mesh, callback) {
+    const geometry = mesh.geometry;
+    const positions = geometry.attributes.position;
+    const skinIndicies = geometry.attributes.skinIndex;
+    const skinWeights = geometry.attributes.skinWeight;
+    const skeleton = mesh.skeleton;
+    skeleton.update();
+    const boneMatricies = skeleton.boneMatrices;
+    const skinWeightScale = skinWeights.normalized && ArrayBuffer.isView(skinWeights.array) ? 1 / (Math.pow(2, 8 * skinWeights.array.BYTES_PER_ELEMENT) - 1) : 1;
+
+    for (let posIdx = 0; posIdx < positions.count; posIdx++) {
+      const pos = new Vector3().fromBufferAttribute(positions, posIdx);
+      const skinned = new Vector4(0, 0, 0, 0);
+      const skinVertex = new Vector4(pos.x, pos.y, pos.z).applyMatrix4(mesh.bindMatrix);
+      const weights = [skinWeights.getX(posIdx), skinWeights.getY(posIdx), skinWeights.getZ(posIdx), skinWeights.getW(posIdx)].map(weight => weight * skinWeightScale);
+      const indicies = [skinIndicies.getX(posIdx), skinIndicies.getY(posIdx), skinIndicies.getZ(posIdx), skinIndicies.getW(posIdx)];
+      weights.forEach((weight, index) => {
+        const boneMatrix = new Matrix4().fromArray(boneMatricies, indicies[index] * 16);
+        skinned.add(skinVertex.clone().applyMatrix4(boneMatrix).multiplyScalar(weight));
+      });
+      const transformed = new Vector3().fromArray(skinned.applyMatrix4(mesh.bindMatrixInverse).toArray());
+      transformed.applyMatrix4(mesh.matrixWorld);
+      callback(transformed);
+    }
   }
 
 }
@@ -6560,12 +6654,12 @@ class GLTFLoader extends Loader {
       loader.load(gltfURL, gltf => {
         const model = this._parseToModel(gltf, gltfFile.name);
 
-        resolve(model);
         revokeURLs();
+        resolve(model);
       }, evt => this._onLoadingProgress(evt, gltfURL, loadingContext), err => {
         loadingContext.initialized = true;
-        reject(err);
         revokeURLs();
+        reject(err);
       });
     });
   }
@@ -6642,7 +6736,6 @@ class GLTFLoader extends Loader {
     const model = new Model({
       src,
       scenes: gltf.scenes,
-      json: gltf.parser.json,
       animations: gltf.animations,
       fixSkinnedBbox
     });
@@ -6704,6 +6797,7 @@ class View3D extends Component {
     autoInit = true,
     autoResize = true,
     useResizeObserver = true,
+    maintainSize = false,
     on = {},
     plugins = [],
     maxDeltaTime = 1 / 30
@@ -6745,6 +6839,7 @@ class View3D extends Component {
     this._autoInit = autoInit;
     this._autoResize = autoResize;
     this._useResizeObserver = useResizeObserver;
+    this._maintainSize = maintainSize;
     this._model = null;
     this._initialized = false;
     this._loadingContext = [];
@@ -7002,7 +7097,9 @@ class View3D extends Component {
   }
   /**
    * Initial zoom value.
-   * Positive value will make camera zoomed in and negative value will make camera zoomed out.
+   * If `number` is given, positive value will make camera zoomed in and negative value will make camera zoomed out.
+   * If `object` is given, it will fit model's bounding box's front / side face to the given ratio of the canvas height / width.
+   * For example, `{ axis: "y", ratio: 0.5 }` will set the zoom of the camera so that the height of the model to 50% of the height of the canvas.
    * @type {number}
    * @default 0
    */
@@ -7266,6 +7363,16 @@ class View3D extends Component {
     return this._useResizeObserver;
   }
   /**
+   * Whether to retain 3D model's visual size on canvas resize
+   * @type {boolean}
+   * @default false
+   */
+
+
+  get maintainSize() {
+    return this._maintainSize;
+  }
+  /**
    * Maximum delta time in any given frame
    * This can prevent a long frame hitch / lag
    * The default value is 0.33333...(30 fps). Set this value to `Infinity` to disable
@@ -7321,6 +7428,10 @@ class View3D extends Component {
   set maxDeltaTime(val) {
     this._maxDeltaTime = val;
   }
+
+  set maintainSize(val) {
+    this._maintainSize = val;
+  }
   /**
    * Destroy View3D instance and remove all events attached to it
    * @returns {void}
@@ -7355,10 +7466,6 @@ class View3D extends Component {
         throw new View3DError(ERROR.MESSAGES.PROVIDE_SRC_FIRST, ERROR.CODES.PROVIDE_SRC_FIRST);
       }
 
-      if (this._autoResize) {
-        this._autoResizer.enable();
-      }
-
       const scene = this._scene;
       const renderer = this._renderer;
       const control = this._control;
@@ -7367,6 +7474,11 @@ class View3D extends Component {
       const background = this._background;
       const meshoptPath = this._meshoptPath;
       const tasks = [];
+      this.resize();
+
+      if (this._autoResize) {
+        this._autoResizer.enable();
+      }
 
       if (meshoptPath && !GLTFLoader.meshoptDecoder) {
         yield GLTFLoader.setMeshoptDecoder(meshoptPath);
@@ -7417,10 +7529,11 @@ class View3D extends Component {
 
   resize() {
     const renderer = this._renderer;
+    const prevSize = this._initialized ? renderer.size : null;
     renderer.resize();
     const newSize = renderer.size;
 
-    this._camera.resize(newSize);
+    this._camera.resize(newSize, prevSize);
 
     this._control.resize(newSize);
 
@@ -7668,7 +7781,7 @@ class View3D extends Component {
  */
 
 
-View3D.VERSION = "2.2.1";
+View3D.VERSION = "2.3.0";
 
 /*
  * "View In Ar" Icon from [Google Material Design Icons](https://github.com/google/material-design-icons)
@@ -7689,6 +7802,8 @@ class ARButton {
    * @param {object} [options={}] Options for the ARButton
    * @param {string} [options.availableText="View in AR"] A text that will be shown on mouse hover when it's available to enter the AR session.
    * @param {string} [options.unavailableText="AR is not available in this browser"] A text that will be shown on mouse hover when it's not available to enter the AR session.
+   * @param {string} [options.buttonClass="view3d-ar-button"] A class that will be applied to the button element.
+   * @param {string} [options.tooltipClass="view3d-tooltip"] A class that will be applied to the tooltip element.
    */
   constructor(options = {}) {
     this._options = options;
@@ -8013,8 +8128,11 @@ const checkWebGLAvailability = () => {
 const checkWASMAvailability = () => {
   try {
     if (typeof WebAssembly === "object" && typeof WebAssembly.instantiate === "function") {
-      const module = new WebAssembly.Module(Uint8Array.of(0x0, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00));
-      if (module instanceof WebAssembly.Module) return new WebAssembly.Instance(module) instanceof WebAssembly.Instance;
+      const wasmModule = new WebAssembly.Module(Uint8Array.of(0x0, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00));
+
+      if (wasmModule instanceof WebAssembly.Module) {
+        return new WebAssembly.Instance(wasmModule) instanceof WebAssembly.Instance;
+      }
     }
   } catch (e) {
     return false;
