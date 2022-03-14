@@ -1,6 +1,6 @@
 {
 	"name": "@egjs/view3d",
-	"version": "2.3.0-beta.3",
+	"version": "2.3.0",
 	"description": "Fast & Customizable glTF 3D model viewer, packed with full of features!",
 	"main": "dist/view3d.js",
 	"module": "dist/view3d.esm.js",
@@ -20,7 +20,7 @@
 		"lint": "eslint 'src/**/*.ts'",
 		"lint:test": "eslint 'test/unit/**/*.ts'",
 		"docs:build": "rm -rf ./demo/docs/api && jsdoc-to-mdx -c ./jsdoc-to-mdx.json",
-		"demo:build": "run-s build demo:copy-lib docs:build demo:build-docusaurus",
+		"demo:build": "run-s build demo:copy-lib docs:build && npm run demo:build-docusaurus",
 		"demo:build-docusaurus": "npm run build --prefix demo",
 		"demo:copy-lib": "run-s demo:copy-lib-version demo:copy-lib-latest",
 		"demo:copy-lib-version": "cpx 'dist/**/*' demo/static/release/$npm_package_version --clean && cpx 'css/**/*' demo/static/release/$npm_package_version/css --clean",
