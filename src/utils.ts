@@ -79,17 +79,6 @@ export const toRadian = (x: number) => x * Math.PI / 180;
 export const toDegree = (x: number) => x * 180 / Math.PI;
 export const clamp = (x: number, min: number, max: number) => Math.max(Math.min(x, max), min);
 
-export const findIndex = <T>(target: T, list: T[]) => {
-  let index = -1;
-  for (const itemIndex of range(list.length)) {
-    if (list[itemIndex] === target) {
-      index = itemIndex;
-      break;
-    }
-  }
-  return index;
-};
-
 // Linear interpolation between a and b
 export const lerp = (a: number, b: number, t: number) => {
   return a * (1 - t) + b * t;

@@ -7,7 +7,6 @@ import {
   range,
   toRadian,
   clamp,
-  findIndex,
   getElement,
   lerp,
   circulate,
@@ -129,29 +128,6 @@ describe("Utils", () => {
       const clamped = values.map(val => clamp(val, -100, 100));
 
       expect(values).to.deep.equal(clamped);
-    });
-  });
-
-  describe("findIndex", () => {
-    it("can find correct index in the array", () => {
-      const array = [1, 2, 3, 4, 5];
-      const index = findIndex(2, array);
-
-      expect(index).to.equal(1);
-    });
-
-    it("should return index of first element found", () => {
-      const array = [1, 2, 2, 2, 2];
-      const index = findIndex(2, array);
-
-      expect(index).to.equal(1);
-    });
-
-    it("should return -1 when it couldn't find element", () => {
-      const array = [0, 1, 2, 3, 4];
-      const index = findIndex(5, array);
-
-      expect(index).to.equal(-1);
     });
   });
 
