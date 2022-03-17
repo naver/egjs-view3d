@@ -8,7 +8,7 @@ import * as THREE from "three";
 import View3D from "./View3D";
 import View3DError from "./core/View3DError";
 import ERROR from "./const/error";
-import { NoBoolean } from "./type/utils";
+import { NoBoolean, TypedArray } from "./type/utils";
 
 export const isNumber = (val: any): val is number => typeof val === "number";
 export const isString = (val: any): val is string => typeof val === "string";
@@ -196,4 +196,24 @@ export const createLoadingContext = (view3D: View3D, src: string): View3D["loadi
   view3D.loadingContext.push(context);
 
   return context;
+};
+
+export const getAttributeScale = (attrib: THREE.BufferAttribute | THREE.InterleavedBufferAttribute) => {
+  if (attrib.normalized && ArrayBuffer.isView(attrib.array)) {
+    const buffer = attrib.array as TypedArray;
+    const isSigned = isSignedArrayBuffer(buffer);
+    const scale = 1 / (Math.pow(2, 8 * buffer.BYTES_PER_ELEMENT) - 1);
+
+    return isSigned ? scale * 2 : scale;
+  } else {
+    return 1;
+  }
+};
+
+export const isSignedArrayBuffer = (buffer: TypedArray) => {
+  const testBuffer = new (buffer.constructor as any)(1);
+
+  testBuffer[0] = -1;
+
+  return testBuffer[0] < 0;
 };

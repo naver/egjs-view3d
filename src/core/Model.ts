@@ -6,7 +6,7 @@
 import * as THREE from "three";
 import { Vector3 } from "three";
 
-import { TypedArray } from "../type/utils";
+import { getAttributeScale } from "../utils";
 
 /**
  * Data class for loaded 3d model
@@ -16,7 +16,6 @@ class Model {
   private _scene: THREE.Group;
   private _bbox: THREE.Box3;
   private _animations: THREE.AnimationClip[];
-  private _json: Record<string, any>;
   private _fixSkinnedBbox: boolean;
 
   /**
@@ -132,10 +131,17 @@ class Model {
           result = callbackfn(result, vertex);
         });
       } else {
-        for (let idx = 0; idx < position.count; idx++) {
-          const vertex = new THREE.Vector3().fromBufferAttribute(position, idx);
+        const posScale = getAttributeScale(position);
 
+        for (let idx = 0; idx < position.count; idx++) {
+          const vertex = new THREE.Vector3()
+            .fromBufferAttribute(position, idx);
+
+          if (position.normalized) {
+            vertex.multiplyScalar(posScale);
+          }
           vertex.applyMatrix4(mesh.matrixWorld);
+
           result = callbackfn(result, vertex);
         }
       }
@@ -200,12 +206,11 @@ class Model {
     skeleton.update();
     const boneMatricies = skeleton.boneMatrices;
 
-    const skinWeightScale = (skinWeights.normalized && ArrayBuffer.isView(skinWeights.array))
-      ? 1 / (Math.pow(2, 8 * (skinWeights.array as TypedArray).BYTES_PER_ELEMENT) - 1)
-      : 1;
+    const positionScale = getAttributeScale(positions);
+    const skinWeightScale = getAttributeScale(skinWeights);
 
     for (let posIdx = 0; posIdx < positions.count; posIdx++) {
-      const pos = new Vector3().fromBufferAttribute(positions, posIdx);
+      const pos = new Vector3().fromBufferAttribute(positions, posIdx).multiplyScalar(positionScale);
       const skinned = new THREE.Vector4(0, 0, 0, 0);
       const skinVertex = new THREE.Vector4(pos.x, pos.y, pos.z).applyMatrix4(mesh.bindMatrix);
 
