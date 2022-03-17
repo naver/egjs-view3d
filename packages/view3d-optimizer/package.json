@@ -1,0 +1,37 @@
+{
+  "name": "@egjs/view3d-optimizer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "NAVER Corp.",
+  "license": "MIT",
+  "keywords": [
+    "model-viewer",
+    "3d",
+    "three",
+    "3d-model",
+    "typescript"
+  ],
+  "bugs": {
+    "url": "https://github.com/naver/egjs-view3d/issues"
+  },
+  "homepage": "https://github.com/naver/egjs-view3d#readme",
+  "dependencies": {
+    "@gltf-transform/cli": "^2.0.5",
+    "@gltf-transform/core": "^2.0.5",
+    "@gltf-transform/extensions": "^2.0.5",
+    "@gltf-transform/functions": "^2.0.5",
+    "@squoosh/cli": "^0.7.2",
+    "chalk": "^4.1.2",
+    "child-process-promise": "^2.2.1",
+    "command-exists": "^1.2.9",
+    "commander": "^9.0.0",
+    "fs-extra": "^10.0.1",
+    "gltf-pipeline": "^3.0.4",
+    "probe-image-size": "^7.2.3",
+    "tmp-promise": "^3.0.3"
+  }
+}
