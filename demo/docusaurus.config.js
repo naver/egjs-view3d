@@ -16,6 +16,7 @@ const config = {
   favicon: "img/favicon.png",
   organizationName: "naver",
   projectName: "naver.github.io",
+  trailingSlash: false,
   plugins: ["docusaurus-plugin-sass", glslify],
   presets: [
     [

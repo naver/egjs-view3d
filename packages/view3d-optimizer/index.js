@@ -18,8 +18,9 @@ program
   .option("-m, --meshopt", "apply Draco mesh compression")
   .option("-tc, --basisu", "apply KTX2 basisu supercompression (ETC1S)")
   .option("-w, --webp", "include webp textures")
-  .addOption(new Option("-t0, --texture-lod-0 [size]", "apply texture LOD with the given size"))
-  .addOption(new Option("-mt, --max-texture-size [size]", "restrict max texture size"))
+  .addOption(new Option("-t0, --texture-lod-0 [size]", "apply minimum texture LOD with the given size"))
+  .addOption(new Option("-t1, --texture-lod-1 [size]", "apply threshold texture LOD with the given size"))
+  .addOption(new Option("-tm, --max-texture-size [size]", "restrict max texture size"))
   .option("--force-jpg", "force convert png images to jpg")
   .option("-s, --silent", "run silently without log");
 
@@ -180,6 +181,73 @@ tmp.withDir(async tempDir => {
       // Save modified gltf
       fs.writeJSONSync(tmpFile, gltf);
     }
+  }
+
+  if (options.textureLod1) {
+    const thresholdSize = parseFloat(options.textureLod1);
+    if (isNaN(thresholdSize)) {
+      console.error(chalk.red("Failed to parse the texture-lod-1 texture size"));
+      process.exit(1);
+    }
+
+    const gltf = fs.readJSONSync(tmpFile);
+    const textures = [...gltf.textures];
+    const images = textures
+      .map(texture => gltf.images[texture.source])
+      .filter(img => !!img.uri);
+    const jpgImages = [];
+    const pngImages = [];
+
+    const commonConfig = `--resize "{\"width\": ${thresholdSize}, \"height\": ${thresholdSize}}" --suffix "_${thresholdSize}" --output-dir "${tempDir.path}"`;
+
+    for (const texture of textures) {
+      const origImage = images[texture.source];
+      const origSize = await probe(fs.createReadStream(path.resolve(tempDir.path, origImage.uri)));
+
+      if (Math.max(origSize.width, origSize.height) <= thresholdSize) break;
+
+      const newTextureIndex = gltf.textures.length;
+
+      gltf.textures.push({
+        sampler: texture.sampler,
+        source: newTextureIndex
+      });
+
+      if (!texture.extras) texture.extras = {};
+      if (!texture.extras["view3d-lod"]) texture.extras["view3d-lod"] = [];
+
+      texture.extras["view3d-lod"].levels.push({
+        size: thresholdSize,
+        index: newTextureIndex
+      });
+
+      const newImage = {};
+
+      if (origImage.mimeType) newImage.mimeType = origImage.mimeType;
+
+      const extName = path.extname(origImage.uri);
+      const fileName = path.basename(origImage.uri, extName);
+
+      newImage.uri = `${fileName}_${thresholdSize}${extName}`;
+
+      gltf.images.push(newImage);
+
+      if (origImage.mimeType ? origImage.mimeType === "image/jpeg" : /jpe?g$/.test(origImage.uri)) {
+        jpgImages.push(origImage);
+      }
+      if (origImage.mimeType ? origImage.mimeType === "image/png" : origImage.uri.endsWith("png")) {
+        pngImages.push(origImage);
+      }
+    };
+
+    const tasks = [];
+    if (jpgImages.length > 0) tasks.push(`npx squoosh-cli --mozjpeg auto ${commonConfig} ${jpgImages.map(img => path.resolve(tempDir.path, img.uri)).join(" ")}`);
+    if (pngImages.length > 0) tasks.push(`npx squoosh-cli --oxipng auto ${commonConfig} ${pngImages.map(img => path.resolve(tempDir.path, img.uri)).join(" ")}`);
+
+    await run(tasks, `Applying texture LOD (${thresholdSize})`);
+
+    // Save modified gltf
+    fs.writeJSONSync(tmpFile, gltf);
   }
 
   if (options.webp) {
