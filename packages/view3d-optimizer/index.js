@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2022 NAVER Corp.
+ * egjs projects are licensed under the MIT license
+ */
+
 /* eslint-disable no-console */
 const path = require("path");
 const { performance } = require("perf_hooks");

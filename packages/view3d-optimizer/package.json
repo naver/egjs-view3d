@@ -1,19 +1,17 @@
 {
   "name": "@egjs/view3d-optimizer",
   "version": "1.0.0",
-  "description": "",
+  "description": "glTF/glb optimizer designed just for View3D",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "bin": {
+    "view3d-optimizer": "./index.js"
   },
   "author": "NAVER Corp.",
   "license": "MIT",
   "keywords": [
-    "model-viewer",
     "3d",
-    "three",
     "3d-model",
-    "typescript"
+    "gltf"
   ],
   "bugs": {
     "url": "https://github.com/naver/egjs-view3d/issues"
