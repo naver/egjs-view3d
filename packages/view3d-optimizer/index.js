@@ -219,7 +219,7 @@ tmp.withDir(async tempDir => {
       });
 
       if (!texture.extras) texture.extras = {};
-      if (!texture.extras["view3d-lod"]) texture.extras["view3d-lod"] = [];
+      if (!texture.extras["view3d-lod"]) texture.extras["view3d-lod"] = { levels: [] };
 
       texture.extras["view3d-lod"].levels.push({
         size: thresholdSize,
