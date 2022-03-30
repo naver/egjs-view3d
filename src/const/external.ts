@@ -89,10 +89,14 @@ export const EASING = {
  * @type {object}
  * @property {"view3d-poster"} POSTER A class name for poster element
  * @property {"view3d-ar-overlay"} AR_OVERLAY A class name for AR overlay element
+ * @property {"view3d-annotation-wrapper"} ANNOTATION_WRAPPER A class name for annotation wrapper element
+ * @property {"view3d-annotation"} ANNOTATION A class name for annotation element
  */
 export const DEFAULT_CLASS = {
   POSTER: "view3d-poster",
-  AR_OVERLAY: "view3d-ar-overlay"
+  AR_OVERLAY: "view3d-ar-overlay",
+  ANNOTATION_WRAPPER: "view3d-annotation-wrapper",
+  ANNOTATION: "view3d-annotation"
 } as const;
 
 /**

@@ -1,0 +1,26 @@
+---
+sidebar_position: 1
+---
+
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+
+<OptionDescriptor type="string | HTMLElement" defaultVal={'".view3d-annotation-wrapper"'} />
+
+CSS Selector string or HTMLElement for the annotation wrapper element.
+
+```html
+<div id="wrapper" class="view3d-wrapper">
+  <canvas class="view3d-canvas"></canvas>
+  <div class="view3d-annotation-wrapper">
+    <div class="view3d-annotation" data-position="0 -0.5 0.5"></div>
+    <div class="view3d-annotation" data-position="0.5 1 -0.3"></div>
+    <div class="view3d-annotation" data-position="0.3 0.3 0.3"></div>
+  </div>
+</div>
+```
+
+```js
+new View3D("#wrapper", {
+  annotationWrapper: ".view3d-annotation-wrapper"
+})
+```

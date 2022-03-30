@@ -159,7 +159,8 @@ class Renderer {
       camera,
       control,
       autoPlayer,
-      animator
+      animator,
+      annotation
     } = view3D;
 
     const deltaMiliSec = delta * 1000;
@@ -187,6 +188,9 @@ class Renderer {
     scene.shadowPlane.render();
     threeRenderer.render(scene.root, camera.threeCamera);
     threeRenderer.autoClear = true;
+
+    // Render annotations
+    annotation.render(camera.threeCamera);
 
     view3D.trigger(EVENTS.RENDER, {
       type: EVENTS.RENDER,

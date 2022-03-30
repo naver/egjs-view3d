@@ -12,6 +12,7 @@ import AutoResizer from "./core/AutoResizer";
 import Model from "./core/Model";
 import ModelAnimator from "./core/ModelAnimator";
 import ARManager from "./core/ARManager";
+import AnnotationManager from "./core/AnnotationManager";
 import { ShadowOptions } from "./core/ShadowPlane";
 import View3DError from "./core/View3DError";
 import OrbitControl from "./control/OrbitControl";
@@ -29,6 +30,7 @@ import * as EVENT_TYPES from "./type/event";
 import { View3DPlugin } from "./plugin";
 import { getElement, getObjectOption, isCSSSelector, isElement } from "./utils";
 import { LiteralUnion, OptionGetters, ValueOf } from "./type/utils";
+import { LoadingItem } from "./type/external";
 import { GLTFLoader } from "./loader";
 
 /**
@@ -91,6 +93,10 @@ export interface View3DOptions {
   skyboxBlur: boolean;
   toneMapping: LiteralUnion<ValueOf<typeof TONE_MAPPING>, THREE.ToneMapping>;
 
+  // Annotation
+  annotationWrapper: HTMLElement | string;
+  annotationSelector: string;
+
   // AR
   webAR: boolean | Partial<WebARSessionOptions>;
   sceneViewer: boolean | Partial<SceneViewerSessionOptions>;
@@ -131,18 +137,13 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _animator: ModelAnimator;
   private _autoResizer: AutoResizer;
   private _arManager: ARManager;
+  private _annotationManager: AnnotationManager;
 
   // Internal States
   private _rootEl: HTMLElement;
   private _plugins: View3DPlugin[];
   private _initialized: boolean;
-  private _loadingContext: Array<{
-    src: string;
-    loaded: number;
-    total: number;
-    lengthComputable: boolean;
-    initialized: boolean;
-  }>;
+  private _loadingContext: LoadingItem[];
 
   // Options
   private _src: View3DOptions["src"];
@@ -172,6 +173,9 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _shadow: View3DOptions["shadow"];
   private _skyboxBlur: View3DOptions["skyboxBlur"];
   private _toneMapping: View3DOptions["toneMapping"];
+
+  private _annotationWrapper: View3DOptions["annotationWrapper"];
+  private _annotationSelector: View3DOptions["annotationSelector"];
 
   private _webAR: View3DOptions["webAR"];
   private _sceneViewer: View3DOptions["sceneViewer"];
@@ -235,6 +239,11 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    * @readonly
    */
   public get ar() { return this._arManager; }
+  /**
+   * {@link AnnotationManager} instance of the View3D
+   * @type {AnnotationManager}
+   */
+  public get annotation() { return this._annotationManager; }
 
   // Internal State Getter
   /**
@@ -251,7 +260,8 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   public get initialized() { return this._initialized; }
   /**
    * An array of loading status of assets.
-   * @type {object[]}
+   * @type {LoadingItem[]}
+   * @readonly
    * @internal
    */
   public get loadingContext() { return this._loadingContext; }
@@ -435,6 +445,17 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get toneMapping() { return this._toneMapping; }
   /**
+   * @type {HTMLElement | string}
+   * @default ".view3d-annotation-wrapper"
+   */
+  public get annotationWrapper() { return this._annotationWrapper; }
+  /**
+   * CSS selector of the annotation elements inside the root element
+   * @type {string}
+   * @default ".view3d-annotation"
+   */
+  public get annotationSelector() { return this._annotationSelector; }
+  /**
    * Options for the WebXR-based AR session.
    * If `false` is given, it will disable WebXR-based AR session.
    * @type {boolean | WebARSessionOptions}
@@ -594,6 +615,8 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     shadow = true,
     skyboxBlur = false,
     toneMapping = TONE_MAPPING.LINEAR,
+    annotationWrapper = `.${DEFAULT_CLASS.ANNOTATION_WRAPPER}`,
+    annotationSelector = `.${DEFAULT_CLASS.ANNOTATION}`,
     webAR = true,
     sceneViewer = true,
     quickLook = true,
@@ -641,6 +664,9 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._skyboxBlur = skyboxBlur;
     this._toneMapping = toneMapping;
 
+    this._annotationWrapper = annotationWrapper;
+    this._annotationSelector = annotationSelector;
+
     this._webAR = webAR;
     this._sceneViewer = sceneViewer;
     this._quickLook = quickLook;
@@ -668,6 +694,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._autoPlayer = new AutoPlayer(this, getObjectOption(autoplay));
     this._autoResizer = new AutoResizer(this);
     this._arManager = new ARManager(this);
+    this._annotationManager = new AnnotationManager(this);
 
     this._addEventHandlers(on);
     this._addPosterImage();
@@ -708,6 +735,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     const scene = this._scene;
     const renderer = this._renderer;
     const control = this._control;
+    const annotationManager = this._annotationManager;
     const skybox = this._skybox;
     const envmap = this._envmap;
     const background = this._background;
@@ -715,6 +743,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     const tasks: Array<Promise<any>> = [];
 
     this.resize();
+    annotationManager.collect();
 
     if (this._autoResize) {
       this._autoResizer.enable();

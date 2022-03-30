@@ -22,7 +22,7 @@ export const getNullableElement = (el: HTMLElement | string | null, parent?: HTM
     const queryResult = parentEl.querySelector(el);
 
     if (!queryResult) {
-      throw new View3DError(ERROR.MESSAGES.ELEMENT_NOT_FOUND(el), ERROR.CODES.ELEMENT_NOT_FOUND);
+      return null;
     }
 
     targetEl = queryResult as HTMLElement;
@@ -37,7 +37,11 @@ export const getElement = (el: HTMLElement | string, parent?: HTMLElement): HTML
   const targetEl = getNullableElement(el, parent);
 
   if (!targetEl) {
-    throw new View3DError(ERROR.MESSAGES.WRONG_TYPE(el, ["HTMLElement", "string"]), ERROR.CODES.WRONG_TYPE);
+    if (isString(el)) {
+      throw new View3DError(ERROR.MESSAGES.ELEMENT_NOT_FOUND(el), ERROR.CODES.ELEMENT_NOT_FOUND);
+    } else {
+      throw new View3DError(ERROR.MESSAGES.WRONG_TYPE(el, ["HTMLElement", "string"]), ERROR.CODES.WRONG_TYPE);
+    }
   }
 
   return targetEl;
