@@ -44,10 +44,12 @@ export const EVENTS = {
   BEFORE_RENDER: "beforeRender",
   RENDER: "render",
   PROGRESS: "progress",
-  QUICK_LOOK_TAP: "quickLookTap",
+  INPUT_START: "inputStart",
+  INPUT_END: "inputEnd",
   AR_START: "arStart",
   AR_END: "arEnd",
-  AR_MODEL_PLACED: "arModelPlaced"
+  AR_MODEL_PLACED: "arModelPlaced",
+  QUICK_LOOK_TAP: "quickLookTap"
 } as const;
 
 /**
@@ -175,3 +177,16 @@ export const QUICK_LOOK_CUSTOM_BANNER_SIZE = {
   MEDIUM: "medium",
   LARGE: "large"
 } as const;
+
+/**
+ * Input types
+ * @type {object}
+ * @property {0} ROTATE Rotate input
+ * @property {1} TRANSLATE Translate input
+ * @property {2} ZOOM Zoom input
+ */
+export enum INPUT_TYPE {
+  ROTATE,
+  TRANSLATE,
+  ZOOM
+}

@@ -11,6 +11,7 @@ import Motion from "../core/Motion";
 import * as BROWSER from "../const/browser";
 import * as DEFAULT from "../const/default";
 import { CONTROL_EVENTS } from "../const/internal";
+import { INPUT_TYPE } from "../const/external";
 import { ControlEvents, OptionGetters } from "../type/utils";
 
 import CameraControl from "./CameraControl";
@@ -171,7 +172,9 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
     this._enabled = true;
     this.sync();
 
-    this.trigger(CONTROL_EVENTS.ENABLE);
+    this.trigger(CONTROL_EVENTS.ENABLE, {
+      inputType: INPUT_TYPE.TRANSLATE
+    });
   }
 
   /**
@@ -195,7 +198,9 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
 
     this._enabled = false;
 
-    this.trigger(CONTROL_EVENTS.DISABLE);
+    this.trigger(CONTROL_EVENTS.DISABLE, {
+      inputType: INPUT_TYPE.TRANSLATE
+    });
   }
 
   /**
@@ -224,7 +229,10 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
     window.addEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
     window.addEventListener(BROWSER.EVENTS.CONTEXT_MENU, this._onContextMenu, false);
 
-    this.trigger(CONTROL_EVENTS.HOLD);
+    this.trigger(CONTROL_EVENTS.HOLD, {
+      inputType: INPUT_TYPE.TRANSLATE,
+      isTouch: false
+    });
   };
 
   private _onMouseMove = (evt: MouseEvent) => {
@@ -247,7 +255,10 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
     window.removeEventListener(BROWSER.EVENTS.MOUSE_MOVE, this._onMouseMove, false);
     window.removeEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
 
-    this.trigger(CONTROL_EVENTS.RELEASE);
+    this.trigger(CONTROL_EVENTS.RELEASE, {
+      inputType: INPUT_TYPE.TRANSLATE,
+      isTouch: false
+    });
   };
 
   private _onTouchStart = (evt: TouchEvent) => {
@@ -260,6 +271,11 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
 
     this._prevPos.copy(this._getTouchesMiddle(evt.touches));
     this._touchInitialized = true;
+
+    this.trigger(CONTROL_EVENTS.HOLD, {
+      inputType: INPUT_TYPE.TRANSLATE,
+      isTouch: true
+    });
   };
 
   private _onTouchMove = (evt: TouchEvent) => {
@@ -294,7 +310,13 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
   private _onTouchEnd = (evt: TouchEvent) => {
     // Only the two finger motion should be considered
     if (evt.touches.length !== 2) {
-      this._touchInitialized = false;
+      if (this._touchInitialized) {
+        this._touchInitialized = false;
+        this.trigger(CONTROL_EVENTS.RELEASE, {
+          inputType: INPUT_TYPE.TRANSLATE,
+          isTouch: true
+        });
+      }
       return;
     }
 

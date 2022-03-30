@@ -11,6 +11,7 @@ import Motion from "../core/Motion";
 import * as BROWSER from "../const/browser";
 import * as DEFAULT from "../const/default";
 import { CONTROL_EVENTS } from "../const/internal";
+import { INPUT_TYPE } from "../const/external";
 import { ControlEvents, OptionGetters } from "../type/utils";
 
 import CameraControl from "./CameraControl";
@@ -196,7 +197,9 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
     this._enabled = true;
     this.sync();
 
-    this.trigger(CONTROL_EVENTS.ENABLE);
+    this.trigger(CONTROL_EVENTS.ENABLE, {
+      inputType: INPUT_TYPE.ROTATE
+    });
   }
 
   /**
@@ -218,7 +221,9 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
 
     this._enabled = false;
 
-    this.trigger(CONTROL_EVENTS.DISABLE);
+    this.trigger(CONTROL_EVENTS.DISABLE, {
+      inputType: INPUT_TYPE.ROTATE
+    });
   }
 
   /**
@@ -248,7 +253,10 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
     window.addEventListener(BROWSER.EVENTS.MOUSE_MOVE, this._onMouseMove, false);
     window.addEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
 
-    this.trigger(CONTROL_EVENTS.HOLD);
+    this.trigger(CONTROL_EVENTS.HOLD, {
+      inputType: INPUT_TYPE.ROTATE,
+      isTouch: false
+    });
   };
 
   private _onMouseMove = (evt: MouseEvent) => {
@@ -272,7 +280,10 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
     window.removeEventListener(BROWSER.EVENTS.MOUSE_MOVE, this._onMouseMove, false);
     window.removeEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
 
-    this.trigger(CONTROL_EVENTS.RELEASE);
+    this.trigger(CONTROL_EVENTS.RELEASE, {
+      inputType: INPUT_TYPE.ROTATE,
+      isTouch: false
+    });
   };
 
   private _onTouchStart = (evt: TouchEvent) => {
@@ -280,6 +291,11 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
 
     this._isFirstTouch = true;
     this._prevPos.set(touch.clientX, touch.clientY);
+
+    this.trigger(CONTROL_EVENTS.HOLD, {
+      inputType: INPUT_TYPE.ROTATE,
+      isTouch: true
+    });
   };
 
   private _onTouchMove = (evt: TouchEvent) => {
@@ -333,6 +349,10 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
       this._prevPos.set(touch.clientX, touch.clientY);
     } else {
       this._prevPos.set(0, 0);
+      this.trigger(CONTROL_EVENTS.RELEASE, {
+        inputType: INPUT_TYPE.ROTATE,
+        isTouch: true
+      });
     }
 
     this._isScrolling = false;

@@ -7,7 +7,8 @@ import View3D from "../View3D";
 import { CURSOR } from "../const/browser";
 import { CONTROL_EVENTS } from "../const/internal";
 import { getObjectOption } from "../utils";
-import { ValueOf } from "../type/utils";
+import { EVENTS, INPUT_TYPE } from "../const/external";
+import { ControlEvents, ValueOf } from "../type/utils";
 
 import RotateControl from "./RotateControl";
 import TranslateControl from "./TranslateControl";
@@ -153,7 +154,9 @@ class OrbitControl {
     targetEl.style.cursor = newCursor;
   }
 
-  private _onEnable = () => {
+  private _onEnable = ({ inputType }: ControlEvents["enable"]) => {
+    if (inputType === INPUT_TYPE.ZOOM) return;
+
     const view3D = this._view3D;
     const canvas = view3D.renderer.canvas;
 
@@ -166,9 +169,10 @@ class OrbitControl {
     }
   };
 
-  private _onDisable = () => {
-    const canvas = this._view3D.renderer.canvas;
+  private _onDisable = ({ inputType }: ControlEvents["disable"]) => {
+    if (inputType === INPUT_TYPE.ZOOM) return;
 
+    const canvas = this._view3D.renderer.canvas;
     const shouldRemoveGrabCursor = canvas.style.cursor !== CURSOR.NONE
       && (!this._rotateControl.enabled && !this._translateControl.enabled);
 
@@ -177,22 +181,42 @@ class OrbitControl {
     }
   };
 
-  private _onHold = () => {
-    const grabCursorEnabled = this._view3D.useGrabCursor
-      && (this._rotateControl.enabled || this._translateControl.enabled);
+  private _onHold = ({ inputType, isTouch }: ControlEvents["hold"]) => {
+    const view3D = this._view3D;
 
-    if (grabCursorEnabled) {
-      this._setCursor(CURSOR.GRABBING);
+    if (inputType !== INPUT_TYPE.ZOOM && !isTouch) {
+      const grabCursorEnabled = view3D.useGrabCursor
+        && (this._rotateControl.enabled || this._translateControl.enabled);
+
+      if (grabCursorEnabled) {
+        this._setCursor(CURSOR.GRABBING);
+      }
     }
+
+    view3D.trigger(EVENTS.INPUT_START, {
+      type: EVENTS.INPUT_START,
+      target: view3D,
+      inputType
+    });
   };
 
-  private _onRelease = () => {
-    const grabCursorEnabled = this._view3D.useGrabCursor
-      && (this._rotateControl.enabled || this._translateControl.enabled);
+  private _onRelease = ({ inputType, isTouch }: ControlEvents["release"]) => {
+    const view3D = this._view3D;
 
-    if (grabCursorEnabled) {
-      this._setCursor(CURSOR.GRAB);
+    if (inputType !== INPUT_TYPE.ZOOM && !isTouch) {
+      const grabCursorEnabled = view3D.useGrabCursor
+        && (this._rotateControl.enabled || this._translateControl.enabled);
+
+      if (grabCursorEnabled) {
+        this._setCursor(CURSOR.GRAB);
+      }
     }
+
+    view3D.trigger(EVENTS.INPUT_END, {
+      type: EVENTS.INPUT_END,
+      target: view3D,
+      inputType
+    });
   };
 }
 

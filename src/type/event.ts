@@ -4,6 +4,7 @@
  */
 import View3D from "../View3D";
 import Model from "../core/Model";
+import { INPUT_TYPE } from "../const/external";
 import WebARSession from "../xr/WebARSession";
 
 /**
@@ -167,16 +168,27 @@ export interface LoadProgressEvent {
 }
 
 /**
- * An event that fires when user clicked the Apple pay button or custom action button
- * @see https://developer.apple.com/documentation/arkit/adding_an_apple_pay_button_or_a_custom_action_in_ar_quick_look#3405186
- * @event View3D#quickLookTap
- * @type {Event}
+ * An event that fires on the start of every inputs
  * @property {string} type The type of event.
  * @property {View3D} target An instance of View3D that triggered this event.
+ * @property {INPUT_TYPE} inputType Type of the input.
  */
-export interface QuickLookTapEvent extends Omit<Event, "target"> {
+export interface InputStartEvent {
   type: string;
   target: View3D;
+  inputType: INPUT_TYPE;
+}
+
+/**
+ * An event that fires on the end of every inputs
+ * @property {string} type The type of event.
+ * @property {View3D} target An instance of View3D that triggered this event.
+ * @property {INPUT_TYPE} inputType Type of the input.
+ */
+export interface InputEndEvent {
+  type: string;
+  target: View3D;
+  inputType: INPUT_TYPE;
 }
 
 /**
@@ -224,4 +236,17 @@ export interface ARModelPlacedEvent {
   target: View3D;
   session: WebARSession;
   model: Model;
+}
+
+/**
+ * An event that fires when user clicked the Apple pay button or custom action button
+ * @see https://developer.apple.com/documentation/arkit/adding_an_apple_pay_button_or_a_custom_action_in_ar_quick_look#3405186
+ * @event View3D#quickLookTap
+ * @type {Event}
+ * @property {string} type The type of event.
+ * @property {View3D} target An instance of View3D that triggered this event.
+ */
+export interface QuickLookTapEvent extends Omit<Event, "target"> {
+  type: string;
+  target: View3D;
 }

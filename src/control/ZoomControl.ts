@@ -4,13 +4,15 @@
  */
 
 import * as THREE from "three";
+import Component from "@egjs/component";
 
 import View3D from "../View3D";
 import Motion from "../core/Motion";
 import * as BROWSER from "../const/browser";
 import * as DEFAULT from "../const/default";
-import { AUTO } from "../const/external";
-import { OptionGetters, Range } from "../type/utils";
+import { CONTROL_EVENTS } from "../const/internal";
+import { AUTO, INPUT_TYPE } from "../const/external";
+import { ControlEvents, OptionGetters, Range } from "../type/utils";
 
 import CameraControl from "./CameraControl";
 
@@ -36,7 +38,7 @@ export interface ZoomControlOptions {
 /**
  * Distance controller handling both mouse wheel and pinch zoom(fov)
  */
-class ZoomControl implements CameraControl, OptionGetters<ZoomControlOptions> {
+class ZoomControl extends Component<ControlEvents> implements CameraControl, OptionGetters<ZoomControlOptions> {
   // Options
   private _scale: ZoomControlOptions["scale"];
   private _duration: ZoomControlOptions["duration"];
@@ -114,6 +116,8 @@ class ZoomControl implements CameraControl, OptionGetters<ZoomControlOptions> {
     maxFov = AUTO,
     easing = DEFAULT.EASING
   }: Partial<ZoomControlOptions> = {}) {
+    super();
+
     this._view3D = view3D;
     this._scale = scale;
     this._duration = duration;
@@ -172,8 +176,11 @@ class ZoomControl implements CameraControl, OptionGetters<ZoomControlOptions> {
     targetEl.addEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, { passive: false, capture: false });
 
     this._enabled = true;
-
     this.sync();
+
+    this.trigger(CONTROL_EVENTS.ENABLE, {
+      inputType: INPUT_TYPE.ZOOM
+    });
   }
 
   /**
@@ -190,6 +197,10 @@ class ZoomControl implements CameraControl, OptionGetters<ZoomControlOptions> {
     targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, false);
 
     this._enabled = false;
+
+    this.trigger(CONTROL_EVENTS.DISABLE, {
+      inputType: INPUT_TYPE.ZOOM
+    });
   }
 
   /**
@@ -227,6 +238,13 @@ class ZoomControl implements CameraControl, OptionGetters<ZoomControlOptions> {
     const animation = this._motion;
     const delta = -this._scale * this._wheelModifier * evt.deltaY;
 
+    if (animation.progress <= 0) {
+      this.trigger(CONTROL_EVENTS.HOLD, {
+        inputType: INPUT_TYPE.ZOOM,
+        isTouch: false
+      });
+    }
+
     animation.setEndDelta(delta);
   };
 
@@ -255,7 +273,14 @@ class ZoomControl implements CameraControl, OptionGetters<ZoomControlOptions> {
     animation.setEndDelta(delta);
   };
 
-  private _onTouchEnd = () => {
+  private _onTouchEnd = (evt: TouchEvent) => {
+    if (evt.touches.length !== 0) return;
+
+    this.trigger(CONTROL_EVENTS.RELEASE, {
+      inputType: INPUT_TYPE.ZOOM,
+      isTouch: true
+    });
+
     this._prevTouchDistance = -1;
   };
 }
