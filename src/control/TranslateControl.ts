@@ -54,6 +54,12 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
    * @type {boolean}
    */
   public get enabled() { return this._enabled; }
+  /**
+   * Whether this control is animating the camera
+   * @readonly
+   * @type {boolean}
+   */
+  public get animating() { return this._xMotion.activated || this._yMotion.activated; }
 
   /**
    * Scale factor for translation
@@ -138,8 +144,10 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
     const screenScale = new THREE.Vector2(camera.renderWidth, camera.renderHeight).divide(screenSize);
     delta.multiply(screenScale);
 
-    camera.pivot.add(viewXDir.multiplyScalar(delta.x));
-    camera.pivot.add(viewYDir.multiplyScalar(delta.y));
+    const newPivot = camera.pivot.clone();
+    camera.pivot = newPivot
+      .add(viewXDir.multiplyScalar(delta.x))
+      .add(viewYDir.multiplyScalar(delta.y));
   }
 
   /**

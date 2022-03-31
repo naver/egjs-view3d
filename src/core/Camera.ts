@@ -108,7 +108,7 @@ class Camera {
   public set yaw(val: number) { this._newPose.yaw = val; }
   public set pitch(val: number) { this._newPose.pitch = val; }
   public set zoom(val: number) { this._newPose.zoom = val; }
-  public set pivot(val: THREE.Vector3) { this._newPose.pivot = val; }
+  public set pivot(val: THREE.Vector3) { this._newPose.pivot.copy(val); }
 
   /**
    * Create new Camera instance

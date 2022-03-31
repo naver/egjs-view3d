@@ -27,17 +27,29 @@ class OrbitControl {
 
   // Internal Values Getter
   /**
-   * {@link RotateControl} of this control
+   * Rotate(left-click) part of this control
+   * @type {RotateControl}
+   * @readonly
    */
   public get rotate() { return this._rotateControl; }
   /**
-   * {@link TranslateControl} of this control
+   * Translation(right-click) part of this control
+   * @type {TranslateControl}
+   * @readonly
    */
   public get translate() { return this._translateControl; }
   /**
-   * {@link ZoomControl} of this control
+   * Zoom(mouse wheel) part of this control
+   * @type {ZoomControl}
+   * @readonly
    */
   public get zoom() { return this._zoomControl; }
+  /**
+   * Whether one of the controls is animating at the moment
+   * @type {boolean}
+   * @readonly
+   */
+  public get animating() { return this._rotateControl.animating || this._translateControl.animating || this._zoomControl.animating; }
 
   /**
    * Create new OrbitControl instance

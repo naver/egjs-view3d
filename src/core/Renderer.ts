@@ -151,6 +151,14 @@ class Renderer {
     this._renderer.setAnimationLoop(null);
   }
 
+  public renderSingleFrame(): void {
+    const renderer = this._renderer;
+    if (!renderer.xr.isPresenting) {
+      // Prevent flickering on resize
+      this.defaultRenderLoop(0);
+    }
+  }
+
   private _defaultRenderLoop = (delta: number) => {
     const view3D = this._view3D;
     const threeRenderer = this._renderer;
@@ -164,6 +172,12 @@ class Renderer {
     } = view3D;
 
     const deltaMiliSec = delta * 1000;
+
+    if (
+      !animator.animating
+      && !control.animating
+      && !autoPlayer.animating
+    ) return;
 
     animator.update(delta);
     control.update(deltaMiliSec);

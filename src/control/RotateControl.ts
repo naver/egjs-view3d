@@ -59,6 +59,12 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
    * @type {boolean}
    */
   public get enabled() { return this._enabled; }
+  /**
+   * Whether this control is animating the camera
+   * @readonly
+   * @type {boolean}
+   */
+  public get animating() { return this._xMotion.activated || this._yMotion.activated; }
 
   /**
    * Scale factor for rotation

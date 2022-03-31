@@ -60,6 +60,12 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
    * @readonly
    */
   public get enabled() { return this._enabled; }
+  /**
+   * Whether this control is animating the camera
+   * @readonly
+   * @type {boolean}
+   */
+  public get animating() { return this._motion.activated; }
 
   /**
    * Actual fov range

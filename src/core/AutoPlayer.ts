@@ -50,6 +50,14 @@ class AutoPlayer implements OptionGetters<AutoplayOptions> {
    */
   public get enabled() { return this._enabled; }
   /**
+   * Whether autoplay is updating the camera at the moment
+   * @readonly
+   */
+  public get animating() {
+    return this._enabled && !this._interrupted;
+  }
+
+  /**
    * Reactivation delay after mouse input in milisecond
    */
   public get delay() { return this._delay; }
