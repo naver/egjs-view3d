@@ -46,6 +46,7 @@ export const EVENTS = {
   PROGRESS: "progress",
   INPUT_START: "inputStart",
   INPUT_END: "inputEnd",
+  CAMERA_CHANGE: "cameraChange",
   AR_START: "arStart",
   AR_END: "arEnd",
   AR_MODEL_PLACED: "arModelPlaced",
