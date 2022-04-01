@@ -7,6 +7,7 @@ import * as THREE from "three";
 import { Vector3 } from "three";
 
 import { getAttributeScale } from "../utils";
+import { STANDARD_MAPS } from "../const/internal";
 
 /**
  * Data class for loaded 3d model
@@ -39,6 +40,7 @@ class Model {
    * @readonly
    */
   public get meshes() { return this._getAllMeshes(); }
+  public get images() { return this._getAllImages(); }
   /**
    * Get a copy of model's current bounding box
    * @type THREE#Box3
@@ -190,6 +192,24 @@ class Model {
     });
 
     return meshes;
+  }
+
+  private _getAllImages() {
+    const meshes = this._getAllMeshes();
+    const materials = meshes.reduce((mats, mesh) => {
+      if (Array.isArray(mesh.material)) {
+        return [...mats, ...mesh.material];
+      } else {
+        return [...mats, mesh.material];
+      }
+    }, []);
+    const images = materials.reduce((imgs, mat) => {
+      const maps = STANDARD_MAPS.map(map => mat[map]?.image).filter(val => !!val);
+
+      return [...imgs, ...maps];
+    }, []);
+
+    return images;
   }
 
   private _hasSkinnedMesh(): boolean {

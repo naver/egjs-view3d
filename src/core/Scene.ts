@@ -159,6 +159,8 @@ class Scene {
 
       skybox.useTexture(texture);
     }
+
+    view3D.renderer.renderSingleFrame();
   }
 
   /**
@@ -190,6 +192,8 @@ class Scene {
       this._skybox = null;
       root.environment = null;
     }
+
+    view3D.renderer.renderSingleFrame();
   }
 
   /**
@@ -198,8 +202,9 @@ class Scene {
    * @returns {void}
    */
   public async setEnvMap(url: string | null): Promise<void> {
+    const view3D = this._view3D;
+
     if (url) {
-      const view3D = this._view3D;
       const textureLoader = new TextureLoader(view3D);
       const texture = await textureLoader.loadHDRTexture(url);
 
@@ -207,6 +212,8 @@ class Scene {
     } else {
       this._root.environment = null;
     }
+
+    view3D.renderer.renderSingleFrame();
   }
 
   private _removeChildsOf(obj: THREE.Object3D) {

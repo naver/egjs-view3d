@@ -877,6 +877,8 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
       }
     }
 
+    renderer.renderSingleFrame();
+
     this.trigger(EVENTS.MODEL_CHANGE, {
       type: EVENTS.MODEL_CHANGE,
       target: this,

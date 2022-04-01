@@ -155,11 +155,28 @@ class Renderer {
     const renderer = this._renderer;
     if (!renderer.xr.isPresenting) {
       // Prevent flickering on resize
-      this.defaultRenderLoop(0);
+      this._renderFrame(0);
     }
   }
 
   private _defaultRenderLoop = (delta: number) => {
+    const view3D = this._view3D;
+    const {
+      control,
+      autoPlayer,
+      animator
+    } = view3D;
+
+    if (
+      !animator.animating
+      && !control.animating
+      && !autoPlayer.animating
+    ) return;
+
+    this._renderFrame(delta);
+  };
+
+  private _renderFrame(delta: number) {
     const view3D = this._view3D;
     const threeRenderer = this._renderer;
     const {
@@ -172,12 +189,6 @@ class Renderer {
     } = view3D;
 
     const deltaMiliSec = delta * 1000;
-
-    if (
-      !animator.animating
-      && !control.animating
-      && !autoPlayer.animating
-    ) return;
 
     animator.update(delta);
     control.update(deltaMiliSec);
@@ -211,7 +222,7 @@ class Renderer {
       target: view3D,
       delta: deltaMiliSec
     });
-  };
+  }
 }
 
 export default Renderer;
