@@ -119,6 +119,17 @@ export const TONE_MAPPING = {
 };
 
 /**
+ * Types of zoom control
+ * @type {object}
+ * @property {"fov"} FOV Zoom by chaning fov(field-of-view). This will prevent camera from going inside the model.
+ * @property {"distance"} DISTANCE Zoom by changing camera distance from the model.
+ */
+export const ZOOM_TYPE = {
+  FOV: "fov",
+  DISTANCE: "distance"
+};
+
+/**
  * Available AR session types
  * @type {object}
  * @property {"WebXR"} WEBXR An AR session based on {@link https://developer.mozilla.org/en-US/docs/Web/API/WebXR_Device_API WebXR Device API}

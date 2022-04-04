@@ -85,13 +85,13 @@ class OrbitControl {
 
   /**
    * Update control by given deltaTime
-   * @param deltaTime Number of milisec to update
+   * @param {number} deltaTime Number of milisec to update
    * @returns {void}
    */
-  public update(delta: number): void {
-    this._rotateControl.update(delta);
-    this._translateControl.update(delta);
-    this._zoomControl.update(delta);
+  public update(deltaTime: number): void {
+    this._rotateControl.update(deltaTime);
+    this._translateControl.update(deltaTime);
+    this._zoomControl.update(deltaTime);
   }
 
   /**

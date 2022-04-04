@@ -151,7 +151,7 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
 
   /**
    * Update control by given deltaTime
-   * @param deltaTime Number of milisec to update
+   * @param {number} deltaTime Number of milisec to update
    * @returns {void}
    */
   public update(deltaTime: number): void {

@@ -9,7 +9,7 @@ import View3D from "../View3D";
 import AnimationControl from "../control/AnimationControl";
 import { toRadian, clamp, circulate, toDegree, getRotatedPosition, isNumber } from "../utils";
 import * as DEFAULT from "../const/default";
-import { AUTO, EVENTS } from "../const/external";
+import { AUTO, EVENTS, ZOOM_TYPE } from "../const/external";
 import { BeforeRenderEvent } from "../type/event";
 
 import Pose from "./Pose";
@@ -21,8 +21,8 @@ import Model from "./Model";
 class Camera {
   private _view3D: View3D;
   private _threeCamera: THREE.PerspectiveCamera;
-  private _distance: number = 0;
-  private _baseFov: number = 45;
+  private _baseDistance: number;
+  private _baseFov: number;
   private _defaultPose: Pose;
   private _currentPose: Pose;
   private _newPose: Pose;
@@ -72,16 +72,25 @@ class Camera {
   public get zoom() { return this._currentPose.zoom; }
 
   /**
+   * Camera's default distance from the model center.
+   * This will be automatically calculated based on the model size.
+   * @type {number}
+   * @readonly
+   */
+  public get baseDistance() { return this._baseDistance; }
+
+  /**
    * Camera's default fov value.
    * This will be automatically chosen when `view3D.fov` is "auto", otherwise it is equal to `view3D.fov`
    * @type {number}
+   * @readonly
    */
   public get baseFov() { return this._baseFov; }
 
   /**
    * Current pivot point of camera rotation
-   * @readonly
    * @type THREE.Vector3
+   * @readonly
    * @see {@link https://threejs.org/docs/#api/en/math/Vector3 THREE#Vector3}
    */
   public get pivot() { return this._currentPose.pivot; }
@@ -103,7 +112,7 @@ class Camera {
    * Camera's frustum height
    * @type number
    */
-  public get renderHeight() { return 2 * this._distance * Math.tan(toRadian(this._threeCamera.getEffectiveFOV() / 2)); }
+  public get renderHeight() { return 2 * this._baseDistance * Math.tan(toRadian(this._threeCamera.getEffectiveFOV() / 2)); }
 
   public set yaw(val: number) { this._newPose.yaw = val; }
   public set pitch(val: number) { this._newPose.pitch = val; }
@@ -118,6 +127,8 @@ class Camera {
     this._view3D = view3D;
     this._threeCamera = new THREE.PerspectiveCamera();
     this._maxTanHalfHFov = 0;
+    this._baseFov = 45;
+    this._baseDistance = 0;
 
     const initialZoom = isNumber(view3D.initialZoom) ? view3D.initialZoom : 0;
 
@@ -250,7 +261,7 @@ class Camera {
     }
 
     defaultPose.pivot = modelCenter.clone();
-    this._distance = effectiveCamDist;
+    this._baseDistance = effectiveCamDist;
 
     camera.near = (effectiveCamDist - maxDistToCenter) * 0.1;
     camera.far = (effectiveCamDist + maxDistToCenter) * 10;
@@ -285,9 +296,9 @@ class Camera {
     const threeCamera = this._threeCamera;
     const currentPose = this._currentPose;
     const newPose = this._newPose;
-    const distance = this._distance;
     const baseFov = this._baseFov;
-    const zoomRange = control.zoom.range;
+    const baseDistance = this._baseDistance;
+    const isFovZoom = control.zoom.type === ZOOM_TYPE.FOV;
 
     if (newPose.equals(currentPose)) return;
 
@@ -296,11 +307,17 @@ class Camera {
     // Clamp current pose
     currentPose.yaw = circulate(newPose.yaw, 0, 360);
     currentPose.pitch = clamp(newPose.pitch, DEFAULT.PITCH_RANGE.min, DEFAULT.PITCH_RANGE.max);
-    currentPose.zoom = -(clamp(baseFov - newPose.zoom, zoomRange.min, zoomRange.max) - baseFov);
+    currentPose.zoom = -newPose.zoom;
     currentPose.pivot.copy(newPose.pivot);
 
+    const fov = isFovZoom
+      ? baseFov - currentPose.zoom
+      : baseFov;
+    const distance = isFovZoom
+      ? baseDistance
+      : baseDistance - currentPose.zoom;
+
     const newCamPos = getRotatedPosition(distance, currentPose.yaw, currentPose.pitch);
-    const fov = baseFov - currentPose.zoom;
 
     newCamPos.add(currentPose.pivot);
 
