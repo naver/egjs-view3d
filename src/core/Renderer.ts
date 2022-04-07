@@ -154,7 +154,6 @@ class Renderer {
   public renderSingleFrame(): void {
     const renderer = this._renderer;
     if (!renderer.xr.isPresenting) {
-      // Prevent flickering on resize
       this._renderFrame(0);
     }
   }

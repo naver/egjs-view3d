@@ -808,6 +808,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._camera.resize(newSize, prevSize);
     this._control.resize(newSize);
 
+    // Prevent flickering on resize
     renderer.renderSingleFrame();
 
     this.trigger(EVENTS.RESIZE, { ...newSize, type: EVENTS.RESIZE, target: this });

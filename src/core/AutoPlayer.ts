@@ -153,7 +153,7 @@ class AutoPlayer implements OptionGetters<AutoplayOptions> {
   }
 
   /**
-   * Enable this input and add event listeners
+   * Enable autoplay and add event listeners
    * @returns {void}
    */
   public enable(): void {
@@ -172,6 +172,16 @@ class AutoPlayer implements OptionGetters<AutoplayOptions> {
     targetEl.addEventListener(BROWSER.EVENTS.WHEEL, this._onWheel, { passive: false, capture: false });
 
     this._enabled = true;
+  }
+
+  /**
+   * Enable autoplay after current delay value
+   * @returns {void}
+   */
+  public enableAfterDelay() {
+    this.enable();
+    this._interrupted = true;
+    this._setUninterruptedAfterDelay(this._delay);
   }
 
   /**

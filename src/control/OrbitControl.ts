@@ -10,6 +10,7 @@ import { getObjectOption } from "../utils";
 import { EVENTS, INPUT_TYPE } from "../const/external";
 import { ControlEvents, ValueOf } from "../type/utils";
 
+import CameraControl from "./CameraControl";
 import RotateControl from "./RotateControl";
 import TranslateControl from "./TranslateControl";
 import ZoomControl from "./ZoomControl";
@@ -23,7 +24,7 @@ class OrbitControl {
   private _rotateControl: RotateControl;
   private _translateControl: TranslateControl;
   private _zoomControl: ZoomControl;
-
+  private _extraControls: CameraControl[];
 
   // Internal Values Getter
   /**
@@ -45,11 +46,22 @@ class OrbitControl {
    */
   public get zoom() { return this._zoomControl; }
   /**
+   * Extra camera controls added, like {@link AnimationControl}
+   * @type {CameraControl[]}
+   * @readonly
+   */
+  public get extraControls() { return this._extraControls; }
+  /**
    * Whether one of the controls is animating at the moment
    * @type {boolean}
    * @readonly
    */
-  public get animating() { return this._rotateControl.animating || this._translateControl.animating || this._zoomControl.animating; }
+  public get animating() {
+    return this._rotateControl.animating
+      || this._translateControl.animating
+      || this._zoomControl.animating
+      || this._extraControls.some(control => control.animating);
+  }
 
   /**
    * Create new OrbitControl instance
@@ -61,8 +73,9 @@ class OrbitControl {
     this._rotateControl = new RotateControl(view3D, getObjectOption(view3D.rotate));
     this._translateControl = new TranslateControl(view3D, getObjectOption(view3D.translate));
     this._zoomControl = new ZoomControl(view3D, getObjectOption(view3D.zoom));
+    this._extraControls = [];
 
-    [this._rotateControl, this._translateControl].forEach(control => {
+    [this._rotateControl, this._translateControl, this._zoomControl].forEach(control => {
       control.on({
         [CONTROL_EVENTS.HOLD]: this._onHold,
         [CONTROL_EVENTS.RELEASE]: this._onRelease,
@@ -81,6 +94,8 @@ class OrbitControl {
     this._rotateControl.destroy();
     this._translateControl.destroy();
     this._zoomControl.destroy();
+    this._extraControls.forEach(control => control.destroy());
+    this._extraControls = [];
   }
 
   /**
@@ -92,6 +107,7 @@ class OrbitControl {
     this._rotateControl.update(deltaTime);
     this._translateControl.update(deltaTime);
     this._zoomControl.update(deltaTime);
+    this._extraControls.forEach(control => control.update(deltaTime));
   }
 
   /**
@@ -105,6 +121,7 @@ class OrbitControl {
     this._rotateControl.resize(size);
     this._translateControl.resize(size);
     this._zoomControl.resize(size);
+    this._extraControls.forEach(control => control.resize(size));
   }
 
   /**
@@ -125,6 +142,8 @@ class OrbitControl {
     if (view3D.zoom) {
       this._zoomControl.enable();
     }
+
+    this._extraControls.forEach(control => control.enable());
   }
 
   /**
@@ -135,6 +154,7 @@ class OrbitControl {
     this._rotateControl.disable();
     this._translateControl.disable();
     this._zoomControl.disable();
+    this._extraControls.forEach(control => control.disable());
   }
 
   /**
@@ -145,6 +165,30 @@ class OrbitControl {
     this._rotateControl.sync();
     this._translateControl.sync();
     this._zoomControl.sync();
+    this._extraControls.forEach(control => control.sync());
+  }
+
+  /**
+   * Add extra control
+   * @param {CameraControl} control Control to add
+   * @returns {void}
+   */
+  public add(control: CameraControl) {
+    this._extraControls.push(control);
+  }
+
+  /**
+   * Remove extra control
+   * @param {CameraControl} control Control to add
+   * @returns {void}
+   */
+  public remove(control: CameraControl) {
+    const extraControls = this._extraControls;
+    const controlIdx = extraControls.findIndex(ctrl => ctrl === control);
+
+    if (controlIdx >= 0) {
+      extraControls.splice(controlIdx, 1);
+    }
   }
 
   /**

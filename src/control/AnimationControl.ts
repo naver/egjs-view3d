@@ -39,6 +39,12 @@ class AnimationControl implements CameraControl {
    * Easing function of the animation
    */
   public get easing() { return this._motion.easing; }
+  /**
+   * Whether this control is animating the camera
+   * @readonly
+   * @type {boolean}
+   */
+  public get animating() { return this._motion.activated; }
 
   public set duration(val: number) { this._motion.duration = val; }
   public set easing(val: (x: number) => number) { this._motion.easing = val; }

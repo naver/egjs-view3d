@@ -10,7 +10,6 @@ import AnimationControl from "../control/AnimationControl";
 import { toRadian, clamp, circulate, toDegree, getRotatedPosition, isNumber } from "../utils";
 import * as DEFAULT from "../const/default";
 import { AUTO, EVENTS, ZOOM_TYPE } from "../const/external";
-import { BeforeRenderEvent } from "../type/event";
 
 import Pose from "./Pose";
 import Model from "./Model";
@@ -72,6 +71,17 @@ class Camera {
   public get zoom() { return this._currentPose.zoom; }
 
   /**
+   * Camera's disatance from current camera pivot(target)
+   * @type {number}
+   * @readonly
+   */
+  public get distance() {
+    return this._view3D.control.zoom.type === ZOOM_TYPE.FOV
+      ? this._baseDistance
+      : this._baseDistance - this._currentPose.zoom;
+  }
+
+  /**
    * Camera's default distance from the model center.
    * This will be automatically calculated based on the model size.
    * @type {number}
@@ -98,6 +108,7 @@ class Camera {
   /**
    * Camera's focus of view value (vertical)
    * @type number
+   * @readonly
    * @see {@link https://threejs.org/docs/#api/en/cameras/PerspectiveCamera.fov THREE#PerspectiveCamera}
    */
   public get fov() { return this._threeCamera.fov; }
@@ -105,14 +116,18 @@ class Camera {
   /**
    * Camera's frustum width
    * @type number
+   * @readonly
    */
   public get renderWidth() { return this.renderHeight * this._threeCamera.aspect; }
 
   /**
    * Camera's frustum height
    * @type number
+   * @readonly
    */
-  public get renderHeight() { return 2 * this._baseDistance * Math.tan(toRadian(this._threeCamera.getEffectiveFOV() / 2)); }
+  public get renderHeight() {
+    return 2 * this.distance * Math.tan(toRadian(this._threeCamera.getEffectiveFOV() / 2));
+  }
 
   public set yaw(val: number) { this._newPose.yaw = val; }
   public set pitch(val: number) { this._newPose.pitch = val; }
@@ -146,6 +161,7 @@ class Camera {
   public async reset(duration: number = 0, easing: (x: number) => number = DEFAULT.EASING): Promise<void> {
     const view3D = this._view3D;
     const control = view3D.control;
+    const autoPlayer = view3D.autoPlayer;
     const currentPose = this._currentPose;
     const defaultPose = this._defaultPose;
 
@@ -159,25 +175,27 @@ class Camera {
       return Promise.resolve();
     } else {
       // Play the animation
+      const autoplayEnabled = autoPlayer.enabled;
       const resetControl = new AnimationControl(view3D, currentPose, defaultPose);
       resetControl.duration = duration;
       resetControl.easing = easing;
       resetControl.enable();
 
+      if (autoplayEnabled) {
+        autoPlayer.disable();
+      }
       control.disable();
-
-      const updateResetControl = (evt: BeforeRenderEvent) => {
-        resetControl.update(evt.delta);
-      };
-
-      view3D.on(EVENTS.BEFORE_RENDER, updateResetControl);
+      control.add(resetControl);
 
       return new Promise(resolve => {
         resetControl.onFinished(() => {
+          control.remove(resetControl);
           control.sync();
           control.enable();
 
-          view3D.off(EVENTS.BEFORE_RENDER, updateResetControl);
+          if (autoplayEnabled) {
+            autoPlayer.enableAfterDelay();
+          }
 
           resolve();
         });
@@ -299,8 +317,6 @@ class Camera {
     const baseFov = this._baseFov;
     const baseDistance = this._baseDistance;
     const isFovZoom = control.zoom.type === ZOOM_TYPE.FOV;
-
-    if (newPose.equals(currentPose)) return;
 
     const prevPose = currentPose.clone();
 
