@@ -158,6 +158,7 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
     const camera = this._view3D.camera;
     const xMotion = this._xMotion;
     const yMotion = this._yMotion;
+    const newPose = camera.newPose;
     const yawEnabled = !this._disableYaw;
     const pitchEnabled = !this._disablePitch;
 
@@ -167,11 +168,11 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
     );
 
     if (yawEnabled) {
-      camera.yaw += delta.x;
+      newPose.yaw += delta.x;
     }
 
     if (pitchEnabled) {
-      camera.pitch += delta.y;
+      newPose.pitch += delta.y;
     }
   }
 

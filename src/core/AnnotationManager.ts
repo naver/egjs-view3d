@@ -32,17 +32,26 @@ class AnnotationManager {
     this._wrapper = getNullableElement(view3D.annotationWrapper, view3D.rootEl) || this._createWrapper();
   }
 
+  /**
+   * Collect annotations from the wrapper
+   */
   public collect() {
     const view3D = this._view3D;
     const wrapper = this._wrapper;
     const annotationEls = [].slice.apply(wrapper.querySelectorAll(view3D.annotationSelector)) as HTMLElement[];
 
+    let defaultAnnotationIdx = 1;
     const annotations = annotationEls.map(el => {
       const positionStr = el.dataset.position ?? "";
       const position = positionStr.split(" ").map(val => parseFloat(val));
 
+      if (el.classList.contains(DEFAULT_CLASS.ANNOTATION_DEFAULT), el.innerHTML === "") {
+        el.innerHTML = `${defaultAnnotationIdx}`;
+        defaultAnnotationIdx += 1;
+      }
+
       return new Annotation({
-        el,
+        element: el,
         position
       });
     });
@@ -50,18 +59,34 @@ class AnnotationManager {
     this.add(...annotations);
   }
 
+  /**
+   * Render annotations
+   * @param {THREE.PerspectiveCamera} camera Current rendering camera
+   */
   public render(camera: THREE.PerspectiveCamera) {
     const threeRenderer = this._view3D.renderer.threeRenderer;
     const halfScreenSize = threeRenderer.getSize(new THREE.Vector2()).multiplyScalar(0.5);
+    const camPos = camera.position;
 
-    this._list.forEach(annotation => {
+    // Sort by distance most far to camera (descending)
+    const annotations = [...this._list].map(annotation => {
+      return {
+        annotation,
+        distToCameraSquared: camPos.distanceToSquared(annotation.position)
+      };
+    }).sort((a, b) => b.distToCameraSquared - a.distToCameraSquared)
+      .map(({ annotation }) => annotation);
+
+    annotations.forEach((annotation, idx) => {
+      const el = annotation.element;
       const screenRelPos = annotation.position.clone().project(camera);
       const screenPos = new THREE.Vector2(screenRelPos.x, -screenRelPos.y);
 
       screenPos.multiply(halfScreenSize);
       screenPos.add(halfScreenSize);
 
-      annotation.el.style.transform = `translate(-50%, -50%) translate(${screenPos.x}px, ${screenPos.y}px)`;
+      el.style.zIndex = `${idx + 1}`;
+      el.style.transform = `translate(-50%, -50%) translate(${screenPos.x}px, ${screenPos.y}px)`;
     });
   }
 

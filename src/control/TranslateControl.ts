@@ -131,6 +131,7 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
    */
   public update(deltaTime: number): void {
     const camera = this._view3D.camera;
+    const newPose = camera.newPose;
     const screenSize = this._screenSize;
 
     const delta = new THREE.Vector2(
@@ -144,8 +145,8 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
     const screenScale = new THREE.Vector2(camera.renderWidth, camera.renderHeight).divide(screenSize);
     delta.multiply(screenScale);
 
-    const newPivot = camera.pivot.clone();
-    camera.pivot = newPivot
+    const newPivot = newPose.pivot.clone();
+    newPose.pivot = newPivot
       .add(viewXDir.multiplyScalar(delta.x))
       .add(viewYDir.multiplyScalar(delta.y));
   }

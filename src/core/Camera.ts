@@ -50,22 +50,29 @@ class Camera {
   public get currentPose(): Pose { return this._currentPose.clone(); }
 
   /**
+   * Camera's new pose that will be applied on the next frame
+   * {@link Camera#updatePosition} should be called after changing this value.
+   * @type {Pose}
+   */
+  public get newPose(): Pose { return this._newPose; }
+
+  /**
    * Camera's current yaw
-   * {@link Camera#updatePosition} should be called after changing this value, and normally it is called every frame.
+   * {@link Camera#updatePosition} should be called after changing this value.
    * @type {number}
    */
   public get yaw() { return this._currentPose.yaw; }
 
   /**
    * Camera's current pitch
-   * {@link Camera#updatePosition} should be called after changing this value, and normally it is called every frame.
+   * {@link Camera#updatePosition} should be called after changing this value.
    * @type {number}
    */
   public get pitch() { return this._currentPose.pitch; }
 
   /**
    * Camera's current zoom value
-   * {@link Camera#updatePosition} should be called after changing this value, and normally it is called every frame.
+   * {@link Camera#updatePosition} should be called after changing this value.
    * @type {number}
    */
   public get zoom() { return this._currentPose.zoom; }
@@ -184,14 +191,12 @@ class Camera {
       if (autoplayEnabled) {
         autoPlayer.disable();
       }
-      control.disable();
       control.add(resetControl);
 
       return new Promise(resolve => {
         resetControl.onFinished(() => {
           control.remove(resetControl);
           control.sync();
-          control.enable();
 
           if (autoplayEnabled) {
             autoPlayer.enableAfterDelay();
@@ -323,7 +328,7 @@ class Camera {
     // Clamp current pose
     currentPose.yaw = circulate(newPose.yaw, 0, 360);
     currentPose.pitch = clamp(newPose.pitch, DEFAULT.PITCH_RANGE.min, DEFAULT.PITCH_RANGE.max);
-    currentPose.zoom = -newPose.zoom;
+    currentPose.zoom = newPose.zoom;
     currentPose.pivot.copy(newPose.pivot);
 
     const fov = isFovZoom
@@ -341,6 +346,8 @@ class Camera {
     threeCamera.position.copy(newCamPos);
     threeCamera.lookAt(currentPose.pivot);
     threeCamera.updateProjectionMatrix();
+
+    newPose.copy(currentPose);
 
     view3D.trigger(EVENTS.CAMERA_CHANGE, {
       type: EVENTS.CAMERA_CHANGE,

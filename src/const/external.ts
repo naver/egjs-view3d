@@ -99,7 +99,8 @@ export const DEFAULT_CLASS = {
   POSTER: "view3d-poster",
   AR_OVERLAY: "view3d-ar-overlay",
   ANNOTATION_WRAPPER: "view3d-annotation-wrapper",
-  ANNOTATION: "view3d-annotation"
+  ANNOTATION: "view3d-annotation",
+  ANNOTATION_DEFAULT: "default"
 } as const;
 
 /**

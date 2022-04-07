@@ -202,11 +202,10 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
    */
   public update(deltaTime: number): void {
     const camera = this._view3D.camera;
+    const newPose = camera.newPose;
     const motion = this._motion;
 
-    motion.update(deltaTime);
-
-    camera.zoom = motion.val;
+    newPose.zoom -= motion.update(deltaTime);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -263,7 +262,7 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
     const camera = this._view3D.camera;
     const motion = this._motion;
 
-    motion.reset(0);
+    motion.reset(camera.zoom);
 
     if (this._type === ZOOM_TYPE.FOV) {
       this._scaleModifier = -1;
