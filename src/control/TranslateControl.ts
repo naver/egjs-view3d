@@ -122,6 +122,7 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
    */
   public destroy(): void {
     this.disable();
+    this.off();
   }
 
   /**

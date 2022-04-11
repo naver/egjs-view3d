@@ -193,6 +193,7 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
    */
   public destroy(): void {
     this.disable();
+    this.off();
   }
 
   /**

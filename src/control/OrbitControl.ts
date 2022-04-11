@@ -46,6 +46,12 @@ class OrbitControl {
    */
   public get zoom() { return this._zoomControl; }
   /**
+   * Base controls
+   * @type {CameraControl[]}
+   * @readonly
+   */
+  public get controls() { return [this._rotateControl, this._translateControl, this._zoomControl]; }
+  /**
    * Extra camera controls added, like {@link AnimationControl}
    * @type {CameraControl[]}
    * @readonly

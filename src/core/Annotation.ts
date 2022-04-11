@@ -4,6 +4,9 @@
  */
 import * as THREE from "three";
 
+import * as BROWSER from "../const/browser";
+import { DEFAULT_CLASS } from "../const/external";
+
 /**
  * Options for {@link Annotation}
  */
@@ -28,7 +31,25 @@ class Annotation {
     this._position = new THREE.Vector3().fromArray(options.position);
 
     this._el.draggable = false;
+
+    this.enableClickHandler();
   }
+
+  public enableClickHandler() {
+    this._el.addEventListener(BROWSER.EVENTS.CLICK, this._onClick);
+  }
+
+  public disableClickHandler() {
+    this._el.removeEventListener(BROWSER.EVENTS.CLICK, this._onClick);
+  }
+
+  private _onClick = () => {
+    this._el.classList.add(DEFAULT_CLASS.ANNOTATION_SELECTED);
+
+    window.addEventListener("click", () => {
+      this._el.classList.remove(DEFAULT_CLASS.ANNOTATION_SELECTED);
+    }, { once: true, capture: true });
+  };
 }
 
 export default Annotation;

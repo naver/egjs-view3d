@@ -756,7 +756,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     const tasks: Array<Promise<any>> = [];
 
     this.resize();
-    annotationManager.collect();
+    annotationManager.init();
 
     if (this._autoResize) {
       this._autoResizer.enable();

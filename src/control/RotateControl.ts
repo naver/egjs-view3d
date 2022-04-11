@@ -147,6 +147,7 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
    */
   public destroy(): void {
     this.disable();
+    this.off();
   }
 
   /**

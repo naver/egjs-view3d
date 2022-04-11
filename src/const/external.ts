@@ -94,13 +94,20 @@ export const EASING = {
  * @property {"view3d-ar-overlay"} AR_OVERLAY A class name for AR overlay element
  * @property {"view3d-annotation-wrapper"} ANNOTATION_WRAPPER A class name for annotation wrapper element
  * @property {"view3d-annotation"} ANNOTATION A class name for annotation element
+ * @property {"default"} ANNOTATION_DEFAULT A class name for default style annotation element
+ * @property {"selected"} ANNOTATION_SELECTED A class name for selected annotation element
+ * @property {"flip-x"} ANNOTATION_FLIP_X A class name for annotation element which has tooltip on the left side
+ * @property {"flip-y"} ANNOTATION_FLIP_Y A class name for annotation element which has tooltip on the bottom side
  */
 export const DEFAULT_CLASS = {
   POSTER: "view3d-poster",
   AR_OVERLAY: "view3d-ar-overlay",
   ANNOTATION_WRAPPER: "view3d-annotation-wrapper",
   ANNOTATION: "view3d-annotation",
-  ANNOTATION_DEFAULT: "default"
+  ANNOTATION_DEFAULT: "default",
+  ANNOTATION_SELECTED: "selected",
+  ANNOTATION_FLIP_X: "flip-x",
+  ANNOTATION_FLIP_Y: "flip-y"
 } as const;
 
 /**

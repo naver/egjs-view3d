@@ -6,12 +6,15 @@
   left: 0
   pointer-events: none
   overflow: hidden
+  pointer-events: none
+  counter-reset: annotation-index
 
 .view3d-annotation
-  pointer-events: none !important
+  pointer-events: all
   position: absolute
   user-select: none
   opacity: 0
+  cursor: pointer
   &.default
     width: 25px
     height: 25px
@@ -24,3 +27,33 @@
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3)
     justify-content: center
     align-items: center
+    counter-increment: annotation-index
+    &::before
+      content: counter(annotation-index)
+  &.flip-y
+    .view3d-annotation-tooltip
+      top: auto
+      bottom: 12px
+  &.flip-x
+    .view3d-annotation-tooltip
+      left: auto
+      right: 35px
+  > *
+    visibility: hidden
+  &.selected
+    opacity: 1 !important
+    z-index: 9999 !important
+    > *
+      visibility: visible
+
+.view3d-annotation-tooltip
+  position: absolute
+  left: 35px
+  top: 12px
+  display: flex
+  padding: 25px
+  width: max-content
+  background-color: rgba(0, 0, 0, 0.3)
+  color: white
+  cursor: auto
+  user-select: auto

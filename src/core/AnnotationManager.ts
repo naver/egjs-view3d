@@ -6,6 +6,7 @@ import * as THREE from "three";
 
 import View3D from "../View3D";
 import { DEFAULT_CLASS } from "../const/external";
+import { CONTROL_EVENTS } from "../const/internal";
 import { getNullableElement, toDegree } from "../utils";
 
 import Annotation from "./Annotation";
@@ -33,22 +34,16 @@ class AnnotationManager {
   }
 
   /**
-   * Collect annotations from the wrapper
+   * Initialize and collect annotations from the wrapper
    */
-  public collect() {
+  public init() {
     const view3D = this._view3D;
     const wrapper = this._wrapper;
     const annotationEls = [].slice.apply(wrapper.querySelectorAll(view3D.annotationSelector)) as HTMLElement[];
 
-    let defaultAnnotationIdx = 1;
     const annotations = annotationEls.map(el => {
       const positionStr = el.dataset.position ?? "";
       const position = positionStr.split(" ").map(val => parseFloat(val));
-
-      if (el.classList.contains(DEFAULT_CLASS.ANNOTATION_DEFAULT), el.innerHTML === "") {
-        el.innerHTML = `${defaultAnnotationIdx}`;
-        defaultAnnotationIdx += 1;
-      }
 
       return new Annotation({
         element: el,
@@ -56,7 +51,19 @@ class AnnotationManager {
       });
     });
 
+    view3D.control.controls.forEach(control => {
+      control.on({
+        [CONTROL_EVENTS.HOLD]: this._onInput
+      });
+    });
+
     this.add(...annotations);
+  }
+
+  public destroy() {
+    this._list.forEach(annotation => {
+      annotation.disableClickHandler();
+    });
   }
 
   /**
@@ -112,6 +119,18 @@ class AnnotationManager {
 
       el.style.zIndex = `${idx + 1}`;
       el.style.transform = `translate(-50%, -50%) translate(${screenPos.x}px, ${screenPos.y}px)`;
+
+      if (screenRelPos.y < 0) {
+        el.classList.add(DEFAULT_CLASS.ANNOTATION_FLIP_Y);
+      } else {
+        el.classList.remove(DEFAULT_CLASS.ANNOTATION_FLIP_Y);
+      }
+
+      if (screenRelPos.x > 0) {
+        el.classList.add(DEFAULT_CLASS.ANNOTATION_FLIP_X);
+      } else {
+        el.classList.remove(DEFAULT_CLASS.ANNOTATION_FLIP_X);
+      }
     });
   }
 
@@ -134,8 +153,8 @@ class AnnotationManager {
    * Remove all hotspots
    */
   public reset() {
-    const items = this._list;
-    items.splice(0, items.length);
+    const annotations = this._list;
+    annotations.splice(0, annotations.length);
   }
 
   private _createWrapper(): HTMLElement {
@@ -147,6 +166,14 @@ class AnnotationManager {
 
     return wrapper;
   }
+
+  private _onInput = () => {
+    const annotations = this._list;
+
+    annotations.forEach(annotation => {
+      annotation.element.classList.remove(DEFAULT_CLASS.ANNOTATION_SELECTED);
+    });
+  };
 }
 
 export default AnnotationManager;
