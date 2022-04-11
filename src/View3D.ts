@@ -99,6 +99,7 @@ export interface View3DOptions {
   // Annotation
   annotationWrapper: HTMLElement | string;
   annotationSelector: string;
+  annotationBreakpoints: Record<number, number>;
 
   // AR
   webAR: boolean | Partial<WebARSessionOptions>;
@@ -179,6 +180,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
   private _annotationWrapper: View3DOptions["annotationWrapper"];
   private _annotationSelector: View3DOptions["annotationSelector"];
+  private _annotationBreakpoints: View3DOptions["annotationBreakpoints"];
 
   private _webAR: View3DOptions["webAR"];
   private _sceneViewer: View3DOptions["sceneViewer"];
@@ -459,6 +461,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get annotationSelector() { return this._annotationSelector; }
   /**
+   * Breakpoints for the annotation opacity, mapped by degree between (camera-pivot-annotation) as key.
+   * @type {Record<number, number>}
+   * @default { 165: 0.1, 135: 0.4 }
+   */
+  public get annotationBreakpoints() { return this._annotationBreakpoints; }
+  /**
    * Options for the WebXR-based AR session.
    * If `false` is given, it will disable WebXR-based AR session.
    * @type {boolean | WebARSessionOptions}
@@ -620,6 +628,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     toneMapping = TONE_MAPPING.LINEAR,
     annotationWrapper = `.${DEFAULT_CLASS.ANNOTATION_WRAPPER}`,
     annotationSelector = `.${DEFAULT_CLASS.ANNOTATION}`,
+    annotationBreakpoints = DEFAULT.ANNOTATION_BREAKPOINT,
     webAR = true,
     sceneViewer = true,
     quickLook = true,
@@ -669,6 +678,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
     this._annotationWrapper = annotationWrapper;
     this._annotationSelector = annotationSelector;
+    this._annotationBreakpoints = annotationBreakpoints;
 
     this._webAR = webAR;
     this._sceneViewer = sceneViewer;

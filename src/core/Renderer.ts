@@ -214,7 +214,7 @@ class Renderer {
     threeRenderer.autoClear = true;
 
     // Render annotations
-    annotation.render(camera.threeCamera);
+    annotation.render();
 
     view3D.trigger(EVENTS.RENDER, {
       type: EVENTS.RENDER,

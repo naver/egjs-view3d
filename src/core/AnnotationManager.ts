@@ -6,12 +6,12 @@ import * as THREE from "three";
 
 import View3D from "../View3D";
 import { DEFAULT_CLASS } from "../const/external";
-import { getNullableElement } from "../utils";
+import { getNullableElement, toDegree } from "../utils";
 
 import Annotation from "./Annotation";
 
 /**
- * Manager class for {@link HotSpot}
+ * Manager class for {@link Annotation}
  */
 class AnnotationManager {
   private _view3D: View3D;
@@ -61,12 +61,22 @@ class AnnotationManager {
 
   /**
    * Render annotations
-   * @param {THREE.PerspectiveCamera} camera Current rendering camera
    */
-  public render(camera: THREE.PerspectiveCamera) {
-    const threeRenderer = this._view3D.renderer.threeRenderer;
+  public render() {
+    const view3D = this._view3D;
+
+    if (!view3D.model) return;
+
+    const camera = view3D.camera;
+    const threeRenderer = view3D.renderer.threeRenderer;
     const halfScreenSize = threeRenderer.getSize(new THREE.Vector2()).multiplyScalar(0.5);
-    const camPos = camera.position;
+    const threeCamera = camera.threeCamera;
+    const camPos = threeCamera.position;
+    const camPivot = camera.pivot;
+    const breakpoints = {
+      ...view3D.annotationBreakpoints,
+      0: 1
+    };
 
     // Sort by distance most far to camera (descending)
     const annotations = [...this._list].map(annotation => {
@@ -77,10 +87,25 @@ class AnnotationManager {
     }).sort((a, b) => b.distToCameraSquared - a.distToCameraSquared)
       .map(({ annotation }) => annotation);
 
+    const pivotToCamDir = new THREE.Vector3().subVectors(camPos, camPivot).normalize();
+    const breakpointKeysDesc = Object.keys(breakpoints)
+      .map(val => parseFloat(val))
+      .sort((a, b) => b - a);
+
     annotations.forEach((annotation, idx) => {
       const el = annotation.element;
-      const screenRelPos = annotation.position.clone().project(camera);
+      const screenRelPos = annotation.position.clone().project(threeCamera);
       const screenPos = new THREE.Vector2(screenRelPos.x, -screenRelPos.y);
+      const pivotToAnnotationDir = new THREE.Vector3().subVectors(annotation.position, camPivot).normalize();
+
+      const camToAnnotationDegree = toDegree(Math.abs(Math.acos(pivotToAnnotationDir.dot(pivotToCamDir))));
+
+      for (const breakpoint of breakpointKeysDesc) {
+        if (camToAnnotationDegree > breakpoint) {
+          el.style.opacity = breakpoints[breakpoint];
+          break;
+        }
+      }
 
       screenPos.multiply(halfScreenSize);
       screenPos.add(halfScreenSize);

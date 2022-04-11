@@ -1,14 +1,12 @@
 ---
-sidebar_position: 2
+title: Annotation(Hotspot)
+sidebar_position: 6
 ---
 
 import View3D from "@site/src/components/View3D";
 import License from "@site/src/components/License";
-import OptionDescriptor from "@site/src/components/OptionDescriptor";
 
-<OptionDescriptor type="string" defaultVal={'".view3d-annotation"'} />
-
-CSS Selector string for the annotation elements.
+You can place the annotations above the 3D model by adding elements inside `".view3d-annotation-wrapper"` element.
 
 ```html
 <div id="wrapper" class="view3d-wrapper">
@@ -21,12 +19,13 @@ CSS Selector string for the annotation elements.
 </div>
 ```
 
-```js
-new View3D("#wrapper", {
-  annotationSelector: ".view3d-annotation"
-})
-```
-## Example
+:::info
+
+If you want to change the class names for those elements, see [annotationWrapper](/docs/options/annotation/annotationWrapper) and [annotationSelector](/docs/options/annotation/annotationSelector).
+In that case, you have to add correct CSS for each elements yourself.
+
+:::
+
 <View3D
   src="/egjs-view3d/model/draco/alarm.glb"
   envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
@@ -56,4 +55,3 @@ new View3D("#wrapper", {
     license: "CC0"
   }
 ]} />
-

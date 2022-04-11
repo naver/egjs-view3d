@@ -18,6 +18,7 @@ const config = {
   projectName: "naver.github.io",
   trailingSlash: false,
   plugins: ["docusaurus-plugin-sass", glslify],
+  trailingSlash: false,
   presets: [
     [
       "@docusaurus/preset-classic",
@@ -27,7 +28,8 @@ const config = {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
           editUrl: "https://github.com/naver/egjs-view3d/edit/main/demo/",
-          remarkPlugins: [require("remark-breaks")]
+          remarkPlugins: [require("remark-breaks")],
+          breadcrumbs: false
         },
         pages: {
           remarkPlugins: [require("remark-breaks")]
