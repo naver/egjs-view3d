@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import React from "react";
 import clsx from "clsx";
 import ReactTooltip from "react-tooltip";
@@ -48,6 +49,7 @@ class Playground extends React.Component<{}, {
   }
 
   public componentDidMount() {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { SimpleDropzone } = require("simple-dropzone");
 
     const view3D = new VanillaView3D("#playground-view3d", {
@@ -87,6 +89,8 @@ class Playground extends React.Component<{}, {
         void this.onFileChange(e.files);
       }
     });
+
+    this._listenAnnotationAdd();
   }
 
   public componentDidUpdate() {
@@ -199,6 +203,61 @@ class Playground extends React.Component<{}, {
       URL.revokeObjectURL(url);
     }
   };
+
+  private _listenAnnotationAdd() {
+    const view3D = this._view3D;
+    const canvas = view3D.renderer.canvas;
+    const raycaster = new THREE.Raycaster();
+    canvas.addEventListener("dblclick", evt => {
+      const model = view3D.model;
+      if (!model) return;
+
+      const pointer = new THREE.Vector2();
+      pointer.x = (evt.offsetX / canvas.width) * 2 - 1;
+      pointer.y = -(evt.offsetY / canvas.height) * 2 + 1;
+
+      raycaster.setFromCamera(pointer, view3D.camera.threeCamera);
+
+      const intersects = raycaster.intersectObjects([model.scene]);
+
+      if (!intersects.length) return;
+
+      const currentPose = view3D.camera.currentPose;
+      const el = document.createElement("div");
+      el.classList.add("view3d-annotation");
+      el.classList.add("default");
+
+      const tooltip = document.createElement("div");
+      tooltip.classList.add("view3d-annotation-tooltip");
+      tooltip.classList.add("default");
+      el.appendChild(tooltip);
+
+      const removeButton = document.createElement("button");
+      removeButton.classList.add("button");
+      removeButton.classList.add("is-danger");
+      removeButton.innerHTML = "REMOVE";
+      tooltip.appendChild(removeButton);
+
+      view3D.annotation.wrapper.appendChild(el);
+
+      const added = view3D.annotation.add({
+        element: el,
+        position: intersects[0].point.toArray(),
+        // FIXME: current position based
+        focus: [currentPose.yaw, currentPose.pitch, currentPose.zoom]
+      })[0];
+
+      removeButton.addEventListener("click", () => {
+        const itemIdx = view3D.annotation.list.findIndex(item => item === added);
+
+        if (itemIdx >= 0) {
+          view3D.annotation.remove(itemIdx);
+        }
+      });
+
+      view3D.renderer.renderSingleFrame();
+    });
+  }
 }
 
 export default Playground;

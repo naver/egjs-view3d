@@ -26,6 +26,13 @@ class AnnotationManager {
    */
   public get list() { return this._list; }
 
+  /**
+   * Wrapper element for annotations
+   * @type {HTMLElement}
+   * @readonly
+   */
+  public get wrapper() { return this._wrapper; }
+
   /** */
   public constructor(view3D: View3D) {
     this._view3D = view3D;
@@ -148,16 +155,25 @@ class AnnotationManager {
    * Add new annotation to the scene
    * @param {AnnotationOptions} annotations Annotations to add
    */
-  public add(...annotations: AnnotationOptions[]) {
+  public add(...annotations: AnnotationOptions[]): Annotation[] {
     const view3D = this._view3D;
-    this._list.push(...annotations.map(options => new Annotation(view3D, options)));
+    const newAnnotations = annotations.map(options => new Annotation(view3D, options));
+    this._list.push(...newAnnotations);
+
+    return newAnnotations;
   }
 
   /**
    * Remove annotation at the given index
    */
-  public remove(index: number) {
-    this._list.splice(index, 1);
+  public remove(index: number): Annotation | null {
+    const removed = this._list.splice(index, 1)[0];
+
+    if (removed.element.parentElement === this._wrapper) {
+      this._wrapper.removeChild(removed.element);
+    }
+
+    return removed || null;
   }
 
   /**
