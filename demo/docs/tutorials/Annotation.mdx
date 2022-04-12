@@ -6,20 +6,37 @@ sidebar_position: 6
 import View3D from "@site/src/components/View3D";
 import License from "@site/src/components/License";
 
+## Annotations
 You can place the annotations above the 3D model by adding elements inside `".view3d-annotation-wrapper"` element.
+
+You should also add `data-position="x y z"`, which will place annotations in the given position.
+(Optional) By adding `data-focus="yaw pitch zoom"`, you can set where the camera should be when annotation is clicked.
 
 ```html
 <div id="wrapper" class="view3d-wrapper">
   <canvas class="view3d-canvas"></canvas>
   <div class="view3d-annotation-wrapper">
-    <div class="view3d-annotation default" data-position="0 -0.5 0.5"></div>
-    <div class="view3d-annotation default" data-position="0.5 1 -0.3"></div>
-    <div class="view3d-annotation default" data-position="0.3 0.3 0.3"></div>
+    <div className="view3d-annotation default" data-position="0.13 0.5 -0.05" data-focus="-90 0 30"></div>
+    <div className="view3d-annotation default" data-position="-0.22 0.5 0.05" data-focus="90 0 30"></div>
+    <div className="view3d-annotation default" data-position="-0.05 0.4 0.18" data-focus="0 20 35"></div>
   </div>
 </div>
 ```
 
 Adding `default` class will render annotations in a default style, which renders white circles with index in it.
+
+<View3D
+  src="/egjs-view3d/model/draco/payphone.glb"
+  envmap="/egjs-view3d/texture/sepulchral_chapel_rotunda_1k.hdr"
+  poster="/egjs-view3d/poster/payphone.png"
+  annotationSelector=".view3d-annotation"
+  showExampleCode>
+  <div className="view3d-annotation-wrapper">
+    <div className="view3d-annotation default" data-position="0.13 0.5 -0.05" data-focus="-90 0 30"></div>
+    <div className="view3d-annotation default" data-position="-0.22 0.5 0.05" data-focus="90 0 30"></div>
+    <div className="view3d-annotation default" data-position="-0.05 0.4 0.18" data-focus="0 20 35"></div>
+  </div>
+</View3D>
 
 :::info
 
@@ -27,6 +44,40 @@ If you want to change the class names for those elements, see [annotationWrapper
 In that case, you have to add correct CSS for each elements yourself.
 
 :::
+
+## Tooltips
+You can add an element with class `.view3d-annotation-tooltip` inside annotations for showing tooltips that will appear when clicked.
+
+Adding `default` class will render tooltips in a default style, which has translucent black background and some paddings applied.
+
+```html
+<div id="wrapper" class="view3d-wrapper">
+  <canvas class="view3d-canvas"></canvas>
+  <div class="view3d-annotation-wrapper">
+    <div class="view3d-annotation default" data-position="0.1 0 0">
+      <div class="view3d-annotation-tooltip default">
+        <div class="card">
+          <div class="card-image">
+            <figure class="image is-4by3 m-0">
+              <img src="https://bulma.io/images/placeholders/1280x960.png" alt="Placeholder image" />
+            </figure>
+          </div>
+          <div class="card-content is-size-7">
+            <div class="content">
+              Lorem ipsum leo risus, porta ac consectetur ac, vestibulum at eros. Donec id elit non mi porta gravida at eget metus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Cras mattis consectetur purus sit amet fermentum.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="view3d-annotation default" data-position="0 0.1 0">
+      <div class="view3d-annotation-tooltip default">Plane text description</div>
+    </div>
+    <div class="view3d-annotation default" data-position="0.3 0.3 0.3"></div>
+  </div>
+</div>
+```
+
 
 <View3D
   src="/egjs-view3d/model/draco/alarm.glb"
@@ -36,7 +87,7 @@ In that case, you have to add correct CSS for each elements yourself.
   showExampleCode>
   <div className="view3d-annotation-wrapper">
     <div className="view3d-annotation default" data-position="0.1 0 0">
-      <div className="view3d-annotation-tooltip">
+      <div className="view3d-annotation-tooltip default">
         <div className="card" style={{ width: "240px" }}>
           <div className="card-image">
             <figure className="image is-4by3 m-0">
@@ -52,7 +103,7 @@ In that case, you have to add correct CSS for each elements yourself.
       </div>
     </div>
     <div className="view3d-annotation default" data-position="0 0.1 0">
-      <div className="view3d-annotation-tooltip">Plane text description</div>
+      <div className="view3d-annotation-tooltip default">Plane text description</div>
     </div>
     <div className="view3d-annotation default" data-position="0 0 0"></div>
   </div>

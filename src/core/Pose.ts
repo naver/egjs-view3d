@@ -5,6 +5,8 @@
 
 import * as THREE from "three";
 
+import { circulate } from "../utils";
+
 /**
  * Data class of camera's pose
  */
@@ -68,7 +70,7 @@ class Pose {
   public equals(pose: Pose): boolean {
     const { yaw, pitch, zoom, pivot } = this;
 
-    return yaw === pose.yaw
+    return circulate(yaw, 0, 360) === circulate(pose.yaw, 0, 360)
       && pitch === pose.pitch
       && zoom === pose.zoom
       && pivot.equals(pose.pivot);

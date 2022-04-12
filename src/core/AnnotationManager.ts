@@ -7,9 +7,9 @@ import * as THREE from "three";
 import View3D from "../View3D";
 import { DEFAULT_CLASS } from "../const/external";
 import { CONTROL_EVENTS } from "../const/internal";
-import { getNullableElement, toDegree } from "../utils";
+import { getNullableElement, losePrecision, toDegree } from "../utils";
 
-import Annotation from "./Annotation";
+import Annotation, { AnnotationOptions } from "./Annotation";
 
 /**
  * Manager class for {@link Annotation}
@@ -42,12 +42,19 @@ class AnnotationManager {
     const annotationEls = [].slice.apply(wrapper.querySelectorAll(view3D.annotationSelector)) as HTMLElement[];
 
     const annotations = annotationEls.map(el => {
-      const positionStr = el.dataset.position ?? "";
-      const position = positionStr.split(" ").map(val => parseFloat(val));
+      const positionStr = el.dataset.position;
+      const focusStr = el.dataset.focus;
+      const position = positionStr
+        ? positionStr.split(" ").map(val => parseFloat(val))
+        : [];
+      const focus = focusStr
+        ? focusStr.split(" ").map(val => parseFloat(val))
+        : [];
 
-      return new Annotation({
+      return new Annotation(view3D, {
         element: el,
-        position
+        position,
+        focus
       });
     });
 
@@ -57,12 +64,12 @@ class AnnotationManager {
       });
     });
 
-    this.add(...annotations);
+    this._list.push(...annotations);
   }
 
   public destroy() {
     this._list.forEach(annotation => {
-      annotation.disableClickHandler();
+      annotation.disableEvents();
     });
   }
 
@@ -120,13 +127,16 @@ class AnnotationManager {
       el.style.zIndex = `${idx + 1}`;
       el.style.transform = `translate(-50%, -50%) translate(${screenPos.x}px, ${screenPos.y}px)`;
 
-      if (screenRelPos.y < 0) {
+      const screenX = losePrecision(screenRelPos.x, 10);
+      const screenY = losePrecision(screenRelPos.y, 10);
+
+      if (screenY < 0) {
         el.classList.add(DEFAULT_CLASS.ANNOTATION_FLIP_Y);
       } else {
         el.classList.remove(DEFAULT_CLASS.ANNOTATION_FLIP_Y);
       }
 
-      if (screenRelPos.x > 0) {
+      if (screenX > 0) {
         el.classList.add(DEFAULT_CLASS.ANNOTATION_FLIP_X);
       } else {
         el.classList.remove(DEFAULT_CLASS.ANNOTATION_FLIP_X);
@@ -136,10 +146,11 @@ class AnnotationManager {
 
   /**
    * Add new annotation to the scene
-   * @param {AnnotationOptions} annotation Annotations to add
+   * @param {AnnotationOptions} annotations Annotations to add
    */
-  public add(...annotations: Annotation[]) {
-    this._list.push(...annotations);
+  public add(...annotations: AnnotationOptions[]) {
+    const view3D = this._view3D;
+    this._list.push(...annotations.map(options => new Annotation(view3D, options)));
   }
 
   /**

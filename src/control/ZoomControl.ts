@@ -263,7 +263,7 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
     const camera = this._view3D.camera;
     const motion = this._motion;
 
-    motion.reset(camera.zoom);
+    motion.reset(-camera.zoom);
 
     if (this._type === ZOOM_TYPE.FOV) {
       this._scaleModifier = -1;

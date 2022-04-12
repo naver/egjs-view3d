@@ -188,6 +188,22 @@ export const getRotatedPosition = (distance: number, yawDeg: number, pitchDeg: n
   return newPos;
 };
 
+
+/**
+ * In Radians
+ */
+export const directionToYawPitch = (direction: THREE.Vector3) => {
+  const xz = new THREE.Vector2(direction.x, direction.z);
+  const origin = new THREE.Vector2();
+  const yaw = getRotationAngle(origin, new THREE.Vector2(0, 1), xz);
+  const pitch = Math.atan2(direction.y, xz.distanceTo(origin));
+
+  return {
+    yaw,
+    pitch
+  };
+};
+
 export const createLoadingContext = (view3D: View3D, src: string): View3D["loadingContext"][0] => {
   const context = {
     src,
@@ -220,4 +236,10 @@ export const isSignedArrayBuffer = (buffer: TypedArray) => {
   testBuffer[0] = -1;
 
   return testBuffer[0] < 0;
+};
+
+export const losePrecision = (val: number, fractionDigits: number) => {
+  const multiplier = Math.pow(10, fractionDigits);
+
+  return Math.round(val * multiplier) / multiplier;
 };

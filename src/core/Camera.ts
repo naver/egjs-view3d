@@ -161,20 +161,23 @@ class Camera {
 
   /**
    * Reset camera to default pose
-   * @param duration Duration of the reset animation
-   * @param easing Easing function for the reset animation
+   * @param {number} [duration=0] Duration of the reset animation
+   * @param {function} [easing] Easing function for the reset animation
+   * @param {Pose} [pose] Pose to reset, camera will reset to `defaultPose` if pose is not given.
    * @returns Promise that resolves when the animation finishes
    */
-  public async reset(duration: number = 0, easing: (x: number) => number = DEFAULT.EASING): Promise<void> {
+  public async reset(duration: number = 0, easing: (x: number) => number = DEFAULT.EASING, pose?: Pose): Promise<void> {
     const view3D = this._view3D;
     const control = view3D.control;
     const autoPlayer = view3D.autoPlayer;
+    const newPose = this._newPose;
     const currentPose = this._currentPose;
-    const defaultPose = this._defaultPose;
+    const targetPose = pose ?? this._defaultPose;
 
     if (duration <= 0) {
       // Reset camera immediately
-      this._newPose = defaultPose.clone();
+      newPose.copy(targetPose);
+      currentPose.copy(targetPose);
 
       this.updatePosition();
       control.sync();
@@ -183,7 +186,7 @@ class Camera {
     } else {
       // Play the animation
       const autoplayEnabled = autoPlayer.enabled;
-      const resetControl = new AnimationControl(view3D, currentPose, defaultPose);
+      const resetControl = new AnimationControl(view3D, currentPose, targetPose);
       resetControl.duration = duration;
       resetControl.easing = easing;
       resetControl.enable();
@@ -195,6 +198,9 @@ class Camera {
 
       return new Promise(resolve => {
         resetControl.onFinished(() => {
+          newPose.copy(targetPose);
+          currentPose.copy(targetPose);
+
           control.remove(resetControl);
           control.sync();
 

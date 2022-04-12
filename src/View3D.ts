@@ -463,7 +463,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   /**
    * Breakpoints for the annotation opacity, mapped by degree between (camera-pivot-annotation) as key.
    * @type {Record<number, number>}
-   * @default { 165: 0.1, 135: 0.4 }
+   * @default { 165: 0, 135: 0.4 }
    */
   public get annotationBreakpoints() { return this._annotationBreakpoints; }
   /**

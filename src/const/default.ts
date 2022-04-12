@@ -24,7 +24,7 @@ export const PITCH_RANGE: Readonly<Range> = {
 };
 
 export const ANNOTATION_BREAKPOINT = {
-  165: 0.1,
+  165: 0,
   135: 0.4
 };
 
