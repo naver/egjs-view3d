@@ -8,6 +8,7 @@ import Playground from "../../../pages/Playground";
 import { clamp } from "../../../../../src/utils";
 import MenuItem from "../MenuItem";
 import HelpIcon from "../../../../static/icon/help.svg";
+import { TEXTURE_LOD_EXTRA } from "../../../../../src/const/internal";
 
 class DownloadTab extends React.Component<{
   playground: Playground;
@@ -179,11 +180,6 @@ class DownloadTab extends React.Component<{
           });
         }
 
-        const customTextureLODExtension = "EXT_View3D_texture_LOD";
-        if (includeTextureLOD && !gltf.extensionsUsed.includes(customTextureLODExtension)) {
-          gltf.extensionsUsed.push(customTextureLODExtension);
-        }
-
         const toImageFiles = origImages.map(async (gltfImage, idx) => {
           const imageURI = gltfImage.uri.split("/");
           const texture = gltfTextures.find(tex => tex.source === idx);
@@ -257,7 +253,9 @@ class DownloadTab extends React.Component<{
 
             // Use smallest image
             gltfImage.uri = `${imgFileName}.${type}`;
-            texture.extensions[customTextureLODExtension] = {
+
+            if (!texture.extras) texture.extras = {};
+            texture.extras[TEXTURE_LOD_EXTRA] = {
               levels: textureLODLevels
             };
           } else {
@@ -269,6 +267,14 @@ class DownloadTab extends React.Component<{
         });
 
         await Promise.all(toImageFiles);
+
+        await Promise.all(gltf.buffers.map(async (buffer, idx) => {
+          const name = gltf.buffers.length > 1 ? `${modelName}-${idx}.bin` : `${modelName}.bin`;
+          const buf = await fetch(buffer.uri).then(res => res.arrayBuffer());
+
+          zip.file(name, buf);
+          buffer.uri = name;
+        }));
 
         zip.file(`${modelName}.gltf`, JSON.stringify(gltf, null, 2));
 

@@ -10,7 +10,7 @@ import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader";
 
 import View3D from "../View3D";
 import Model from "../core/Model";
-import { CUSTOM_TEXTURE_LOD_EXTENSION, STANDARD_MAPS } from "../const/internal";
+import { CUSTOM_TEXTURE_LOD_EXTENSION, STANDARD_MAPS, TEXTURE_LOD_EXTRA } from "../const/internal";
 import { createLoadingContext } from "../utils";
 
 import Loader from "./Loader";
@@ -182,74 +182,80 @@ class GLTFLoader extends Loader {
       });
     });
 
-    const extensionsUsed = gltf.parser.json.extensionsUsed as string[] | undefined;
-    if (extensionsUsed && extensionsUsed.some(extension => extension === CUSTOM_TEXTURE_LOD_EXTENSION)) {
-      const maxTextureSize = view3D.renderer.threeRenderer.capabilities.maxTextureSize;
-      const meshes: THREE.Mesh[] = [];
+    const maxTextureSize = view3D.renderer.threeRenderer.capabilities.maxTextureSize;
+    const meshes: THREE.Mesh[] = [];
 
-      gltf.scenes.forEach(scene => {
-        scene.traverse(obj => {
-          if ((obj as any).isMesh) {
-            meshes.push(obj as THREE.Mesh);
-          }
-        });
+    gltf.scenes.forEach(scene => {
+      scene.traverse(obj => {
+        if ((obj as any).isMesh) {
+          meshes.push(obj as THREE.Mesh);
+        }
+      });
+    });
+
+    const materials = meshes.reduce((allMaterials, mesh) => {
+      return [...allMaterials, ...(Array.isArray(mesh.material) ? mesh.material : [mesh.material])];
+    }, []);
+
+    const textures: THREE.Texture[] = materials.reduce((allTextures, material) => {
+      return [
+        ...allTextures,
+        ...STANDARD_MAPS.filter(map => material[map]).map(mapName => material[mapName])
+      ];
+    }, []);
+
+    const associations = gltf.parser.associations;
+    const gltfJSON = gltf.parser.json;
+
+    const gltfTextures = textures
+      .filter(texture => associations.has(texture))
+      .map(texture => {
+        return gltfJSON.textures[associations.get(texture)!.textures!];
       });
 
-      const materials = meshes.reduce((allMaterials, mesh) => {
-        return [...allMaterials, ...(Array.isArray(mesh.material) ? mesh.material : [mesh.material])];
-      }, []);
-      const textures: THREE.Texture[] = materials.reduce((allTextures, material) => {
-        return [
-          ...allTextures,
-          ...STANDARD_MAPS.filter(map => material[map]).map(mapName => material[mapName])
-        ];
-      }, []);
+    const texturesByLevel: Array<Array<{
+      index: number;
+      texture: THREE.Texture;
+    }>> = gltfTextures.reduce((levels, texture, texIdx) => {
+      const hasExtension = texture.extensions && texture.extensions[CUSTOM_TEXTURE_LOD_EXTENSION];
+      const hasExtra = texture.extras && texture.extras[TEXTURE_LOD_EXTRA];
 
-      const associations = gltf.parser.associations;
-      const gltfJSON = gltf.parser.json;
+      if (!hasExtension && !hasExtra) return levels;
 
-      const gltfTextures = textures
-        .filter(texture => associations.has(texture))
-        .map(texture => {
-          return gltfJSON.textures[associations.get(texture)!.textures!];
-        });
+      const currentTexture = textures[texIdx];
+      const lodLevels: Array<{ index: number; size: number }> = hasExtension
+        ? texture.extensions[CUSTOM_TEXTURE_LOD_EXTENSION].levels
+        : texture.extras[TEXTURE_LOD_EXTRA].levels;
 
-      const texturesByLevel: Array<Array<{ index: number; texture: THREE.Texture }>> = gltfTextures.reduce((levels, texture, texIdx) => {
-        if (!texture.extensions[CUSTOM_TEXTURE_LOD_EXTENSION]) return levels;
+      lodLevels.forEach(({ index, size }, level) => {
+        if (size > maxTextureSize) return;
+        if (!levels[level]) {
+          levels[level] = [];
+        }
 
-        const currentTexture = textures[texIdx];
-        const lodLevels = texture.extensions[CUSTOM_TEXTURE_LOD_EXTENSION].levels as Array<{ index: number; size: number }>;
-
-        lodLevels.forEach(({ index, size }, level) => {
-          if (size > maxTextureSize) return;
-          if (!levels[level]) {
-            levels[level] = [];
-          }
-
-          levels[level].push({ index, texture: currentTexture });
-        });
-
-        return levels;
-      }, []);
-
-      const loaded = texturesByLevel.map(() => false);
-
-      texturesByLevel.forEach(async (levelTextures, level) => {
-        // Change textures when all texture of the level loaded
-        const texturesLoaded = await Promise.all(levelTextures.map(({ index }) => gltf.parser.getDependency("texture", index) as Promise<THREE.Texture>));
-        const higherLevelLoaded = loaded.slice(level + 1).some(val => !!val);
-
-        loaded[level] = true;
-
-        if (higherLevelLoaded) return;
-
-        texturesLoaded.forEach((texture, index) => {
-          const origTexture = levelTextures[index].texture;
-          origTexture.image = texture.image;
-          origTexture.needsUpdate = true;
-        });
+        levels[level].push({ index, texture: currentTexture });
       });
-    }
+
+      return levels;
+    }, []);
+
+    const loaded = texturesByLevel.map(() => false);
+
+    texturesByLevel.forEach(async (levelTextures, level) => {
+      // Change textures when all texture of the level loaded
+      const texturesLoaded = await Promise.all(levelTextures.map(({ index }) => gltf.parser.getDependency("texture", index) as Promise<THREE.Texture>));
+      const higherLevelLoaded = loaded.slice(level + 1).some(val => !!val);
+
+      loaded[level] = true;
+
+      if (higherLevelLoaded) return;
+
+      texturesLoaded.forEach((texture, index) => {
+        const origTexture = levelTextures[index].texture;
+        origTexture.image = texture.image;
+        origTexture.needsUpdate = true;
+      });
+    });
 
     const model = new Model({
       src,
