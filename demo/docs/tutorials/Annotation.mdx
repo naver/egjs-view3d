@@ -13,12 +13,12 @@ You should also add `data-position="x y z"`, which will place annotations in the
 (Optional) By adding `data-focus="yaw pitch zoom"`, you can set where the camera should be when annotation is clicked.
 
 ```html
-<div id="wrapper" class="view3d-wrapper">
+<div class="view3d-wrapper">
   <canvas class="view3d-canvas"></canvas>
   <div class="view3d-annotation-wrapper">
-    <div className="view3d-annotation default" data-position="0.13 0.5 -0.05" data-focus="-90 0 30"></div>
-    <div className="view3d-annotation default" data-position="-0.22 0.5 0.05" data-focus="90 0 30"></div>
-    <div className="view3d-annotation default" data-position="-0.05 0.4 0.18" data-focus="0 20 35"></div>
+    <div class="view3d-annotation default" data-position="0.13 0.5 -0.05" data-focus="-90 0 30"></div>
+    <div class="view3d-annotation default" data-position="-0.22 0.5 0.05" data-focus="90 0 30" data-duration="500"></div>
+    <div class="view3d-annotation default" data-position="-0.05 0.4 0.18" data-focus="0 20 35" data-duration="0"></div>
   </div>
 </div>
 ```
@@ -29,12 +29,11 @@ Adding `default` class will render annotations in a default style, which renders
   src="/egjs-view3d/model/draco/payphone.glb"
   envmap="/egjs-view3d/texture/sepulchral_chapel_rotunda_1k.hdr"
   poster="/egjs-view3d/poster/payphone.png"
-  annotationSelector=".view3d-annotation"
   showExampleCode>
   <div className="view3d-annotation-wrapper">
     <div className="view3d-annotation default" data-position="0.13 0.5 -0.05" data-focus="-90 0 30"></div>
-    <div className="view3d-annotation default" data-position="-0.22 0.5 0.05" data-focus="90 0 30"></div>
-    <div className="view3d-annotation default" data-position="-0.05 0.4 0.18" data-focus="0 20 35"></div>
+    <div className="view3d-annotation default" data-position="-0.22 0.5 0.05" data-focus="90 0 30" data-duration="500"></div>
+    <div className="view3d-annotation default" data-position="-0.05 0.4 0.18" data-focus="0 20 35" data-duration="0"></div>
   </div>
 </View3D>
 
@@ -45,13 +44,60 @@ In that case, you have to add correct CSS for each elements yourself.
 
 :::
 
-## Tooltips
+## Annotation for animated models
+
+```html
+<div class="view3d-wrapper">
+  <canvas class="view3d-canvas"></canvas>
+  <div class="view3d-annotation-wrapper">
+    <div class="view3d-annotation default" data-mesh-index="7" data-face-index="5" data-focus="0 0 15" data-duration="500">
+      <div class="view3d-annotation-tooltip default">A thick eyebrow</div>
+    </div>
+    <div class="view3d-annotation default" data-mesh-index="15" data-face-index="5" data-focus="30 15 30" data-duration="200">
+      <div class="view3d-annotation-tooltip default">An animated robot arm</div>
+    </div>
+  </div>
+</div>
+```
+
+<>{(() => {
+  const view3D = React.useRef();
+  return <View3D
+    ref={view3D}
+    src="/egjs-view3d/model/RobotExpressive.glb"
+    envmap="/egjs-view3d/texture/sepulchral_chapel_rotunda_1k.hdr"
+    on={{
+      ready: (e) => { e.target.animator.mixer.timeScale = 0.3; }
+    }}
+    showExampleCode>
+    <div className="view3d-annotation-wrapper">
+      <div className="view3d-annotation default" data-mesh-index="7" data-face-index="5" data-focus="0 0 15" data-duration="500">
+        <div className="view3d-annotation-tooltip default">A thick eyebrow</div>
+      </div>
+      <div className="view3d-annotation default" data-mesh-index="15" data-face-index="5" data-focus="30 15 30" data-duration="200">
+        <div className="view3d-annotation-tooltip default">An animated robot arm</div>
+      </div>
+    </div>
+    <div className="view3d-overlay is-align-items-flex-start is-justify-content-flex-end">
+      <div className="buttons p-4">
+        <button className="button" onClick={() => {
+          view3D.current.view3D.annotation.list[0].focus();
+        }}>Focus 1</button>
+        <button className="button" onClick={() => {
+          view3D.current.view3D.annotation.list[1].focus();
+        }}>Focus 2</button>
+      </div>
+    </div>
+  </View3D>
+})()}</>
+
+## Annotation Tooltips
 You can add an element with class `.view3d-annotation-tooltip` inside annotations for showing tooltips that will appear when clicked.
 
 Adding `default` class will render tooltips in a default style, which has translucent black background and some paddings applied.
 
 ```html
-<div id="wrapper" class="view3d-wrapper">
+<div class="view3d-wrapper">
   <canvas class="view3d-canvas"></canvas>
   <div class="view3d-annotation-wrapper">
     <div class="view3d-annotation default" data-position="0.1 0 0">
@@ -78,12 +124,10 @@ Adding `default` class will render tooltips in a default style, which has transl
 </div>
 ```
 
-
 <View3D
   src="/egjs-view3d/model/draco/alarm.glb"
-  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+  envmap="/egjs-view3d/texture/sepulchral_chapel_rotunda_1k.hdr"
   poster="/egjs-view3d/poster/alarm.png"
-  annotationSelector=".view3d-annotation"
   showExampleCode>
   <div className="view3d-annotation-wrapper">
     <div className="view3d-annotation default" data-position="0.1 0 0">
@@ -109,6 +153,8 @@ Adding `default` class will render tooltips in a default style, which has transl
   </div>
 </View3D>
 
+## Available Data Attributes
+
 <License items={[
   {
     name: "Alarm Clock 01",
@@ -118,8 +164,22 @@ Adding `default` class will render tooltips in a default style, which has transl
     license: "CC0"
   },
   {
-    name: "Artist Workshop",
-    link: "https://polyhaven.com/a/artist_workshop",
+    name: "Korean Public Payphone 01",
+    link: "https://polyhaven.com/a/korean_public_payphone_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "RobotExpressive",
+    link: "https://github.com/mrdoob/three.js/tree/master/examples/models/gltf/RobotExpressive",
+    author: "Tomás Laulhé",
+    authorLink: "https://www.patreon.com/quaternius",
+    license: "CC0"
+  },
+  {
+    name: "Sepulchral Chapel Rotunda",
+    link: "https://polyhaven.com/a/sepulchral_chapel_rotunda",
     author: "Poly Haven",
     authorLink: "https://polyhaven.com/",
     license: "CC0"

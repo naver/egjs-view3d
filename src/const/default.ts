@@ -25,7 +25,8 @@ export const PITCH_RANGE: Readonly<Range> = {
 
 export const ANNOTATION_BREAKPOINT = {
   165: 0,
-  135: 0.4
+  135: 0.4,
+  0: 1
 };
 
 export const AR_OVERLAY_CLASS = "view3d-ar-overlay";

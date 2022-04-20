@@ -6,8 +6,7 @@
 import * as THREE from "three";
 import { Vector3 } from "three";
 
-import { getAttributeScale } from "../utils";
-import { STANDARD_MAPS } from "../const/internal";
+import { getAttributeScale, getSkinnedVertex } from "../utils";
 
 /**
  * Data class for loaded 3d model
@@ -40,7 +39,6 @@ class Model {
    * @readonly
    */
   public get meshes() { return this._getAllMeshes(); }
-  public get images() { return this._getAllImages(); }
   /**
    * Get a copy of model's current bounding box
    * @type THREE#Box3
@@ -194,24 +192,6 @@ class Model {
     return meshes;
   }
 
-  private _getAllImages() {
-    const meshes = this._getAllMeshes();
-    const materials = meshes.reduce((mats, mesh) => {
-      if (Array.isArray(mesh.material)) {
-        return [...mats, ...mesh.material];
-      } else {
-        return [...mats, mesh.material];
-      }
-    }, []);
-    const images = materials.reduce((imgs, mat) => {
-      const maps = STANDARD_MAPS.map(map => mat[map]?.image).filter(val => !!val);
-
-      return [...imgs, ...maps];
-    }, []);
-
-    return images;
-  }
-
   private _hasSkinnedMesh(): boolean {
     return this._getAllMeshes().some(mesh => (mesh as THREE.SkinnedMesh).isSkinnedMesh);
   }
@@ -219,42 +199,16 @@ class Model {
   private _forEachSkinnedVertices(mesh: THREE.SkinnedMesh, callback: (vertex: THREE.Vector3) => any) {
     const geometry = mesh.geometry;
     const positions = geometry.attributes.position;
-    const skinIndicies = geometry.attributes.skinIndex;
     const skinWeights = geometry.attributes.skinWeight;
     const skeleton = mesh.skeleton;
 
     skeleton.update();
-    const boneMatricies = skeleton.boneMatrices;
 
     const positionScale = getAttributeScale(positions);
     const skinWeightScale = getAttributeScale(skinWeights);
 
     for (let posIdx = 0; posIdx < positions.count; posIdx++) {
-      const pos = new Vector3().fromBufferAttribute(positions, posIdx).multiplyScalar(positionScale);
-      const skinned = new THREE.Vector4(0, 0, 0, 0);
-      const skinVertex = new THREE.Vector4(pos.x, pos.y, pos.z).applyMatrix4(mesh.bindMatrix);
-
-      const weights = [
-        skinWeights.getX(posIdx),
-        skinWeights.getY(posIdx),
-        skinWeights.getZ(posIdx),
-        skinWeights.getW(posIdx)
-      ].map(weight => weight * skinWeightScale);
-
-      const indicies = [
-        skinIndicies.getX(posIdx),
-        skinIndicies.getY(posIdx),
-        skinIndicies.getZ(posIdx),
-        skinIndicies.getW(posIdx)
-      ];
-
-      weights.forEach((weight, index) => {
-        const boneMatrix = new THREE.Matrix4().fromArray(boneMatricies, indicies[index] * 16);
-        skinned.add(skinVertex.clone().applyMatrix4(boneMatrix).multiplyScalar(weight));
-      });
-
-      const transformed = new THREE.Vector3().fromArray(skinned.applyMatrix4(mesh.bindMatrixInverse).toArray());
-      transformed.applyMatrix4(mesh.matrixWorld);
+      const transformed = getSkinnedVertex(posIdx, mesh, positionScale, skinWeightScale);
 
       callback(transformed);
     }

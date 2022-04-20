@@ -18,6 +18,7 @@ class AnimationControl implements CameraControl {
   // Options
   private _from: Pose;
   private _to: Pose;
+  private _disableOnFinish: boolean;
 
   // Internal values
   private _view3D: View3D;
@@ -59,10 +60,27 @@ class AnimationControl implements CameraControl {
    */
   public constructor(view3D: View3D, from: Pose, to: Pose, {
     duration = DEFAULT.ANIMATION_DURATION,
-    easing = DEFAULT.EASING
+    easing = DEFAULT.EASING,
+    disableOnFinish = true
   } = {}) {
     this._view3D = view3D;
 
+    this._motion = new Motion({ duration, range: DEFAULT.ANIMATION_RANGE, easing });
+    this._disableOnFinish = disableOnFinish;
+
+    this.changeStartEnd(from, to);
+  }
+
+  /**
+   * Destroy the instance and remove all event listeners attached
+   * This also will reset CSS cursor to intial
+   * @returns {void}
+   */
+  public destroy(): void {
+    this.disable();
+  }
+
+  public changeStartEnd(from: Pose, to: Pose) {
     from = from.clone();
     to = to.clone();
 
@@ -76,18 +94,8 @@ class AnimationControl implements CameraControl {
         : to.yaw - 360;
     }
 
-    this._motion = new Motion({ duration, range: DEFAULT.ANIMATION_RANGE, easing });
     this._from = from;
     this._to = to;
-  }
-
-  /**
-   * Destroy the instance and remove all event listeners attached
-   * This also will reset CSS cursor to intial
-   * @returns {void}
-   */
-  public destroy(): void {
-    this.disable();
   }
 
   /**
@@ -113,8 +121,12 @@ class AnimationControl implements CameraControl {
     camera.pivot = from.pivot.clone().lerp(to.pivot, progress);
 
     if (progress >= 1) {
-      this.disable();
+      if (this._disableOnFinish) {
+        this.disable();
+      }
+
       this._finishCallbacks.forEach(callback => callback());
+      this.clearFinished();
     }
   }
 
@@ -126,8 +138,7 @@ class AnimationControl implements CameraControl {
     if (this._enabled) return;
 
     this._enabled = true;
-    this._motion.reset(0);
-    this._motion.setEndDelta(1);
+    this.reset();
   }
 
   /**
@@ -138,6 +149,11 @@ class AnimationControl implements CameraControl {
     if (!this._enabled) return;
 
     this._enabled = false;
+  }
+
+  public reset() {
+    this._motion.reset(0);
+    this._motion.setEndDelta(1);
   }
 
   /**

@@ -147,9 +147,9 @@ class AutoPlayer implements OptionGetters<AutoplayOptions> {
       return;
     }
 
-    const camera = this._view3D.camera;
+    const newPose = this._view3D.camera.newPose;
 
-    camera.yaw += this._speed * deltaTime / 100;
+    newPose.yaw += this._speed * deltaTime / 100;
   }
 
   /**

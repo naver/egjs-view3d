@@ -46,6 +46,11 @@ html[data-theme='dark'] .header-github-link::before {
   justify-content: center;
   align-items: center;
   z-index: 1;
+  pointer-events: none;
+}
+
+.view3d-overlay > * {
+  pointer-events: all;
 }
 
 .view3d-overlay.hidden {

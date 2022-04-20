@@ -14,6 +14,7 @@ import EnvironmentTab from "../components/playground/tab/EnvironmentTab";
 import DownloadTab from "../components/playground/tab/DownloadTab";
 import ModelInfo from "../components/playground/ModelInfo";
 import ResetIcon from "../../static/icon/reset.svg";
+import FaceAnnotation from "../../../src/core/annotation/FaceAnnotation";
 
 const menus = [
   {
@@ -240,22 +241,25 @@ class Playground extends React.Component<{}, {
 
       view3D.annotation.wrapper.appendChild(el);
 
-      const added = view3D.annotation.add({
+      const newAnnotation = new FaceAnnotation(view3D, {
         element: el,
-        position: intersects[0].point.toArray(),
-        // FIXME: current position based
-        focus: [currentPose.yaw, currentPose.pitch, currentPose.zoom]
-      })[0];
+        focus: [currentPose.yaw, currentPose.pitch, currentPose.zoom],
+        meshIndex: model.meshes.findIndex(mesh => mesh === intersects[0].object),
+        faceIndex: intersects[0].faceIndex
+      });
+      view3D.annotation.add(newAnnotation);
 
       removeButton.addEventListener("click", () => {
-        const itemIdx = view3D.annotation.list.findIndex(item => item === added);
+        const itemIdx = view3D.annotation.list.findIndex(item => item === newAnnotation);
 
         if (itemIdx >= 0) {
           view3D.annotation.remove(itemIdx);
+          this.setState({});
         }
       });
 
       view3D.renderer.renderSingleFrame();
+      this.setState({});
     });
   }
 }

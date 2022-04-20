@@ -216,13 +216,13 @@ class ModelAnimator {
     this._flushFadePromises();
     this._restoreTimeScale();
     activeAction.fadeOut(duration / 1000);
-    this._activeAnimationIdx = -1;
 
     const fadePromise = new Promise<boolean>(resolve => {
       const onFrame = () => {
         if (activeAction.getEffectiveWeight() > 0) return;
 
         view3D.off(EVENTS.BEFORE_RENDER, onFrame);
+        this._activeAnimationIdx = -1;
         resolve(true);
       };
 

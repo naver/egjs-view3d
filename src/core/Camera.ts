@@ -181,6 +181,7 @@ class Camera {
 
       this.updatePosition();
       control.sync();
+      view3D.renderer.renderSingleFrame();
 
       return Promise.resolve();
     } else {

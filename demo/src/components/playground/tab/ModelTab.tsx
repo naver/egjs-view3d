@@ -52,6 +52,10 @@ class ModelTab extends React.Component<{
           </ul>
         </li>
       </div>
+      <p className="menu-label">Annotation</p>
+      <div className="menu-list">{
+        playground.view3D?.annotation.list.map((hotspot, idx) => <div key={idx}>{idx + 1}</div>)
+      }</div>
     </>;
   }
 

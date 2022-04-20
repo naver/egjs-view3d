@@ -12,7 +12,7 @@ import AutoResizer from "./core/AutoResizer";
 import Model from "./core/Model";
 import ModelAnimator from "./core/ModelAnimator";
 import ARManager from "./core/ARManager";
-import AnnotationManager from "./core/AnnotationManager";
+import AnnotationManager from "./core/annotation/AnnotationManager";
 import { ShadowOptions } from "./core/ShadowPlane";
 import View3DError from "./core/View3DError";
 import OrbitControl from "./control/OrbitControl";
@@ -463,7 +463,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   /**
    * Breakpoints for the annotation opacity, mapped by degree between (camera-pivot-annotation) as key.
    * @type {Record<number, number>}
-   * @default { 165: 0, 135: 0.4 }
+   * @default { 165: 0, 135: 0.4, 0: 1 }
    */
   public get annotationBreakpoints() { return this._annotationBreakpoints; }
   /**
@@ -817,6 +817,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     const newSize = renderer.size;
     this._camera.resize(newSize, prevSize);
     this._control.resize(newSize);
+    this._annotationManager.resize();
 
     // Prevent flickering on resize
     renderer.renderSingleFrame();
@@ -859,6 +860,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     const scene = this._scene;
     const camera = this._camera;
     const animator = this._animator;
+    const annotationManager = this._annotationManager;
     const inXR = renderer.threeRenderer.xr.isPresenting;
 
     scene.reset();
@@ -877,6 +879,9 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     if (model.animations.length > 0) {
       animator.play(0);
     }
+
+    annotationManager.reset();
+    annotationManager.collect();
 
     this._model = model;
 

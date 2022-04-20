@@ -104,6 +104,7 @@ export const DEFAULT_CLASS = {
   AR_OVERLAY: "view3d-ar-overlay",
   ANNOTATION_WRAPPER: "view3d-annotation-wrapper",
   ANNOTATION: "view3d-annotation",
+  ANNOTATION_TOOLTIP: "view3d-annotation-tooltip",
   ANNOTATION_DEFAULT: "default",
   ANNOTATION_SELECTED: "selected",
   ANNOTATION_FLIP_X: "flip-x",

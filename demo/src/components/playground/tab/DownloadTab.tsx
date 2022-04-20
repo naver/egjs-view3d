@@ -185,8 +185,7 @@ class DownloadTab extends React.Component<{
           const texture = gltfTextures.find(tex => tex.source === idx);
           const threeTexture = textures.get(imageURI[imageURI.length - 1]);
 
-          const modelImages = origModel.json?.images ?? [];
-          const mimeType = modelImages[idx]?.mimeType ?? "image/png";
+          const mimeType = gltfImage.mimeType ?? "image/png";
           const type = mimeType.split("/")[1];
           const imgFileName = `${modelName}${idx}`;
           const { image } = threeTexture;
