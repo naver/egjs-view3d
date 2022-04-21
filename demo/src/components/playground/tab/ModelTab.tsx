@@ -54,7 +54,16 @@ class ModelTab extends React.Component<{
       </div>
       <p className="menu-label">Annotation</p>
       <div className="menu-list">{
-        playground.view3D?.annotation.list.map((hotspot, idx) => <div key={idx}>{idx + 1}</div>)
+        playground.view3D?.annotation.list.map((hotspot, idx) => <div key={idx} className="is-flex is-align-items-center mt-2">
+          <span className="has-text-weight-bold">{idx + 1}</span>
+          <button className="button is-small ml-2" onClick={() => {
+            hotspot.focus();
+          }}>Focus</button>
+          <button className="button is-small is-danger ml-2" onClick={() => {
+            playground.view3D?.annotation.remove(idx);
+            this.forceUpdate();
+          }}>Remove</button>
+        </div>)
       }</div>
     </>;
   }

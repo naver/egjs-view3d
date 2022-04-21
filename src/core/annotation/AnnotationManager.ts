@@ -122,8 +122,9 @@ class AnnotationManager {
    */
   public render() {
     const view3D = this._view3D;
+    const model = view3D.model;
 
-    if (!view3D.model) return;
+    if (!model) return;
 
     const camera = view3D.camera;
     const threeRenderer = view3D.renderer.threeRenderer;
@@ -131,7 +132,7 @@ class AnnotationManager {
     const halfScreenSize = screenSize.clone().multiplyScalar(0.5);
     const threeCamera = camera.threeCamera;
     const camPos = threeCamera.position;
-    const camPivot = camera.pivot;
+    const modelCenter = model.bbox.getCenter(new THREE.Vector3());
     const breakpoints = view3D.annotationBreakpoints;
 
     // Sort by distance most far to camera (descending)
@@ -147,7 +148,7 @@ class AnnotationManager {
         };
       }).sort((a, b) => b.distToCameraSquared - a.distToCameraSquared);
 
-    const pivotToCamDir = new THREE.Vector3().subVectors(camPos, camPivot).normalize();
+    const centerToCamDir = new THREE.Vector3().subVectors(camPos, modelCenter).normalize();
     const breakpointKeysDesc = Object.keys(breakpoints)
       .map(val => parseFloat(val))
       .sort((a, b) => b - a);
@@ -157,8 +158,8 @@ class AnnotationManager {
 
       const screenRelPos = position.clone().project(threeCamera);
       const screenPos = new THREE.Vector2(screenRelPos.x, -screenRelPos.y);
-      const pivotToAnnotationDir = new THREE.Vector3().subVectors(position, camPivot).normalize();
-      const camToAnnotationDegree = toDegree(Math.abs(Math.acos(pivotToAnnotationDir.dot(pivotToCamDir))));
+      const centerToAnnotationDir = new THREE.Vector3().subVectors(position, modelCenter).normalize();
+      const camToAnnotationDegree = toDegree(Math.abs(Math.acos(centerToAnnotationDir.dot(centerToCamDir))));
 
       screenPos.multiply(halfScreenSize);
       screenPos.add(halfScreenSize);

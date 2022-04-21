@@ -9,12 +9,13 @@ import Layout from "@theme/Layout";
 import styles from "./playground.module.css";
 
 import VanillaView3D, { GLTFLoader, LoadingBar } from "../../../src";
+import FaceAnnotation from "../../../src/core/annotation/FaceAnnotation";
+import { directionToYawPitch, toDegree } from "../../../src/utils";
 import ModelTab from "../components/playground/tab/ModelTab";
 import EnvironmentTab from "../components/playground/tab/EnvironmentTab";
 import DownloadTab from "../components/playground/tab/DownloadTab";
 import ModelInfo from "../components/playground/ModelInfo";
 import ResetIcon from "../../static/icon/reset.svg";
-import FaceAnnotation from "../../../src/core/annotation/FaceAnnotation";
 
 const menus = [
   {
@@ -241,11 +242,15 @@ class Playground extends React.Component<{}, {
 
       view3D.annotation.wrapper.appendChild(el);
 
+      const intersect = intersects[0];
+      const normal = intersect.face.normal.normalize();
+      const { yaw, pitch } = directionToYawPitch(normal);
+
       const newAnnotation = new FaceAnnotation(view3D, {
         element: el,
-        focus: [currentPose.yaw, currentPose.pitch, currentPose.zoom],
+        focus: [currentPose.yaw - toDegree(yaw), currentPose.pitch - toDegree(pitch), currentPose.zoom],
         meshIndex: model.meshes.findIndex(mesh => mesh === intersects[0].object),
-        faceIndex: intersects[0].faceIndex
+        faceIndex: intersect.faceIndex
       });
       view3D.annotation.add(newAnnotation);
 

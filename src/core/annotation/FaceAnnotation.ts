@@ -130,7 +130,7 @@ class FaceAnnotation extends Annotation {
 
     const atoB = new THREE.Vector3().subVectors(animated[1], animated[0]).normalize();
     const atoC = new THREE.Vector3().subVectors(animated[2], animated[0]).normalize();
-    const normal = new THREE.Vector3().crossVectors(atoB, atoC);
+    const normal = new THREE.Vector3().crossVectors(atoB, atoC).normalize();
 
     return normal;
   }
@@ -152,28 +152,25 @@ class FaceAnnotation extends Annotation {
     const mesh = model.meshes[this._meshIndex];
     const indexes = mesh.geometry.getIndex()!;
     const face = (indexes.array as TypedArray).slice(3 * faceIndex, 3 * faceIndex + 3);
-    const hasAnimation = model.animations.length > 0;
 
-    if (hasAnimation) {
-      if ((mesh as THREE.SkinnedMesh).isSkinnedMesh) {
-        const geometry = mesh.geometry;
-        const positions = geometry.attributes.position;
-        const skinWeights = geometry.attributes.skinWeight;
+    if ((mesh as THREE.SkinnedMesh).isSkinnedMesh) {
+      const geometry = mesh.geometry;
+      const positions = geometry.attributes.position;
+      const skinWeights = geometry.attributes.skinWeight;
 
-        const positionScale = getAttributeScale(positions);
-        const skinWeightScale = getAttributeScale(skinWeights);
+      const positionScale = getAttributeScale(positions);
+      const skinWeightScale = getAttributeScale(skinWeights);
 
-        vertices.forEach((vertex, idx) => {
-          const posIdx = face[idx];
-          const transformed = getSkinnedVertex(posIdx, mesh as THREE.SkinnedMesh, positionScale, skinWeightScale);
+      vertices.forEach((vertex, idx) => {
+        const posIdx = face[idx];
+        const transformed = getSkinnedVertex(posIdx, mesh as THREE.SkinnedMesh, positionScale, skinWeightScale);
 
-          vertex.copy(transformed);
-        });
-      } else {
-        vertices.forEach(vertex => {
-          vertex.applyMatrix4(mesh.matrixWorld);
-        });
-      }
+        vertex.copy(transformed);
+      });
+    } else {
+      vertices.forEach(vertex => {
+        vertex.applyMatrix4(mesh.matrixWorld);
+      });
     }
 
     return vertices;
