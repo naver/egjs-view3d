@@ -166,7 +166,7 @@ class Camera {
    * @param {Pose} [pose] Pose to reset, camera will reset to `defaultPose` if pose is not given.
    * @returns Promise that resolves when the animation finishes
    */
-  public async reset(duration: number = 0, easing: (x: number) => number = DEFAULT.EASING, pose?: Pose): Promise<void> {
+  public reset(duration: number = 0, easing: (x: number) => number = DEFAULT.EASING, pose?: Pose): Promise<void> {
     const view3D = this._view3D;
     const control = view3D.control;
     const autoPlayer = view3D.autoPlayer;
@@ -179,9 +179,8 @@ class Camera {
       newPose.copy(targetPose);
       currentPose.copy(targetPose);
 
-      this.updatePosition();
-      control.sync();
       view3D.renderer.renderSingleFrame();
+      control.sync();
 
       return Promise.resolve();
     } else {

@@ -7,6 +7,7 @@ import MeshSimplification from "../item/MeshSimplification";
 import Playground from "../../../pages/Playground";
 import MenuItem from "../MenuItem";
 import Range from "../../Range";
+import RemoveIcon from "../../../../static/icon/remove.svg";
 
 class ModelTab extends React.Component<{
   playground: Playground;
@@ -56,13 +57,14 @@ class ModelTab extends React.Component<{
       <div className="menu-list">{
         playground.view3D?.annotation.list.map((hotspot, idx) => <div key={idx} className="is-flex is-align-items-center mt-2">
           <span className="has-text-weight-bold">{idx + 1}</span>
+          <input type="text" placeholder="Label" />
           <button className="button is-small ml-2" onClick={() => {
             hotspot.focus();
           }}>Focus</button>
           <button className="button is-small is-danger ml-2" onClick={() => {
             playground.view3D?.annotation.remove(idx);
             this.forceUpdate();
-          }}>Remove</button>
+          }}><RemoveIcon fill="white" width="24" height="24" /></button>
         </div>)
       }</div>
     </>;

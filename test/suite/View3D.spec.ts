@@ -7,6 +7,7 @@ import {
   Renderer,
   Scene,
   ARManager,
+  AnnotationManager,
   AutoPlayer,
   TONE_MAPPING,
   ERROR_CODES,
@@ -47,6 +48,10 @@ describe("View3D", () => {
 
     it("should have XRManager in it", async () => {
       expect((await createView3D()).ar).to.be.instanceOf(ARManager);
+    });
+
+    it("should have AnnotationManager in it", async () => {
+      expect((await createView3D()).annotation).to.be.instanceOf(AnnotationManager);
     });
 
     it("should have root element in it", async () => {

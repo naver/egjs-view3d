@@ -234,12 +234,6 @@ class Playground extends React.Component<{}, {
       tooltip.classList.add("default");
       el.appendChild(tooltip);
 
-      const removeButton = document.createElement("button");
-      removeButton.classList.add("button");
-      removeButton.classList.add("is-danger");
-      removeButton.innerHTML = "REMOVE";
-      tooltip.appendChild(removeButton);
-
       view3D.annotation.wrapper.appendChild(el);
 
       const intersect = intersects[0];
@@ -253,17 +247,8 @@ class Playground extends React.Component<{}, {
         faceIndex: intersect.faceIndex
       });
       view3D.annotation.add(newAnnotation);
-
-      removeButton.addEventListener("click", () => {
-        const itemIdx = view3D.annotation.list.findIndex(item => item === newAnnotation);
-
-        if (itemIdx >= 0) {
-          view3D.annotation.remove(itemIdx);
-          this.setState({});
-        }
-      });
-
       view3D.renderer.renderSingleFrame();
+
       this.setState({});
     });
   }

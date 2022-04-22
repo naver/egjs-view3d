@@ -137,7 +137,7 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
 
     const delta = new THREE.Vector2(
       this._xMotion.update(deltaTime),
-      this._yMotion.update(deltaTime),
+      this._yMotion.update(deltaTime)
     );
 
     const viewXDir = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.threeCamera.quaternion);

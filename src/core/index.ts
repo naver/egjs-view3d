@@ -38,3 +38,5 @@ export {
 export type {
   AutoplayOptions
 };
+
+export * from "./annotation";

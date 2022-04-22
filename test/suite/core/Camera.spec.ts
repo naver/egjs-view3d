@@ -49,37 +49,36 @@ describe("Camera", () => {
 
   describe("reset", () => {
     it("should set pose to default pose immediately if duration = 0", async () => {
-      const camera = (await createView3D()).camera;
-      camera.yaw = 90;
-      camera.pitch = 45;
-      camera.zoom = 50;
-      camera.pivot = new THREE.Vector3(2, 2, 2);
+      const camera = (await createView3D({ src: "/cube.glb" })).camera;
+      camera.newPose.yaw = 90;
+      camera.newPose.pitch = 45;
+      camera.newPose.zoom = 50;
+      camera.newPose.pivot = new THREE.Vector3(2, 2, 2);
 
+      camera.updatePosition();
       const poseBeforeReset = camera.currentPose.clone();
       camera.reset(0);
 
-      expect(poseBeforeReset).not.to.deep.equal(camera.defaultPose);
-      expect(camera.currentPose).to.deep.equal(camera.defaultPose);
+      expect(poseBeforeReset.equals(camera.defaultPose)).to.be.false;
+      expect(camera.currentPose.equals(camera.defaultPose)).to.be.true;
     });
 
     it("should set pose to default pose after given duration if duration > 0", async () => {
-      const view3D = await createView3D();
+      const view3D = await createView3D({ src: "/cube.glb" });
       const camera = view3D.camera;
-      camera.yaw = 90;
-      camera.pitch = 45;
-      camera.zoom = 50;
-      camera.pivot = new THREE.Vector3(2, 2, 2);
+      camera.newPose.yaw = 90;
+      camera.newPose.pitch = 45;
+      camera.newPose.zoom = 50;
+      camera.newPose.pivot = new THREE.Vector3(2, 2, 2);
 
+      camera.updatePosition();
       const poseBeforeReset = camera.currentPose.clone();
       view3D.renderer.setAnimationLoop(view3D.renderer.defaultRenderLoop);
 
       await camera.reset(500);
 
-      expect(poseBeforeReset).not.to.deep.equal(camera.defaultPose);
-      expect(camera.currentPose.pitch).to.equal(camera.defaultPose.pitch);
-      expect(camera.currentPose.yaw).to.equal(camera.defaultPose.yaw);
-      expect(camera.currentPose.zoom).to.equal(camera.defaultPose.zoom);
-      expect(camera.currentPose.pivot).to.deep.equal(camera.defaultPose.pivot);
+      expect(poseBeforeReset.equals(camera.defaultPose)).to.be.false;
+      expect(camera.currentPose.equals(camera.defaultPose)).to.be.true;
     });
   });
 
