@@ -194,7 +194,7 @@ export const getRotatedPosition = (distance: number, yawDeg: number, pitchDeg: n
 export const directionToYawPitch = (direction: THREE.Vector3) => {
   const xz = new THREE.Vector2(direction.x, direction.z);
   const origin = new THREE.Vector2();
-  const yaw = direction.y <= 0.99
+  const yaw = Math.abs(direction.y) <= 0.99
     ? getRotationAngle(origin, new THREE.Vector2(0, 1), xz)
     : 0;
   const pitch = Math.atan2(direction.y, xz.distanceTo(origin));

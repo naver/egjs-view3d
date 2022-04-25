@@ -4,9 +4,10 @@
  */
 
 import * as THREE from "three";
-import { Vector3 } from "three";
 
 import { getAttributeScale, getSkinnedVertex } from "../utils";
+
+import { Annotation } from "./annotation";
 
 /**
  * Data class for loaded 3d model
@@ -16,6 +17,7 @@ class Model {
   private _scene: THREE.Group;
   private _bbox: THREE.Box3;
   private _animations: THREE.AnimationClip[];
+  private _annotations: Annotation[];
   private _fixSkinnedBbox: boolean;
 
   /**
@@ -34,6 +36,11 @@ class Model {
    * @readonly
    */
   public get animations() { return this._animations; }
+  /**
+   * {@link Annotation}s included inside the model
+   * @readonly
+   */
+  public get annotations() { return this._annotations; }
   /**
    * {@link https://threejs.org/docs/#api/en/objects/Mesh THREE.Mesh}es inside model if there's any.
    * @readonly
@@ -80,6 +87,7 @@ class Model {
     src,
     scenes,
     animations = [],
+    annotations = [],
     fixSkinnedBbox = false,
     castShadow = true,
     receiveShadow = false
@@ -87,6 +95,7 @@ class Model {
     src: string;
     scenes: THREE.Object3D[];
     animations?: THREE.AnimationClip[];
+    annotations?: Annotation[];
     fixSkinnedBbox?: boolean;
     castShadow?: boolean;
     receiveShadow?: boolean;
@@ -97,6 +106,7 @@ class Model {
     scene.add(...scenes);
 
     this._animations = animations;
+    this._annotations = annotations;
     this._scene = scene;
     const bbox = this._getInitialBbox(fixSkinnedBbox);
 

@@ -55,18 +55,31 @@ class AnnotationManager {
     });
   }
 
+  /**
+   * Destroy all annotations & event handlers
+   */
   public destroy() {
-    this._list.forEach(annotation => {
-      annotation.disableEvents();
+    this._view3D.control.controls.forEach(control => {
+      control.off({
+        [CONTROL_EVENTS.HOLD]: this._onInput
+      });
     });
+
+    this.reset();
   }
 
+  /**
+   * Resize annotations
+   */
   public resize() {
     this._list.forEach(annotation => {
       annotation.resize();
     });
   }
 
+  /**
+   * Collect annotations inside the wrapper element
+   */
   public collect() {
     const view3D = this._view3D;
     const wrapper = this._wrapper;
@@ -110,11 +123,53 @@ class AnnotationManager {
       }
     });
 
-    annotations.forEach(annotation => {
-      annotation.enableEvents();
+    this.add(...annotations);
+  }
+
+  /**
+   * Load annotation JSON from URL
+   * @param {string} url URL to annotations json
+   */
+  public load(url: string): Promise<Annotation[]> {
+    const fileLoader = new THREE.FileLoader();
+
+    return new Promise((resolve, reject) => {
+      fileLoader.load(url, json => {
+        const data = JSON.parse(json as string);
+        const parsed = this.parse(data);
+
+        this.add(...parsed);
+
+        resolve(parsed);
+      }, undefined, error => {
+        reject(error);
+      });
+    });
+  }
+
+  /**
+   * Parse an array of annotation data
+   * @param {object[]} data An array of annotation data
+   */
+  public parse(data: Array<Record<string, any>>): Annotation[] {
+    const view3D = this._view3D;
+    const annotations = data.map(annotationData => {
+      const element = this._createDefaultAnnotationElement(annotationData.label);
+
+      if (annotationData.meshIndex != null) {
+        return new FaceAnnotation(view3D, {
+          ...annotationData,
+          element
+        });
+      } else {
+        return new PointAnnotation(view3D, {
+          ...annotationData,
+          element
+        });
+      }
     });
 
-    this._list.push(...annotations);
+    return annotations;
   }
 
   /**
@@ -185,8 +240,14 @@ class AnnotationManager {
    * @param {Annotation} annotations Annotations to add
    */
   public add(...annotations: Annotation[])  {
+    const wrapper = this._wrapper;
+
     annotations.forEach(annotation => {
       annotation.enableEvents();
+
+      if (annotation.element && annotation.element.parentElement !== wrapper) {
+        wrapper.appendChild(annotation.element);
+      }
     });
 
     this._list.push(...annotations);
@@ -225,6 +286,21 @@ class AnnotationManager {
     view3D.rootEl.appendChild(wrapper);
 
     return wrapper;
+  }
+
+  private _createDefaultAnnotationElement(label: string | null): HTMLElement {
+    const annotation = document.createElement("div");
+
+    annotation.classList.add(DEFAULT_CLASS.ANNOTATION);
+    annotation.classList.add(DEFAULT_CLASS.ANNOTATION_DEFAULT);
+
+    if (label) {
+      const tooltip = document.createElement("div");
+      tooltip.classList.add(DEFAULT_CLASS.ANNOTATION_TOOLTIP);
+      annotation.appendChild(tooltip);
+    }
+
+    return annotation;
   }
 
   private _onInput = () => {

@@ -69,6 +69,7 @@ abstract class Annotation {
 
   public abstract focus(): Promise<void>;
   public abstract unfocus(): void;
+  public abstract toJSON(): Record<string, any>;
 
   public destroy() {
     const wrapper = this._view3D.annotation.wrapper;

@@ -731,6 +731,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._control.destroy();
     this._autoResizer.disable();
     this._animator.reset();
+    this._annotationManager.destroy();
     this._plugins.forEach(plugin => plugin.teardown(this));
     this._plugins = [];
   }
@@ -882,6 +883,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
     annotationManager.reset();
     annotationManager.collect();
+    annotationManager.add(...model.annotations);
 
     this._model = model;
 

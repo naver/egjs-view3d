@@ -210,6 +210,7 @@ class Playground extends React.Component<{}, {
     const view3D = this._view3D;
     const canvas = view3D.renderer.canvas;
     const raycaster = new THREE.Raycaster();
+
     canvas.addEventListener("dblclick", evt => {
       const model = view3D.model;
       if (!model) return;
@@ -237,12 +238,10 @@ class Playground extends React.Component<{}, {
       view3D.annotation.wrapper.appendChild(el);
 
       const intersect = intersects[0];
-      const normal = intersect.face.normal.normalize();
-      const { yaw, pitch } = directionToYawPitch(normal);
 
       const newAnnotation = new FaceAnnotation(view3D, {
         element: el,
-        focus: [currentPose.yaw - toDegree(yaw), currentPose.pitch - toDegree(pitch), currentPose.zoom],
+        focus: [currentPose.yaw, currentPose.pitch, currentPose.zoom],
         meshIndex: model.meshes.findIndex(mesh => mesh === intersects[0].object),
         faceIndex: intersect.faceIndex
       });

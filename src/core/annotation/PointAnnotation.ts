@@ -82,6 +82,14 @@ class PointAnnotation extends Annotation {
     el.classList.remove(DEFAULT_CLASS.ANNOTATION_SELECTED);
   }
 
+  public toJSON() {
+    return {
+      position: this._position.toArray(),
+      focus: this._focus,
+      duration: this._focusDuration
+    };
+  }
+
   private _calculateNormalFromModelCenter(): THREE.Vector3 {
     const view3D = this._view3D;
     const model = view3D.model;

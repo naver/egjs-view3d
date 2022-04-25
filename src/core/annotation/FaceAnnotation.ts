@@ -8,7 +8,7 @@ import View3D from "../../View3D";
 import Pose from "../Pose";
 import AnimationControl from "../../control/AnimationControl";
 import { DEFAULT_CLASS } from "../../const/external";
-import { directionToYawPitch, getAttributeScale, getSkinnedVertex, toDegree } from "../../utils";
+import { getAttributeScale, getSkinnedVertex } from "../../utils";
 import { TypedArray } from "../../type/utils";
 
 import Annotation, { AnnotationOptions } from "./Annotation";
@@ -65,6 +65,7 @@ class FaceAnnotation extends Annotation {
       duration: this._focusDuration,
       disableOnFinish: false
     });
+
     this._trackingControl = trackingControl;
 
     trackingControl.enable();
@@ -109,30 +110,17 @@ class FaceAnnotation extends Annotation {
     trackingControl.reset();
   }
 
-  private _getFocus(): THREE.Vector3 {
-    const focus = new THREE.Vector3().fromArray(this._focus);
-
-    // Reset focus yaw/pitch by face normal
-    const normal = this._getFaceNormal();
-    const { yaw, pitch } = directionToYawPitch(normal);
-
-    focus.x += toDegree(yaw);
-    focus.y += toDegree(pitch);
-
-    return focus;
+  public toJSON() {
+    return {
+      meshIndex: this._meshIndex,
+      faceIndex: this._faceIndex,
+      focus: this._focus,
+      duration: this._focusDuration
+    };
   }
 
-  private _getFaceNormal(): THREE.Vector3 {
-    const vertices = this._getVertices();
-    if (!vertices) return new THREE.Vector3();
-
-    const animated = this._getAnimatedVertices(vertices);
-
-    const atoB = new THREE.Vector3().subVectors(animated[1], animated[0]).normalize();
-    const atoC = new THREE.Vector3().subVectors(animated[2], animated[0]).normalize();
-    const normal = new THREE.Vector3().crossVectors(atoB, atoC).normalize();
-
-    return normal;
+  private _getFocus(): THREE.Vector3 {
+    return new THREE.Vector3().fromArray(this._focus);
   }
 
   private _getPosition(): THREE.Vector3 {
