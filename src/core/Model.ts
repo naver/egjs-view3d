@@ -199,7 +199,7 @@ class Model {
       }
     });
 
-    return meshes;
+    return meshes.sort((a, b) => a.name.localeCompare(b.name));
   }
 
   private _hasSkinnedMesh(): boolean {

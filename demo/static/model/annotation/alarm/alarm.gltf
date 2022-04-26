@@ -655,7 +655,7 @@
           "levels": [
             {
               "size": 2048,
-              "index": 6
+              "index": 7
             }
           ]
         }
@@ -693,7 +693,7 @@
           "levels": [
             {
               "size": 2048,
-              "index": 7
+              "index": 6
             }
           ]
         }
@@ -718,7 +718,7 @@
       }
     },
     {
-      "sampler": 1,
+      "sampler": 3,
       "source": 12,
       "extensions": {
         "EXT_texture_webp": {
@@ -727,7 +727,7 @@
       }
     },
     {
-      "sampler": 3,
+      "sampler": 1,
       "source": 14,
       "extensions": {
         "EXT_texture_webp": {
@@ -813,19 +813,19 @@
     },
     {
       "mimeType": "image/png",
-      "uri": "alarm1_2048.png"
-    },
-    {
-      "mimeType": "image/webp",
-      "uri": "alarm1_2048.webp"
-    },
-    {
-      "mimeType": "image/png",
       "uri": "alarm3_2048.png"
     },
     {
       "mimeType": "image/webp",
       "uri": "alarm3_2048.webp"
+    },
+    {
+      "mimeType": "image/png",
+      "uri": "alarm1_2048.png"
+    },
+    {
+      "mimeType": "image/webp",
+      "uri": "alarm1_2048.webp"
     }
   ],
   "meshes": [
@@ -907,37 +907,48 @@
   "extras": {
     "view3d-annotation": [
       {
-        "meshIndex": 1,
-        "faceIndex": 1397,
+        "meshIndex": 0,
+        "faceIndex": 1350,
         "focus": [
-          346.0840336134454,
-          59.743589743589574,
-          40
+          27.63025210084033,
+          10.596892886345088,
+          36
         ],
         "duration": 1000,
-        "label": null
+        "label": "Hammer"
       },
       {
-        "meshIndex": 1,
-        "faceIndex": 2867,
+        "meshIndex": 0,
+        "faceIndex": 2864,
         "focus": [
-          190.78244631185734,
-          12.051282051281934,
-          42
+          175.058823529412,
+          6.475878986099791,
+          38
         ],
         "duration": 1000,
-        "label": null
+        "label": "Backplate"
       },
       {
-        "meshIndex": 1,
-        "faceIndex": 1791,
+        "meshIndex": 0,
+        "faceIndex": 1855,
         "focus": [
-          277.7142857142857,
-          -34.77179487179492,
-          22
+          311.3949579831932,
+          -38.41373671300078,
+          12
         ],
         "duration": 1000,
-        "label": null
+        "label": "Leg1"
+      },
+      {
+        "meshIndex": 0,
+        "faceIndex": 1642,
+        "focus": [
+          37.71428571428568,
+          -42.82910874897788,
+          12
+        ],
+        "duration": 1000,
+        "label": "Leg2"
       }
     ]
   }

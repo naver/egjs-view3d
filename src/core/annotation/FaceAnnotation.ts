@@ -173,7 +173,7 @@ class FaceAnnotation extends Annotation {
     if (!model || meshIndex < 0 || faceIndex < 0) return null;
 
     const mesh = model.meshes[meshIndex];
-    const indexes = mesh?.geometry.getIndex();
+    const indexes = mesh?.geometry.index;
     const face = (indexes?.array as TypedArray).slice(3 * faceIndex, 3 * faceIndex + 3);
 
     if (!mesh || !indexes || !face || face.length < 3) return null;

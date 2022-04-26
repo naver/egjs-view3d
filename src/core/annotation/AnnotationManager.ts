@@ -297,6 +297,8 @@ class AnnotationManager {
     if (label) {
       const tooltip = document.createElement("div");
       tooltip.classList.add(DEFAULT_CLASS.ANNOTATION_TOOLTIP);
+      tooltip.classList.add(DEFAULT_CLASS.ANNOTATION_DEFAULT);
+      tooltip.innerHTML = label;
       annotation.appendChild(tooltip);
     }
 

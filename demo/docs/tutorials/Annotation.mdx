@@ -50,10 +50,10 @@ In that case, you have to add correct CSS for each elements yourself.
 <div class="view3d-wrapper">
   <canvas class="view3d-canvas"></canvas>
   <div class="view3d-annotation-wrapper">
-    <div class="view3d-annotation default" data-mesh-index="7" data-face-index="5" data-focus="0 0 15" data-duration="500">
+    <div class="view3d-annotation default" data-mesh-index="10" data-face-index="5" data-focus="0 0 15" data-duration="500">
       <div class="view3d-annotation-tooltip default">A thick eyebrow</div>
     </div>
-    <div class="view3d-annotation default" data-mesh-index="15" data-face-index="5" data-focus="30 15 30" data-duration="200">
+    <div class="view3d-annotation default" data-mesh-index="6" data-face-index="5" data-focus="30 15 30" data-duration="200">
       <div class="view3d-annotation-tooltip default">An animated robot arm</div>
     </div>
   </div>
@@ -62,6 +62,7 @@ In that case, you have to add correct CSS for each elements yourself.
 
 <>{(() => {
   const view3D = React.useRef();
+  console.log(view3D);
   return <View3D
     ref={view3D}
     src="/egjs-view3d/model/RobotExpressive.glb"
@@ -71,10 +72,10 @@ In that case, you have to add correct CSS for each elements yourself.
     }}
     showExampleCode>
     <div className="view3d-annotation-wrapper">
-      <div className="view3d-annotation default" data-mesh-index="7" data-face-index="5" data-focus="0 0 15" data-duration="500">
+      <div className="view3d-annotation default" data-mesh-index="10" data-face-index="5" data-focus="0 0 15" data-duration="500">
         <div className="view3d-annotation-tooltip default">A thick eyebrow</div>
       </div>
-      <div className="view3d-annotation default" data-mesh-index="15" data-face-index="5" data-focus="30 15 30" data-duration="200">
+      <div className="view3d-annotation default" data-mesh-index="6" data-face-index="5" data-focus="30 15 30" data-duration="200">
         <div className="view3d-annotation-tooltip default">An animated robot arm</div>
       </div>
     </div>
@@ -154,8 +155,7 @@ Adding `default` class will render tooltips in a default style, which has transl
 </View3D>
 
 ## Annotations inside glTF
-Annotations can be included in glTF files when saving 3D models with [Playground](/Playground)
-See the **Download** section.
+Annotations can be included in glTF files when saving 3D models with [Playground](/Playground) (See **Download** tab)
 
 <View3D
   src="/egjs-view3d/model/annotation/alarm/alarm.gltf"
@@ -163,12 +163,13 @@ See the **Download** section.
   showExampleCode />
 
 ## Load annotations from JSON file
-Annotations can be included in glTF files when saving 3D models with [Playground](/Playground)
-See the **Download** section.
+Annotations can be loaded from the saved JSON file made with [Playground](/Playground) (See **Model** tab)
+Use [annotationURL](/docs/options/annotation/annotationURL) to load it.
 
 <View3D
-  src="/egjs-view3d/model/annotation/alarm/alarm.gltf"
+  src="/egjs-view3d/model/draco/alarm.glb"
   envmap="/egjs-view3d/texture/sepulchral_chapel_rotunda_1k.hdr"
+  annotationURL="/egjs-view3d/model/annotation/alarm-annotations.json"
   showExampleCode />
 
 <License items={[
