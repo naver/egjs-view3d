@@ -8,7 +8,7 @@ import View3D from "../../View3D";
 import Pose from "../Pose";
 import AnimationControl from "../../control/AnimationControl";
 import { DEFAULT_CLASS } from "../../const/external";
-import { getAttributeScale, getSkinnedVertex } from "../../utils";
+import { getAttributeScale, getSkinnedVertex, range } from "../../utils";
 import { TypedArray } from "../../type/utils";
 
 import Annotation, { AnnotationOptions } from "./Annotation";
@@ -30,7 +30,7 @@ class FaceAnnotation extends Annotation {
   private _trackingControl: AnimationControl | null;
 
   public get position() { return this._getPosition(); }
-  public get renderable() { return super.renderable && this._meshIndex >= 0 && this._faceIndex >= 0; }
+  public get renderable() { return !!this._element && this._meshIndex >= 0 && this._faceIndex >= 0; }
 
   public get meshIndex() { return this._meshIndex; }
   public get faceIndex() { return this._faceIndex; }
@@ -173,13 +173,15 @@ class FaceAnnotation extends Annotation {
     if (!model || meshIndex < 0 || faceIndex < 0) return null;
 
     const mesh = model.meshes[meshIndex];
-    const indexes = mesh?.geometry.index;
-    const face = (indexes?.array as TypedArray).slice(3 * faceIndex, 3 * faceIndex + 3);
+    const indexes = mesh?.geometry.index?.array;
+    const face = indexes
+      ? range(3).map(idx => indexes[3 * faceIndex + idx])
+      : null;
 
-    if (!mesh || !indexes || !face || face.length < 3) return null;
+    if (!mesh || !indexes || !face || face.some(val => val == null)) return null;
 
     const position = mesh.geometry.getAttribute("position");
-    const vertices = [...face].map((index: number) => {
+    const vertices = face.map((index: number) => {
       return new THREE.Vector3().fromBufferAttribute(position, index);
     });
 
