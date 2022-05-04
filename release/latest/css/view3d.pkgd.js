@@ -4,7 +4,7 @@ name: @egjs/view3d
 license: MIT
 author: NAVER Corp.
 repository: https://github.com/naver/egjs-view3d
-version: 2.3.1
+version: 2.4.0
 */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -2456,7 +2456,7 @@ version: 2.3.1
       const queryResult = parentEl.querySelector(el);
 
       if (!queryResult) {
-        throw new View3DError(ERROR.MESSAGES.ELEMENT_NOT_FOUND(el), ERROR.CODES.ELEMENT_NOT_FOUND);
+        return null;
       }
 
       targetEl = queryResult;
@@ -2470,7 +2470,11 @@ version: 2.3.1
     const targetEl = getNullableElement(el, parent);
 
     if (!targetEl) {
-      throw new View3DError(ERROR.MESSAGES.WRONG_TYPE(el, ["HTMLElement", "string"]), ERROR.CODES.WRONG_TYPE);
+      if (isString(el)) {
+        throw new View3DError(ERROR.MESSAGES.ELEMENT_NOT_FOUND(el), ERROR.CODES.ELEMENT_NOT_FOUND);
+      } else {
+        throw new View3DError(ERROR.MESSAGES.WRONG_TYPE(el, ["HTMLElement", "string"]), ERROR.CODES.WRONG_TYPE);
+      }
     }
 
     return targetEl;
@@ -2495,6 +2499,13 @@ version: 2.3.1
     }
 
     return true;
+  };
+  const range = end => {
+    if (!end || end <= 0) {
+      return [];
+    }
+
+    return Array.apply(0, Array(end)).map((undef, idx) => idx);
   };
   const toRadian = x => x * Math.PI / 180;
   const toDegree = x => x * 180 / Math.PI;
@@ -2563,6 +2574,20 @@ version: 2.3.1
     newPos.z = newPos.z * Math.cos(-yaw);
     return newPos;
   };
+  /**
+   * In Radians
+   */
+
+  const directionToYawPitch = direction => {
+    const xz = new Vector2(direction.x, direction.z);
+    const origin = new Vector2();
+    const yaw = Math.abs(direction.y) <= 0.99 ? getRotationAngle(origin, new Vector2(0, 1), xz) : 0;
+    const pitch = Math.atan2(direction.y, xz.distanceTo(origin));
+    return {
+      yaw,
+      pitch
+    };
+  };
   const createLoadingContext = (view3D, src) => {
     const context = {
       src,
@@ -2573,6 +2598,41 @@ version: 2.3.1
     };
     view3D.loadingContext.push(context);
     return context;
+  };
+  const getAttributeScale = attrib => {
+    if (attrib.normalized && ArrayBuffer.isView(attrib.array)) {
+      const buffer = attrib.array;
+      const isSigned = isSignedArrayBuffer(buffer);
+      const scale = 1 / (Math.pow(2, 8 * buffer.BYTES_PER_ELEMENT) - 1);
+      return isSigned ? scale * 2 : scale;
+    } else {
+      return 1;
+    }
+  };
+  const getSkinnedVertex = (posIdx, mesh, positionScale, skinWeightScale) => {
+    const geometry = mesh.geometry;
+    const positions = geometry.attributes.position;
+    const skinIndicies = geometry.attributes.skinIndex;
+    const skinWeights = geometry.attributes.skinWeight;
+    const skeleton = mesh.skeleton;
+    const boneMatricies = skeleton.boneMatrices;
+    const pos = new Vector3().fromBufferAttribute(positions, posIdx).multiplyScalar(positionScale);
+    const skinned = new Vector4(0, 0, 0, 0);
+    const skinVertex = new Vector4(pos.x, pos.y, pos.z).applyMatrix4(mesh.bindMatrix);
+    const weights = [skinWeights.getX(posIdx), skinWeights.getY(posIdx), skinWeights.getZ(posIdx), skinWeights.getW(posIdx)].map(weight => weight * skinWeightScale);
+    const indicies = [skinIndicies.getX(posIdx), skinIndicies.getY(posIdx), skinIndicies.getZ(posIdx), skinIndicies.getW(posIdx)];
+    weights.forEach((weight, index) => {
+      const boneMatrix = new Matrix4().fromArray(boneMatricies, indicies[index] * 16);
+      skinned.add(skinVertex.clone().applyMatrix4(boneMatrix).multiplyScalar(weight));
+    });
+    const transformed = new Vector3().fromArray(skinned.applyMatrix4(mesh.bindMatrixInverse).toArray());
+    transformed.applyMatrix4(mesh.matrixWorld);
+    return transformed;
+  };
+  const isSignedArrayBuffer = buffer => {
+    const testBuffer = new buffer.constructor(1);
+    testBuffer[0] = -1;
+    return testBuffer[0] < 0;
   };
 
   /*! *****************************************************************************
@@ -3135,10 +3195,13 @@ version: 2.3.1
     BEFORE_RENDER: "beforeRender",
     RENDER: "render",
     PROGRESS: "progress",
-    QUICK_LOOK_TAP: "quickLookTap",
+    INPUT_START: "inputStart",
+    INPUT_END: "inputEnd",
+    CAMERA_CHANGE: "cameraChange",
     AR_START: "arStart",
     AR_END: "arEnd",
-    AR_MODEL_PLACED: "arModelPlaced"
+    AR_MODEL_PLACED: "arModelPlaced",
+    QUICK_LOOK_TAP: "quickLookTap"
   };
   /**
    * Collection of predefined easing functions
@@ -3179,11 +3242,24 @@ version: 2.3.1
    * @type {object}
    * @property {"view3d-poster"} POSTER A class name for poster element
    * @property {"view3d-ar-overlay"} AR_OVERLAY A class name for AR overlay element
+   * @property {"view3d-annotation-wrapper"} ANNOTATION_WRAPPER A class name for annotation wrapper element
+   * @property {"view3d-annotation"} ANNOTATION A class name for annotation element
+   * @property {"default"} ANNOTATION_DEFAULT A class name for default style annotation element
+   * @property {"selected"} ANNOTATION_SELECTED A class name for selected annotation element
+   * @property {"flip-x"} ANNOTATION_FLIP_X A class name for annotation element which has tooltip on the left side
+   * @property {"flip-y"} ANNOTATION_FLIP_Y A class name for annotation element which has tooltip on the bottom side
    */
 
   const DEFAULT_CLASS = {
     POSTER: "view3d-poster",
-    AR_OVERLAY: "view3d-ar-overlay"
+    AR_OVERLAY: "view3d-ar-overlay",
+    ANNOTATION_WRAPPER: "view3d-annotation-wrapper",
+    ANNOTATION: "view3d-annotation",
+    ANNOTATION_TOOLTIP: "view3d-annotation-tooltip",
+    ANNOTATION_DEFAULT: "default",
+    ANNOTATION_SELECTED: "selected",
+    ANNOTATION_FLIP_X: "flip-x",
+    ANNOTATION_FLIP_Y: "flip-y"
   };
   /**
    * Possible values for the toneMapping option.
@@ -3200,6 +3276,17 @@ version: 2.3.1
     REINHARD: ReinhardToneMapping,
     CINEON: CineonToneMapping,
     ACES_FILMIC: ACESFilmicToneMapping
+  };
+  /**
+   * Types of zoom control
+   * @type {object}
+   * @property {"fov"} FOV Zoom by chaning fov(field-of-view). This will prevent camera from going inside the model.
+   * @property {"distance"} DISTANCE Zoom by changing camera distance from the model.
+   */
+
+  const ZOOM_TYPE = {
+    FOV: "fov",
+    DISTANCE: "distance"
   };
   /**
    * Available AR session types
@@ -3262,6 +3349,21 @@ version: 2.3.1
     MEDIUM: "medium",
     LARGE: "large"
   };
+  /**
+   * Input types
+   * @type {object}
+   * @property {0} ROTATE Rotate input
+   * @property {1} TRANSLATE Translate input
+   * @property {2} ZOOM Zoom input
+   */
+
+  var INPUT_TYPE;
+
+  (function (INPUT_TYPE) {
+    INPUT_TYPE[INPUT_TYPE["ROTATE"] = 0] = "ROTATE";
+    INPUT_TYPE[INPUT_TYPE["TRANSLATE"] = 1] = "TRANSLATE";
+    INPUT_TYPE[INPUT_TYPE["ZOOM"] = 2] = "ZOOM";
+  })(INPUT_TYPE || (INPUT_TYPE = {}));
 
   /*
    * Copyright (c) 2020 NAVER Corp.
@@ -3279,40 +3381,14 @@ version: 2.3.1
     constructor(view3D) {
       this._defaultRenderLoop = delta => {
         const view3D = this._view3D;
-        const threeRenderer = this._renderer;
         const {
-          scene,
-          camera,
           control,
           autoPlayer,
           animator
         } = view3D;
-        const deltaMiliSec = delta * 1000;
-        animator.update(delta);
-        control.update(deltaMiliSec);
-        autoPlayer.update(deltaMiliSec);
-        view3D.trigger(EVENTS.BEFORE_RENDER, {
-          type: EVENTS.BEFORE_RENDER,
-          target: view3D,
-          delta: deltaMiliSec
-        });
-        camera.updatePosition();
-        threeRenderer.autoClear = false;
-        threeRenderer.clear();
+        if (!animator.animating && !control.animating && !autoPlayer.animating) return;
 
-        if (scene.skybox && scene.skybox.enabled) {
-          scene.skybox.updateCamera();
-          threeRenderer.render(scene.skybox.scene, scene.skybox.camera);
-        }
-
-        scene.shadowPlane.render();
-        threeRenderer.render(scene.root, camera.threeCamera);
-        threeRenderer.autoClear = true;
-        view3D.trigger(EVENTS.RENDER, {
-          type: EVENTS.RENDER,
-          target: view3D,
-          delta: deltaMiliSec
-        });
+        this._renderFrame(delta);
       };
 
       this._view3D = view3D;
@@ -3455,6 +3531,55 @@ version: 2.3.1
 
 
       this._renderer.setAnimationLoop(null);
+    }
+
+    renderSingleFrame() {
+      const renderer = this._renderer;
+
+      if (!renderer.xr.isPresenting) {
+        this._renderFrame(0);
+      }
+    }
+
+    _renderFrame(delta) {
+      const view3D = this._view3D;
+      const threeRenderer = this._renderer;
+      const {
+        scene,
+        camera,
+        control,
+        autoPlayer,
+        animator,
+        annotation
+      } = view3D;
+      const deltaMiliSec = delta * 1000;
+      animator.update(delta);
+      control.update(deltaMiliSec);
+      autoPlayer.update(deltaMiliSec);
+      view3D.trigger(EVENTS.BEFORE_RENDER, {
+        type: EVENTS.BEFORE_RENDER,
+        target: view3D,
+        delta: deltaMiliSec
+      });
+      camera.updatePosition();
+      threeRenderer.autoClear = false;
+      threeRenderer.clear();
+
+      if (scene.skybox && scene.skybox.enabled) {
+        scene.skybox.updateCamera();
+        threeRenderer.render(scene.skybox.scene, scene.skybox.camera);
+      }
+
+      scene.shadowPlane.render();
+      threeRenderer.render(scene.root, camera.threeCamera);
+      threeRenderer.autoClear = true; // Render annotations
+
+      annotation.render();
+      view3D.trigger(EVENTS.RENDER, {
+        type: EVENTS.RENDER,
+        target: view3D,
+        delta: deltaMiliSec
+      });
     }
 
   }
@@ -3880,7 +4005,8 @@ version: 2.3.1
     MOUSE_ENTER: "mouseenter",
     MOUSE_LEAVE: "mouseleave",
     LOAD: "load",
-    ERROR: "error"
+    ERROR: "error",
+    CLICK: "click"
   };
   const CURSOR = {
     GRAB: "grab",
@@ -4015,6 +4141,8 @@ version: 2.3.1
   })(GESTURE || (GESTURE = {}));
 
   const CUSTOM_TEXTURE_LOD_EXTENSION = "EXT_View3D_texture_LOD";
+  const TEXTURE_LOD_EXTRA = "view3d-lod";
+  const ANNOTATION_EXTRA = "view3d-annotation";
 
   /**
    * Two pass Gaussian blur filter (horizontal and vertical blur shaders)
@@ -4810,6 +4938,8 @@ version: 2.3.1
           texture.encoding = sRGBEncoding;
           skybox.useTexture(texture);
         }
+
+        view3D.renderer.renderSingleFrame();
       });
     }
     /**
@@ -4845,6 +4975,8 @@ version: 2.3.1
           this._skybox = null;
           root.environment = null;
         }
+
+        view3D.renderer.renderSingleFrame();
       });
     }
     /**
@@ -4856,14 +4988,17 @@ version: 2.3.1
 
     setEnvMap(url) {
       return __awaiter(this, void 0, void 0, function* () {
+        const view3D = this._view3D;
+
         if (url) {
-          const view3D = this._view3D;
           const textureLoader = new TextureLoader$1(view3D);
           const texture = yield textureLoader.loadHDRTexture(url);
           this._root.environment = texture;
         } else {
           this._root.environment = null;
         }
+
+        view3D.renderer.renderSingleFrame();
       });
     }
 
@@ -4907,6 +5042,11 @@ version: 2.3.1
   const PITCH_RANGE = {
     min: -89.9,
     max: 89.9
+  };
+  const ANNOTATION_BREAKPOINT = {
+    165: 0,
+    135: 0.4,
+    0: 1
   };
   const AR_OVERLAY_CLASS = "view3d-ar-overlay";
   const DRACO_DECODER_URL = "https://www.gstatic.com/draco/versioned/decoders/1.4.1/";
@@ -4963,6 +5103,10 @@ version: 2.3.1
 
     get easing() {
       return this._easing;
+    }
+
+    get activated() {
+      return this._activated;
     }
 
     set duration(val) {
@@ -5047,27 +5191,19 @@ version: 2.3.1
      */
     constructor(view3D, from, to, {
       duration = ANIMATION_DURATION,
-      easing = EASING$1
+      easing = EASING$1,
+      disableOnFinish = true
     } = {}) {
       this._enabled = false;
       this._finishCallbacks = [];
       this._view3D = view3D;
-      from = from.clone();
-      to = to.clone();
-      from.yaw = circulate(from.yaw, 0, 360);
-      to.yaw = circulate(to.yaw, 0, 360); // Take the smaller degree
-
-      if (Math.abs(to.yaw - from.yaw) > 180) {
-        to.yaw = to.yaw < from.yaw ? to.yaw + 360 : to.yaw - 360;
-      }
-
       this._motion = new Motion({
         duration,
         range: ANIMATION_RANGE,
         easing
       });
-      this._from = from;
-      this._to = to;
+      this._disableOnFinish = disableOnFinish;
+      this.changeStartEnd(from, to);
     }
 
     get element() {
@@ -5098,6 +5234,16 @@ version: 2.3.1
     get easing() {
       return this._motion.easing;
     }
+    /**
+     * Whether this control is animating the camera
+     * @readonly
+     * @type {boolean}
+     */
+
+
+    get animating() {
+      return this._motion.activated;
+    }
 
     set duration(val) {
       this._motion.duration = val;
@@ -5115,6 +5261,20 @@ version: 2.3.1
 
     destroy() {
       this.disable();
+    }
+
+    changeStartEnd(from, to) {
+      from = from.clone();
+      to = to.clone();
+      from.yaw = circulate(from.yaw, 0, 360);
+      to.yaw = circulate(to.yaw, 0, 360); // Take the smaller degree
+
+      if (Math.abs(to.yaw - from.yaw) > 180) {
+        to.yaw = to.yaw < from.yaw ? to.yaw + 360 : to.yaw - 360;
+      }
+
+      this._from = from;
+      this._to = to;
     }
     /**
      * Update control by given deltaTime
@@ -5138,9 +5298,13 @@ version: 2.3.1
       camera.pivot = from.pivot.clone().lerp(to.pivot, progress);
 
       if (progress >= 1) {
-        this.disable();
+        if (this._disableOnFinish) {
+          this.disable();
+        }
 
         this._finishCallbacks.forEach(callback => callback());
+
+        this.clearFinished();
       }
     }
     /**
@@ -5152,10 +5316,7 @@ version: 2.3.1
     enable() {
       if (this._enabled) return;
       this._enabled = true;
-
-      this._motion.reset(0);
-
-      this._motion.setEndDelta(1);
+      this.reset();
     }
     /**
      * Disable this input and remove all event handlers
@@ -5166,6 +5327,12 @@ version: 2.3.1
     disable() {
       if (!this._enabled) return;
       this._enabled = false;
+    }
+
+    reset() {
+      this._motion.reset(0);
+
+      this._motion.setEndDelta(1);
     }
     /**
      * Add callback which is called when animation is finished
@@ -5234,6 +5401,33 @@ version: 2.3.1
     clone() {
       return new Pose(this.yaw, this.pitch, this.zoom, this.pivot.toArray());
     }
+    /**
+     * Copy values from the other pose
+     * @param {Pose} pose pose to copy
+     */
+
+
+    copy(pose) {
+      this.yaw = pose.yaw;
+      this.pitch = pose.pitch;
+      this.zoom = pose.zoom;
+      this.pivot.copy(pose.pivot);
+    }
+    /**
+     * Return whether values of this pose is equal to other pose
+     * @param {Pose} pose pose to check
+     */
+
+
+    equals(pose) {
+      const {
+        yaw,
+        pitch,
+        zoom,
+        pivot
+      } = this;
+      return circulate(yaw, 0, 360) === circulate(pose.yaw, 0, 360) && pitch === pose.pitch && zoom === pose.zoom && pivot.equals(pose.pivot);
+    }
 
   }
 
@@ -5251,14 +5445,15 @@ version: 2.3.1
      * @param canvas \<canvas\> element to render 3d model
      */
     constructor(view3D) {
-      this._distance = 0;
-      this._baseFov = 45;
       this._view3D = view3D;
       this._threeCamera = new PerspectiveCamera();
       this._maxTanHalfHFov = 0;
+      this._baseFov = 45;
+      this._baseDistance = 0;
       const initialZoom = isNumber(view3D.initialZoom) ? view3D.initialZoom : 0;
       this._defaultPose = new Pose(view3D.yaw, view3D.pitch, initialZoom);
       this._currentPose = this._defaultPose.clone();
+      this._newPose = this._currentPose.clone();
     }
     /**
      * Three.js {@link https://threejs.org/docs/#api/en/cameras/PerspectiveCamera PerspectiveCamera} instance
@@ -5292,8 +5487,18 @@ version: 2.3.1
       return this._currentPose.clone();
     }
     /**
+     * Camera's new pose that will be applied on the next frame
+     * {@link Camera#updatePosition} should be called after changing this value.
+     * @type {Pose}
+     */
+
+
+    get newPose() {
+      return this._newPose;
+    }
+    /**
      * Camera's current yaw
-     * {@link Camera#updatePosition} should be called after changing this value, and normally it is called every frame.
+     * {@link Camera#updatePosition} should be called after changing this value.
      * @type {number}
      */
 
@@ -5303,7 +5508,7 @@ version: 2.3.1
     }
     /**
      * Camera's current pitch
-     * {@link Camera#updatePosition} should be called after changing this value, and normally it is called every frame.
+     * {@link Camera#updatePosition} should be called after changing this value.
      * @type {number}
      */
 
@@ -5313,7 +5518,7 @@ version: 2.3.1
     }
     /**
      * Camera's current zoom value
-     * {@link Camera#updatePosition} should be called after changing this value, and normally it is called every frame.
+     * {@link Camera#updatePosition} should be called after changing this value.
      * @type {number}
      */
 
@@ -5322,9 +5527,31 @@ version: 2.3.1
       return this._currentPose.zoom;
     }
     /**
+     * Camera's disatance from current camera pivot(target)
+     * @type {number}
+     * @readonly
+     */
+
+
+    get distance() {
+      return this._view3D.control.zoom.type === ZOOM_TYPE.FOV ? this._baseDistance : this._baseDistance - this._currentPose.zoom;
+    }
+    /**
+     * Camera's default distance from the model center.
+     * This will be automatically calculated based on the model size.
+     * @type {number}
+     * @readonly
+     */
+
+
+    get baseDistance() {
+      return this._baseDistance;
+    }
+    /**
      * Camera's default fov value.
      * This will be automatically chosen when `view3D.fov` is "auto", otherwise it is equal to `view3D.fov`
      * @type {number}
+     * @readonly
      */
 
 
@@ -5333,8 +5560,8 @@ version: 2.3.1
     }
     /**
      * Current pivot point of camera rotation
-     * @readonly
      * @type THREE.Vector3
+     * @readonly
      * @see {@link https://threejs.org/docs/#api/en/math/Vector3 THREE#Vector3}
      */
 
@@ -5345,6 +5572,7 @@ version: 2.3.1
     /**
      * Camera's focus of view value (vertical)
      * @type number
+     * @readonly
      * @see {@link https://threejs.org/docs/#api/en/cameras/PerspectiveCamera.fov THREE#PerspectiveCamera}
      */
 
@@ -5355,6 +5583,7 @@ version: 2.3.1
     /**
      * Camera's frustum width
      * @type number
+     * @readonly
      */
 
 
@@ -5364,71 +5593,81 @@ version: 2.3.1
     /**
      * Camera's frustum height
      * @type number
+     * @readonly
      */
 
 
     get renderHeight() {
-      return 2 * this._distance * Math.tan(toRadian(this._threeCamera.getEffectiveFOV() / 2));
+      return 2 * this.distance * Math.tan(toRadian(this._threeCamera.getEffectiveFOV() / 2));
     }
 
     set yaw(val) {
-      this._currentPose.yaw = val;
+      this._newPose.yaw = val;
     }
 
     set pitch(val) {
-      this._currentPose.pitch = val;
+      this._newPose.pitch = val;
     }
 
     set zoom(val) {
-      this._currentPose.zoom = val;
+      this._newPose.zoom = val;
     }
 
     set pivot(val) {
-      this._currentPose.pivot = val;
+      this._newPose.pivot.copy(val);
     }
     /**
      * Reset camera to default pose
-     * @param duration Duration of the reset animation
-     * @param easing Easing function for the reset animation
+     * @param {number} [duration=0] Duration of the reset animation
+     * @param {function} [easing] Easing function for the reset animation
+     * @param {Pose} [pose] Pose to reset, camera will reset to `defaultPose` if pose is not given.
      * @returns Promise that resolves when the animation finishes
      */
 
 
-    reset(duration = 0, easing = EASING$1) {
-      return __awaiter(this, void 0, void 0, function* () {
-        const view3D = this._view3D;
-        const control = view3D.control;
-        const currentPose = this._currentPose;
-        const defaultPose = this._defaultPose;
+    reset(duration = 0, easing = EASING$1, pose) {
+      const view3D = this._view3D;
+      const control = view3D.control;
+      const autoPlayer = view3D.autoPlayer;
+      const newPose = this._newPose;
+      const currentPose = this._currentPose;
+      const targetPose = pose !== null && pose !== void 0 ? pose : this._defaultPose;
 
-        if (duration <= 0) {
-          // Reset camera immediately
-          this._currentPose = defaultPose.clone();
-          control.sync();
-          return Promise.resolve();
-        } else {
-          // Play the animation
-          const resetControl = new AnimationControl(view3D, currentPose, defaultPose);
-          resetControl.duration = duration;
-          resetControl.easing = easing;
-          resetControl.enable();
-          control.disable();
+      if (duration <= 0) {
+        // Reset camera immediately
+        newPose.copy(targetPose);
+        currentPose.copy(targetPose);
+        view3D.renderer.renderSingleFrame();
+        control.sync();
+        return Promise.resolve();
+      } else {
+        // Play the animation
+        const autoplayEnabled = autoPlayer.enabled;
+        const resetControl = new AnimationControl(view3D, currentPose, targetPose);
+        resetControl.duration = duration;
+        resetControl.easing = easing;
+        resetControl.enable();
 
-          const updateResetControl = evt => {
-            resetControl.update(evt.delta);
-          };
-
-          view3D.on(EVENTS.BEFORE_RENDER, updateResetControl);
-          return new Promise(resolve => {
-            resetControl.onFinished(() => {
-              control.sync();
-              control.enable();
-              view3D.off(EVENTS.BEFORE_RENDER, updateResetControl);
-              resolve();
-            });
-          });
+        if (autoplayEnabled) {
+          autoPlayer.disable();
         }
-      });
+
+        control.add(resetControl);
+        return new Promise(resolve => {
+          resetControl.onFinished(() => {
+            newPose.copy(targetPose);
+            currentPose.copy(targetPose);
+            control.remove(resetControl);
+            control.sync();
+
+            if (autoplayEnabled) {
+              autoPlayer.enableAfterDelay();
+            }
+
+            resolve();
+          });
+        });
+      }
     }
     /**
      * Update camera's aspect to given size
@@ -5502,7 +5741,7 @@ version: 2.3.1
       }
 
       defaultPose.pivot = modelCenter.clone();
-      this._distance = effectiveCamDist;
+      this._baseDistance = effectiveCamDist;
       camera.near = (effectiveCamDist - maxDistToCenter) * 0.1;
       camera.far = (effectiveCamDist + maxDistToCenter) * 10;
       control.zoom.updateRange();
@@ -5521,31 +5760,41 @@ version: 2.3.1
       }
     }
     /**
-     * Update camera position base on the {@link Camera#currentPose currentPose} value
+     * Update camera position
      * @returns {void}
      */
 
 
     updatePosition() {
-      const {
-        control
-      } = this._view3D;
+      const view3D = this._view3D;
+      const control = view3D.control;
       const threeCamera = this._threeCamera;
       const currentPose = this._currentPose;
-      const distance = this._distance;
+      const newPose = this._newPose;
       const baseFov = this._baseFov;
-      const zoomRange = control.zoom.range; // Clamp current pose
+      const baseDistance = this._baseDistance;
+      const isFovZoom = control.zoom.type === ZOOM_TYPE.FOV;
+      const prevPose = currentPose.clone(); // Clamp current pose
 
-      currentPose.yaw = circulate(currentPose.yaw, 0, 360);
-      currentPose.pitch = clamp$1(currentPose.pitch, PITCH_RANGE.min, PITCH_RANGE.max);
-      currentPose.zoom = -(clamp$1(baseFov - currentPose.zoom, zoomRange.min, zoomRange.max) - baseFov);
+      currentPose.yaw = circulate(newPose.yaw, 0, 360);
+      currentPose.pitch = clamp$1(newPose.pitch, PITCH_RANGE.min, PITCH_RANGE.max);
+      currentPose.zoom = newPose.zoom;
+      currentPose.pivot.copy(newPose.pivot);
+      const fov = isFovZoom ? baseFov - currentPose.zoom : baseFov;
+      const distance = isFovZoom ? baseDistance : baseDistance - currentPose.zoom;
       const newCamPos = getRotatedPosition(distance, currentPose.yaw, currentPose.pitch);
-      const fov = baseFov - currentPose.zoom;
       newCamPos.add(currentPose.pivot);
       threeCamera.fov = fov;
       threeCamera.position.copy(newCamPos);
       threeCamera.lookAt(currentPose.pivot);
       threeCamera.updateProjectionMatrix();
+      newPose.copy(currentPose);
+      view3D.trigger(EVENTS.CAMERA_CHANGE, {
+        type: EVENTS.CAMERA_CHANGE,
+        target: view3D,
+        pose: currentPose.clone(),
+        prevPose
+      });
     }
 
     _applyEffectiveFov(fov) {
@@ -5724,6 +5973,16 @@ version: 2.3.1
       return this._mixer.timeScale === 0;
     }
     /**
+     * An boolean value indicating whether at least one of the animation is playing
+     * @type {boolean}
+     * @readonly
+     */
+
+
+    get animating() {
+      return this.activeAnimation && !this.paused;
+    }
+    /**
      * Store the given clips
      * @param clips Three.js {@link https://threejs.org/docs/#api/en/animation/AnimationClip AnimationClip}s of the model
      * @returns {void}
@@ -5851,11 +6110,11 @@ version: 2.3.1
         this._restoreTimeScale();
 
         activeAction.fadeOut(duration / 1000);
-        this._activeAnimationIdx = -1;
         const fadePromise = new Promise(resolve => {
           const onFrame = () => {
             if (activeAction.getEffectiveWeight() > 0) return;
             view3D.off(EVENTS.BEFORE_RENDER, onFrame);
+            this._activeAnimationIdx = -1;
             resolve(true);
           };
 
@@ -5900,7 +6159,10 @@ version: 2.3.1
       this._actions.forEach(action => {
         action.stop();
         action.setEffectiveWeight(0);
-      });
+      }); // Render single frame to show deactivated state
+
+
+      this._view3D.renderer.renderSingleFrame();
 
       this._activeAnimationIdx = -1;
 
@@ -8419,6 +8681,680 @@ version: 2.3.1
    * egjs projects are licensed under the MIT license
    */
   /**
+   * Annotation(Hotspot) base class
+   */
+
+  class Annotation {
+    /** */
+    constructor(view3D, {
+      element = null,
+      focus = [],
+      focusDuration = 1000
+    } = {}) {
+      this._onClick = () => {
+        void this.focus();
+      };
+
+      this._onWheel = evt => {
+        evt.preventDefault();
+        evt.stopPropagation();
+      };
+
+      this._view3D = view3D;
+      this._element = element;
+      this._focus = focus;
+      this._focusDuration = focusDuration;
+      this._enabled = false;
+      this._tooltipSize = new Vector2();
+
+      if (element) {
+        element.draggable = false;
+        this.resize();
+      }
+    }
+    /**
+     * Element of the annotation
+     * @type {HTMLElement}
+     * @readonly
+     */
+
+
+    get element() {
+      return this._element;
+    }
+    /**
+     * Whether this annotation is renderable in the screen
+     * @type {boolean}
+     * @readonly
+     */
+
+
+    get renderable() {
+      return !!this._element;
+    }
+
+    destroy() {
+      const wrapper = this._view3D.annotation.wrapper;
+      const element = this._element;
+      this.disableEvents();
+
+      if (element && element.parentElement === wrapper) {
+        wrapper.removeChild(element);
+      }
+    }
+
+    resize() {
+      const el = this._element;
+      if (!el) return;
+      const tooltip = el.querySelector(`.${DEFAULT_CLASS.ANNOTATION_TOOLTIP}`);
+
+      if (tooltip) {
+        this._tooltipSize.set(tooltip.offsetWidth, tooltip.offsetHeight);
+      }
+    }
+
+    render({
+      screenPos,
+      screenSize,
+      renderOrder
+    }) {
+      const el = this._element;
+      const tooltipSize = this._tooltipSize;
+      if (!el) return;
+      el.style.zIndex = `${renderOrder + 1}`;
+      el.style.transform = `translate(-50%, -50%) translate(${screenPos.x}px, ${screenPos.y}px)`;
+
+      if (screenPos.y + tooltipSize.y > screenSize.y) {
+        el.classList.add(DEFAULT_CLASS.ANNOTATION_FLIP_Y);
+      } else {
+        el.classList.remove(DEFAULT_CLASS.ANNOTATION_FLIP_Y);
+      }
+
+      if (screenPos.x + tooltipSize.x > screenSize.x) {
+        el.classList.add(DEFAULT_CLASS.ANNOTATION_FLIP_X);
+      } else {
+        el.classList.remove(DEFAULT_CLASS.ANNOTATION_FLIP_X);
+      }
+    }
+
+    setOpacity(opacity) {
+      const el = this._element;
+      if (!el) return;
+      el.style.opacity = `${opacity}`;
+    }
+
+    enableEvents() {
+      const el = this._element;
+      if (!el || this._enabled) return;
+      el.addEventListener(EVENTS$1.CLICK, this._onClick);
+      el.addEventListener(EVENTS$1.WHEEL, this._onWheel);
+      this._enabled = true;
+    }
+
+    disableEvents() {
+      const el = this._element;
+      if (!el || !this._enabled) return;
+      el.removeEventListener(EVENTS$1.CLICK, this._onClick);
+      el.removeEventListener(EVENTS$1.WHEEL, this._onWheel);
+      this._enabled = false;
+    }
+
+  }
+
+  /**
+   * {@link Annotation} that stays at one point
+   */
+
+  class PointAnnotation extends Annotation {
+    /** */
+    constructor(view3D, _a = {}) {
+      var {
+        position = []
+      } = _a,
+          commonOptions = __rest(_a, ["position"]);
+
+      super(view3D, commonOptions);
+      this._position = new Vector3().fromArray(position);
+      const focus = this._focus;
+
+      if (focus.length > 0) {
+        const focusVector = new Vector3().fromArray(focus);
+        this._focusPose = new Pose(focusVector.x, focusVector.y, focusVector.z, this._position.toArray());
+      } else {
+        this._focusPose = null;
+      }
+    }
+
+    get position() {
+      return this._position;
+    }
+
+    focus() {
+      return __awaiter(this, void 0, void 0, function* () {
+        const {
+          camera
+        } = this._view3D;
+        const el = this._element;
+        let targetPose = this._focusPose;
+
+        if (!targetPose) {
+          const modelToPos = this._calculateNormalFromModelCenter();
+
+          const {
+            yaw,
+            pitch
+          } = directionToYawPitch(modelToPos);
+          targetPose = new Pose(toDegree(yaw), toDegree(pitch), 0, this._position.toArray());
+        }
+
+        if (el) {
+          el.classList.add(DEFAULT_CLASS.ANNOTATION_SELECTED);
+          window.addEventListener("click", () => {
+            this.unfocus();
+          }, {
+            once: true,
+            capture: true
+          });
+        }
+
+        if (!targetPose.equals(camera.currentPose)) {
+          return camera.reset(this._focusDuration, EASING$1, targetPose);
+        } else {
+          return Promise.resolve();
+        }
+      });
+    }
+
+    unfocus() {
+      const el = this._element;
+      if (!el) return;
+      el.classList.remove(DEFAULT_CLASS.ANNOTATION_SELECTED);
+    }
+
+    toJSON() {
+      return {
+        position: this._position.toArray(),
+        focus: this._focus,
+        duration: this._focusDuration
+      };
+    }
+
+    _calculateNormalFromModelCenter() {
+      const view3D = this._view3D;
+      const model = view3D.model;
+      const center = model ? model.bbox.getCenter(new Vector3()) : new Vector3();
+      return new Vector3().subVectors(this._position, center).normalize();
+    }
+
+  }
+
+  /**
+   *
+   */
+
+  class FaceAnnotation extends Annotation {
+    /** */
+    constructor(view3D, _a = {}) {
+      var {
+        meshIndex = -1,
+        faceIndex = -1
+      } = _a,
+          commonOptions = __rest(_a, ["meshIndex", "faceIndex"]);
+
+      super(view3D, commonOptions);
+      this._meshIndex = meshIndex;
+      this._faceIndex = faceIndex;
+      this._trackingControl = null;
+    }
+
+    get position() {
+      return this._getPosition();
+    }
+
+    get renderable() {
+      return !!this._element && this._meshIndex >= 0 && this._faceIndex >= 0;
+    }
+
+    get meshIndex() {
+      return this._meshIndex;
+    }
+
+    get faceIndex() {
+      return this._faceIndex;
+    }
+
+    focus() {
+      return __awaiter(this, void 0, void 0, function* () {
+        const el = this._element;
+
+        if (el) {
+          el.classList.add(DEFAULT_CLASS.ANNOTATION_SELECTED);
+        }
+
+        const view3D = this._view3D;
+        const {
+          camera,
+          control
+        } = view3D;
+
+        const focus = this._getFocus();
+
+        const position = this._getPosition();
+
+        const targetPose = new Pose(focus.x, focus.y, focus.z, position.toArray());
+        const trackingControl = new AnimationControl(view3D, camera.currentPose, targetPose, {
+          duration: this._focusDuration,
+          disableOnFinish: false
+        });
+        this._trackingControl = trackingControl;
+        trackingControl.enable();
+        control.add(trackingControl);
+        window.addEventListener("click", () => {
+          this.unfocus();
+        }, {
+          once: true,
+          capture: true
+        });
+      });
+    }
+
+    unfocus() {
+      const el = this._element;
+      const {
+        control
+      } = this._view3D;
+      const trackingControl = this._trackingControl;
+
+      if (el) {
+        el.classList.remove(DEFAULT_CLASS.ANNOTATION_SELECTED);
+      }
+
+      if (trackingControl) {
+        control.sync();
+        control.remove(trackingControl);
+        trackingControl.destroy();
+        this._trackingControl = null;
+      }
+    }
+
+    render(params) {
+      super.render(params);
+      const trackingControl = this._trackingControl;
+      if (!trackingControl) return;
+      const {
+        camera
+      } = this._view3D;
+
+      const focus = this._getFocus();
+
+      const position = this._getPosition();
+
+      const targetPose = new Pose(focus.x, focus.y, focus.z, position.toArray());
+      trackingControl.changeStartEnd(camera.currentPose, targetPose);
+      trackingControl.reset();
+    }
+
+    toJSON() {
+      return {
+        meshIndex: this._meshIndex,
+        faceIndex: this._faceIndex,
+        focus: this._focus,
+        duration: this._focusDuration
+      };
+    }
+
+    _getFocus() {
+      return new Vector3().fromArray(this._focus);
+    }
+
+    _getPosition() {
+      const vertices = this._getVertices();
+
+      if (!vertices) return new Vector3();
+
+      const animated = this._getAnimatedVertices(vertices);
+
+      return animated.reduce((summed, vertex) => {
+        return summed.add(vertex);
+      }, new Vector3()).divideScalar(3);
+    }
+
+    _getAnimatedVertices(vertices) {
+      const model = this._view3D.model;
+      const faceIndex = this._faceIndex;
+      const mesh = model.meshes[this._meshIndex];
+      const indexes = mesh.geometry.getIndex();
+      const face = indexes.array.slice(3 * faceIndex, 3 * faceIndex + 3);
+
+      if (mesh.isSkinnedMesh) {
+        const geometry = mesh.geometry;
+        const positions = geometry.attributes.position;
+        const skinWeights = geometry.attributes.skinWeight;
+        const positionScale = getAttributeScale(positions);
+        const skinWeightScale = getAttributeScale(skinWeights);
+        vertices.forEach((vertex, idx) => {
+          const posIdx = face[idx];
+          const transformed = getSkinnedVertex(posIdx, mesh, positionScale, skinWeightScale);
+          vertex.copy(transformed);
+        });
+      } else {
+        vertices.forEach(vertex => {
+          vertex.applyMatrix4(mesh.matrixWorld);
+        });
+      }
+
+      return vertices;
+    }
+
+    _getVertices() {
+      var _a;
+
+      const view3D = this._view3D;
+      const meshIndex = this._meshIndex;
+      const faceIndex = this._faceIndex;
+      const model = view3D.model;
+      if (!model || meshIndex < 0 || faceIndex < 0) return null;
+      const mesh = model.meshes[meshIndex];
+      const indexes = (_a = mesh === null || mesh === void 0 ? void 0 : mesh.geometry.index) === null || _a === void 0 ? void 0 : _a.array;
+      const face = indexes ? range(3).map(idx => indexes[3 * faceIndex + idx]) : null;
+      if (!mesh || !indexes || !face || face.some(val => val == null)) return null;
+      const position = mesh.geometry.getAttribute("position");
+      const vertices = face.map(index => {
+        return new Vector3().fromBufferAttribute(position, index);
+      });
+      return vertices;
+    }
+
+  }
+
+  /*
+   * Copyright (c) 2020 NAVER Corp.
+   * egjs projects are licensed under the MIT license
+   */
+  /**
+   * Manager class for {@link Annotation}
+   */
+
+  class AnnotationManager {
+    /** */
+    constructor(view3D) {
+      this._onInput = () => {
+        const annotations = this._list;
+        annotations.forEach(annotation => {
+          const el = annotation.element;
+          if (!el) return;
+          annotation.unfocus();
+        });
+      };
+
+      this._view3D = view3D;
+      this._list = [];
+      this._wrapper = getNullableElement(view3D.annotationWrapper, view3D.rootEl) || this._createWrapper();
+    }
+    /**
+     * List of annotations
+     * @type {Annotation[]}
+     * @readonly
+     */
+
+
+    get list() {
+      return this._list;
+    }
+    /**
+     * Wrapper element for annotations
+     * @type {HTMLElement}
+     * @readonly
+     */
+
+
+    get wrapper() {
+      return this._wrapper;
+    }
+    /**
+     * Initialize and collect annotations from the wrapper
+     */
+
+
+    init() {
+      const view3D = this._view3D;
+      view3D.control.controls.forEach(control => {
+        control.on({
+          [CONTROL_EVENTS.HOLD]: this._onInput
+        });
+      });
+    }
+    /**
+     * Destroy all annotations & event handlers
+     */
+
+
+    destroy() {
+      this._view3D.control.controls.forEach(control => {
+        control.off({
+          [CONTROL_EVENTS.HOLD]: this._onInput
+        });
+      });
+
+      this.reset();
+    }
+    /**
+     * Resize annotations
+     */
+
+
+    resize() {
+      this._list.forEach(annotation => {
+        annotation.resize();
+      });
+    }
+    /**
+     * Collect annotations inside the wrapper element
+     */
+
+
+    collect() {
+      const view3D = this._view3D;
+      const wrapper = this._wrapper;
+      const annotationEls = [].slice.apply(wrapper.querySelectorAll(view3D.annotationSelector));
+      const annotations = annotationEls.map(element => {
+        const focusStr = element.dataset.focus;
+        const focus = focusStr ? focusStr.split(" ").map(val => parseFloat(val)) : [];
+        const focusDuration = element.dataset.duration ? parseFloat(element.dataset.duration) : void 0;
+        const commonOptions = {
+          element,
+          focus,
+          focusDuration
+        };
+
+        if (element.dataset.meshIndex) {
+          const meshIndex = parseFloat(element.dataset.meshIndex);
+          const faceIndex = element.dataset.faceIndex ? parseFloat(element.dataset.faceIndex) : void 0;
+          return new FaceAnnotation(view3D, Object.assign(Object.assign({}, commonOptions), {
+            meshIndex,
+            faceIndex
+          }));
+        } else {
+          const positionStr = element.dataset.position;
+          const position = positionStr ? positionStr.split(" ").map(val => parseFloat(val)) : [];
+          return new PointAnnotation(view3D, Object.assign(Object.assign({}, commonOptions), {
+            position
+          }));
+        }
+      });
+      this.add(...annotations);
+    }
+    /**
+     * Load annotation JSON from URL
+     * @param {string} url URL to annotations json
+     */
+
+
+    load(url) {
+      const fileLoader = new FileLoader();
+      return new Promise((resolve, reject) => {
+        fileLoader.load(url, json => {
+          const data = JSON.parse(json);
+          const parsed = this.parse(data);
+          this.add(...parsed);
+          resolve(parsed);
+        }, undefined, error => {
+          reject(error);
+        });
+      });
+    }
+    /**
+     * Parse an array of annotation data
+     * @param {object[]} data An array of annotation data
+     */
+
+
+    parse(data) {
+      const view3D = this._view3D;
+      const annotations = data.map(annotationData => {
+        const element = this._createDefaultAnnotationElement(annotationData.label);
+
+        if (annotationData.meshIndex != null) {
+          return new FaceAnnotation(view3D, Object.assign(Object.assign({}, annotationData), {
+            element
+          }));
+        } else {
+          return new PointAnnotation(view3D, Object.assign(Object.assign({}, annotationData), {
+            element
+          }));
+        }
+      });
+      return annotations;
+    }
+    /**
+     * Render annotations
+     */
+
+
+    render() {
+      const view3D = this._view3D;
+      const model = view3D.model;
+      if (!model) return;
+      const camera = view3D.camera;
+      const threeRenderer = view3D.renderer.threeRenderer;
+      const screenSize = threeRenderer.getSize(new Vector2());
+      const halfScreenSize = screenSize.clone().multiplyScalar(0.5);
+      const threeCamera = camera.threeCamera;
+      const camPos = threeCamera.position;
+      const modelCenter = model.bbox.getCenter(new Vector3());
+      const breakpoints = view3D.annotationBreakpoints; // Sort by distance most far to camera (descending)
+
+      const annotationsDesc = [...this._list].filter(annotation => annotation.renderable).map(annotation => {
+        const position = annotation.position;
+        return {
+          annotation,
+          position,
+          distToCameraSquared: camPos.distanceToSquared(position)
+        };
+      }).sort((a, b) => b.distToCameraSquared - a.distToCameraSquared);
+      const centerToCamDir = new Vector3().subVectors(camPos, modelCenter).normalize();
+      const breakpointKeysDesc = Object.keys(breakpoints).map(val => parseFloat(val)).sort((a, b) => b - a);
+      annotationsDesc.forEach(({
+        annotation,
+        position
+      }, idx) => {
+        if (!annotation.element) return;
+        const screenRelPos = position.clone().project(threeCamera);
+        const screenPos = new Vector2(screenRelPos.x, -screenRelPos.y);
+        const centerToAnnotationDir = new Vector3().subVectors(position, modelCenter).normalize();
+        const camToAnnotationDegree = toDegree(Math.abs(Math.acos(centerToAnnotationDir.dot(centerToCamDir))));
+        screenPos.multiply(halfScreenSize);
+        screenPos.add(halfScreenSize);
+
+        for (const breakpoint of breakpointKeysDesc) {
+          if (camToAnnotationDegree >= breakpoint) {
+            annotation.setOpacity(breakpoints[breakpoint]);
+            break;
+          }
+        }
+
+        annotation.render({
+          position,
+          renderOrder: idx,
+          screenPos,
+          screenSize
+        });
+      });
+    }
+    /**
+     * Add new annotation to the scene
+     * @param {Annotation} annotations Annotations to add
+     */
+
+
+    add(...annotations) {
+      const wrapper = this._wrapper;
+      annotations.forEach(annotation => {
+        annotation.enableEvents();
+
+        if (annotation.element && annotation.element.parentElement !== wrapper) {
+          wrapper.appendChild(annotation.element);
+        }
+      });
+
+      this._list.push(...annotations);
+    }
+    /**
+     * Remove annotation at the given index
+     */
+
+
+    remove(index) {
+      const removed = this._list.splice(index, 1)[0];
+
+      if (!removed) return null;
+      removed.destroy();
+      return removed;
+    }
+    /**
+     * Remove all hotspots
+     */
+
+
+    reset() {
+      const annotations = this._list;
+      const removed = annotations.splice(0, annotations.length);
+      removed.forEach(annotation => {
+        annotation.destroy();
+      });
+    }
+
+    _createWrapper() {
+      const view3D = this._view3D;
+      const wrapper = document.createElement("div");
+      wrapper.classList.add(DEFAULT_CLASS.ANNOTATION_WRAPPER);
+      view3D.rootEl.appendChild(wrapper);
+      return wrapper;
+    }
+
+    _createDefaultAnnotationElement(label) {
+      const annotation = document.createElement("div");
+      annotation.classList.add(DEFAULT_CLASS.ANNOTATION);
+      annotation.classList.add(DEFAULT_CLASS.ANNOTATION_DEFAULT);
+
+      if (label) {
+        const tooltip = document.createElement("div");
+        tooltip.classList.add(DEFAULT_CLASS.ANNOTATION_TOOLTIP);
+        tooltip.classList.add(DEFAULT_CLASS.ANNOTATION_DEFAULT);
+        tooltip.innerHTML = label;
+        annotation.appendChild(tooltip);
+      }
+
+      return annotation;
+    }
+
+  }
+
+  /*
+   * Copyright (c) 2020 NAVER Corp.
+   * egjs projects are licensed under the MIT license
+   */
+  /**
    * Model's rotation control that supports both mouse & touch
    */
 
@@ -8455,7 +9391,10 @@ version: 2.3.1
 
         window.addEventListener(EVENTS$1.MOUSE_MOVE, this._onMouseMove, false);
         window.addEventListener(EVENTS$1.MOUSE_UP, this._onMouseUp, false);
-        this.trigger(CONTROL_EVENTS.HOLD);
+        this.trigger(CONTROL_EVENTS.HOLD, {
+          inputType: INPUT_TYPE.ROTATE,
+          isTouch: false
+        });
       };
 
       this._onMouseMove = evt => {
@@ -8476,7 +9415,10 @@ version: 2.3.1
 
         window.removeEventListener(EVENTS$1.MOUSE_MOVE, this._onMouseMove, false);
         window.removeEventListener(EVENTS$1.MOUSE_UP, this._onMouseUp, false);
-        this.trigger(CONTROL_EVENTS.RELEASE);
+        this.trigger(CONTROL_EVENTS.RELEASE, {
+          inputType: INPUT_TYPE.ROTATE,
+          isTouch: false
+        });
       };
 
       this._onTouchStart = evt => {
@@ -8484,6 +9426,11 @@ version: 2.3.1
         this._isFirstTouch = true;
 
         this._prevPos.set(touch.clientX, touch.clientY);
+
+        this.trigger(CONTROL_EVENTS.HOLD, {
+          inputType: INPUT_TYPE.ROTATE,
+          isTouch: true
+        });
       };
 
       this._onTouchMove = evt => {
@@ -8533,6 +9480,11 @@ version: 2.3.1
           this._prevPos.set(touch.clientX, touch.clientY);
         } else {
           this._prevPos.set(0, 0);
+
+          this.trigger(CONTROL_EVENTS.RELEASE, {
+            inputType: INPUT_TYPE.ROTATE,
+            isTouch: true
+          });
         }
 
         this._isScrolling = false;
@@ -8566,6 +9518,16 @@ version: 2.3.1
 
     get enabled() {
       return this._enabled;
+    }
+    /**
+     * Whether this control is animating the camera
+     * @readonly
+     * @type {boolean}
+     */
+
+
+    get animating() {
+      return this._xMotion.activated || this._yMotion.activated;
     }
     /**
      * Scale factor for rotation
@@ -8642,10 +9604,11 @@ version: 2.3.1
 
     destroy() {
       this.disable();
+      this.off();
     }
     /**
      * Update control by given deltaTime
-     * @param deltaTime Number of milisec to update
+     * @param {number} deltaTime Number of milisec to update
      * @returns {void}
      */
 
@@ -8654,16 +9617,17 @@ version: 2.3.1
       const camera = this._view3D.camera;
       const xMotion = this._xMotion;
       const yMotion = this._yMotion;
+      const newPose = camera.newPose;
       const yawEnabled = !this._disableYaw;
       const pitchEnabled = !this._disablePitch;
       const delta = new Vector2(xMotion.update(deltaTime), yMotion.update(deltaTime));
 
       if (yawEnabled) {
-        camera.yaw += delta.x;
+        newPose.yaw += delta.x;
       }
 
       if (pitchEnabled) {
-        camera.pitch += delta.y;
+        newPose.pitch += delta.y;
       }
     }
     /**
@@ -8696,7 +9660,9 @@ version: 2.3.1
       targetEl.addEventListener(EVENTS$1.TOUCH_END, this._onTouchEnd);
       this._enabled = true;
       this.sync();
-      this.trigger(CONTROL_EVENTS.ENABLE);
+      this.trigger(CONTROL_EVENTS.ENABLE, {
+        inputType: INPUT_TYPE.ROTATE
+      });
     }
     /**
      * Disable this input and remove all event handlers
@@ -8714,7 +9680,9 @@ version: 2.3.1
       targetEl.removeEventListener(EVENTS$1.TOUCH_MOVE, this._onTouchMove);
       targetEl.removeEventListener(EVENTS$1.TOUCH_END, this._onTouchEnd);
       this._enabled = false;
-      this.trigger(CONTROL_EVENTS.DISABLE);
+      this.trigger(CONTROL_EVENTS.DISABLE, {
+        inputType: INPUT_TYPE.ROTATE
+      });
     }
     /**
      * Synchronize this control's state to given camera position
@@ -8775,7 +9743,10 @@ version: 2.3.1
         window.addEventListener(EVENTS$1.MOUSE_MOVE, this._onMouseMove, false);
         window.addEventListener(EVENTS$1.MOUSE_UP, this._onMouseUp, false);
         window.addEventListener(EVENTS$1.CONTEXT_MENU, this._onContextMenu, false);
-        this.trigger(CONTROL_EVENTS.HOLD);
+        this.trigger(CONTROL_EVENTS.HOLD, {
+          inputType: INPUT_TYPE.TRANSLATE,
+          isTouch: false
+        });
       };
 
       this._onMouseMove = evt => {
@@ -8795,7 +9766,10 @@ version: 2.3.1
 
         window.removeEventListener(EVENTS$1.MOUSE_MOVE, this._onMouseMove, false);
         window.removeEventListener(EVENTS$1.MOUSE_UP, this._onMouseUp, false);
-        this.trigger(CONTROL_EVENTS.RELEASE);
+        this.trigger(CONTROL_EVENTS.RELEASE, {
+          inputType: INPUT_TYPE.TRANSLATE,
+          isTouch: false
+        });
       };
 
       this._onTouchStart = evt => {
@@ -8809,6 +9783,10 @@ version: 2.3.1
         this._prevPos.copy(this._getTouchesMiddle(evt.touches));
 
         this._touchInitialized = true;
+        this.trigger(CONTROL_EVENTS.HOLD, {
+          inputType: INPUT_TYPE.TRANSLATE,
+          isTouch: true
+        });
       };
 
       this._onTouchMove = evt => {
@@ -8842,7 +9820,14 @@ version: 2.3.1
       this._onTouchEnd = evt => {
         // Only the two finger motion should be considered
         if (evt.touches.length !== 2) {
-          this._touchInitialized = false;
+          if (this._touchInitialized) {
+            this._touchInitialized = false;
+            this.trigger(CONTROL_EVENTS.RELEASE, {
+              inputType: INPUT_TYPE.TRANSLATE,
+              isTouch: true
+            });
+          }
+
           return;
         } // Three fingers to two fingers
 
@@ -8879,6 +9864,16 @@ version: 2.3.1
 
     get enabled() {
       return this._enabled;
+    }
+    /**
+     * Whether this control is animating the camera
+     * @readonly
+     * @type {boolean}
+     */
+
+
+    get animating() {
+      return this._xMotion.activated || this._yMotion.activated;
     }
     /**
      * Scale factor for translation
@@ -8936,24 +9931,26 @@ version: 2.3.1
 
     destroy() {
       this.disable();
+      this.off();
     }
     /**
      * Update control by given deltaTime
-     * @param deltaTime Number of milisec to update
+     * @param {number} deltaTime Number of milisec to update
      * @returns {void}
      */
 
 
     update(deltaTime) {
       const camera = this._view3D.camera;
+      const newPose = camera.newPose;
       const screenSize = this._screenSize;
       const delta = new Vector2(this._xMotion.update(deltaTime), this._yMotion.update(deltaTime));
       const viewXDir = new Vector3(1, 0, 0).applyQuaternion(camera.threeCamera.quaternion);
       const viewYDir = new Vector3(0, 1, 0).applyQuaternion(camera.threeCamera.quaternion);
       const screenScale = new Vector2(camera.renderWidth, camera.renderHeight).divide(screenSize);
       delta.multiply(screenScale);
-      camera.pivot.add(viewXDir.multiplyScalar(delta.x));
-      camera.pivot.add(viewYDir.multiplyScalar(delta.y));
+      const newPivot = newPose.pivot.clone();
+      newPose.pivot = newPivot.add(viewXDir.multiplyScalar(delta.x)).add(viewYDir.multiplyScalar(delta.y));
     }
     /**
      * Resize control to match target size
@@ -8991,7 +9988,9 @@ version: 2.3.1
       });
       this._enabled = true;
       this.sync();
-      this.trigger(CONTROL_EVENTS.ENABLE);
+      this.trigger(CONTROL_EVENTS.ENABLE, {
+        inputType: INPUT_TYPE.TRANSLATE
+      });
     }
     /**
      * Disable this input and remove all event handlers
@@ -9010,7 +10009,9 @@ version: 2.3.1
       targetEl.removeEventListener(EVENTS$1.TOUCH_END, this._onTouchEnd, false);
       window.removeEventListener(EVENTS$1.CONTEXT_MENU, this._onContextMenu, false);
       this._enabled = false;
-      this.trigger(CONTROL_EVENTS.DISABLE);
+      this.trigger(CONTROL_EVENTS.DISABLE, {
+        inputType: INPUT_TYPE.TRANSLATE
+      });
     }
     /**
      * Synchronize this control's state to the camera position
@@ -9038,19 +10039,24 @@ version: 2.3.1
    * Distance controller handling both mouse wheel and pinch zoom(fov)
    */
 
-  class ZoomControl {
+  class ZoomControl extends Component {
     /**
      * Create new ZoomControl instance
      * @param {View3D} view3D An instance of View3D
-     * @param {ZoomControlOptions} options Options
+     * @param {ZoomControlOptions} [options={}] Options
      */
     constructor(view3D, {
+      type = ZOOM_TYPE.FOV,
       scale = 1,
       duration = ANIMATION_DURATION,
       minFov = 1,
       maxFov = AUTO,
+      minDistance = 0.1,
+      maxDistance = 2,
       easing = EASING$1
     } = {}) {
+      super();
+      this._scaleModifier = 1;
       this._wheelModifier = 0.02;
       this._touchModifier = 0.05;
       this._prevTouchDistance = -1;
@@ -9062,7 +10068,15 @@ version: 2.3.1
         evt.preventDefault();
         evt.stopPropagation();
         const animation = this._motion;
-        const delta = -this._scale * this._wheelModifier * evt.deltaY;
+        const delta = -this._scale * this._scaleModifier * this._wheelModifier * evt.deltaY;
+
+        if (animation.progress <= 0) {
+          this.trigger(CONTROL_EVENTS.HOLD, {
+            inputType: INPUT_TYPE.ZOOM,
+            isTouch: false
+          });
+        }
+
         animation.setEndDelta(delta);
       };
 
@@ -9081,7 +10095,7 @@ version: 2.3.1
         const touchPoint2 = new Vector2(touches[1].pageX, touches[1].pageY);
         const touchDiff = touchPoint1.sub(touchPoint2);
 
-        const touchDistance = touchDiff.length() * this._scale * this._touchModifier;
+        const touchDistance = touchDiff.length() * this._scale * this._scaleModifier * this._touchModifier;
 
         const delta = touchDistance - prevTouchDistance;
         this._prevTouchDistance = touchDistance;
@@ -9089,20 +10103,24 @@ version: 2.3.1
         animation.setEndDelta(delta);
       };
 
-      this._onTouchEnd = () => {
+      this._onTouchEnd = evt => {
+        if (evt.touches.length !== 0) return;
+        this.trigger(CONTROL_EVENTS.RELEASE, {
+          inputType: INPUT_TYPE.ZOOM,
+          isTouch: true
+        });
         this._prevTouchDistance = -1;
       };
 
       this._view3D = view3D;
+      this._type = type;
       this._scale = scale;
       this._duration = duration;
       this._minFov = minFov;
       this._maxFov = maxFov;
+      this._minDistance = minDistance;
+      this._maxDistance = maxDistance;
       this._easing = easing;
-      this._range = {
-        min: minFov,
-        max: maxFov === AUTO ? 180 : maxFov
-      };
       this._motion = new Motion({
         duration,
         easing,
@@ -9122,13 +10140,35 @@ version: 2.3.1
       return this._enabled;
     }
     /**
-     * Actual fov range
+     * Whether this control is animating the camera
      * @readonly
+     * @type {boolean}
+     */
+
+
+    get animating() {
+      return this._motion.activated;
+    }
+    /**
+     * Currenet fov/distance range
+     * @readonly
+     * @type {Range}
      */
 
 
     get range() {
-      return this._range;
+      return this._motion.range;
+    }
+    /**
+     * Current control type
+     * @readonly
+     * @see {ZOOM_TYPE}
+     * @default "fov"
+     */
+
+
+    get type() {
+      return this._type;
     }
     /**
      * Scale factor of the zoom
@@ -9152,6 +10192,7 @@ version: 2.3.1
     }
     /**
      * Minimum vertical fov(field of view).
+     * Only available when type is "fov".
      * You can get a bigger image with the smaller value of this.
      * @type {number}
      * @default 1
@@ -9163,6 +10204,7 @@ version: 2.3.1
     }
     /**
      * Maximum vertical fov(field of view).
+     * Only available when type is "fov".
      * You can get a smaller image with the bigger value of this.
      * If `"auto"` is given, it will use Math.min(default fov + 45, 175).
      * @type {"auto" | number}
@@ -9172,6 +10214,28 @@ version: 2.3.1
 
     get maxFov() {
       return this._maxFov;
+    }
+    /**
+     * Minimum camera distance. This will be scaled to camera's default distance({@link camera.baseDistance Camera#baseDistance})
+     * Only available when type is "distance".
+     * @type {number}
+     * @default 0.1
+     */
+
+
+    get minDistance() {
+      return this._minDistance;
+    }
+    /**
+     * Maximum camera distance. This will be scaled to camera's default distance({@link camera.baseDistance Camera#baseDistance})
+     * Only available when type is "distance".
+     * @type {number}
+     * @default 2
+     */
+
+
+    get maxDistance() {
+      return this._maxDistance;
     }
     /**
      * Easing function of the animation
@@ -9185,6 +10249,10 @@ version: 2.3.1
       return this._easing;
     }
 
+    set type(val) {
+      this._type = val;
+    }
+
     set scale(val) {
       this._scale = val;
     }
@@ -9196,10 +10264,10 @@ version: 2.3.1
 
     destroy() {
       this.disable();
+      this.off();
     }
     /**
      * Update control by given deltaTime
-     * @param camera Camera to update position
      * @param deltaTime Number of milisec to update
      * @returns {void}
      */
@@ -9207,8 +10275,9 @@ version: 2.3.1
 
     update(deltaTime) {
       const camera = this._view3D.camera;
+      const newPose = camera.newPose;
       const motion = this._motion;
-      camera.zoom += motion.update(deltaTime);
+      newPose.zoom -= motion.update(deltaTime);
     } // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
 
@@ -9237,6 +10306,9 @@ version: 2.3.1
       });
       this._enabled = true;
       this.sync();
+      this.trigger(CONTROL_EVENTS.ENABLE, {
+        inputType: INPUT_TYPE.ZOOM
+      });
     }
     /**
      * Disable this input and remove all event handlers
@@ -9251,16 +10323,26 @@ version: 2.3.1
       targetEl.removeEventListener(EVENTS$1.TOUCH_MOVE, this._onTouchMove, false);
       targetEl.removeEventListener(EVENTS$1.TOUCH_END, this._onTouchEnd, false);
       this._enabled = false;
+      this.trigger(CONTROL_EVENTS.DISABLE, {
+        inputType: INPUT_TYPE.ZOOM
+      });
     }
     /**
      * Synchronize this control's state to given camera position
-     * @param camera Camera to match state
      * @returns {void}
      */
 
 
     sync() {
-      this._motion.reset(0);
+      const camera = this._view3D.camera;
+      const motion = this._motion;
+      motion.reset(-camera.zoom);
+
+      if (this._type === ZOOM_TYPE.FOV) {
+        this._scaleModifier = -1;
+      } else {
+        this._scaleModifier = -camera.baseDistance / 44;
+      }
     }
     /**
      * Update fov range by the camera's current fov value
@@ -9269,15 +10351,19 @@ version: 2.3.1
 
 
     updateRange() {
-      const max = this._maxFov;
-      const range = this._range;
+      const range = this._motion.range;
       const {
         camera
       } = this._view3D;
-      const baseFov = camera.baseFov;
 
-      if (max === AUTO) {
-        range.max = Math.min(baseFov + 45, 175);
+      if (this._type === ZOOM_TYPE.FOV) {
+        const baseFov = camera.baseFov;
+        const maxFov = this._maxFov;
+        range.max = maxFov === AUTO ? Math.min(baseFov + 45, 175) - baseFov : maxFov - baseFov;
+        range.min = this._minFov - baseFov;
+      } else {
+        range.max = camera.baseDistance * this._maxDistance - camera.baseDistance;
+        range.min = camera.baseDistance * this._minDistance - camera.baseDistance;
       }
     }
 
@@ -9297,7 +10383,10 @@ version: 2.3.1
      * @param {View3D} view3D An instance of View3D
      */
     constructor(view3D) {
-      this._onEnable = () => {
+      this._onEnable = ({
+        inputType
+      }) => {
+        if (inputType === INPUT_TYPE.ZOOM) return;
         const view3D = this._view3D;
         const canvas = view3D.renderer.canvas;
         const shouldSetGrabCursor = view3D.useGrabCursor && (this._rotateControl.enabled || this._translateControl.enabled) && canvas.style.cursor === CURSOR.NONE;
@@ -9307,7 +10396,10 @@ version: 2.3.1
         }
       };
 
-      this._onDisable = () => {
+      this._onDisable = ({
+        inputType
+      }) => {
+        if (inputType === INPUT_TYPE.ZOOM) return;
         const canvas = this._view3D.renderer.canvas;
         const shouldRemoveGrabCursor = canvas.style.cursor !== CURSOR.NONE && !this._rotateControl.enabled && !this._translateControl.enabled;
 
@@ -9316,27 +10408,54 @@ version: 2.3.1
         }
       };
 
-      this._onHold = () => {
-        const grabCursorEnabled = this._view3D.useGrabCursor && (this._rotateControl.enabled || this._translateControl.enabled);
+      this._onHold = ({
+        inputType,
+        isTouch
+      }) => {
+        const view3D = this._view3D;
 
-        if (grabCursorEnabled) {
-          this._setCursor(CURSOR.GRABBING);
+        if (inputType !== INPUT_TYPE.ZOOM && !isTouch) {
+          const grabCursorEnabled = view3D.useGrabCursor && (this._rotateControl.enabled || this._translateControl.enabled);
+
+          if (grabCursorEnabled) {
+            this._setCursor(CURSOR.GRABBING);
+          }
         }
+
+        view3D.trigger(EVENTS.INPUT_START, {
+          type: EVENTS.INPUT_START,
+          target: view3D,
+          inputType
+        });
       };
 
-      this._onRelease = () => {
-        const grabCursorEnabled = this._view3D.useGrabCursor && (this._rotateControl.enabled || this._translateControl.enabled);
+      this._onRelease = ({
+        inputType,
+        isTouch
+      }) => {
+        const view3D = this._view3D;
 
-        if (grabCursorEnabled) {
-          this._setCursor(CURSOR.GRAB);
+        if (inputType !== INPUT_TYPE.ZOOM && !isTouch) {
+          const grabCursorEnabled = view3D.useGrabCursor && (this._rotateControl.enabled || this._translateControl.enabled);
+
+          if (grabCursorEnabled) {
+            this._setCursor(CURSOR.GRAB);
+          }
         }
+
+        view3D.trigger(EVENTS.INPUT_END, {
+          type: EVENTS.INPUT_END,
+          target: view3D,
+          inputType
+        });
       };
 
       this._view3D = view3D;
       this._rotateControl = new RotateControl(view3D, getObjectOption(view3D.rotate));
       this._translateControl = new TranslateControl(view3D, getObjectOption(view3D.translate));
       this._zoomControl = new ZoomControl(view3D, getObjectOption(view3D.zoom));
-      [this._rotateControl, this._translateControl].forEach(control => {
+      this._extraControls = [];
+      [this._rotateControl, this._translateControl, this._zoomControl].forEach(control => {
         control.on({
           [CONTROL_EVENTS.HOLD]: this._onHold,
           [CONTROL_EVENTS.RELEASE]: this._onRelease,
@@ -9347,7 +10466,9 @@ version: 2.3.1
     } // Internal Values Getter
 
     /**
-     * {@link RotateControl} of this control
+     * Rotate(left-click) part of this control
+     * @type {RotateControl}
+     * @readonly
      */
 
 
@@ -9355,7 +10476,9 @@ version: 2.3.1
       return this._rotateControl;
     }
     /**
-     * {@link TranslateControl} of this control
+     * Translation(right-click) part of this control
+     * @type {TranslateControl}
+     * @readonly
      */
 
 
@@ -9363,12 +10486,44 @@ version: 2.3.1
       return this._translateControl;
     }
     /**
-     * {@link ZoomControl} of this control
+     * Zoom(mouse wheel) part of this control
+     * @type {ZoomControl}
+     * @readonly
      */
 
 
     get zoom() {
       return this._zoomControl;
+    }
+    /**
+     * Base controls
+     * @type {CameraControl[]}
+     * @readonly
+     */
+
+
+    get controls() {
+      return [this._rotateControl, this._translateControl, this._zoomControl];
+    }
+    /**
+     * Extra camera controls added, like {@link AnimationControl}
+     * @type {CameraControl[]}
+     * @readonly
+     */
+
+
+    get extraControls() {
+      return this._extraControls;
+    }
+    /**
+     * Whether one of the controls is animating at the moment
+     * @type {boolean}
+     * @readonly
+     */
+
+
+    get animating() {
+      return this._rotateControl.animating || this._translateControl.animating || this._zoomControl.animating || this._extraControls.some(control => control.animating);
     }
     /**
      * Destroy the instance and remove all event listeners attached
@@ -9383,20 +10538,26 @@ version: 2.3.1
       this._translateControl.destroy();
 
       this._zoomControl.destroy();
+
+      this._extraControls.forEach(control => control.destroy());
+
+      this._extraControls = [];
     }
     /**
      * Update control by given deltaTime
-     * @param deltaTime Number of milisec to update
+     * @param {number} deltaTime Number of milisec to update
      * @returns {void}
      */
 
 
-    update(delta) {
-      this._rotateControl.update(delta);
+    update(deltaTime) {
+      this._rotateControl.update(deltaTime);
 
-      this._translateControl.update(delta);
+      this._translateControl.update(deltaTime);
 
-      this._zoomControl.update(delta);
+      this._zoomControl.update(deltaTime);
+
+      this._extraControls.forEach(control => control.update(deltaTime));
     }
     /**
      * Resize control to match target size
@@ -9413,6 +10574,8 @@ version: 2.3.1
       this._translateControl.resize(size);
 
       this._zoomControl.resize(size);
+
+      this._extraControls.forEach(control => control.resize(size));
     }
     /**
      * Enable this control and add event listeners
@@ -9434,6 +10597,8 @@ version: 2.3.1
       if (view3D.zoom) {
         this._zoomControl.enable();
       }
+
+      this._extraControls.forEach(control => control.enable());
     }
     /**
      * Disable this control and remove all event handlers
@@ -9447,6 +10612,8 @@ version: 2.3.1
       this._translateControl.disable();
 
       this._zoomControl.disable();
+
+      this._extraControls.forEach(control => control.disable());
     }
     /**
      * Synchronize this control's state to current camera position
@@ -9460,6 +10627,33 @@ version: 2.3.1
       this._translateControl.sync();
 
       this._zoomControl.sync();
+
+      this._extraControls.forEach(control => control.sync());
+    }
+    /**
+     * Add extra control
+     * @param {CameraControl} control Control to add
+     * @returns {void}
+     */
+
+
+    add(control) {
+      this._extraControls.push(control);
+    }
+    /**
+     * Remove extra control
+     * @param {CameraControl} control Control to add
+     * @returns {void}
+     */
+
+
+    remove(control) {
+      const extraControls = this._extraControls;
+      const controlIdx = extraControls.findIndex(ctrl => ctrl === control);
+
+      if (controlIdx >= 0) {
+        extraControls.splice(controlIdx, 1);
+      }
     }
     /**
      * Update cursor to current option
@@ -9580,6 +10774,15 @@ version: 2.3.1
       return this._enabled;
     }
     /**
+     * Whether autoplay is updating the camera at the moment
+     * @readonly
+     */
+
+
+    get animating() {
+      return this._enabled && !this._interrupted;
+    }
+    /**
      * Reactivation delay after mouse input in milisecond
      */
 
@@ -9685,11 +10888,11 @@ version: 2.3.1
         return;
       }
 
-      const camera = this._view3D.camera;
-      camera.yaw += this._speed * deltaTime / 100;
+      const newPose = this._view3D.camera.newPose;
+      newPose.yaw += this._speed * deltaTime / 100;
     }
     /**
-     * Enable this input and add event listeners
+     * Enable autoplay and add event listeners
      * @returns {void}
      */
 
@@ -9713,6 +10916,18 @@ version: 2.3.1
         capture: false
       });
       this._enabled = true;
+    }
+    /**
+     * Enable autoplay after current delay value
+     * @returns {void}
+     */
+
+
+    enableAfterDelay() {
+      this.enable();
+      this._interrupted = true;
+
+      this._setUninterruptedAfterDelay(this._delay);
     }
     /**
      * Disable this input and remove all event handlers
@@ -13808,6 +15023,7 @@ version: 2.3.1
       src,
       scenes,
       animations = [],
+      annotations = [],
       fixSkinnedBbox = false,
       castShadow = true,
       receiveShadow = false
@@ -13816,6 +15032,7 @@ version: 2.3.1
       const scene = new Group();
       scene.add(...scenes);
       this._animations = animations;
+      this._annotations = annotations;
       this._scene = scene;
 
       const bbox = this._getInitialBbox(fixSkinnedBbox); // Move to position where bbox.min.y = 0
@@ -13857,6 +15074,15 @@ version: 2.3.1
 
     get animations() {
       return this._animations;
+    }
+    /**
+     * {@link Annotation}s included inside the model
+     * @readonly
+     */
+
+
+    get annotations() {
+      return this._annotations;
     }
     /**
      * {@link https://threejs.org/docs/#api/en/objects/Mesh THREE.Mesh}es inside model if there's any.
@@ -13926,8 +15152,15 @@ version: 2.3.1
             result = callbackfn(result, vertex);
           });
         } else {
+          const posScale = getAttributeScale(position);
+
           for (let idx = 0; idx < position.count; idx++) {
             const vertex = new Vector3().fromBufferAttribute(position, idx);
+
+            if (position.normalized) {
+              vertex.multiplyScalar(posScale);
+            }
+
             vertex.applyMatrix4(mesh.matrixWorld);
             result = callbackfn(result, vertex);
           }
@@ -13974,7 +15207,7 @@ version: 2.3.1
         }
       });
 
-      return meshes;
+      return meshes.sort((a, b) => a.name.localeCompare(b.name));
     }
 
     _hasSkinnedMesh() {
@@ -13984,25 +15217,14 @@ version: 2.3.1
     _forEachSkinnedVertices(mesh, callback) {
       const geometry = mesh.geometry;
       const positions = geometry.attributes.position;
-      const skinIndicies = geometry.attributes.skinIndex;
       const skinWeights = geometry.attributes.skinWeight;
       const skeleton = mesh.skeleton;
       skeleton.update();
-      const boneMatricies = skeleton.boneMatrices;
-      const skinWeightScale = skinWeights.normalized && ArrayBuffer.isView(skinWeights.array) ? 1 / (Math.pow(2, 8 * skinWeights.array.BYTES_PER_ELEMENT) - 1) : 1;
+      const positionScale = getAttributeScale(positions);
+      const skinWeightScale = getAttributeScale(skinWeights);
 
       for (let posIdx = 0; posIdx < positions.count; posIdx++) {
-        const pos = new Vector3().fromBufferAttribute(positions, posIdx);
-        const skinned = new Vector4(0, 0, 0, 0);
-        const skinVertex = new Vector4(pos.x, pos.y, pos.z).applyMatrix4(mesh.bindMatrix);
-        const weights = [skinWeights.getX(posIdx), skinWeights.getY(posIdx), skinWeights.getZ(posIdx), skinWeights.getW(posIdx)].map(weight => weight * skinWeightScale);
-        const indicies = [skinIndicies.getX(posIdx), skinIndicies.getY(posIdx), skinIndicies.getZ(posIdx), skinIndicies.getW(posIdx)];
-        weights.forEach((weight, index) => {
-          const boneMatrix = new Matrix4().fromArray(boneMatricies, indicies[index] * 16);
-          skinned.add(skinVertex.clone().applyMatrix4(boneMatrix).multiplyScalar(weight));
-        });
-        const transformed = new Vector3().fromArray(skinned.applyMatrix4(mesh.bindMatrixInverse).toArray());
-        transformed.applyMatrix4(mesh.matrixWorld);
+        const transformed = getSkinnedVertex(posIdx, mesh, positionScale, skinWeightScale);
         callback(transformed);
       }
     }
@@ -14167,70 +15389,76 @@ version: 2.3.1
           obj.frustumCulled = false;
         });
       });
-      const extensionsUsed = gltf.parser.json.extensionsUsed;
+      const maxTextureSize = view3D.renderer.threeRenderer.capabilities.maxTextureSize;
+      const meshes = [];
+      gltf.scenes.forEach(scene => {
+        scene.traverse(obj => {
+          if (obj.isMesh) {
+            meshes.push(obj);
+          }
+        });
+      });
+      const materials = meshes.reduce((allMaterials, mesh) => {
+        return [...allMaterials, ...(Array.isArray(mesh.material) ? mesh.material : [mesh.material])];
+      }, []);
+      const textures = materials.reduce((allTextures, material) => {
+        return [...allTextures, ...STANDARD_MAPS.filter(map => material[map]).map(mapName => material[mapName])];
+      }, []);
+      const associations = gltf.parser.associations;
+      const gltfJSON = gltf.parser.json;
+      const gltfTextures = textures.filter(texture => associations.has(texture)).map(texture => {
+        return gltfJSON.textures[associations.get(texture).textures];
+      });
+      const texturesByLevel = gltfTextures.reduce((levels, texture, texIdx) => {
+        const hasExtension = texture.extensions && texture.extensions[CUSTOM_TEXTURE_LOD_EXTENSION];
+        const hasExtra = texture.extras && texture.extras[TEXTURE_LOD_EXTRA];
+        if (!hasExtension && !hasExtra) return levels;
+        const currentTexture = textures[texIdx];
+        const lodLevels = hasExtension ? texture.extensions[CUSTOM_TEXTURE_LOD_EXTENSION].levels : texture.extras[TEXTURE_LOD_EXTRA].levels;
+        lodLevels.forEach(({
+          index,
+          size
+        }, level) => {
+          if (size > maxTextureSize) return;
 
-      if (extensionsUsed && extensionsUsed.some(extension => extension === CUSTOM_TEXTURE_LOD_EXTENSION)) {
-        const maxTextureSize = view3D.renderer.threeRenderer.capabilities.maxTextureSize;
-        const meshes = [];
-        gltf.scenes.forEach(scene => {
-          scene.traverse(obj => {
-            if (obj.isMesh) {
-              meshes.push(obj);
-            }
-          });
-        });
-        const materials = meshes.reduce((allMaterials, mesh) => {
-          return [...allMaterials, ...(Array.isArray(mesh.material) ? mesh.material : [mesh.material])];
-        }, []);
-        const textures = materials.reduce((allTextures, material) => {
-          return [...allTextures, ...STANDARD_MAPS.filter(map => material[map]).map(mapName => material[mapName])];
-        }, []);
-        const associations = gltf.parser.associations;
-        const gltfJSON = gltf.parser.json;
-        const gltfTextures = textures.filter(texture => associations.has(texture)).map(texture => {
-          return gltfJSON.textures[associations.get(texture).textures];
-        });
-        const texturesByLevel = gltfTextures.reduce((levels, texture, texIdx) => {
-          if (!texture.extensions[CUSTOM_TEXTURE_LOD_EXTENSION]) return levels;
-          const currentTexture = textures[texIdx];
-          const lodLevels = texture.extensions[CUSTOM_TEXTURE_LOD_EXTENSION].levels;
-          lodLevels.forEach(({
+          if (!levels[level]) {
+            levels[level] = [];
+          }
+
+          levels[level].push({
             index,
-            size
-          }, level) => {
-            if (size > maxTextureSize) return;
-
-            if (!levels[level]) {
-              levels[level] = [];
-            }
-
-            levels[level].push({
-              index,
-              texture: currentTexture
-            });
+            texture: currentTexture
           });
-          return levels;
-        }, []);
-        const loaded = texturesByLevel.map(() => false);
-        texturesByLevel.forEach((levelTextures, level) => __awaiter(this, void 0, void 0, function* () {
-          // Change textures when all texture of the level loaded
-          const texturesLoaded = yield Promise.all(levelTextures.map(({
-            index
-          }) => gltf.parser.getDependency("texture", index)));
-          const higherLevelLoaded = loaded.slice(level + 1).some(val => !!val);
-          loaded[level] = true;
-          if (higherLevelLoaded) return;
-          texturesLoaded.forEach((texture, index) => {
-            const origTexture = levelTextures[index].texture;
-            origTexture.image = texture.image;
-            origTexture.needsUpdate = true;
-          });
-        }));
+        });
+        return levels;
+      }, []);
+      const loaded = texturesByLevel.map(() => false);
+      texturesByLevel.forEach((levelTextures, level) => __awaiter(this, void 0, void 0, function* () {
+        // Change textures when all texture of the level loaded
+        const texturesLoaded = yield Promise.all(levelTextures.map(({
+          index
+        }) => gltf.parser.getDependency("texture", index)));
+        const higherLevelLoaded = loaded.slice(level + 1).some(val => !!val);
+        loaded[level] = true;
+        if (higherLevelLoaded) return;
+        texturesLoaded.forEach((texture, index) => {
+          const origTexture = levelTextures[index].texture;
+          origTexture.image = texture.image;
+          origTexture.needsUpdate = true;
+          view3D.renderer.renderSingleFrame();
+        });
+      }));
+      const annotations = [];
+
+      if (gltf.parser.json.extras && gltf.parser.json.extras[ANNOTATION_EXTRA]) {
+        const data = gltf.parser.json.extras[ANNOTATION_EXTRA];
+        annotations.push(...view3D.annotation.parse(data));
       }
 
       const model = new Model({
         src,
         scenes: gltf.scenes,
+        annotations,
         animations: gltf.animations,
         fixSkinnedBbox
       });
@@ -14283,6 +15511,10 @@ version: 2.3.1
       shadow = true,
       skyboxBlur = false,
       toneMapping = TONE_MAPPING.LINEAR,
+      annotationURL = null,
+      annotationWrapper = `.${DEFAULT_CLASS.ANNOTATION_WRAPPER}`,
+      annotationSelector = `.${DEFAULT_CLASS.ANNOTATION}`,
+      annotationBreakpoints = ANNOTATION_BREAKPOINT,
       webAR = true,
       sceneViewer = true,
       quickLook = true,
@@ -14325,6 +15557,10 @@ version: 2.3.1
       this._shadow = shadow;
       this._skyboxBlur = skyboxBlur;
       this._toneMapping = toneMapping;
+      this._annotationURL = annotationURL;
+      this._annotationWrapper = annotationWrapper;
+      this._annotationSelector = annotationSelector;
+      this._annotationBreakpoints = annotationBreakpoints;
       this._webAR = webAR;
       this._sceneViewer = sceneViewer;
       this._quickLook = quickLook;
@@ -14349,6 +15585,7 @@ version: 2.3.1
       this._autoPlayer = new AutoPlayer(this, getObjectOption(autoplay));
       this._autoResizer = new AutoResizer(this);
       this._arManager = new ARManager(this);
+      this._annotationManager = new AnnotationManager(this);
 
       this._addEventHandlers(on);
 
@@ -14442,6 +15679,15 @@ version: 2.3.1
 
     get ar() {
       return this._arManager;
+    }
+    /**
+     * {@link AnnotationManager} instance of the View3D
+     * @type {AnnotationManager}
+     */
+
+
+    get annotation() {
+      return this._annotationManager;
     } // Internal State Getter
 
     /**
@@ -14466,7 +15712,8 @@ version: 2.3.1
     }
     /**
      * An array of loading status of assets.
-     * @type {object[]}
+     * @type {LoadingItem[]}
+     * @readonly
      * @internal
      */
 
@@ -14757,6 +16004,46 @@ version: 2.3.1
       return this._toneMapping;
     }
     /**
+     * An URL to the JSON file that has annotation informations.
+     * @type {string | null}
+     * @default null
+     */
+
+
+    get annotationURL() {
+      return this._annotationURL;
+    }
+    /**
+     * An element or CSS selector of the annotation wrapper element.
+     * @type {HTMLElement | string}
+     * @default ".view3d-annotation-wrapper"
+     */
+
+
+    get annotationWrapper() {
+      return this._annotationWrapper;
+    }
+    /**
+     * CSS selector of the annotation elements inside the root element
+     * @type {string}
+     * @default ".view3d-annotation"
+     */
+
+
+    get annotationSelector() {
+      return this._annotationSelector;
+    }
+    /**
+     * Breakpoints for the annotation opacity, mapped by degree between (camera-model center-annotation) as key.
+     * @type {Record<number, number>}
+     * @default { 165: 0, 135: 0.4, 0: 1 }
+     */
+
+
+    get annotationBreakpoints() {
+      return this._annotationBreakpoints;
+    }
+    /**
      * Options for the WebXR-based AR session.
      * If `false` is given, it will disable WebXR-based AR session.
      * @type {boolean | WebARSessionOptions}
@@ -14944,6 +16231,8 @@ version: 2.3.1
 
       this._animator.reset();
 
+      this._annotationManager.destroy();
+
       this._plugins.forEach(plugin => plugin.teardown(this));
 
       this._plugins = [];
@@ -14964,12 +16253,14 @@ version: 2.3.1
         const scene = this._scene;
         const renderer = this._renderer;
         const control = this._control;
+        const annotationManager = this._annotationManager;
         const skybox = this._skybox;
         const envmap = this._envmap;
         const background = this._background;
         const meshoptPath = this._meshoptPath;
         const tasks = [];
         this.resize();
+        annotationManager.init();
 
         if (this._autoResize) {
           this._autoResizer.enable();
@@ -15000,6 +16291,11 @@ version: 2.3.1
         tasks.push(...loadModel);
         void this._resetLoadingContextOnFinish(tasks);
         yield Promise.race(loadModel);
+
+        if (this._annotationURL) {
+          yield this._annotationManager.load(this._annotationURL);
+        }
+
         control.enable();
 
         if (this._autoplay) {
@@ -15009,6 +16305,7 @@ version: 2.3.1
 
         renderer.stopAnimationLoop();
         renderer.setAnimationLoop(renderer.defaultRenderLoop);
+        renderer.renderSingleFrame();
         this._initialized = true;
         this.trigger(EVENTS.READY, {
           type: EVENTS.READY,
@@ -15032,11 +16329,10 @@ version: 2.3.1
 
       this._control.resize(newSize);
 
-      if (!renderer.threeRenderer.xr.isPresenting) {
-        // Prevent flickering on resize
-        renderer.defaultRenderLoop(0);
-      }
+      this._annotationManager.resize(); // Prevent flickering on resize
 
+
+      renderer.renderSingleFrame();
       this.trigger(EVENTS.RESIZE, Object.assign(Object.assign({}, newSize), {
         type: EVENTS.RESIZE,
         target: this
@@ -15078,6 +16374,7 @@ version: 2.3.1
       const scene = this._scene;
       const camera = this._camera;
       const animator = this._animator;
+      const annotationManager = this._annotationManager;
       const inXR = renderer.threeRenderer.xr.isPresenting;
       scene.reset();
       scene.add(model.scene);
@@ -15095,6 +16392,9 @@ version: 2.3.1
         animator.play(0);
       }
 
+      annotationManager.reset();
+      annotationManager.collect();
+      annotationManager.add(...model.annotations);
       this._model = model;
 
       if (inXR) {
@@ -15105,6 +16405,7 @@ version: 2.3.1
         }
       }
 
+      renderer.renderSingleFrame();
       this.trigger(EVENTS.MODEL_CHANGE, {
         type: EVENTS.MODEL_CHANGE,
         target: this,
@@ -15276,7 +16577,7 @@ version: 2.3.1
    */
 
 
-  View3D.VERSION = "2.3.1";
+  View3D.VERSION = "2.4.0";
 
   /*
    * "View In Ar" Icon from [Google Material Design Icons](https://github.com/google/material-design-icons)
@@ -15656,6 +16957,10 @@ version: 2.3.1
     ShadowPlane: ShadowPlane,
     Skybox: Skybox,
     View3DError: View3DError,
+    Annotation: Annotation,
+    PointAnnotation: PointAnnotation,
+    FaceAnnotation: FaceAnnotation,
+    AnnotationManager: AnnotationManager,
     AnimationControl: AnimationControl,
     OrbitControl: OrbitControl,
     RotateControl: RotateControl,
@@ -15671,10 +16976,12 @@ version: 2.3.1
     EASING: EASING,
     DEFAULT_CLASS: DEFAULT_CLASS,
     TONE_MAPPING: TONE_MAPPING,
+    ZOOM_TYPE: ZOOM_TYPE,
     AR_SESSION_TYPE: AR_SESSION_TYPE,
     SCENE_VIEWER_MODE: SCENE_VIEWER_MODE,
     QUICK_LOOK_APPLE_PAY_BUTTON_TYPE: QUICK_LOOK_APPLE_PAY_BUTTON_TYPE,
     QUICK_LOOK_CUSTOM_BANNER_SIZE: QUICK_LOOK_CUSTOM_BANNER_SIZE,
+    get INPUT_TYPE () { return INPUT_TYPE; },
     ERROR_CODES: ERROR_CODES,
     isAvailable: isAvailable
   };
