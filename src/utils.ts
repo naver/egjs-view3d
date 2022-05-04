@@ -22,7 +22,7 @@ export const getNullableElement = (el: HTMLElement | string | null, parent?: HTM
     const queryResult = parentEl.querySelector(el);
 
     if (!queryResult) {
-      throw new View3DError(ERROR.MESSAGES.ELEMENT_NOT_FOUND(el), ERROR.CODES.ELEMENT_NOT_FOUND);
+      return null;
     }
 
     targetEl = queryResult as HTMLElement;
@@ -37,7 +37,11 @@ export const getElement = (el: HTMLElement | string, parent?: HTMLElement): HTML
   const targetEl = getNullableElement(el, parent);
 
   if (!targetEl) {
-    throw new View3DError(ERROR.MESSAGES.WRONG_TYPE(el, ["HTMLElement", "string"]), ERROR.CODES.WRONG_TYPE);
+    if (isString(el)) {
+      throw new View3DError(ERROR.MESSAGES.ELEMENT_NOT_FOUND(el), ERROR.CODES.ELEMENT_NOT_FOUND);
+    } else {
+      throw new View3DError(ERROR.MESSAGES.WRONG_TYPE(el, ["HTMLElement", "string"]), ERROR.CODES.WRONG_TYPE);
+    }
   }
 
   return targetEl;
@@ -184,6 +188,23 @@ export const getRotatedPosition = (distance: number, yawDeg: number, pitchDeg: n
   return newPos;
 };
 
+/**
+ * In Radians
+ */
+export const directionToYawPitch = (direction: THREE.Vector3) => {
+  const xz = new THREE.Vector2(direction.x, direction.z);
+  const origin = new THREE.Vector2();
+  const yaw = Math.abs(direction.y) <= 0.99
+    ? getRotationAngle(origin, new THREE.Vector2(0, 1), xz)
+    : 0;
+  const pitch = Math.atan2(direction.y, xz.distanceTo(origin));
+
+  return {
+    yaw,
+    pitch
+  };
+};
+
 export const createLoadingContext = (view3D: View3D, src: string): View3D["loadingContext"][0] => {
   const context = {
     src,
@@ -208,6 +229,43 @@ export const getAttributeScale = (attrib: THREE.BufferAttribute | THREE.Interlea
   } else {
     return 1;
   }
+};
+
+export const getSkinnedVertex = (posIdx: number, mesh: THREE.SkinnedMesh, positionScale: number, skinWeightScale: number) => {
+  const geometry = mesh.geometry;
+  const positions = geometry.attributes.position;
+  const skinIndicies = geometry.attributes.skinIndex;
+  const skinWeights = geometry.attributes.skinWeight;
+  const skeleton = mesh.skeleton;
+  const boneMatricies = skeleton.boneMatrices;
+
+  const pos = new THREE.Vector3().fromBufferAttribute(positions, posIdx).multiplyScalar(positionScale);
+  const skinned = new THREE.Vector4(0, 0, 0, 0);
+  const skinVertex = new THREE.Vector4(pos.x, pos.y, pos.z).applyMatrix4(mesh.bindMatrix);
+
+  const weights = [
+    skinWeights.getX(posIdx),
+    skinWeights.getY(posIdx),
+    skinWeights.getZ(posIdx),
+    skinWeights.getW(posIdx)
+  ].map(weight => weight * skinWeightScale);
+
+  const indicies = [
+    skinIndicies.getX(posIdx),
+    skinIndicies.getY(posIdx),
+    skinIndicies.getZ(posIdx),
+    skinIndicies.getW(posIdx)
+  ];
+
+  weights.forEach((weight, index) => {
+    const boneMatrix = new THREE.Matrix4().fromArray(boneMatricies, indicies[index] * 16);
+    skinned.add(skinVertex.clone().applyMatrix4(boneMatrix).multiplyScalar(weight));
+  });
+
+  const transformed = new THREE.Vector3().fromArray(skinned.applyMatrix4(mesh.bindMatrixInverse).toArray());
+  transformed.applyMatrix4(mesh.matrixWorld);
+
+  return transformed;
 };
 
 export const isSignedArrayBuffer = (buffer: TypedArray) => {

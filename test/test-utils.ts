@@ -32,6 +32,9 @@ export const createView3D = async (options: Partial<View3DOptions & { children: 
   wrapper.appendChild(canvas);
   sandbox.appendChild(wrapper);
 
+  canvas.style.width = "1000px";
+  canvas.style.height = "660px";
+
   const { children = [], ...restOptions } = options;
 
   children.forEach(el => {

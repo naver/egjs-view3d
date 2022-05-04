@@ -11,6 +11,8 @@ export * from "./loader";
 export * from "./plugin";
 export * from "./const/external";
 export * from "./helper";
+export * from "./type/event";
+export * from "./type/external";
 
 export type {
   View3DOptions,

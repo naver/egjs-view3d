@@ -11,6 +11,7 @@ import Motion from "../core/Motion";
 import * as BROWSER from "../const/browser";
 import * as DEFAULT from "../const/default";
 import { CONTROL_EVENTS } from "../const/internal";
+import { INPUT_TYPE } from "../const/external";
 import { ControlEvents, OptionGetters } from "../type/utils";
 
 import CameraControl from "./CameraControl";
@@ -53,6 +54,12 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
    * @type {boolean}
    */
   public get enabled() { return this._enabled; }
+  /**
+   * Whether this control is animating the camera
+   * @readonly
+   * @type {boolean}
+   */
+  public get animating() { return this._xMotion.activated || this._yMotion.activated; }
 
   /**
    * Scale factor for translation
@@ -115,20 +122,22 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
    */
   public destroy(): void {
     this.disable();
+    this.off();
   }
 
   /**
    * Update control by given deltaTime
-   * @param deltaTime Number of milisec to update
+   * @param {number} deltaTime Number of milisec to update
    * @returns {void}
    */
   public update(deltaTime: number): void {
     const camera = this._view3D.camera;
+    const newPose = camera.newPose;
     const screenSize = this._screenSize;
 
     const delta = new THREE.Vector2(
       this._xMotion.update(deltaTime),
-      this._yMotion.update(deltaTime),
+      this._yMotion.update(deltaTime)
     );
 
     const viewXDir = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.threeCamera.quaternion);
@@ -137,8 +146,10 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
     const screenScale = new THREE.Vector2(camera.renderWidth, camera.renderHeight).divide(screenSize);
     delta.multiply(screenScale);
 
-    camera.pivot.add(viewXDir.multiplyScalar(delta.x));
-    camera.pivot.add(viewYDir.multiplyScalar(delta.y));
+    const newPivot = newPose.pivot.clone();
+    newPose.pivot = newPivot
+      .add(viewXDir.multiplyScalar(delta.x))
+      .add(viewYDir.multiplyScalar(delta.y));
   }
 
   /**
@@ -171,7 +182,9 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
     this._enabled = true;
     this.sync();
 
-    this.trigger(CONTROL_EVENTS.ENABLE);
+    this.trigger(CONTROL_EVENTS.ENABLE, {
+      inputType: INPUT_TYPE.TRANSLATE
+    });
   }
 
   /**
@@ -195,7 +208,9 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
 
     this._enabled = false;
 
-    this.trigger(CONTROL_EVENTS.DISABLE);
+    this.trigger(CONTROL_EVENTS.DISABLE, {
+      inputType: INPUT_TYPE.TRANSLATE
+    });
   }
 
   /**
@@ -224,7 +239,10 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
     window.addEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
     window.addEventListener(BROWSER.EVENTS.CONTEXT_MENU, this._onContextMenu, false);
 
-    this.trigger(CONTROL_EVENTS.HOLD);
+    this.trigger(CONTROL_EVENTS.HOLD, {
+      inputType: INPUT_TYPE.TRANSLATE,
+      isTouch: false
+    });
   };
 
   private _onMouseMove = (evt: MouseEvent) => {
@@ -247,7 +265,10 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
     window.removeEventListener(BROWSER.EVENTS.MOUSE_MOVE, this._onMouseMove, false);
     window.removeEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
 
-    this.trigger(CONTROL_EVENTS.RELEASE);
+    this.trigger(CONTROL_EVENTS.RELEASE, {
+      inputType: INPUT_TYPE.TRANSLATE,
+      isTouch: false
+    });
   };
 
   private _onTouchStart = (evt: TouchEvent) => {
@@ -260,6 +281,11 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
 
     this._prevPos.copy(this._getTouchesMiddle(evt.touches));
     this._touchInitialized = true;
+
+    this.trigger(CONTROL_EVENTS.HOLD, {
+      inputType: INPUT_TYPE.TRANSLATE,
+      isTouch: true
+    });
   };
 
   private _onTouchMove = (evt: TouchEvent) => {
@@ -294,7 +320,13 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
   private _onTouchEnd = (evt: TouchEvent) => {
     // Only the two finger motion should be considered
     if (evt.touches.length !== 2) {
-      this._touchInitialized = false;
+      if (this._touchInitialized) {
+        this._touchInitialized = false;
+        this.trigger(CONTROL_EVENTS.RELEASE, {
+          inputType: INPUT_TYPE.TRANSLATE,
+          isTouch: true
+        });
+      }
       return;
     }
 

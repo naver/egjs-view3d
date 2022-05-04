@@ -5,6 +5,8 @@
 
 import * as THREE from "three";
 
+import { circulate } from "../utils";
+
 /**
  * Data class of camera's pose
  */
@@ -48,6 +50,30 @@ class Pose {
       this.yaw, this.pitch, this.zoom,
       this.pivot.toArray(),
     );
+  }
+
+  /**
+   * Copy values from the other pose
+   * @param {Pose} pose pose to copy
+   */
+  public copy(pose: Pose) {
+    this.yaw = pose.yaw;
+    this.pitch = pose.pitch;
+    this.zoom = pose.zoom;
+    this.pivot.copy(pose.pivot);
+  }
+
+  /**
+   * Return whether values of this pose is equal to other pose
+   * @param {Pose} pose pose to check
+   */
+  public equals(pose: Pose): boolean {
+    const { yaw, pitch, zoom, pivot } = this;
+
+    return circulate(yaw, 0, 360) === circulate(pose.yaw, 0, 360)
+      && pitch === pose.pitch
+      && zoom === pose.zoom
+      && pivot.equals(pose.pivot);
   }
 }
 

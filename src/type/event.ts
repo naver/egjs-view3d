@@ -4,6 +4,8 @@
  */
 import View3D from "../View3D";
 import Model from "../core/Model";
+import Pose from "../core/Pose";
+import { INPUT_TYPE } from "../const/external";
 import WebARSession from "../xr/WebARSession";
 
 /**
@@ -11,7 +13,7 @@ import WebARSession from "../xr/WebARSession";
  * This will be called once after the first 3D model is loaded.
  * @event View3D#ready
  * @type {object}
- * @property {string} type The type of event.
+ * @property {string} type A type of the event.
  * @property {View3D} target An instance of View3D that triggered this event.
  */
 export interface ReadyEvent {
@@ -23,7 +25,7 @@ export interface ReadyEvent {
  * An event that fires before loading a 3D model.
  * @event View3D#loadStart
  * @type {object}
- * @property {string} type The type of event.
+ * @property {string} type A type of the event.
  * @property {View3D} target An instance of View3D that triggered this event.
  * @property {string} src A source URL of the model to load.
  * @property {number} level A level of model when loading multiple models at once, an integer starting from 0.
@@ -41,7 +43,7 @@ export interface LoadStartEvent {
  * An event that fires when the 3D model is loaded but not displayed yet.
  * @event View3D#load
  * @type {object}
- * @property {string} type The type of event.
+ * @property {string} type A type of the event.
  * @property {View3D} target An instance of View3D that triggered this event.
  * @property {Model} model A new model that loaded.
  * @property {number} level A level of model when loading multiple models at once, an integer starting from 0.
@@ -59,7 +61,7 @@ export interface LoadEvent {
  * An event that fires when the 3D model fails to load / parse
  * @event View3D#loadError
  * @type {object}
- * @property {string} type The type of event.
+ * @property {string} type A type of the event.
  * @property {View3D} target An instance of View3D that triggered this event.
  * @property {number} level A level of model when loading multiple models at once, an integer starting from 0.
  * @property {number} maxLevel Maximum level of models loading.
@@ -77,7 +79,7 @@ export interface LoadErrorEvent {
  * An event that fires when all assets in a single load sequence(i.e. View3D's init, load) are finished to load
  * @event View3D#loadFinish
  * @type {object}
- * @property {string} type The type of event.
+ * @property {string} type A type of the event.
  * @property {View3D} target An instance of View3D that triggered this event.
  */
 export interface LoadFinishEvent {
@@ -89,7 +91,7 @@ export interface LoadFinishEvent {
  * An event that fires when the 3D Model is loaded and displayed on the canvas.
  * @event View3D#modelChange
  * @type {object}
- * @property {string} type The type of event.
+ * @property {string} type A type of the event.
  * @property {View3D} target An instance of View3D that triggered this event.
  * @property {Model} model A new model that displayed.
  */
@@ -103,7 +105,7 @@ export interface ModelChangeEvent {
  * An event that fires when View3D's {@link View3D#resize resize()} is called
  * @event View3D#resize
  * @type {object}
- * @property {string} type The type of event.
+ * @property {string} type A type of the event.
  * @property {View3D} target An instance of View3D that triggered this event.
  * @property {number} width New width of the canvas.
  * @property {number} height New height of the canvas.
@@ -119,7 +121,7 @@ export interface ResizeEvent {
  * An event that fires before rendering a frame.
  * @event View3D#beforeRender
  * @type {object}
- * @property {string} type The type of event.
+ * @property {string} type A type of the event.
  * @property {View3D} target An instance of View3D that triggered this event.
  * @property {number} delta Time passed from the previous render call, in milisecond.
  */
@@ -133,7 +135,7 @@ export interface BeforeRenderEvent {
  * An event that fires after rendering a frame.
  * @event View3D#afterRender
  * @type {object}
- * @property {string} type The type of event.
+ * @property {string} type A type of the event.
  * @property {View3D} target An instance of View3D that triggered this event.
  * @property {number} delta Time passed from the previous render call, in milisecond.
  */
@@ -150,7 +152,7 @@ export interface RenderEvent {
  * @see https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent
  * @event View3D#progress
  * @type {object}
- * @property {string} type The type of event.
+ * @property {string} type A type of the event.
  * @property {View3D} target An instance of View3D that triggered this event.
  * @property {string} src A source URL of the asset
  * @property {boolean} lengthComputable A boolean flag indicating if the total work to be done, and the amount of work already done, by the underlying process is calculable. In other words, it tells if the progress is measurable or not.
@@ -167,16 +169,41 @@ export interface LoadProgressEvent {
 }
 
 /**
- * An event that fires when user clicked the Apple pay button or custom action button
- * @see https://developer.apple.com/documentation/arkit/adding_an_apple_pay_button_or_a_custom_action_in_ar_quick_look#3405186
- * @event View3D#quickLookTap
- * @type {Event}
- * @property {string} type The type of event.
+ * An event that fires on the start of every inputs
+ * @property {string} type A type of the event.
  * @property {View3D} target An instance of View3D that triggered this event.
+ * @property {INPUT_TYPE} inputType Type of the input.
  */
-export interface QuickLookTapEvent extends Omit<Event, "target"> {
+export interface InputStartEvent {
   type: string;
   target: View3D;
+  inputType: INPUT_TYPE;
+}
+
+/**
+ * An event that fires on the end of every inputs
+ * @property {string} type A type of the event.
+ * @property {View3D} target An instance of View3D that triggered this event.
+ * @property {INPUT_TYPE} inputType Type of the input.
+ */
+export interface InputEndEvent {
+  type: string;
+  target: View3D;
+  inputType: INPUT_TYPE;
+}
+
+/**
+ * An event that fires on camera movement
+ * @property {string} type A type of the event.
+ * @property {View3D} target An instance of View3D that triggered this event.
+ * @property {Pose} pose Current yaw, pitch, zoom, and pivot value
+ * @property {Pose} prevPose Previous yaw, pitch, zoom, and pivot value
+ */
+export interface CameraChangeEvent {
+  type: string;
+  target: View3D;
+  pose: Pose;
+  prevPose: Pose;
 }
 
 /**
@@ -184,7 +211,7 @@ export interface QuickLookTapEvent extends Omit<Event, "target"> {
  * Not available in SceneViewer or AR Quick Look.
  * @event View3D#arStart
  * @type {object}
- * @property {string} type The type of event.
+ * @property {string} type A type of the event.
  * @property {View3D} target An instance of View3D that triggered this event.
  * @property {WebARSession} session An instance of WebARSession that triggered this event.
  */
@@ -199,7 +226,7 @@ export interface ARStartEvent {
  * Not available in SceneViewer or AR Quick Look.
  * @event View3D#arEnd
  * @type {object}
- * @property {string} type The type of event.
+ * @property {string} type A type of the event.
  * @property {View3D} target An instance of View3D that triggered this event.
  * @property {WebARSession} session An instance of WebARSession that triggered this event.
  */
@@ -214,7 +241,7 @@ export interface AREndEvent {
  * Not available in SceneViewer or AR Quick Look.
  * @event View3D#arModelPlaced
  * @type {object}
- * @property {string} type The type of event.
+ * @property {string} type A type of the event.
  * @property {View3D} target An instance of View3D that triggered this event.
  * @property {WebARSession} session An instance of WebARSession that triggered this event.
  * @property {Model} model A model placed.
@@ -224,4 +251,17 @@ export interface ARModelPlacedEvent {
   target: View3D;
   session: WebARSession;
   model: Model;
+}
+
+/**
+ * An event that fires when user clicked the Apple pay button or custom action button
+ * @see https://developer.apple.com/documentation/arkit/adding_an_apple_pay_button_or_a_custom_action_in_ar_quick_look#3405186
+ * @event View3D#quickLookTap
+ * @type {Event}
+ * @property {string} type A type of the event.
+ * @property {View3D} target An instance of View3D that triggered this event.
+ */
+export interface QuickLookTapEvent extends Omit<Event, "target"> {
+  type: string;
+  target: View3D;
 }

@@ -29,6 +29,7 @@ class Motion {
   public get loop() { return this._loop; }
   public get range() { return this._range; }
   public get easing() { return this._easing; }
+  public get activated() { return this._activated; }
 
   public set duration(val: number) { this._duration = val; }
   public set loop(val: boolean) { this._loop = val; }

@@ -23,7 +23,8 @@ export const EVENTS = {
   MOUSE_ENTER: "mouseenter",
   MOUSE_LEAVE: "mouseleave",
   LOAD: "load",
-  ERROR: "error"
+  ERROR: "error",
+  CLICK: "click"
 } as const;
 
 export const CURSOR = {

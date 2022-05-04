@@ -8,7 +8,7 @@ import Playground from "../../../pages/Playground";
 import { clamp } from "../../../../../src/utils";
 import MenuItem from "../MenuItem";
 import HelpIcon from "../../../../static/icon/help.svg";
-import { TEXTURE_LOD_EXTRA } from "../../../../../src/const/internal";
+import { ANNOTATION_EXTRA, TEXTURE_LOD_EXTRA } from "../../../../../src/const/internal";
 
 class DownloadTab extends React.Component<{
   playground: Playground;
@@ -32,6 +32,10 @@ class DownloadTab extends React.Component<{
                 <span className="my-0 mr-1">Include Multiple Levels of Textures</span>
                 <span className="icon is-small mr-2" style={{ verticalAlign: "top" }}><HelpIcon data-tip="Include multiple levels(sizes) of textures. Low-res textures will be loaded first, and will be replaced with highres textures after they're loaded." /></span>
                 <input id="model-tlod" className="checkbox" type="checkbox" defaultChecked={true} disabled={isLoading}></input>
+              </div>
+              <div className="mt-2">
+                <span className="my-0 mr-1">Include Annotations</span>
+                <input id="model-annotations" className="checkbox" type="checkbox" defaultChecked={true} disabled={isLoading}></input>
               </div>
               <div className="mt-2">
                 <span className="my-0 mr-2">Minimum Texture Size</span>
@@ -78,6 +82,7 @@ class DownloadTab extends React.Component<{
 
     const includeWebP = (document.querySelector("#model-webp") as HTMLInputElement).checked;
     const includeTextureLOD = (document.querySelector("#model-tlod") as HTMLInputElement).checked;
+    const includeAnnotations = (document.querySelector("#model-annotations") as HTMLInputElement).checked;
     const minimumTextureSize = parseFloat((document.querySelector("#model-tlod-0") as HTMLInputElement).value);
     const maximumTextureSize = parseFloat((document.querySelector("#model-tlod-1") as HTMLInputElement).value);
 
@@ -121,6 +126,16 @@ class DownloadTab extends React.Component<{
           extensionsUsed?: string[];
           [key: string]: any;
         };
+
+        if (includeAnnotations) {
+          const annotations = view3D.annotation.list;
+          if (!gltf.extras) gltf.extras = {};
+
+          gltf.extras[ANNOTATION_EXTRA] = annotations.map(annotation => ({
+            ...annotation.toJSON(),
+            label: annotation.element.querySelector(".view3d-annotation-tooltip").innerHTML || null
+          }));
+        }
 
         const nameGuessRegex = /(\w+)\.\w+$/i;
         const regexRes = nameGuessRegex.exec(origModel.src);
@@ -185,8 +200,7 @@ class DownloadTab extends React.Component<{
           const texture = gltfTextures.find(tex => tex.source === idx);
           const threeTexture = textures.get(imageURI[imageURI.length - 1]);
 
-          const modelImages = origModel.json?.images ?? [];
-          const mimeType = modelImages[idx]?.mimeType ?? "image/png";
+          const mimeType = gltfImage.mimeType ?? "image/png";
           const type = mimeType.split("/")[1];
           const imgFileName = `${modelName}${idx}`;
           const { image } = threeTexture;

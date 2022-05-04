@@ -50,6 +50,14 @@ class AutoPlayer implements OptionGetters<AutoplayOptions> {
    */
   public get enabled() { return this._enabled; }
   /**
+   * Whether autoplay is updating the camera at the moment
+   * @readonly
+   */
+  public get animating() {
+    return this._enabled && !this._interrupted;
+  }
+
+  /**
    * Reactivation delay after mouse input in milisecond
    */
   public get delay() { return this._delay; }
@@ -139,13 +147,13 @@ class AutoPlayer implements OptionGetters<AutoplayOptions> {
       return;
     }
 
-    const camera = this._view3D.camera;
+    const newPose = this._view3D.camera.newPose;
 
-    camera.yaw += this._speed * deltaTime / 100;
+    newPose.yaw += this._speed * deltaTime / 100;
   }
 
   /**
-   * Enable this input and add event listeners
+   * Enable autoplay and add event listeners
    * @returns {void}
    */
   public enable(): void {
@@ -164,6 +172,16 @@ class AutoPlayer implements OptionGetters<AutoplayOptions> {
     targetEl.addEventListener(BROWSER.EVENTS.WHEEL, this._onWheel, { passive: false, capture: false });
 
     this._enabled = true;
+  }
+
+  /**
+   * Enable autoplay after current delay value
+   * @returns {void}
+   */
+  public enableAfterDelay() {
+    this.enable();
+    this._interrupted = true;
+    this._setUninterruptedAfterDelay(this._delay);
   }
 
   /**

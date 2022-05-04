@@ -9,8 +9,7 @@ import View3D from "../View3D";
 import AnimationControl from "../control/AnimationControl";
 import { toRadian, clamp, circulate, toDegree, getRotatedPosition, isNumber } from "../utils";
 import * as DEFAULT from "../const/default";
-import { AUTO, EVENTS } from "../const/external";
-import { BeforeRenderEvent } from "../type/event";
+import { AUTO, EVENTS, ZOOM_TYPE } from "../const/external";
 
 import Pose from "./Pose";
 import Model from "./Model";
@@ -21,10 +20,11 @@ import Model from "./Model";
 class Camera {
   private _view3D: View3D;
   private _threeCamera: THREE.PerspectiveCamera;
-  private _distance: number = 0;
-  private _baseFov: number = 45;
+  private _baseDistance: number;
+  private _baseFov: number;
   private _defaultPose: Pose;
   private _currentPose: Pose;
+  private _newPose: Pose;
   private _maxTanHalfHFov: number;
 
   /**
@@ -50,37 +50,64 @@ class Camera {
   public get currentPose(): Pose { return this._currentPose.clone(); }
 
   /**
+   * Camera's new pose that will be applied on the next frame
+   * {@link Camera#updatePosition} should be called after changing this value.
+   * @type {Pose}
+   */
+  public get newPose(): Pose { return this._newPose; }
+
+  /**
    * Camera's current yaw
-   * {@link Camera#updatePosition} should be called after changing this value, and normally it is called every frame.
+   * {@link Camera#updatePosition} should be called after changing this value.
    * @type {number}
    */
   public get yaw() { return this._currentPose.yaw; }
 
   /**
    * Camera's current pitch
-   * {@link Camera#updatePosition} should be called after changing this value, and normally it is called every frame.
+   * {@link Camera#updatePosition} should be called after changing this value.
    * @type {number}
    */
   public get pitch() { return this._currentPose.pitch; }
 
   /**
    * Camera's current zoom value
-   * {@link Camera#updatePosition} should be called after changing this value, and normally it is called every frame.
+   * {@link Camera#updatePosition} should be called after changing this value.
    * @type {number}
    */
   public get zoom() { return this._currentPose.zoom; }
 
   /**
+   * Camera's disatance from current camera pivot(target)
+   * @type {number}
+   * @readonly
+   */
+  public get distance() {
+    return this._view3D.control.zoom.type === ZOOM_TYPE.FOV
+      ? this._baseDistance
+      : this._baseDistance - this._currentPose.zoom;
+  }
+
+  /**
+   * Camera's default distance from the model center.
+   * This will be automatically calculated based on the model size.
+   * @type {number}
+   * @readonly
+   */
+  public get baseDistance() { return this._baseDistance; }
+
+  /**
    * Camera's default fov value.
    * This will be automatically chosen when `view3D.fov` is "auto", otherwise it is equal to `view3D.fov`
    * @type {number}
+   * @readonly
    */
   public get baseFov() { return this._baseFov; }
 
   /**
    * Current pivot point of camera rotation
-   * @readonly
    * @type THREE.Vector3
+   * @readonly
    * @see {@link https://threejs.org/docs/#api/en/math/Vector3 THREE#Vector3}
    */
   public get pivot() { return this._currentPose.pivot; }
@@ -88,6 +115,7 @@ class Camera {
   /**
    * Camera's focus of view value (vertical)
    * @type number
+   * @readonly
    * @see {@link https://threejs.org/docs/#api/en/cameras/PerspectiveCamera.fov THREE#PerspectiveCamera}
    */
   public get fov() { return this._threeCamera.fov; }
@@ -95,19 +123,23 @@ class Camera {
   /**
    * Camera's frustum width
    * @type number
+   * @readonly
    */
   public get renderWidth() { return this.renderHeight * this._threeCamera.aspect; }
 
   /**
    * Camera's frustum height
    * @type number
+   * @readonly
    */
-  public get renderHeight() { return 2 * this._distance * Math.tan(toRadian(this._threeCamera.getEffectiveFOV() / 2)); }
+  public get renderHeight() {
+    return 2 * this.distance * Math.tan(toRadian(this._threeCamera.getEffectiveFOV() / 2));
+  }
 
-  public set yaw(val: number) { this._currentPose.yaw = val; }
-  public set pitch(val: number) { this._currentPose.pitch = val; }
-  public set zoom(val: number) { this._currentPose.zoom = val; }
-  public set pivot(val: THREE.Vector3) { this._currentPose.pivot = val; }
+  public set yaw(val: number) { this._newPose.yaw = val; }
+  public set pitch(val: number) { this._newPose.pitch = val; }
+  public set zoom(val: number) { this._newPose.zoom = val; }
+  public set pivot(val: THREE.Vector3) { this._newPose.pivot.copy(val); }
 
   /**
    * Create new Camera instance
@@ -117,53 +149,64 @@ class Camera {
     this._view3D = view3D;
     this._threeCamera = new THREE.PerspectiveCamera();
     this._maxTanHalfHFov = 0;
+    this._baseFov = 45;
+    this._baseDistance = 0;
 
     const initialZoom = isNumber(view3D.initialZoom) ? view3D.initialZoom : 0;
 
     this._defaultPose = new Pose(view3D.yaw, view3D.pitch, initialZoom);
     this._currentPose = this._defaultPose.clone();
+    this._newPose = this._currentPose.clone();
   }
 
   /**
    * Reset camera to default pose
-   * @param duration Duration of the reset animation
-   * @param easing Easing function for the reset animation
+   * @param {number} [duration=0] Duration of the reset animation
+   * @param {function} [easing] Easing function for the reset animation
+   * @param {Pose} [pose] Pose to reset, camera will reset to `defaultPose` if pose is not given.
    * @returns Promise that resolves when the animation finishes
    */
-  public async reset(duration: number = 0, easing: (x: number) => number = DEFAULT.EASING): Promise<void> {
+  public reset(duration: number = 0, easing: (x: number) => number = DEFAULT.EASING, pose?: Pose): Promise<void> {
     const view3D = this._view3D;
     const control = view3D.control;
+    const autoPlayer = view3D.autoPlayer;
+    const newPose = this._newPose;
     const currentPose = this._currentPose;
-    const defaultPose = this._defaultPose;
+    const targetPose = pose ?? this._defaultPose;
 
     if (duration <= 0) {
       // Reset camera immediately
-      this._currentPose = defaultPose.clone();
+      newPose.copy(targetPose);
+      currentPose.copy(targetPose);
 
+      view3D.renderer.renderSingleFrame();
       control.sync();
 
       return Promise.resolve();
     } else {
       // Play the animation
-      const resetControl = new AnimationControl(view3D, currentPose, defaultPose);
+      const autoplayEnabled = autoPlayer.enabled;
+      const resetControl = new AnimationControl(view3D, currentPose, targetPose);
       resetControl.duration = duration;
       resetControl.easing = easing;
       resetControl.enable();
 
-      control.disable();
-
-      const updateResetControl = (evt: BeforeRenderEvent) => {
-        resetControl.update(evt.delta);
-      };
-
-      view3D.on(EVENTS.BEFORE_RENDER, updateResetControl);
+      if (autoplayEnabled) {
+        autoPlayer.disable();
+      }
+      control.add(resetControl);
 
       return new Promise(resolve => {
         resetControl.onFinished(() => {
-          control.sync();
-          control.enable();
+          newPose.copy(targetPose);
+          currentPose.copy(targetPose);
 
-          view3D.off(EVENTS.BEFORE_RENDER, updateResetControl);
+          control.remove(resetControl);
+          control.sync();
+
+          if (autoplayEnabled) {
+            autoPlayer.enableAfterDelay();
+          }
 
           resolve();
         });
@@ -247,7 +290,7 @@ class Camera {
     }
 
     defaultPose.pivot = modelCenter.clone();
-    this._distance = effectiveCamDist;
+    this._baseDistance = effectiveCamDist;
 
     camera.near = (effectiveCamDist - maxDistToCenter) * 0.1;
     camera.far = (effectiveCamDist + maxDistToCenter) * 10;
@@ -273,24 +316,35 @@ class Camera {
   }
 
   /**
-   * Update camera position base on the {@link Camera#currentPose currentPose} value
+   * Update camera position
    * @returns {void}
    */
   public updatePosition(): void {
-    const { control } = this._view3D;
+    const view3D = this._view3D;
+    const control = view3D.control;
     const threeCamera = this._threeCamera;
     const currentPose = this._currentPose;
-    const distance = this._distance;
+    const newPose = this._newPose;
     const baseFov = this._baseFov;
-    const zoomRange = control.zoom.range;
+    const baseDistance = this._baseDistance;
+    const isFovZoom = control.zoom.type === ZOOM_TYPE.FOV;
+
+    const prevPose = currentPose.clone();
 
     // Clamp current pose
-    currentPose.yaw = circulate(currentPose.yaw, 0, 360);
-    currentPose.pitch = clamp(currentPose.pitch, DEFAULT.PITCH_RANGE.min, DEFAULT.PITCH_RANGE.max);
-    currentPose.zoom = -(clamp(baseFov - currentPose.zoom, zoomRange.min, zoomRange.max) - baseFov);
+    currentPose.yaw = circulate(newPose.yaw, 0, 360);
+    currentPose.pitch = clamp(newPose.pitch, DEFAULT.PITCH_RANGE.min, DEFAULT.PITCH_RANGE.max);
+    currentPose.zoom = newPose.zoom;
+    currentPose.pivot.copy(newPose.pivot);
+
+    const fov = isFovZoom
+      ? baseFov - currentPose.zoom
+      : baseFov;
+    const distance = isFovZoom
+      ? baseDistance
+      : baseDistance - currentPose.zoom;
 
     const newCamPos = getRotatedPosition(distance, currentPose.yaw, currentPose.pitch);
-    const fov = baseFov - currentPose.zoom;
 
     newCamPos.add(currentPose.pivot);
 
@@ -298,6 +352,15 @@ class Camera {
     threeCamera.position.copy(newCamPos);
     threeCamera.lookAt(currentPose.pivot);
     threeCamera.updateProjectionMatrix();
+
+    newPose.copy(currentPose);
+
+    view3D.trigger(EVENTS.CAMERA_CHANGE, {
+      type: EVENTS.CAMERA_CHANGE,
+      target: view3D,
+      pose: currentPose.clone(),
+      prevPose
+    });
   }
 
   private _applyEffectiveFov(fov: number) {

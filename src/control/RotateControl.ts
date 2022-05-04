@@ -11,6 +11,7 @@ import Motion from "../core/Motion";
 import * as BROWSER from "../const/browser";
 import * as DEFAULT from "../const/default";
 import { CONTROL_EVENTS } from "../const/internal";
+import { INPUT_TYPE } from "../const/external";
 import { ControlEvents, OptionGetters } from "../type/utils";
 
 import CameraControl from "./CameraControl";
@@ -58,6 +59,12 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
    * @type {boolean}
    */
   public get enabled() { return this._enabled; }
+  /**
+   * Whether this control is animating the camera
+   * @readonly
+   * @type {boolean}
+   */
+  public get animating() { return this._xMotion.activated || this._yMotion.activated; }
 
   /**
    * Scale factor for rotation
@@ -140,17 +147,19 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
    */
   public destroy(): void {
     this.disable();
+    this.off();
   }
 
   /**
    * Update control by given deltaTime
-   * @param deltaTime Number of milisec to update
+   * @param {number} deltaTime Number of milisec to update
    * @returns {void}
    */
   public update(deltaTime: number): void {
     const camera = this._view3D.camera;
     const xMotion = this._xMotion;
     const yMotion = this._yMotion;
+    const newPose = camera.newPose;
     const yawEnabled = !this._disableYaw;
     const pitchEnabled = !this._disablePitch;
 
@@ -160,11 +169,11 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
     );
 
     if (yawEnabled) {
-      camera.yaw += delta.x;
+      newPose.yaw += delta.x;
     }
 
     if (pitchEnabled) {
-      camera.pitch += delta.y;
+      newPose.pitch += delta.y;
     }
   }
 
@@ -196,7 +205,9 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
     this._enabled = true;
     this.sync();
 
-    this.trigger(CONTROL_EVENTS.ENABLE);
+    this.trigger(CONTROL_EVENTS.ENABLE, {
+      inputType: INPUT_TYPE.ROTATE
+    });
   }
 
   /**
@@ -218,7 +229,9 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
 
     this._enabled = false;
 
-    this.trigger(CONTROL_EVENTS.DISABLE);
+    this.trigger(CONTROL_EVENTS.DISABLE, {
+      inputType: INPUT_TYPE.ROTATE
+    });
   }
 
   /**
@@ -248,7 +261,10 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
     window.addEventListener(BROWSER.EVENTS.MOUSE_MOVE, this._onMouseMove, false);
     window.addEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
 
-    this.trigger(CONTROL_EVENTS.HOLD);
+    this.trigger(CONTROL_EVENTS.HOLD, {
+      inputType: INPUT_TYPE.ROTATE,
+      isTouch: false
+    });
   };
 
   private _onMouseMove = (evt: MouseEvent) => {
@@ -272,7 +288,10 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
     window.removeEventListener(BROWSER.EVENTS.MOUSE_MOVE, this._onMouseMove, false);
     window.removeEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
 
-    this.trigger(CONTROL_EVENTS.RELEASE);
+    this.trigger(CONTROL_EVENTS.RELEASE, {
+      inputType: INPUT_TYPE.ROTATE,
+      isTouch: false
+    });
   };
 
   private _onTouchStart = (evt: TouchEvent) => {
@@ -280,6 +299,11 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
 
     this._isFirstTouch = true;
     this._prevPos.set(touch.clientX, touch.clientY);
+
+    this.trigger(CONTROL_EVENTS.HOLD, {
+      inputType: INPUT_TYPE.ROTATE,
+      isTouch: true
+    });
   };
 
   private _onTouchMove = (evt: TouchEvent) => {
@@ -333,6 +357,10 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
       this._prevPos.set(touch.clientX, touch.clientY);
     } else {
       this._prevPos.set(0, 0);
+      this.trigger(CONTROL_EVENTS.RELEASE, {
+        inputType: INPUT_TYPE.ROTATE,
+        isTouch: true
+      });
     }
 
     this._isScrolling = false;

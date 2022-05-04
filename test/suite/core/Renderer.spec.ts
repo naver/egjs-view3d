@@ -60,7 +60,7 @@ describe("Renderer", () => {
       view3D.on("beforeRender", beforeRenderSpy);
       view3D.on("render", renderSpy);
 
-      view3D.renderer.defaultRenderLoop(16);
+      view3D.renderer.renderSingleFrame();
 
       expect(beforeRenderSpy.calledOnce).to.be.true;
       expect(renderSpy.calledOnce).to.be.true;

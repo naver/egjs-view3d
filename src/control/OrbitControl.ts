@@ -7,8 +7,10 @@ import View3D from "../View3D";
 import { CURSOR } from "../const/browser";
 import { CONTROL_EVENTS } from "../const/internal";
 import { getObjectOption } from "../utils";
-import { ValueOf } from "../type/utils";
+import { EVENTS, INPUT_TYPE } from "../const/external";
+import { ControlEvents, ValueOf } from "../type/utils";
 
+import CameraControl from "./CameraControl";
 import RotateControl from "./RotateControl";
 import TranslateControl from "./TranslateControl";
 import ZoomControl from "./ZoomControl";
@@ -22,21 +24,50 @@ class OrbitControl {
   private _rotateControl: RotateControl;
   private _translateControl: TranslateControl;
   private _zoomControl: ZoomControl;
-
+  private _extraControls: CameraControl[];
 
   // Internal Values Getter
   /**
-   * {@link RotateControl} of this control
+   * Rotate(left-click) part of this control
+   * @type {RotateControl}
+   * @readonly
    */
   public get rotate() { return this._rotateControl; }
   /**
-   * {@link TranslateControl} of this control
+   * Translation(right-click) part of this control
+   * @type {TranslateControl}
+   * @readonly
    */
   public get translate() { return this._translateControl; }
   /**
-   * {@link ZoomControl} of this control
+   * Zoom(mouse wheel) part of this control
+   * @type {ZoomControl}
+   * @readonly
    */
   public get zoom() { return this._zoomControl; }
+  /**
+   * Base controls
+   * @type {CameraControl[]}
+   * @readonly
+   */
+  public get controls() { return [this._rotateControl, this._translateControl, this._zoomControl]; }
+  /**
+   * Extra camera controls added, like {@link AnimationControl}
+   * @type {CameraControl[]}
+   * @readonly
+   */
+  public get extraControls() { return this._extraControls; }
+  /**
+   * Whether one of the controls is animating at the moment
+   * @type {boolean}
+   * @readonly
+   */
+  public get animating() {
+    return this._rotateControl.animating
+      || this._translateControl.animating
+      || this._zoomControl.animating
+      || this._extraControls.some(control => control.animating);
+  }
 
   /**
    * Create new OrbitControl instance
@@ -48,8 +79,9 @@ class OrbitControl {
     this._rotateControl = new RotateControl(view3D, getObjectOption(view3D.rotate));
     this._translateControl = new TranslateControl(view3D, getObjectOption(view3D.translate));
     this._zoomControl = new ZoomControl(view3D, getObjectOption(view3D.zoom));
+    this._extraControls = [];
 
-    [this._rotateControl, this._translateControl].forEach(control => {
+    [this._rotateControl, this._translateControl, this._zoomControl].forEach(control => {
       control.on({
         [CONTROL_EVENTS.HOLD]: this._onHold,
         [CONTROL_EVENTS.RELEASE]: this._onRelease,
@@ -68,17 +100,20 @@ class OrbitControl {
     this._rotateControl.destroy();
     this._translateControl.destroy();
     this._zoomControl.destroy();
+    this._extraControls.forEach(control => control.destroy());
+    this._extraControls = [];
   }
 
   /**
    * Update control by given deltaTime
-   * @param deltaTime Number of milisec to update
+   * @param {number} deltaTime Number of milisec to update
    * @returns {void}
    */
-  public update(delta: number): void {
-    this._rotateControl.update(delta);
-    this._translateControl.update(delta);
-    this._zoomControl.update(delta);
+  public update(deltaTime: number): void {
+    this._rotateControl.update(deltaTime);
+    this._translateControl.update(deltaTime);
+    this._zoomControl.update(deltaTime);
+    this._extraControls.forEach(control => control.update(deltaTime));
   }
 
   /**
@@ -92,6 +127,7 @@ class OrbitControl {
     this._rotateControl.resize(size);
     this._translateControl.resize(size);
     this._zoomControl.resize(size);
+    this._extraControls.forEach(control => control.resize(size));
   }
 
   /**
@@ -112,6 +148,8 @@ class OrbitControl {
     if (view3D.zoom) {
       this._zoomControl.enable();
     }
+
+    this._extraControls.forEach(control => control.enable());
   }
 
   /**
@@ -122,6 +160,7 @@ class OrbitControl {
     this._rotateControl.disable();
     this._translateControl.disable();
     this._zoomControl.disable();
+    this._extraControls.forEach(control => control.disable());
   }
 
   /**
@@ -132,6 +171,30 @@ class OrbitControl {
     this._rotateControl.sync();
     this._translateControl.sync();
     this._zoomControl.sync();
+    this._extraControls.forEach(control => control.sync());
+  }
+
+  /**
+   * Add extra control
+   * @param {CameraControl} control Control to add
+   * @returns {void}
+   */
+  public add(control: CameraControl) {
+    this._extraControls.push(control);
+  }
+
+  /**
+   * Remove extra control
+   * @param {CameraControl} control Control to add
+   * @returns {void}
+   */
+  public remove(control: CameraControl) {
+    const extraControls = this._extraControls;
+    const controlIdx = extraControls.findIndex(ctrl => ctrl === control);
+
+    if (controlIdx >= 0) {
+      extraControls.splice(controlIdx, 1);
+    }
   }
 
   /**
@@ -153,7 +216,9 @@ class OrbitControl {
     targetEl.style.cursor = newCursor;
   }
 
-  private _onEnable = () => {
+  private _onEnable = ({ inputType }: ControlEvents["enable"]) => {
+    if (inputType === INPUT_TYPE.ZOOM) return;
+
     const view3D = this._view3D;
     const canvas = view3D.renderer.canvas;
 
@@ -166,9 +231,10 @@ class OrbitControl {
     }
   };
 
-  private _onDisable = () => {
-    const canvas = this._view3D.renderer.canvas;
+  private _onDisable = ({ inputType }: ControlEvents["disable"]) => {
+    if (inputType === INPUT_TYPE.ZOOM) return;
 
+    const canvas = this._view3D.renderer.canvas;
     const shouldRemoveGrabCursor = canvas.style.cursor !== CURSOR.NONE
       && (!this._rotateControl.enabled && !this._translateControl.enabled);
 
@@ -177,22 +243,42 @@ class OrbitControl {
     }
   };
 
-  private _onHold = () => {
-    const grabCursorEnabled = this._view3D.useGrabCursor
-      && (this._rotateControl.enabled || this._translateControl.enabled);
+  private _onHold = ({ inputType, isTouch }: ControlEvents["hold"]) => {
+    const view3D = this._view3D;
 
-    if (grabCursorEnabled) {
-      this._setCursor(CURSOR.GRABBING);
+    if (inputType !== INPUT_TYPE.ZOOM && !isTouch) {
+      const grabCursorEnabled = view3D.useGrabCursor
+        && (this._rotateControl.enabled || this._translateControl.enabled);
+
+      if (grabCursorEnabled) {
+        this._setCursor(CURSOR.GRABBING);
+      }
     }
+
+    view3D.trigger(EVENTS.INPUT_START, {
+      type: EVENTS.INPUT_START,
+      target: view3D,
+      inputType
+    });
   };
 
-  private _onRelease = () => {
-    const grabCursorEnabled = this._view3D.useGrabCursor
-      && (this._rotateControl.enabled || this._translateControl.enabled);
+  private _onRelease = ({ inputType, isTouch }: ControlEvents["release"]) => {
+    const view3D = this._view3D;
 
-    if (grabCursorEnabled) {
-      this._setCursor(CURSOR.GRAB);
+    if (inputType !== INPUT_TYPE.ZOOM && !isTouch) {
+      const grabCursorEnabled = view3D.useGrabCursor
+        && (this._rotateControl.enabled || this._translateControl.enabled);
+
+      if (grabCursorEnabled) {
+        this._setCursor(CURSOR.GRAB);
+      }
     }
+
+    view3D.trigger(EVENTS.INPUT_END, {
+      type: EVENTS.INPUT_END,
+      target: view3D,
+      inputType
+    });
   };
 }
 

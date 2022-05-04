@@ -72,6 +72,13 @@ class ModelAnimator {
   public get paused() { return this._mixer.timeScale === 0; }
 
   /**
+   * An boolean value indicating whether at least one of the animation is playing
+   * @type {boolean}
+   * @readonly
+   */
+  public get animating() { return this.activeAnimation && !this.paused; }
+
+  /**
    * Create new ModelAnimator instance
    */
   public constructor(view3D: View3D) {
@@ -209,13 +216,13 @@ class ModelAnimator {
     this._flushFadePromises();
     this._restoreTimeScale();
     activeAction.fadeOut(duration / 1000);
-    this._activeAnimationIdx = -1;
 
     const fadePromise = new Promise<boolean>(resolve => {
       const onFrame = () => {
         if (activeAction.getEffectiveWeight() > 0) return;
 
         view3D.off(EVENTS.BEFORE_RENDER, onFrame);
+        this._activeAnimationIdx = -1;
         resolve(true);
       };
 
@@ -258,6 +265,9 @@ class ModelAnimator {
       action.stop();
       action.setEffectiveWeight(0);
     });
+
+    // Render single frame to show deactivated state
+    this._view3D.renderer.renderSingleFrame();
 
     this._activeAnimationIdx = -1;
     this._flushFadePromises();

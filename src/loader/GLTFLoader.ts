@@ -10,7 +10,8 @@ import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader";
 
 import View3D from "../View3D";
 import Model from "../core/Model";
-import { CUSTOM_TEXTURE_LOD_EXTENSION, STANDARD_MAPS, TEXTURE_LOD_EXTRA } from "../const/internal";
+import Annotation from "../core/annotation/Annotation";
+import { ANNOTATION_EXTRA, CUSTOM_TEXTURE_LOD_EXTENSION, STANDARD_MAPS, TEXTURE_LOD_EXTRA } from "../const/internal";
 import { createLoadingContext } from "../utils";
 
 import Loader from "./Loader";
@@ -254,12 +255,22 @@ class GLTFLoader extends Loader {
         const origTexture = levelTextures[index].texture;
         origTexture.image = texture.image;
         origTexture.needsUpdate = true;
+        view3D.renderer.renderSingleFrame();
       });
     });
+
+    const annotations: Annotation[] = [];
+
+    if (gltf.parser.json.extras && gltf.parser.json.extras[ANNOTATION_EXTRA]) {
+      const data = gltf.parser.json.extras[ANNOTATION_EXTRA];
+
+      annotations.push(...view3D.annotation.parse(data));
+    }
 
     const model = new Model({
       src,
       scenes: gltf.scenes,
+      annotations,
       animations: gltf.animations,
       fixSkinnedBbox
     });

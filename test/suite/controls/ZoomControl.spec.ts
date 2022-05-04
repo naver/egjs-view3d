@@ -133,7 +133,7 @@ describe("ZoomControl", () => {
   });
 
   describe("updateRange", () => {
-    it("should update its range.max to camera's baseFov + 45 if maxFov is 'auto'", async () => {
+    it("should update its range.max to 45 if maxFov is 'auto'", async () => {
       const view3D = await createView3D();
       const zoomControl = new ZoomControl(view3D);
 
@@ -141,10 +141,10 @@ describe("ZoomControl", () => {
       baseFovStub.get(() => 45);
       zoomControl.updateRange();
 
-      expect(zoomControl.range.max).to.equal(90);
+      expect(zoomControl.range.max).to.equal(45);
     });
 
-    it("should not exceed 175 when setting range.max", async () => {
+    it("should set range.max to be Math.min(baseFov + 45, 175) - baseFov when setting range.max", async () => {
       const view3D = await createView3D();
       const zoomControl = new ZoomControl(view3D);
 
@@ -152,18 +152,18 @@ describe("ZoomControl", () => {
       baseFovStub.get(() => 180 - 45);
       zoomControl.updateRange();
 
-      expect(zoomControl.range.max).to.equal(175);
+      expect(zoomControl.range.max).to.equal(40);
     });
 
-    it("should not change range.max if it's given as maxFov", async () => {
+    it("should set range.max to maxFov - baseFov if maxFov is given", async () => {
       const view3D = await createView3D();
-      const zoomControl = new ZoomControl(view3D, { maxFov: 45 });
+      const zoomControl = new ZoomControl(view3D, { maxFov: 100 });
 
       const baseFovStub = Cypress.sinon.stub(view3D.camera, "baseFov");
       baseFovStub.get(() => 45);
       zoomControl.updateRange();
 
-      expect(zoomControl.range.max).to.equal(45);
+      expect(zoomControl.range.max).to.equal(100 - 45);
     });
   });
 });

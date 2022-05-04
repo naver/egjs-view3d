@@ -1,3 +1,5 @@
+import { INPUT_TYPE } from "../const/external";
+
 /*
  * Copyright (c) 2020 NAVER Corp.
  * egjs projects are licensed under the MIT license
@@ -17,10 +19,10 @@ export interface Range {
 }
 
 export interface ControlEvents {
-  hold: void;
-  release: void;
-  enable: void;
-  disable: void;
+  hold: { inputType: INPUT_TYPE; isTouch: boolean };
+  release: { inputType: INPUT_TYPE; isTouch: boolean };
+  enable: { inputType: INPUT_TYPE };
+  disable: { inputType: INPUT_TYPE };
 }
 
 export type TypedArray =

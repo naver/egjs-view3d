@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import React from "react";
 import clsx from "clsx";
 import ReactTooltip from "react-tooltip";
@@ -8,6 +9,8 @@ import Layout from "@theme/Layout";
 import styles from "./playground.module.css";
 
 import VanillaView3D, { GLTFLoader, LoadingBar } from "../../../src";
+import FaceAnnotation from "../../../src/core/annotation/FaceAnnotation";
+import { directionToYawPitch, toDegree } from "../../../src/utils";
 import ModelTab from "../components/playground/tab/ModelTab";
 import EnvironmentTab from "../components/playground/tab/EnvironmentTab";
 import DownloadTab from "../components/playground/tab/DownloadTab";
@@ -48,6 +51,7 @@ class Playground extends React.Component<{}, {
   }
 
   public componentDidMount() {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { SimpleDropzone } = require("simple-dropzone");
 
     const view3D = new VanillaView3D("#playground-view3d", {
@@ -87,6 +91,8 @@ class Playground extends React.Component<{}, {
         void this.onFileChange(e.files);
       }
     });
+
+    this._listenAnnotationAdd();
   }
 
   public componentDidUpdate() {
@@ -199,6 +205,53 @@ class Playground extends React.Component<{}, {
       URL.revokeObjectURL(url);
     }
   };
+
+  private _listenAnnotationAdd() {
+    const view3D = this._view3D;
+    const canvas = view3D.renderer.canvas;
+    const raycaster = new THREE.Raycaster();
+
+    canvas.addEventListener("dblclick", evt => {
+      const model = view3D.model;
+      if (!model) return;
+
+      const pointer = new THREE.Vector2();
+      const devicePixelRatio = window.devicePixelRatio;
+      pointer.x = (evt.offsetX / canvas.width) * 2 * devicePixelRatio - 1;
+      pointer.y = -(evt.offsetY / canvas.height) * 2 * devicePixelRatio + 1;
+
+      raycaster.setFromCamera(pointer, view3D.camera.threeCamera);
+
+      const intersects = raycaster.intersectObjects([model.scene]);
+
+      if (!intersects.length) return;
+
+      const currentPose = view3D.camera.currentPose;
+      const el = document.createElement("div");
+      el.classList.add("view3d-annotation");
+      el.classList.add("default");
+
+      const tooltip = document.createElement("div");
+      tooltip.classList.add("view3d-annotation-tooltip");
+      tooltip.classList.add("default");
+      el.appendChild(tooltip);
+
+      view3D.annotation.wrapper.appendChild(el);
+
+      const intersect = intersects[0];
+
+      const newAnnotation = new FaceAnnotation(view3D, {
+        element: el,
+        focus: [currentPose.yaw, currentPose.pitch, currentPose.zoom],
+        meshIndex: model.meshes.findIndex(mesh => mesh === intersects[0].object),
+        faceIndex: intersect.faceIndex
+      });
+      view3D.annotation.add(newAnnotation);
+      view3D.renderer.renderSingleFrame();
+
+      this.setState({});
+    });
+  }
 }
 
 export default Playground;

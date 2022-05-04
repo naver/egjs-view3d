@@ -151,7 +151,31 @@ class Renderer {
     this._renderer.setAnimationLoop(null);
   }
 
+  public renderSingleFrame(): void {
+    const renderer = this._renderer;
+    if (!renderer.xr.isPresenting) {
+      this._renderFrame(0);
+    }
+  }
+
   private _defaultRenderLoop = (delta: number) => {
+    const view3D = this._view3D;
+    const {
+      control,
+      autoPlayer,
+      animator
+    } = view3D;
+
+    if (
+      !animator.animating
+      && !control.animating
+      && !autoPlayer.animating
+    ) return;
+
+    this._renderFrame(delta);
+  };
+
+  private _renderFrame(delta: number) {
     const view3D = this._view3D;
     const threeRenderer = this._renderer;
     const {
@@ -159,7 +183,8 @@ class Renderer {
       camera,
       control,
       autoPlayer,
-      animator
+      animator,
+      annotation
     } = view3D;
 
     const deltaMiliSec = delta * 1000;
@@ -188,12 +213,15 @@ class Renderer {
     threeRenderer.render(scene.root, camera.threeCamera);
     threeRenderer.autoClear = true;
 
+    // Render annotations
+    annotation.render();
+
     view3D.trigger(EVENTS.RENDER, {
       type: EVENTS.RENDER,
       target: view3D,
       delta: deltaMiliSec
     });
-  };
+  }
 }
 
 export default Renderer;

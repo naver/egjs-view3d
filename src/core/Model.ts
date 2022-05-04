@@ -4,9 +4,10 @@
  */
 
 import * as THREE from "three";
-import { Vector3 } from "three";
 
-import { getAttributeScale } from "../utils";
+import { getAttributeScale, getSkinnedVertex } from "../utils";
+
+import { Annotation } from "./annotation";
 
 /**
  * Data class for loaded 3d model
@@ -16,6 +17,7 @@ class Model {
   private _scene: THREE.Group;
   private _bbox: THREE.Box3;
   private _animations: THREE.AnimationClip[];
+  private _annotations: Annotation[];
   private _fixSkinnedBbox: boolean;
 
   /**
@@ -34,6 +36,11 @@ class Model {
    * @readonly
    */
   public get animations() { return this._animations; }
+  /**
+   * {@link Annotation}s included inside the model
+   * @readonly
+   */
+  public get annotations() { return this._annotations; }
   /**
    * {@link https://threejs.org/docs/#api/en/objects/Mesh THREE.Mesh}es inside model if there's any.
    * @readonly
@@ -80,6 +87,7 @@ class Model {
     src,
     scenes,
     animations = [],
+    annotations = [],
     fixSkinnedBbox = false,
     castShadow = true,
     receiveShadow = false
@@ -87,6 +95,7 @@ class Model {
     src: string;
     scenes: THREE.Object3D[];
     animations?: THREE.AnimationClip[];
+    annotations?: Annotation[];
     fixSkinnedBbox?: boolean;
     castShadow?: boolean;
     receiveShadow?: boolean;
@@ -97,6 +106,7 @@ class Model {
     scene.add(...scenes);
 
     this._animations = animations;
+    this._annotations = annotations;
     this._scene = scene;
     const bbox = this._getInitialBbox(fixSkinnedBbox);
 
@@ -189,7 +199,7 @@ class Model {
       }
     });
 
-    return meshes;
+    return meshes.sort((a, b) => a.name.localeCompare(b.name));
   }
 
   private _hasSkinnedMesh(): boolean {
@@ -199,42 +209,16 @@ class Model {
   private _forEachSkinnedVertices(mesh: THREE.SkinnedMesh, callback: (vertex: THREE.Vector3) => any) {
     const geometry = mesh.geometry;
     const positions = geometry.attributes.position;
-    const skinIndicies = geometry.attributes.skinIndex;
     const skinWeights = geometry.attributes.skinWeight;
     const skeleton = mesh.skeleton;
 
     skeleton.update();
-    const boneMatricies = skeleton.boneMatrices;
 
     const positionScale = getAttributeScale(positions);
     const skinWeightScale = getAttributeScale(skinWeights);
 
     for (let posIdx = 0; posIdx < positions.count; posIdx++) {
-      const pos = new Vector3().fromBufferAttribute(positions, posIdx).multiplyScalar(positionScale);
-      const skinned = new THREE.Vector4(0, 0, 0, 0);
-      const skinVertex = new THREE.Vector4(pos.x, pos.y, pos.z).applyMatrix4(mesh.bindMatrix);
-
-      const weights = [
-        skinWeights.getX(posIdx),
-        skinWeights.getY(posIdx),
-        skinWeights.getZ(posIdx),
-        skinWeights.getW(posIdx)
-      ].map(weight => weight * skinWeightScale);
-
-      const indicies = [
-        skinIndicies.getX(posIdx),
-        skinIndicies.getY(posIdx),
-        skinIndicies.getZ(posIdx),
-        skinIndicies.getW(posIdx)
-      ];
-
-      weights.forEach((weight, index) => {
-        const boneMatrix = new THREE.Matrix4().fromArray(boneMatricies, indicies[index] * 16);
-        skinned.add(skinVertex.clone().applyMatrix4(boneMatrix).multiplyScalar(weight));
-      });
-
-      const transformed = new THREE.Vector3().fromArray(skinned.applyMatrix4(mesh.bindMatrixInverse).toArray());
-      transformed.applyMatrix4(mesh.matrixWorld);
+      const transformed = getSkinnedVertex(posIdx, mesh, positionScale, skinWeightScale);
 
       callback(transformed);
     }

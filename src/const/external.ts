@@ -44,10 +44,13 @@ export const EVENTS = {
   BEFORE_RENDER: "beforeRender",
   RENDER: "render",
   PROGRESS: "progress",
-  QUICK_LOOK_TAP: "quickLookTap",
+  INPUT_START: "inputStart",
+  INPUT_END: "inputEnd",
+  CAMERA_CHANGE: "cameraChange",
   AR_START: "arStart",
   AR_END: "arEnd",
-  AR_MODEL_PLACED: "arModelPlaced"
+  AR_MODEL_PLACED: "arModelPlaced",
+  QUICK_LOOK_TAP: "quickLookTap"
 } as const;
 
 /**
@@ -89,10 +92,23 @@ export const EASING = {
  * @type {object}
  * @property {"view3d-poster"} POSTER A class name for poster element
  * @property {"view3d-ar-overlay"} AR_OVERLAY A class name for AR overlay element
+ * @property {"view3d-annotation-wrapper"} ANNOTATION_WRAPPER A class name for annotation wrapper element
+ * @property {"view3d-annotation"} ANNOTATION A class name for annotation element
+ * @property {"default"} ANNOTATION_DEFAULT A class name for default style annotation element
+ * @property {"selected"} ANNOTATION_SELECTED A class name for selected annotation element
+ * @property {"flip-x"} ANNOTATION_FLIP_X A class name for annotation element which has tooltip on the left side
+ * @property {"flip-y"} ANNOTATION_FLIP_Y A class name for annotation element which has tooltip on the bottom side
  */
 export const DEFAULT_CLASS = {
   POSTER: "view3d-poster",
-  AR_OVERLAY: "view3d-ar-overlay"
+  AR_OVERLAY: "view3d-ar-overlay",
+  ANNOTATION_WRAPPER: "view3d-annotation-wrapper",
+  ANNOTATION: "view3d-annotation",
+  ANNOTATION_TOOLTIP: "view3d-annotation-tooltip",
+  ANNOTATION_DEFAULT: "default",
+  ANNOTATION_SELECTED: "selected",
+  ANNOTATION_FLIP_X: "flip-x",
+  ANNOTATION_FLIP_Y: "flip-y"
 } as const;
 
 /**
@@ -109,6 +125,17 @@ export const TONE_MAPPING = {
   REINHARD: THREE.ReinhardToneMapping,
   CINEON: THREE.CineonToneMapping,
   ACES_FILMIC: THREE.ACESFilmicToneMapping
+};
+
+/**
+ * Types of zoom control
+ * @type {object}
+ * @property {"fov"} FOV Zoom by chaning fov(field-of-view). This will prevent camera from going inside the model.
+ * @property {"distance"} DISTANCE Zoom by changing camera distance from the model.
+ */
+export const ZOOM_TYPE = {
+  FOV: "fov",
+  DISTANCE: "distance"
 };
 
 /**
@@ -171,3 +198,16 @@ export const QUICK_LOOK_CUSTOM_BANNER_SIZE = {
   MEDIUM: "medium",
   LARGE: "large"
 } as const;
+
+/**
+ * Input types
+ * @type {object}
+ * @property {0} ROTATE Rotate input
+ * @property {1} TRANSLATE Translate input
+ * @property {2} ZOOM Zoom input
+ */
+export enum INPUT_TYPE {
+  ROTATE,
+  TRANSLATE,
+  ZOOM
+}

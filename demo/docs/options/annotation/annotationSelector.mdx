@@ -1,0 +1,59 @@
+---
+sidebar_position: 3
+---
+
+import View3D from "@site/src/components/View3D";
+import License from "@site/src/components/License";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+
+<OptionDescriptor type="string" defaultVal={'".view3d-annotation"'} />
+
+CSS Selector string for the annotation elements.
+
+```html
+<div id="wrapper" class="view3d-wrapper">
+  <canvas class="view3d-canvas"></canvas>
+  <div class="view3d-annotation-wrapper">
+    <div class="view3d-annotation" data-position="0 -0.5 0.5"></div>
+    <div class="view3d-annotation" data-position="0.5 1 -0.3"></div>
+    <div class="view3d-annotation" data-position="0.3 0.3 0.3"></div>
+  </div>
+</div>
+```
+
+```js
+new View3D("#wrapper", {
+  annotationSelector: ".view3d-annotation"
+})
+```
+## Example
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+  poster="/egjs-view3d/poster/alarm.png"
+  annotationSelector=".view3d-annotation"
+  showExampleCode>
+  <div className="view3d-annotation-wrapper">
+    <div className="view3d-annotation default" data-position="0.1 0 0"></div>
+    <div className="view3d-annotation default" data-position="0 0.1 0"></div>
+    <div className="view3d-annotation default" data-position="0 0 0"></div>
+  </div>
+</View3D>
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />
+

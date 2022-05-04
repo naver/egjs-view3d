@@ -45,21 +45,17 @@ describe("Utils", () => {
       expect(getNullableElement(testingEl)).to.equal(testingEl);
     });
 
-    it("will throw View3DError if element with given selector not found", () => {
+    it("will return null if element with given selector not found", () => {
       const query = "#el-that-definitely-not-exist";
 
-      expect(() => getNullableElement(query))
-        .to.throw(ERROR.MESSAGES.ELEMENT_NOT_FOUND(query))
-        .with.property("code", ERROR.CODES.ELEMENT_NOT_FOUND);
+      expect(getNullableElement(query)).to.be.null;
     });
 
-    it("will throw View3DError if element with given selector not found inside given parent", () => {
+    it("will return null if element with given selector not found inside given parent", () => {
       const query = "#el-that-definitely-not-exist";
       const wrapper = createSandbox();
 
-      expect(() => getNullableElement(query, wrapper))
-        .to.throw(ERROR.MESSAGES.ELEMENT_NOT_FOUND(query))
-        .with.property("code", ERROR.CODES.ELEMENT_NOT_FOUND);
+      expect(getNullableElement(query, wrapper)).to.be.null;
     });
 
     it("will return null if given parameter is null", () => {
