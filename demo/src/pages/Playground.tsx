@@ -216,8 +216,9 @@ class Playground extends React.Component<{}, {
       if (!model) return;
 
       const pointer = new THREE.Vector2();
-      pointer.x = (evt.offsetX / canvas.width) * 2 - 1;
-      pointer.y = -(evt.offsetY / canvas.height) * 2 + 1;
+      const devicePixelRatio = window.devicePixelRatio;
+      pointer.x = (evt.offsetX / canvas.width) * 2 * devicePixelRatio - 1;
+      pointer.y = -(evt.offsetY / canvas.height) * 2 * devicePixelRatio + 1;
 
       raycaster.setFromCamera(pointer, view3D.camera.threeCamera);
 
