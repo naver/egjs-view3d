@@ -8,7 +8,7 @@ Note: this tool is not a general solution for optimizing 3D models.
 - "-i, --input <path>", "path to the input gltf/glb file"
 - "-o, --output <path>", "path to the generated output files"
 - "-d, --draco", "apply Draco mesh compression"
-- "-m, --meshopt", "apply Draco mesh compression"
+- "-m, --meshopt", "apply Meshopt compression"
 - "-tc, --basisu", "apply KTX2 basisu supercompression (ETC1S)"
 - "-w, --webp", "include webp textures"
 - "-t0, --texture-lod-0 [size]", "apply minimum texture LOD with the given size"
