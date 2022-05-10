@@ -67,6 +67,7 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
   private _motion: Motion;
   private _prevTouchDistance: number = -1;
   private _enabled: boolean = false;
+  private _isFirstTouch: boolean = true;
 
   /**
    * Whether this control is enabled or not
@@ -205,8 +206,9 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
     const camera = this._view3D.camera;
     const newPose = camera.newPose;
     const motion = this._motion;
+    const delta = motion.update(deltaTime);
 
-    newPose.zoom -= motion.update(deltaTime);
+    newPose.zoom -= delta;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -331,11 +333,12 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
     const touchPoint2 = new THREE.Vector2(touches[1].pageX, touches[1].pageY);
     const touchDiff = touchPoint1.sub(touchPoint2);
     const touchDistance = touchDiff.length() * this._scale * this._scaleModifier * this._touchModifier;
-    const delta = touchDistance - prevTouchDistance;
+    const delta = this._isFirstTouch
+      ? 0
+      : touchDistance - prevTouchDistance;
 
     this._prevTouchDistance = touchDistance;
-
-    if (prevTouchDistance < 0) return;
+    this._isFirstTouch = false;
 
     animation.setEndDelta(delta);
   };
@@ -349,6 +352,7 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
     });
 
     this._prevTouchDistance = -1;
+    this._isFirstTouch = true;
   };
 }
 
