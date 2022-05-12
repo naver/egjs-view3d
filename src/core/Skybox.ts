@@ -36,6 +36,7 @@ class Skybox {
    */
   public enable() {
     this._enabled = true;
+    this._view3D.renderer.renderSingleFrame();
   }
 
   /**
@@ -43,6 +44,7 @@ class Skybox {
    */
   public disable() {
     this._enabled = false;
+    this._view3D.renderer.renderSingleFrame();
   }
 
   /**
@@ -105,6 +107,7 @@ class Skybox {
     threeRenderer.toneMappingExposure = origExposure;
 
     this._scene.background = cubeRenderTarget.texture;
+    this._view3D.renderer.renderSingleFrame();
 
     return this;
   }
@@ -116,6 +119,7 @@ class Skybox {
    */
   public useTexture(texture: THREE.Texture) {
     this._scene.background = texture;
+    this._view3D.renderer.renderSingleFrame();
 
     return this;
   }

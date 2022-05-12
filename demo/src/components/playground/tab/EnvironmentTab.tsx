@@ -43,29 +43,32 @@ class EnvironmentTab extends React.Component<{
         }}></input>
       </MenuItem>
       <MenuItem>
-        <div className="menu-label mb-4">Shadow opacity: {playground.view3D?.scene.shadowPlane.opacity ?? 0.3}</div>
+        <div className="menu-label mb-4">Shadow darkness: {playground.view3D?.scene.shadowPlane.darkness ?? 0.5}</div>
         <Range
           className="mb-2"
           step={0.01}
           min={0}
           max={1}
-          val={playground.view3D?.scene.shadowPlane.opacity ?? 0}
+          val={playground.view3D?.scene.shadowPlane.darkness ?? 0.5}
           onChange={(values) => {
-            playground.view3D.scene.shadowPlane.opacity = values[0];
+            const view3D = playground.view3D;
+            view3D.scene.shadowPlane.darkness = values[0];
+            view3D.renderer.renderSingleFrame();
             this.forceUpdate();
           }} />
       </MenuItem>
       <MenuItem>
-        <div className="menu-label mb-4">Shadow hardness: {playground.view3D?.scene.shadowPlane.hardness ?? 6}</div>
+        <div className="menu-label mb-4">Shadow blur: {playground.view3D?.scene.shadowPlane.blur ?? 3.5}</div>
         <Range
           className="mb-2"
           step={1}
           min={1}
           max={14}
-          val={playground.view3D?.scene.shadowPlane.hardness ?? 6}
+          val={playground.view3D?.scene.shadowPlane.blur ?? 3.5}
           onChange={(values) => {
             const view3D = playground.view3D;
-            view3D.scene.shadowPlane.hardness = values[0];
+            view3D.scene.shadowPlane.blur = values[0];
+            view3D.renderer.renderSingleFrame();
             this.forceUpdate();
           }} />
       </MenuItem>

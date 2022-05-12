@@ -1,7 +1,7 @@
 {
   "name": "@egjs/view3d-optimizer",
   "version": "1.0.0",
-  "description": "glTF/glb optimizer designed just for View3D",
+  "description": "glTF/glb optimizer for View3D",
   "main": "index.js",
   "bin": {
     "view3d-optimizer": "./index.js"

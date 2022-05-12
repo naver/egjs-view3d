@@ -313,10 +313,6 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
     const touch = evt.touches[0];
     const scrollable = this._view3D.scrollable;
 
-    if (scrollable && !evt.cancelable) {
-      return;
-    }
-
     if (this._isFirstTouch) {
       if (scrollable) {
         const delta = new THREE.Vector2(touch.clientX, touch.clientY)

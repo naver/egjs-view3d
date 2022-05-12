@@ -37,6 +37,7 @@ class ModelTab extends React.Component<{
                 val={[Math.floor(view3D?.camera.yaw ?? 0)]}
                 onChange={(values) => {
                   view3D.camera.yaw = values[0];
+                  view3D.renderer.renderSingleFrame();
                   this.forceUpdate();
                 }} />
             </MenuItem>
@@ -50,6 +51,7 @@ class ModelTab extends React.Component<{
                 val={[Math.floor(view3D?.camera.pitch ?? 0)]}
                 onChange={(values) => {
                   view3D.camera.pitch = values[0];
+                  view3D.renderer.renderSingleFrame();
                   this.forceUpdate();
                 }} />
             </MenuItem>

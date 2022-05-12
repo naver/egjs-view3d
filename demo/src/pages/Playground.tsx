@@ -10,7 +10,6 @@ import styles from "./playground.module.css";
 
 import VanillaView3D, { GLTFLoader, LoadingBar } from "../../../src";
 import FaceAnnotation from "../../../src/core/annotation/FaceAnnotation";
-import { directionToYawPitch, toDegree } from "../../../src/utils";
 import ModelTab from "../components/playground/tab/ModelTab";
 import EnvironmentTab from "../components/playground/tab/EnvironmentTab";
 import DownloadTab from "../components/playground/tab/DownloadTab";
