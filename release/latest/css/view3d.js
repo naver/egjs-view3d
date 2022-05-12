@@ -4,7 +4,7 @@ name: @egjs/view3d
 license: MIT
 author: NAVER Corp.
 repository: https://github.com/naver/egjs-view3d
-version: 2.4.0
+version: 2.4.1
 */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('three'), require('@egjs/component'), require('three/examples/jsm/loaders/RGBELoader'), require('three/examples/jsm/shaders/HorizontalBlurShader'), require('three/examples/jsm/shaders/VerticalBlurShader'), require('three/examples/jsm/lights/LightProbeGenerator'), require('three/examples/jsm/loaders/GLTFLoader'), require('three/examples/jsm/loaders/DRACOLoader'), require('three/examples/jsm/loaders/KTX2Loader')) :
@@ -1215,6 +1215,8 @@ version: 2.4.0
 
     enable() {
       this._enabled = true;
+
+      this._view3D.renderer.renderSingleFrame();
     }
     /**
      * Disable skybox rendering
@@ -1223,6 +1225,8 @@ version: 2.4.0
 
     disable() {
       this._enabled = false;
+
+      this._view3D.renderer.renderSingleFrame();
     }
     /**
      * Update current skybox camera to match main camera & apply rotation
@@ -1278,6 +1282,9 @@ version: 2.4.0
       cubeCamera.update(threeRenderer, skyboxScene);
       threeRenderer.toneMappingExposure = origExposure;
       this._scene.background = cubeRenderTarget.texture;
+
+      this._view3D.renderer.renderSingleFrame();
+
       return this;
     }
     /**
@@ -1289,6 +1296,9 @@ version: 2.4.0
 
     useTexture(texture) {
       this._scene.background = texture;
+
+      this._view3D.renderer.renderSingleFrame();
+
       return this;
     }
     /**
@@ -5970,10 +5980,6 @@ version: 2.4.0
         const touch = evt.touches[0];
         const scrollable = this._view3D.scrollable;
 
-        if (scrollable && !evt.cancelable) {
-          return;
-        }
-
         if (this._isFirstTouch) {
           if (scrollable) {
             const delta = new THREE.Vector2(touch.clientX, touch.clientY).sub(this._prevPos);
@@ -6592,6 +6598,7 @@ version: 2.4.0
       this._touchModifier = 0.05;
       this._prevTouchDistance = -1;
       this._enabled = false;
+      this._isFirstTouch = true;
 
       this._onWheel = evt => {
         const wheelScrollable = this._view3D.wheelScrollable;
@@ -6628,9 +6635,9 @@ version: 2.4.0
 
         const touchDistance = touchDiff.length() * this._scale * this._scaleModifier * this._touchModifier;
 
-        const delta = touchDistance - prevTouchDistance;
+        const delta = this._isFirstTouch ? 0 : touchDistance - prevTouchDistance;
         this._prevTouchDistance = touchDistance;
-        if (prevTouchDistance < 0) return;
+        this._isFirstTouch = false;
         animation.setEndDelta(delta);
       };
 
@@ -6641,6 +6648,7 @@ version: 2.4.0
           isTouch: true
         });
         this._prevTouchDistance = -1;
+        this._isFirstTouch = true;
       };
 
       this._view3D = view3D;
@@ -6808,7 +6816,8 @@ version: 2.4.0
       const camera = this._view3D.camera;
       const newPose = camera.newPose;
       const motion = this._motion;
-      newPose.zoom -= motion.update(deltaTime);
+      const delta = motion.update(deltaTime);
+      newPose.zoom -= delta;
     } // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
 
@@ -9078,7 +9087,7 @@ version: 2.4.0
    */
 
 
-  View3D.VERSION = "2.4.0";
+  View3D.VERSION = "2.4.1";
 
   /*
    * "View In Ar" Icon from [Google Material Design Icons](https://github.com/google/material-design-icons)
