@@ -217,7 +217,7 @@ class GLTFLoader extends Loader {
     const texturesByLevel: Array<Array<{
       index: number;
       texture: THREE.Texture;
-    }>> = gltfTextures.reduce((levels, texture, texIdx) => {
+    }>> = [...new Set(gltfTextures).values()].reduce((levels, texture, texIdx) => {
       const hasExtension = texture.extensions && texture.extensions[CUSTOM_TEXTURE_LOD_EXTENSION];
       const hasExtra = texture.extras && texture.extras[TEXTURE_LOD_EXTRA];
 

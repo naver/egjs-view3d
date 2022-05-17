@@ -18,10 +18,10 @@
   },
   "homepage": "https://github.com/naver/egjs-view3d#readme",
   "dependencies": {
-    "@gltf-transform/cli": "^2.0.5",
-    "@gltf-transform/core": "^2.0.5",
-    "@gltf-transform/extensions": "^2.0.5",
-    "@gltf-transform/functions": "^2.0.5",
+    "@gltf-transform/cli": "^2.1.5",
+    "@gltf-transform/core": "^2.1.5",
+    "@gltf-transform/extensions": "^2.1.5",
+    "@gltf-transform/functions": "^2.1.5",
     "@squoosh/cli": "^0.7.2",
     "chalk": "^4.1.2",
     "child-process-promise": "^2.2.1",
@@ -29,7 +29,9 @@
     "commander": "^9.0.0",
     "fs-extra": "^10.0.1",
     "gltf-pipeline": "^3.0.4",
-    "probe-image-size": "^7.2.3",
-    "tmp-promise": "^3.0.3"
+    "gltfpack": "^0.17.0",
+    "meshoptimizer": "^0.17.0",
+    "mozjpeg": "^8.0.0",
+    "probe-image-size": "^7.2.3"
   }
 }

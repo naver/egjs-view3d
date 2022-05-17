@@ -16,7 +16,14 @@ export const STANDARD_MAPS = [
   "map",
   "metalnessMap",
   "normalMap",
-  "roughnessMap"
+  "roughnessMap",
+  "sheenColorMap",
+  "sheenRoughnessMap",
+  "specularColorMap",
+  "specularIntensityMap",
+  "transmissionMap",
+  "clearcoatMap",
+  "clearcoatNormalMap"
 ];
 
 export const CONTROL_EVENTS = {
