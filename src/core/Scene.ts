@@ -20,7 +20,7 @@ import Skybox from "./Skybox";
 class Scene {
   private _view3D: View3D;
   private _root: THREE.Scene;
-  private _skybox: Skybox | null;
+  private _skybox: Skybox;
   private _shadowPlane: ShadowPlane;
   private _userObjects: THREE.Group;
   private _envObjects: THREE.Group;
@@ -71,7 +71,7 @@ class Scene {
   public constructor(view3D: View3D) {
     this._view3D = view3D;
     this._root = new THREE.Scene();
-    this._skybox = null;
+    this._skybox = new Skybox(view3D);
     this._userObjects = new THREE.Group();
     this._envObjects = new THREE.Group();
     this._fixedObjects = new THREE.Group();
@@ -145,9 +145,7 @@ class Scene {
    */
   public async setBackground(background: number | string): Promise<void> {
     const view3D = this._view3D;
-    const skybox = new Skybox(view3D);
-
-    this._skybox = skybox;
+    const skybox = this._skybox;
 
     if (typeof background === "number" || background.charAt(0) === "#") {
       skybox.useColor(background);
@@ -171,14 +169,14 @@ class Scene {
   public async setSkybox(url: string | null): Promise<void> {
     const root = this._root;
     const view3D = this._view3D;
+    const skybox = this._skybox;
 
     // Destroy previous skybox
-    this._skybox?.destroy();
+    skybox.dispose();
 
     if (url) {
       const textureLoader = new TextureLoader(view3D);
       const texture = await textureLoader.loadHDRTexture(url);
-      const skybox = new Skybox(view3D);
 
       if (view3D.skyboxBlur) {
         skybox.useBlurredHDR(texture);
@@ -186,11 +184,11 @@ class Scene {
         skybox.useTexture(texture);
       }
 
-      this._skybox = skybox;
       root.environment = texture;
+      skybox.enable();
     } else {
-      this._skybox = null;
       root.environment = null;
+      skybox.disable();
     }
 
     view3D.renderer.renderSingleFrame();
@@ -203,14 +201,15 @@ class Scene {
    */
   public async setEnvMap(url: string | null): Promise<void> {
     const view3D = this._view3D;
+    const root = this._root;
 
     if (url) {
       const textureLoader = new TextureLoader(view3D);
       const texture = await textureLoader.loadHDRTexture(url);
 
-      this._root.environment = texture;
+      root.environment = texture;
     } else {
-      this._root.environment = null;
+      root.environment = null;
     }
 
     view3D.renderer.renderSingleFrame();
@@ -218,7 +217,7 @@ class Scene {
 
   private _removeChildsOf(obj: THREE.Object3D) {
     obj.traverse(child => {
-      if ((child as any).isMesh) {
+      if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
 
         // Release geometry & material memory

@@ -24,8 +24,8 @@ import { WebARSessionOptions } from "./xr/WebARSession";
 import { SceneViewerSessionOptions } from "./xr/SceneViewerSession";
 import { QuickLookSessionOptions } from "./xr/QuickLookSession";
 import { EVENTS, AUTO, AR_SESSION_TYPE, DEFAULT_CLASS, TONE_MAPPING } from "./const/external";
-import * as DEFAULT from "./const/default";
 import ERROR from "./const/error";
+import * as DEFAULT from "./const/default";
 import * as EVENT_TYPES from "./type/event";
 import { View3DPlugin } from "./plugin";
 import { getElement, getObjectOption, isCSSSelector, isElement } from "./utils";
@@ -95,6 +95,7 @@ export interface View3DOptions {
   shadow: boolean | Partial<ShadowOptions>;
   skyboxBlur: boolean;
   toneMapping: LiteralUnion<ValueOf<typeof TONE_MAPPING>, THREE.ToneMapping>;
+  useDefaultEnv: boolean;
 
   // Annotation
   annotationURL: string | null;
@@ -178,6 +179,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _shadow: View3DOptions["shadow"];
   private _skyboxBlur: View3DOptions["skyboxBlur"];
   private _toneMapping: View3DOptions["toneMapping"];
+  private _useDefaultEnv: View3DOptions["useDefaultEnv"];
 
   private _annotationURL: View3DOptions["annotationURL"];
   private _annotationWrapper: View3DOptions["annotationWrapper"];
@@ -452,6 +454,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get toneMapping() { return this._toneMapping; }
   /**
+   *
+   * @type {boolean}
+   * @default true
+   */
+  public get useDefaultEnv() { return this._useDefaultEnv; }
+  /**
    * An URL to the JSON file that has annotation informations.
    * @type {string | null}
    * @default null
@@ -566,8 +574,9 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   }
 
   public set exposure(val: View3DOptions["exposure"]) {
-    this._renderer.threeRenderer.toneMappingExposure = val;
     this._exposure = val;
+    this._renderer.threeRenderer.toneMappingExposure = val;
+    this._renderer.renderSingleFrame();
   }
 
   public set skyboxBlur(val: View3DOptions["skyboxBlur"]) {
@@ -575,7 +584,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     const scene = this._scene;
     const origEnvmapTexture = scene.root.environment;
 
-    if (origEnvmapTexture && !!scene.skybox) {
+    if (origEnvmapTexture) {
       if (val) {
         scene.skybox.useBlurredHDR(origEnvmapTexture);
       } else {
@@ -587,6 +596,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   public set toneMapping(val: View3DOptions["toneMapping"]) {
     this._toneMapping = val;
     this._renderer.threeRenderer.toneMapping = val as THREE.ToneMapping;
+    this._renderer.renderSingleFrame();
   }
 
   public set useGrabCursor(val: View3DOptions["useGrabCursor"]) {
@@ -635,6 +645,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     shadow = true,
     skyboxBlur = false,
     toneMapping = TONE_MAPPING.LINEAR,
+    useDefaultEnv = true,
     annotationURL = null,
     annotationWrapper = `.${DEFAULT_CLASS.ANNOTATION_WRAPPER}`,
     annotationSelector = `.${DEFAULT_CLASS.ANNOTATION}`,
@@ -685,6 +696,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._shadow = shadow;
     this._skyboxBlur = skyboxBlur;
     this._toneMapping = toneMapping;
+    this._useDefaultEnv = useDefaultEnv;
 
     this._annotationURL = annotationURL;
     this._annotationWrapper = annotationWrapper;
@@ -769,6 +781,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
     this.resize();
     annotationManager.init();
+    scene.skybox.init();
 
     if (this._autoResize) {
       this._autoResizer.enable();
@@ -781,15 +794,13 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     // Load & set skybox / envmap before displaying model
     const hasEnvmap = skybox || envmap;
     if (hasEnvmap) {
-      const tempLight = new THREE.AmbientLight();
-      scene.add(tempLight, false);
-
       const loadEnv = skybox
         ? scene.setSkybox(skybox)
         : scene.setEnvMap(envmap);
 
       tasks.push(loadEnv.then(() => {
-        scene.remove(tempLight);
+        // TODO:
+        // scene.remove(tempLight);
       }));
     }
 
@@ -837,7 +848,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._annotationManager.resize();
 
     // Prevent flickering on resize
-    renderer.renderSingleFrame();
+    renderer.renderSingleFrame(true);
 
     this.trigger(EVENTS.RESIZE, { ...newSize, type: EVENTS.RESIZE, target: this });
   }
