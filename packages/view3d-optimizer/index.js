@@ -103,6 +103,7 @@ const main = async () => {
   fs.ensureDirSync(outDir);
   const finalGLTF = `${outDir}/${outName}`;
   await exec(`npx gltf-transform copy ${tmpFile} ${finalGLTF}`);
+  fs.rmSync(tmpFile);
 
   if (options.forceJpg) {
     const gltf = fs.readJSONSync(finalGLTF);
