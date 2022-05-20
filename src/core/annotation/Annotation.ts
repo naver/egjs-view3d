@@ -7,6 +7,7 @@ import * as THREE from "three";
 import View3D from "../../View3D";
 import * as BROWSER from "../../const/browser";
 import { DEFAULT_CLASS } from "../../const/external";
+import { toDegree, toRadian } from "../../utils";
 
 /**
  * Common options for {@link Annotation}s
@@ -15,6 +16,9 @@ export interface AnnotationOptions {
   element: HTMLElement | null;
   focus: number[];
   focusDuration: number;
+  baseFov: number;
+  baseDistance: number | null;
+  aspect: number;
 }
 
 /**
@@ -32,6 +36,9 @@ abstract class Annotation {
   protected _element: HTMLElement | null;
   protected _focus: number[];
   protected _focusDuration: number;
+  protected _baseFov: number;
+  protected _baseDistance: number | null;
+  protected _aspect: number;
   protected _enabled: boolean;
   protected _tooltipSize: THREE.Vector2;
 
@@ -47,17 +54,42 @@ abstract class Annotation {
    * @readonly
    */
   public get renderable() { return !!this._element; }
+  /**
+   * Base fov value that annotation is referencing
+   * @type {number}
+   */
+  public get baseFov() { return this._baseFov; }
+  /**
+   * Base dsitance value that annotation is referencing
+   * @type {number | null}
+   */
+  public get baseDistance() { return this._baseDistance; }
+  /**
+   * Base aspect value that annotation is referencing
+   * @type {number}
+   */
+  public get aspect() { return this._aspect; }
+
+  public set baseFov(val: number) { this._baseFov = val; }
+  public set baseDistance(val: number | null) { this._baseDistance = val; }
+  public set aspect(val: number) { this._aspect = val; }
 
   /** */
   public constructor(view3D: View3D, {
     element = null,
     focus = [],
-    focusDuration = 1000
+    focusDuration = 1000,
+    baseFov = 45,
+    baseDistance = null,
+    aspect = 1
   }: Partial<AnnotationOptions> = {}) {
     this._view3D = view3D;
     this._element = element;
     this._focus = focus;
     this._focusDuration = focusDuration;
+    this._baseFov = baseFov;
+    this._baseDistance = baseDistance;
+    this._aspect = aspect;
     this._enabled = false;
     this._tooltipSize = new THREE.Vector2();
 
@@ -153,6 +185,28 @@ abstract class Annotation {
     el.removeEventListener(BROWSER.EVENTS.CLICK, this._onClick);
     el.removeEventListener(BROWSER.EVENTS.WHEEL, this._onWheel);
     this._enabled = false;
+  }
+
+  protected _getFocus(): THREE.Vector3 {
+    const view3D = this._view3D;
+    const focusVector = new THREE.Vector3().fromArray(this._focus);
+
+    const currentDistance = view3D.camera.baseDistance;
+    const currentSize = view3D.renderer.size;
+    const currentAspect = Math.max(currentSize.height / currentSize.width, 1);
+
+    const aspect = this._aspect;
+    const baseFov = this._baseFov;
+    const baseDistance = this._baseDistance ?? currentDistance;
+
+    const aspectRatio = currentAspect / aspect;
+    const targetRenderHeight = aspectRatio * baseDistance * Math.tan(toRadian((baseFov - focusVector.z) / 2));
+    const targetFov = 2 * toDegree(Math.atan(targetRenderHeight / currentDistance));
+
+    // zoom value
+    focusVector.z = view3D.camera.baseFov - targetFov;
+
+    return focusVector;
   }
 
   protected _onClick = () => {

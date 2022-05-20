@@ -4,6 +4,6 @@ declare module "*.module.css" {
   export default value;
 }
 declare module "*.svg" {
-  const value: React.FC<React.SVGProps<SVGSVGElement>>;
-  export default value;
+  const content: React.FunctionComponent<React.SVGAttributes<SVGElement>>;
+  export default content;
 }
