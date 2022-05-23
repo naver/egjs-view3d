@@ -170,6 +170,8 @@ export interface LoadProgressEvent {
 
 /**
  * An event that fires on the start of every inputs
+ * @event View3D#inputStart
+ * @type {object}
  * @property {string} type A type of the event.
  * @property {View3D} target An instance of View3D that triggered this event.
  * @property {INPUT_TYPE} inputType Type of the input.
@@ -182,6 +184,8 @@ export interface InputStartEvent {
 
 /**
  * An event that fires on the end of every inputs
+ * @event View3D#inputEnd
+ * @type {object}
  * @property {string} type A type of the event.
  * @property {View3D} target An instance of View3D that triggered this event.
  * @property {INPUT_TYPE} inputType Type of the input.
@@ -194,6 +198,8 @@ export interface InputEndEvent {
 
 /**
  * An event that fires on camera movement
+ * @event View3D#cameraChange
+ * @type {object}
  * @property {string} type A type of the event.
  * @property {View3D} target An instance of View3D that triggered this event.
  * @property {Pose} pose Current yaw, pitch, zoom, and pivot value

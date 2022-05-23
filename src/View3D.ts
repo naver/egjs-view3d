@@ -11,6 +11,7 @@ import Camera from "./core/Camera";
 import AutoResizer from "./core/AutoResizer";
 import Model from "./core/Model";
 import ModelAnimator from "./core/ModelAnimator";
+import Skybox from "./core/Skybox";
 import ARManager from "./core/ARManager";
 import AnnotationManager from "./core/annotation/AnnotationManager";
 import { ShadowOptions } from "./core/ShadowPlane";
@@ -582,13 +583,14 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   public set skyboxBlur(val: View3DOptions["skyboxBlur"]) {
     this._skyboxBlur = val;
     const scene = this._scene;
+    const root = scene.root;
     const origEnvmapTexture = scene.root.environment;
 
-    if (origEnvmapTexture) {
+    if (origEnvmapTexture && root.background !== null) {
       if (val) {
-        scene.skybox.useBlurredHDR(origEnvmapTexture);
+        root.background = Skybox.createBlurredHDR(this, origEnvmapTexture);
       } else {
-        scene.skybox.useTexture(origEnvmapTexture);
+        root.background = origEnvmapTexture;
       }
     }
   }
@@ -781,7 +783,11 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
     this.resize();
     annotationManager.init();
-    scene.skybox.init();
+
+    if (this._useDefaultEnv) {
+      const defaultEnv = Skybox.createDefaultEnv(renderer.threeRenderer);
+      scene.root.environment = defaultEnv;
+    }
 
     if (this._autoResize) {
       this._autoResizer.enable();
@@ -798,10 +804,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
         ? scene.setSkybox(skybox)
         : scene.setEnvMap(envmap);
 
-      tasks.push(loadEnv.then(() => {
-        // TODO:
-        // scene.remove(tempLight);
-      }));
+      tasks.push(loadEnv);
     }
 
     if (!skybox && background) {

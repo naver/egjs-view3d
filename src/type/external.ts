@@ -5,6 +5,7 @@
 
 /**
  * Current context of the loading item
+ * @interface
  * @property {string} src Source URL of the loading item
  * @property {number} loaded Loaded byte
  * @property {number} total Content length of the item

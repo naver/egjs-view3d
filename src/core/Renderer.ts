@@ -186,17 +186,8 @@ class Renderer {
 
     camera.updatePosition();
 
-    threeRenderer.autoClear = false;
-    threeRenderer.clear();
-
-    if (scene.skybox.enabled) {
-      scene.skybox.updateCamera();
-      threeRenderer.render(scene.skybox.scene, scene.skybox.camera);
-    }
-
     scene.shadowPlane.render();
     threeRenderer.render(scene.root, camera.threeCamera);
-    threeRenderer.autoClear = true;
 
     // Render annotations
     annotation.render();

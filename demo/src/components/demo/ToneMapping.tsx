@@ -105,7 +105,7 @@ export default () => {
       </div>
       <View3D
         ref={view3D}
-        src="/egjs-view3d/model/draco/alarm.glb"
+        src="/egjs-view3d/model/trex.glb"
         skybox="/egjs-view3d/texture/royal_esplanade_1k.hdr"
         toneMapping={toneMapping}
         showExampleCode />

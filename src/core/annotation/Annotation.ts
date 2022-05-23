@@ -11,6 +11,7 @@ import { toDegree, toRadian } from "../../utils";
 
 /**
  * Common options for {@link Annotation}s
+ * @interface
  */
 export interface AnnotationOptions {
   element: HTMLElement | null;
