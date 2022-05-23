@@ -307,7 +307,7 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
     const animation = this._motion;
     const delta = -this._scale * this._scaleModifier * this._wheelModifier * evt.deltaY;
 
-    if (animation.progress <= 0) {
+    if (animation.progress <= 0 || animation.progress >= 1) {
       this.trigger(CONTROL_EVENTS.HOLD, {
         inputType: INPUT_TYPE.ZOOM,
         isTouch: false
@@ -338,6 +338,14 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
       : touchDistance - prevTouchDistance;
 
     this._prevTouchDistance = touchDistance;
+
+    if (this._isFirstTouch) {
+      this.trigger(CONTROL_EVENTS.HOLD, {
+        inputType: INPUT_TYPE.ZOOM,
+        isTouch: true
+      });
+    }
+
     this._isFirstTouch = false;
 
     animation.setEndDelta(delta);

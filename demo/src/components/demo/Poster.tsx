@@ -10,7 +10,6 @@ export default () => {
     <View3D
       ref={view3D}
       src="/egjs-view3d/model/draco/alarm.glb"
-      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
       poster="#demo-poster-sample-el"
       autoInit={false}
       clickToLoad

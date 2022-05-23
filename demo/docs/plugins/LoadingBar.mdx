@@ -36,7 +36,6 @@ Without it, they won't be displayed correctly.
       <View3D
         ref={refs[0]}
         src="/egjs-view3d/model/draco/payphone.glb"
-        envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
         poster="/egjs-view3d/poster/payphone.png"
         autoInit={false}
         showLoadingBar={{ type: "default" }} />
@@ -47,8 +46,7 @@ Without it, they won't be displayed correctly.
       <View3D
         ref={refs[1]}
         src="/egjs-view3d/model/meshopt/alarm.glb"
-        envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
-        poster="/egjs-view3d/poster/alarm.png"
+        poster="/egjs-view3d/poster/alarm_default.png"
         autoInit={false}
         showLoadingBar={{ type: "top" }} />
       <button className="button" onClick={() => { refs[1].current.view3D.init(); }}>Load</button>
@@ -58,7 +56,6 @@ Without it, they won't be displayed correctly.
       <View3D
         ref={refs[2]}
         src="/egjs-view3d/model/draco/watch.glb"
-        envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
         poster="/egjs-view3d/poster/watch.png"
         autoInit={false}
         showLoadingBar={{ type: "spinner" }} />
@@ -101,13 +98,6 @@ Without it, they won't be displayed correctly.
   {
     name: "Vintage Pocket Watch",
     link: "https://polyhaven.com/a/vintage_pocket_watch",
-    author: "Poly Haven",
-    authorLink: "https://polyhaven.com/",
-    license: "CC0"
-  },
-  {
-    name: "Artist Workshop",
-    link: "https://polyhaven.com/a/artist_workshop",
     author: "Poly Haven",
     authorLink: "https://polyhaven.com/",
     license: "CC0"

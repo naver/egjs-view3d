@@ -24,8 +24,7 @@ export default () => {
         <View3D
           ref={ref}
           src="/egjs-view3d/model/draco/alarm.glb"
-          envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
-          poster="/egjs-view3d/poster/alarm.png"
+          poster="/egjs-view3d/poster/alarm_default.png"
           maintainSize={false}
           showExampleCode />
       </div>
@@ -33,8 +32,7 @@ export default () => {
         <View3D
           ref={ref2}
           src="/egjs-view3d/model/draco/alarm.glb"
-          envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
-          poster="/egjs-view3d/poster/alarm.png"
+          poster="/egjs-view3d/poster/alarm_default.png"
           maintainSize={true}
           showExampleCode />
       </div>

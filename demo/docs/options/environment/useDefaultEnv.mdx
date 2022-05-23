@@ -8,21 +8,25 @@ import License from "@site/src/components/License";
 
 <OptionDescriptor type="boolean" defaultVal="true" />
 
-Source to the HDR texture image (RGBE), which will used as the scene environment map & background.
-`envmap` will be ignored if this value is not `null`.
+Use a generated envmap as a light source.
+Using `false` will make model unlitten.
 
 ## Example
 
-<View3D
-  src="/egjs-view3d/model/draco/alarm.glb"
-/>
-
 <div className="columns">
   <div className="column">
-
+    <View3D
+      src="/egjs-view3d/model/draco/alarm.glb"
+      useDefaultEnv={true}
+      showExampleCode
+    />
   </div>
   <div className="column">
-
+    <View3D
+      src="/egjs-view3d/model/draco/alarm.glb"
+      useDefaultEnv={false}
+      showExampleCode
+    />
   </div>
 </div>
 

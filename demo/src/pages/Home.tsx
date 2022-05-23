@@ -17,7 +17,6 @@ class Home extends React.Component {
   public componentDidMount() {
     const view3D = new VanillaView3D("#home-view3d", {
       src: "/egjs-view3d/model/cube.glb",
-      envmap: "/egjs-view3d/texture/artist_workshop_1k.hdr",
       zoom: false,
       pitch: 25,
       initialZoom: -5,
@@ -64,13 +63,6 @@ class Home extends React.Component {
           {
             name: "Potted Plant 04",
             link: "https://polyhaven.com/a/potted_plant_04",
-            author: "Poly Haven",
-            authorLink: "https://polyhaven.com/",
-            license: "CC0"
-          },
-          {
-            name: "Artist Workshop",
-            link: "https://polyhaven.com/a/artist_workshop",
             author: "Poly Haven",
             authorLink: "https://polyhaven.com/",
             license: "CC0"

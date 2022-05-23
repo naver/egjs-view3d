@@ -90,7 +90,7 @@ class Skybox {
     renderer.outputEncoding = THREE.LinearEncoding;
     renderer.toneMapping = THREE.NoToneMapping;
 
-    const renderTarget = new THREE.PMREMGenerator(renderer).fromScene(envScene);
+    const renderTarget = new THREE.PMREMGenerator(renderer).fromScene(envScene, 0.035);
 
     renderer.outputEncoding = outputEncoding;
     renderer.toneMapping = toneMapping;

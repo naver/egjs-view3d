@@ -99,12 +99,12 @@ const view3D = new View3D("#view3d", {
 
 <View3D
   src="/egjs-view3d/model/draco/alarm.glb"
-  poster="/egjs-view3d/poster/alarm_black.png"
+  poster="/egjs-view3d/poster/alarm_default.png"
   clickToLoad
   showExampleCode />
 
-But as there's no lighting yet, model will be shown in black (unless it has emissive property enabled)
-View3D uses HDR image as envmap for IBL(image-based lighting), so you can set any HDR image for the option `envmap` and model will be litten.
+View3D uses generated envmap as a default light source.
+You can turn this off with the option [useDefaultEnv](/docs/options/environment/useDefaultEnv), or you can use a HDR image as envmap for IBL(image-based lighting), so you can set any HDR image for the option [envmap](/docs/options/environment/envmap) and model will be litten.
 
 <View3D
   src="/egjs-view3d/model/draco/alarm.glb"

@@ -19,8 +19,7 @@ Each controls can be disabled easily by setting it to `false`.
 
 <View3D
   src="/egjs-view3d/model/draco/alarm.glb"
-  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
-  poster="/egjs-view3d/poster/alarm.png"
+  poster="/egjs-view3d/poster/alarm_default.png"
   translate={false}
   clickToLoad
   showExampleCode />
@@ -34,8 +33,7 @@ It is possible to deactivate only one axis of the rotation with `disablePitch` (
   <div className="column">
   <View3D
     src="/egjs-view3d/model/draco/alarm.glb"
-    envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
-    poster="/egjs-view3d/poster/alarm.png"
+    poster="/egjs-view3d/poster/alarm_default.png"
     rotate={{ disablePitch: true }}
     clickToLoad
     showExampleCode />
@@ -43,8 +41,7 @@ It is possible to deactivate only one axis of the rotation with `disablePitch` (
   <div className="column">
     <View3D
     src="/egjs-view3d/model/draco/alarm.glb"
-    envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
-    poster="/egjs-view3d/poster/alarm.png"
+    poster="/egjs-view3d/poster/alarm_default.png"
     rotate={{ disableYaw: true }}
     clickToLoad
     showExampleCode />
@@ -56,8 +53,7 @@ It is possible to deactivate only one axis of the rotation with `disablePitch` (
 By default, [scrollable](/docs/options/control/scrollable) is enabled to enable scrolling on the canvas area for mobile(touch) devices.
 <View3D
   src="/egjs-view3d/model/draco/alarm.glb"
-  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
-  poster="/egjs-view3d/poster/alarm.png"
+  poster="/egjs-view3d/poster/alarm_default.png"
   scrollable={true}
   clickToLoad
   showExampleCode />
@@ -72,8 +68,17 @@ You can scroll on the canvas if you enable it, but you can't adjust zoom in this
 
 <View3D
   src="/egjs-view3d/model/draco/alarm.glb"
-  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
-  poster="/egjs-view3d/poster/alarm.png"
+  poster="/egjs-view3d/poster/alarm_default.png"
   wheelScrollable={true}
   clickToLoad
   showExampleCode />
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+]} />

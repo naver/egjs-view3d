@@ -22,8 +22,7 @@ See [Setup Script & Styles](/docs/quick-start#setup-script--styles) guide page f
 ### Basics
 <View3D
   src="/egjs-view3d/model/draco/alarm.glb"
-  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
-  poster="/egjs-view3d/poster/alarm.png"
+  poster="/egjs-view3d/poster/alarm_default.png"
   showExampleCode />
 
 ### HTMLElement as poster
@@ -44,8 +43,7 @@ We use `1em` as CSS blur filter's value, so blurring amount can be changed by ch
   <div className="column">
     <View3D
       src="/egjs-view3d/model/draco/alarm.glb"
-      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
-      poster="/egjs-view3d/poster/alarm.png"
+      poster="/egjs-view3d/poster/alarm_default.png"
       autoInit={false}
       style={{ fontSize: "32px" }}
       showExampleCode />
@@ -53,8 +51,7 @@ We use `1em` as CSS blur filter's value, so blurring amount can be changed by ch
   <div className="column">
     <View3D
       src="/egjs-view3d/model/draco/alarm.glb"
-      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
-      poster="/egjs-view3d/poster/alarm.png"
+      poster="/egjs-view3d/poster/alarm_default.png"
       autoInit={false}
       style={{ fontSize: "8px" }}
       showExampleCode />
@@ -75,8 +72,7 @@ Add `noblur` class to `.view3d-wrapper` element and poster blur will be removed.
   <div className="column">
     <View3D
       src="/egjs-view3d/model/draco/alarm.glb"
-      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
-      poster="/egjs-view3d/poster/alarm.png"
+      poster="/egjs-view3d/poster/alarm_default.png"
       autoInit={false}
       showExampleCode />
   </div>
@@ -84,8 +80,7 @@ Add `noblur` class to `.view3d-wrapper` element and poster blur will be removed.
     <View3D
       className="noblur"
       src="/egjs-view3d/model/draco/alarm.glb"
-      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
-      poster="/egjs-view3d/poster/alarm.png"
+      poster="/egjs-view3d/poster/alarm_default.png"
       autoInit={false}
       showExampleCode />
   </div>
@@ -95,13 +90,6 @@ Add `noblur` class to `.view3d-wrapper` element and poster blur will be removed.
   {
     name: "Alarm Clock 01",
     link: "https://polyhaven.com/a/alarm_clock_01",
-    author: "Poly Haven",
-    authorLink: "https://polyhaven.com/",
-    license: "CC0"
-  },
-  {
-    name: "Artist Workshop",
-    link: "https://polyhaven.com/a/artist_workshop",
     author: "Poly Haven",
     authorLink: "https://polyhaven.com/",
     license: "CC0"
