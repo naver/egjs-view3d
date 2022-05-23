@@ -135,6 +135,28 @@ describe("View3D", () => {
       });
     });
 
+    describe("useDefaultEnv", () => {
+      it("should have true as a default value", async () => {
+        expect((await createView3D()).useDefaultEnv).to.be.true;
+      });
+
+      it("should set scene's environment on init", async () => {
+        const view3D = await createView3D();
+
+        await view3D.load("/cube.glb");
+
+        expect(view3D.scene.root.environment).not.to.be.null;
+      });
+
+      it("should not set scene's background on init", async () => {
+        const view3D = await createView3D();
+
+        await view3D.load("/cube.glb");
+
+        expect(view3D.scene.root.background).to.be.null;
+      });
+    });
+
     describe("fov", () => {
       it("should have 'auto' as a default value", async () => {
         expect((await createView3D()).fov).to.equal("auto");
