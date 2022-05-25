@@ -156,8 +156,9 @@ class AnnotationManager {
     baseDistance: number;
     aspect: number;
     items: Array<{
-      meshIndex: number;
+      meshIndex: number | null;
       faceIndex: number;
+      position: number[] | null;
       focus: number[];
       duration: number;
       label: string | null;
@@ -166,11 +167,14 @@ class AnnotationManager {
     const view3D = this._view3D;
     const { baseFov, baseDistance, aspect, items } = data;
     const annotations = items.map(annotationData => {
+      const { meshIndex, faceIndex, position, ...commonData } = annotationData;
       const element = this._createDefaultAnnotationElement(annotationData.label);
 
-      if (annotationData.meshIndex != null) {
+      if (meshIndex != null && faceIndex != null) {
         return new FaceAnnotation(view3D, {
-          ...annotationData,
+          meshIndex,
+          faceIndex,
+          ...commonData,
           baseFov,
           baseDistance,
           aspect,
@@ -178,7 +182,8 @@ class AnnotationManager {
         });
       } else {
         return new PointAnnotation(view3D, {
-          ...annotationData,
+          position: position!,
+          ...commonData,
           baseFov,
           baseDistance,
           aspect,

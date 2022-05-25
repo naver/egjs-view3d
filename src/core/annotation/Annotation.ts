@@ -74,7 +74,10 @@ abstract class Annotation {
   public set baseDistance(val: number | null) { this._baseDistance = val; }
   public set aspect(val: number) { this._aspect = val; }
 
-  /** */
+  /**
+   * @param {View3D} view3D Instance of the view3D
+   * @param {AnnotationOptions} [options={}] Options
+   */
   public constructor(view3D: View3D, {
     element = null,
     focus = [],
@@ -99,10 +102,28 @@ abstract class Annotation {
     }
   }
 
+  /**
+   * Focus camera to this annotation
+   * This will add a class `selected` to this annotation element.
+   * @method Annotation#focus
+   */
   public abstract focus(): Promise<void>;
+  /**
+   * Unfocus camera.
+   * This will remove a class `selected` to this annotation element.
+   * To reset camera to the original position, use {@link Camera#reset}
+   * @method Annotation#unfocus
+   */
   public abstract unfocus(): void;
+  /**
+   * Serialize anntation data to JSON format.
+   * @method Annotation#toJSON
+   */
   public abstract toJSON(): Record<string, any>;
 
+  /**
+   * Destroy annotation and release all resources.
+   */
   public destroy() {
     const wrapper = this._view3D.annotation.wrapper;
     const element = this._element;
@@ -114,6 +135,9 @@ abstract class Annotation {
     }
   }
 
+  /**
+   * Resize annotation to the current size
+   */
   public resize() {
     const el = this._element;
 
@@ -128,6 +152,11 @@ abstract class Annotation {
     }
   }
 
+  /**
+   * Render annotation element
+   * @param {object} params
+   * @internal
+   */
   public render({
     screenPos,
     screenSize,
@@ -159,6 +188,11 @@ abstract class Annotation {
     }
   }
 
+  /**
+   * Set opacity of the annotation
+   * Opacity is automatically controlled with [annotationBreakpoints](/docs/options/annotation/annotationBreakpoints)
+   * @param {number} opacity Opacity to apply, number between 0 and 1
+   */
   public setOpacity(opacity: number) {
     const el = this._element;
 
@@ -167,6 +201,10 @@ abstract class Annotation {
     el.style.opacity = `${opacity}`;
   }
 
+  /**
+   * Add browser event handlers
+   * @internal
+   */
   public enableEvents() {
     const el = this._element;
 
@@ -177,6 +215,10 @@ abstract class Annotation {
     this._enabled = true;
   }
 
+  /**
+   * Remove browser event handlers
+   * @internal
+   */
   public disableEvents() {
     const el = this._element;
 
