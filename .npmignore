@@ -109,6 +109,7 @@ docs/
 docs-src/
 demo/
 test/
+packages/
 .editorconfig
 .eslintrc.json
 .travis.yml
