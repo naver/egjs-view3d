@@ -4,7 +4,7 @@ name: @egjs/view3d
 license: MIT
 author: NAVER Corp.
 repository: https://github.com/naver/egjs-view3d
-version: 2.4.1
+version: 2.4.2
 */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -4120,7 +4120,7 @@ version: 2.4.1
    */
   // Constants that used internally
   // Texture map names that used in THREE#MeshStandardMaterial
-  const STANDARD_MAPS = ["alphaMap", "aoMap", "bumpMap", "displacementMap", "emissiveMap", "envMap", "lightMap", "map", "metalnessMap", "normalMap", "roughnessMap"];
+  const STANDARD_MAPS = ["alphaMap", "aoMap", "bumpMap", "displacementMap", "emissiveMap", "envMap", "lightMap", "map", "metalnessMap", "normalMap", "roughnessMap", "sheenColorMap", "sheenRoughnessMap", "specularColorMap", "specularIntensityMap", "transmissionMap", "clearcoatMap", "clearcoatNormalMap"];
   const CONTROL_EVENTS = {
     HOLD: "hold",
     RELEASE: "release",
@@ -8695,11 +8695,17 @@ version: 2.4.1
    */
 
   class Annotation {
-    /** */
+    /**
+     * @param {View3D} view3D Instance of the view3D
+     * @param {AnnotationOptions} [options={}] Options
+     */
     constructor(view3D, {
       element = null,
       focus = [],
-      focusDuration = 1000
+      focusDuration = 1000,
+      baseFov = 45,
+      baseDistance = null,
+      aspect = 1
     } = {}) {
       this._onClick = () => {
         void this.focus();
@@ -8714,6 +8720,9 @@ version: 2.4.1
       this._element = element;
       this._focus = focus;
       this._focusDuration = focusDuration;
+      this._baseFov = baseFov;
+      this._baseDistance = baseDistance;
+      this._aspect = aspect;
       this._enabled = false;
       this._tooltipSize = new Vector2();
 
@@ -8742,6 +8751,49 @@ version: 2.4.1
     get renderable() {
       return !!this._element;
     }
+    /**
+     * Base fov value that annotation is referencing
+     * @type {number}
+     */
+
+
+    get baseFov() {
+      return this._baseFov;
+    }
+    /**
+     * Base dsitance value that annotation is referencing
+     * @type {number | null}
+     */
+
+
+    get baseDistance() {
+      return this._baseDistance;
+    }
+    /**
+     * Base aspect value that annotation is referencing
+     * @type {number}
+     */
+
+
+    get aspect() {
+      return this._aspect;
+    }
+
+    set baseFov(val) {
+      this._baseFov = val;
+    }
+
+    set baseDistance(val) {
+      this._baseDistance = val;
+    }
+
+    set aspect(val) {
+      this._aspect = val;
+    }
+    /**
+     * Destroy annotation and release all resources.
+     */
+
 
     destroy() {
       const wrapper = this._view3D.annotation.wrapper;
@@ -8752,6 +8804,10 @@ version: 2.4.1
         wrapper.removeChild(element);
       }
     }
+    /**
+     * Resize annotation to the current size
+     */
+
 
     resize() {
       const el = this._element;
@@ -8762,6 +8818,12 @@ version: 2.4.1
         this._tooltipSize.set(tooltip.offsetWidth, tooltip.offsetHeight);
       }
     }
+    /**
+     * Render annotation element
+     * @param {object} params
+     * @internal
+     */
+
 
     render({
       screenPos,
@@ -8786,12 +8848,23 @@ version: 2.4.1
         el.classList.remove(DEFAULT_CLASS.ANNOTATION_FLIP_X);
       }
     }
+    /**
+     * Set opacity of the annotation
+     * Opacity is automatically controlled with [annotationBreakpoints](/docs/options/annotation/annotationBreakpoints)
+     * @param {number} opacity Opacity to apply, number between 0 and 1
+     */
+
 
     setOpacity(opacity) {
       const el = this._element;
       if (!el) return;
       el.style.opacity = `${opacity}`;
     }
+    /**
+     * Add browser event handlers
+     * @internal
+     */
+
 
     enableEvents() {
       const el = this._element;
@@ -8800,6 +8873,11 @@ version: 2.4.1
       el.addEventListener(EVENTS$1.WHEEL, this._onWheel);
       this._enabled = true;
     }
+    /**
+     * Remove browser event handlers
+     * @internal
+     */
+
 
     disableEvents() {
       const el = this._element;
@@ -8807,6 +8885,25 @@ version: 2.4.1
       el.removeEventListener(EVENTS$1.CLICK, this._onClick);
       el.removeEventListener(EVENTS$1.WHEEL, this._onWheel);
       this._enabled = false;
+    }
+
+    _getFocus() {
+      var _a;
+
+      const view3D = this._view3D;
+      const focusVector = new Vector3().fromArray(this._focus);
+      const currentDistance = view3D.camera.baseDistance;
+      const currentSize = view3D.renderer.size;
+      const currentAspect = Math.max(currentSize.height / currentSize.width, 1);
+      const aspect = this._aspect;
+      const baseFov = this._baseFov;
+      const baseDistance = (_a = this._baseDistance) !== null && _a !== void 0 ? _a : currentDistance;
+      const aspectRatio = currentAspect / aspect;
+      const targetRenderHeight = aspectRatio * baseDistance * Math.tan(toRadian((baseFov - focusVector.z) / 2));
+      const targetFov = 2 * toDegree(Math.atan(targetRenderHeight / currentDistance)); // zoom value
+
+      focusVector.z = view3D.camera.baseFov - targetFov;
+      return focusVector;
     }
 
   }
@@ -8825,14 +8922,6 @@ version: 2.4.1
 
       super(view3D, commonOptions);
       this._position = new Vector3().fromArray(position);
-      const focus = this._focus;
-
-      if (focus.length > 0) {
-        const focusVector = new Vector3().fromArray(focus);
-        this._focusPose = new Pose(focusVector.x, focusVector.y, focusVector.z, this._position.toArray());
-      } else {
-        this._focusPose = null;
-      }
     }
 
     get position() {
@@ -8845,9 +8934,15 @@ version: 2.4.1
           camera
         } = this._view3D;
         const el = this._element;
-        let targetPose = this._focusPose;
+        const focus = this._focus;
+        let targetPose;
 
-        if (!targetPose) {
+        if (focus.length > 0) {
+          const focusVector = this._getFocus();
+
+          const position = this._position;
+          targetPose = new Pose(focusVector.x, focusVector.y, focusVector.z, position.toArray());
+        } else {
           const modelToPos = this._calculateNormalFromModelCenter();
 
           const {
@@ -9013,10 +9108,6 @@ version: 2.4.1
       };
     }
 
-    _getFocus() {
-      return new Vector3().fromArray(this._focus);
-    }
-
     _getPosition() {
       const vertices = this._getVertices();
 
@@ -9077,10 +9168,6 @@ version: 2.4.1
 
   }
 
-  /*
-   * Copyright (c) 2020 NAVER Corp.
-   * egjs projects are licensed under the MIT license
-   */
   /**
    * Manager class for {@link Annotation}
    */
@@ -9221,15 +9308,39 @@ version: 2.4.1
 
     parse(data) {
       const view3D = this._view3D;
-      const annotations = data.map(annotationData => {
+      const {
+        baseFov,
+        baseDistance,
+        aspect,
+        items
+      } = data;
+      const annotations = items.map(annotationData => {
+        const {
+          meshIndex,
+          faceIndex,
+          position
+        } = annotationData,
+              commonData = __rest(annotationData, ["meshIndex", "faceIndex", "position"]);
+
         const element = this._createDefaultAnnotationElement(annotationData.label);
 
-        if (annotationData.meshIndex != null) {
-          return new FaceAnnotation(view3D, Object.assign(Object.assign({}, annotationData), {
+        if (meshIndex != null && faceIndex != null) {
+          return new FaceAnnotation(view3D, Object.assign(Object.assign({
+            meshIndex,
+            faceIndex
+          }, commonData), {
+            baseFov,
+            baseDistance,
+            aspect,
             element
           }));
         } else {
-          return new PointAnnotation(view3D, Object.assign(Object.assign({}, annotationData), {
+          return new PointAnnotation(view3D, Object.assign(Object.assign({
+            position: position
+          }, commonData), {
+            baseFov,
+            baseDistance,
+            aspect,
             element
           }));
         }
@@ -9311,6 +9422,7 @@ version: 2.4.1
     }
     /**
      * Remove annotation at the given index
+     * @param {number} index Index of the annotation to remove
      */
 
 
@@ -9322,7 +9434,7 @@ version: 2.4.1
       return removed;
     }
     /**
-     * Remove all hotspots
+     * Remove all annotations
      */
 
 
@@ -9332,6 +9444,30 @@ version: 2.4.1
       removed.forEach(annotation => {
         annotation.destroy();
       });
+    }
+    /**
+     * Save annotations as JSON
+     */
+
+
+    toJSON() {
+      const view3D = this._view3D;
+      const annotations = this._list;
+      const items = annotations.map(annotation => {
+        var _a, _b;
+
+        return Object.assign(Object.assign({}, annotation.toJSON()), {
+          label: ((_b = (_a = annotation.element) === null || _a === void 0 ? void 0 : _a.querySelector(`.${DEFAULT_CLASS.ANNOTATION_TOOLTIP}`)) === null || _b === void 0 ? void 0 : _b.innerHTML) || null
+        });
+      });
+      const size = view3D.renderer.size;
+      const aspect = Math.max(size.height / size.width, 1);
+      return {
+        baseFov: view3D.camera.baseFov,
+        baseDistance: view3D.camera.baseDistance,
+        aspect,
+        items
+      };
     }
 
     _createWrapper() {
@@ -15418,7 +15554,7 @@ version: 2.4.1
       const gltfTextures = textures.filter(texture => associations.has(texture)).map(texture => {
         return gltfJSON.textures[associations.get(texture).textures];
       });
-      const texturesByLevel = gltfTextures.reduce((levels, texture, texIdx) => {
+      const texturesByLevel = [...new Set(gltfTextures).values()].reduce((levels, texture, texIdx) => {
         const hasExtension = texture.extensions && texture.extensions[CUSTOM_TEXTURE_LOD_EXTENSION];
         const hasExtra = texture.extras && texture.extras[TEXTURE_LOD_EXTRA];
         if (!hasExtension && !hasExtra) return levels;
@@ -16586,7 +16722,7 @@ version: 2.4.1
    */
 
 
-  View3D.VERSION = "2.4.1";
+  View3D.VERSION = "2.4.2";
 
   /*
    * "View In Ar" Icon from [Google Material Design Icons](https://github.com/google/material-design-icons)

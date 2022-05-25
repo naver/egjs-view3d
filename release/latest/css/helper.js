@@ -4,7 +4,7 @@ name: @egjs/view3d
 license: MIT
 author: NAVER Corp.
 repository: https://github.com/naver/egjs-view3d
-version: 2.4.1
+version: 2.4.2
 */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
