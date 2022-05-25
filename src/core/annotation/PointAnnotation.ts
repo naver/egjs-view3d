@@ -24,7 +24,6 @@ export interface PointAnnotationOptions extends AnnotationOptions {
  */
 class PointAnnotation extends Annotation {
   private _position: THREE.Vector3;
-  private _focusPose: Pose | null;
 
   public get position() { return this._position; }
 
@@ -36,24 +35,21 @@ class PointAnnotation extends Annotation {
     super(view3D, commonOptions);
 
     this._position = new THREE.Vector3().fromArray(position);
-
-    const focus = this._focus;
-    if (focus.length > 0) {
-      const focusVector = new THREE.Vector3().fromArray(focus);
-
-      this._focusPose = new Pose(focusVector.x, focusVector.y, focusVector.z, this._position.toArray());
-    } else {
-      this._focusPose = null;
-    }
   }
 
   public async focus() {
     const { camera } = this._view3D;
     const el = this._element;
+    const focus = this._focus;
 
-    let targetPose: Pose | null = this._focusPose;
+    let targetPose: Pose;
 
-    if (!targetPose) {
+    if (focus.length > 0) {
+      const focusVector = this._getFocus();
+      const position = this._position;
+
+      targetPose = new Pose(focusVector.x, focusVector.y, focusVector.z, position.toArray());
+    } else {
       const modelToPos = this._calculateNormalFromModelCenter();
       const { yaw, pitch } = directionToYawPitch(modelToPos);
 

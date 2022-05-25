@@ -151,19 +151,42 @@ class AnnotationManager {
    * Parse an array of annotation data
    * @param {object[]} data An array of annotation data
    */
-  public parse(data: Array<Record<string, any>>): Annotation[] {
+  public parse(data: {
+    baseFov: number;
+    baseDistance: number;
+    aspect: number;
+    items: Array<{
+      meshIndex: number | null;
+      faceIndex: number;
+      position: number[] | null;
+      focus: number[];
+      duration: number;
+      label: string | null;
+    }>;
+  }): Annotation[] {
     const view3D = this._view3D;
-    const annotations = data.map(annotationData => {
+    const { baseFov, baseDistance, aspect, items } = data;
+    const annotations = items.map(annotationData => {
+      const { meshIndex, faceIndex, position, ...commonData } = annotationData;
       const element = this._createDefaultAnnotationElement(annotationData.label);
 
-      if (annotationData.meshIndex != null) {
+      if (meshIndex != null && faceIndex != null) {
         return new FaceAnnotation(view3D, {
-          ...annotationData,
+          meshIndex,
+          faceIndex,
+          ...commonData,
+          baseFov,
+          baseDistance,
+          aspect,
           element
         });
       } else {
         return new PointAnnotation(view3D, {
-          ...annotationData,
+          position: position!,
+          ...commonData,
+          baseFov,
+          baseDistance,
+          aspect,
           element
         });
       }
@@ -255,6 +278,7 @@ class AnnotationManager {
 
   /**
    * Remove annotation at the given index
+   * @param {number} index Index of the annotation to remove
    */
   public remove(index: number): Annotation | null {
     const removed = this._list.splice(index, 1)[0];
@@ -267,7 +291,7 @@ class AnnotationManager {
   }
 
   /**
-   * Remove all hotspots
+   * Remove all annotations
    */
   public reset() {
     const annotations = this._list;
@@ -276,6 +300,27 @@ class AnnotationManager {
     removed.forEach(annotation => {
       annotation.destroy();
     });
+  }
+
+  /**
+   * Save annotations as JSON
+   */
+  public toJSON() {
+    const view3D = this._view3D;
+    const annotations = this._list;
+    const items = annotations.map(annotation => ({
+      ...annotation.toJSON(),
+      label: annotation.element?.querySelector(`.${DEFAULT_CLASS.ANNOTATION_TOOLTIP}`)?.innerHTML || null
+    }));
+    const size = view3D.renderer.size;
+    const aspect = Math.max(size.height / size.width, 1);
+
+    return {
+      baseFov: view3D.camera.baseFov,
+      baseDistance: view3D.camera.baseDistance,
+      aspect,
+      items
+    };
   }
 
   private _createWrapper(): HTMLElement {

@@ -238,9 +238,14 @@ class Playground extends React.Component<{}, {
       view3D.annotation.wrapper.appendChild(el);
 
       const intersect = intersects[0];
+      const size = view3D.renderer.size;
+      const aspect = Math.max(size.height / size.width, 1);
 
       const newAnnotation = new FaceAnnotation(view3D, {
         element: el,
+        baseFov: view3D.camera.baseFov,
+        baseDistance: view3D.camera.baseDistance,
+        aspect,
         focus: [currentPose.yaw, currentPose.pitch, currentPose.zoom],
         meshIndex: model.meshes.findIndex(mesh => mesh === intersects[0].object),
         faceIndex: intersect.faceIndex

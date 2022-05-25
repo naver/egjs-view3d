@@ -93,7 +93,7 @@ class ModelTab extends React.Component<{
               view3D.annotation.list.map((hotspot, idx) => <div key={idx} className="is-flex is-align-items-center mt-2">
                 <span className="has-text-weight-bold mr-2">{idx + 1}</span>
                 <input type="text" placeholder="Label" onChange={evt => {
-                  hotspot.element.querySelector(".view3d-annotation-tooltip").innerHTML = evt.target.value;
+                  hotspot.element!.querySelector(".view3d-annotation-tooltip")!.innerHTML = evt.target.value;
                 }} />
                 <button className="button is-small ml-2" onClick={() => {
                   hotspot.focus();
@@ -104,7 +104,8 @@ class ModelTab extends React.Component<{
                 }}><RemoveIcon fill="white" width="24" height="24" /></button>
               </div>)
             }
-            <button className="button is-small mt-2" disabled={isLoading} onClick={this._downloadAnnotation}>              <img className="mr-2" src="/egjs-view3d/icon/file_download_black.svg" />
+            <button className="button is-small mt-2" disabled={isLoading} onClick={this._downloadAnnotation}>
+              <img className="mr-2" src="/egjs-view3d/icon/file_download_black.svg" />
               <span>Download Annotations (.JSON)</span>
             </button>
           </>
@@ -159,11 +160,8 @@ class ModelTab extends React.Component<{
 
     if (!view3D || !model || view3D.annotation.list.length <= 0) return;
 
-    const annotations = view3D.annotation.list;
-    const data = annotations.map(annotation => ({
-      ...annotation.toJSON(),
-      label: annotation.element.querySelector(".view3d-annotation-tooltip").innerHTML || null
-    }));
+    const data = view3D.annotation.toJSON();
+
     const dataBlob = new Blob([JSON.stringify(data)], {
       type: "application/json"
     });

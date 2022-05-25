@@ -119,10 +119,6 @@ class FaceAnnotation extends Annotation {
     };
   }
 
-  private _getFocus(): THREE.Vector3 {
-    return new THREE.Vector3().fromArray(this._focus);
-  }
-
   private _getPosition(): THREE.Vector3 {
     const vertices = this._getVertices();
     if (!vertices) return new THREE.Vector3();

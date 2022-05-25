@@ -76,7 +76,7 @@ class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivE
       autoInit: clickToLoad ? false : restProps.autoInit
     };
 
-    const view3D = new VanillaView3D(this._rootRef.current, options);
+    const view3D = new VanillaView3D(this._rootRef.current!, options);
 
     view3D.on("ready", () => {
       this.setState({

@@ -128,13 +128,9 @@ class DownloadTab extends React.Component<{
         };
 
         if (includeAnnotations) {
-          const annotations = view3D.annotation.list;
           if (!gltf.extras) gltf.extras = {};
 
-          gltf.extras[ANNOTATION_EXTRA] = annotations.map(annotation => ({
-            ...annotation.toJSON(),
-            label: annotation.element.querySelector(".view3d-annotation-tooltip").innerHTML || null
-          }));
+          gltf.extras[ANNOTATION_EXTRA] = view3D.annotation.toJSON();
         }
 
         const nameGuessRegex = /(\w+)\.\w+$/i;
