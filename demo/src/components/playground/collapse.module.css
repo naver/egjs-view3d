@@ -1,0 +1,22 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  background-color: var(--ifm-menu-color-background-active);
+}
+
+.collapsed {
+  display: none;
+}
+
+.icon {
+  width: 48px;
+  height: 48px;
+  fill: #000000;
+}
+
+
+html[data-theme='dark'] .icon {
+  fill: #ffffff;
+}

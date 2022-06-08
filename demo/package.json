@@ -24,9 +24,9 @@
     "file-saver": "^2.0.5",
     "jszip": "^3.7.1",
     "prism-react-renderer": "^1.2.1",
+    "rc-slider": "^10.0.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "react-range": "^1.8.11",
     "simple-dropzone": "^0.8.1",
     "sweetalert2": "^11.3.1",
     "url-loader": "^4.1.1"

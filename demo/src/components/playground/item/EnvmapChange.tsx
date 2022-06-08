@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import clsx from "clsx";
-import { Range } from "react-range";
-import MenuItem from "../MenuItem";
+import Range from "../Range";
+import Collapse from "../Collapse";
+import { Context } from "../context";
+import { onEnvmapChange } from "../action";
+import { Skybox } from "../../../../../src/core";
+import UploadIcon from "@site/static/icon/file_upload_black.svg";
 
 const envmaps = [
   { name: "Artist Workshop", path: "/egjs-view3d/texture/artist_workshop_1k.hdr" },
@@ -18,18 +22,20 @@ const envmaps = [
   { name: "Studio", path: "/egjs-view3d/texture/studio_small_08_1k.hdr" }
 ];
 
-export default ({ onChange, onExposureChange, isLoading }) => {
-  const [exposure, setExposure] = useState(1);
+export default () => {
+  const { state, dispatch } = React.useContext(Context);
+  const view3D = state.view3D;
+  const isLoading = state.isLoading;
+
+  if (!view3D) return <></>;
 
   return <>
-    <MenuItem>
-      <p className="menu-label">
-        Choose HDR envmap
-      </p>
-      <div className="is-flex is-flex-direction-row">
-        <div className={clsx({ select: true, "mr-1": true, "is-loading": isLoading })}>
+    <Collapse title="Environment">
+      <p className="menu-label">Choose HDR envmap</p>
+      <div className="is-flex is-flex-direction-row mb-4">
+        <div className={clsx({ select: true, "mr-1": true, "is-primary": true, "is-loading": isLoading })}>
           <select onChange={e => {
-            onChange(e.target.value);
+            onEnvmapChange(view3D, dispatch, e.target.value);
           }} disabled={isLoading}>
             { envmaps.map((envmap, idx) => (
               <option key={idx} value={envmap.path}>{envmap.name}</option>
@@ -39,58 +45,55 @@ export default ({ onChange, onExposureChange, isLoading }) => {
         <div className="file">
           <label className="file-label">
             <input className="file-input" type="file" name="resume" accept=".hdr" onChange={e => {
-              const file = e.target.files[0];
+              const files = e.target.files;
+              const file = files?.item(0);
               if (!file) return;
 
-              onChange(URL.createObjectURL(file));
+              onEnvmapChange(view3D, dispatch, URL.createObjectURL(file));
             }}></input>
             <span className="file-cta">
-              <span className="file-icon">
-                <img src="/egjs-view3d/icon/file_upload_black.svg" />
-              </span>
+              <span className="file-icon"><UploadIcon /></span>
               <span className="file-label">HDR</span>
             </span>
           </label>
         </div>
       </div>
-    </MenuItem>
-    <MenuItem>
-      <div className="menu-label mb-4">Exposure: {exposure}</div>
       <Range
+        name="Exposure"
         step={0.01}
         min={0}
         max={2}
-        disabled={isLoading}
-        values={[exposure]}
-        onChange={(values) => {
-          setExposure(values[0]);
-          onExposureChange(values[0]);
-        }}
-        renderTrack={({ props, children }) => (
-          <div
-            {...props}
-            style={{
-              ...props.style,
-              height: "6px",
-              width: "100%",
-              backgroundColor: "#ccc"
-            }}
-          >
-            {children}
-          </div>
-        )}
-        renderThumb={({ props }) => (
-          <div
-            {...props}
-            style={{
-              ...props.style,
-              height: "15px",
-              width: "15px",
-              borderRadius: "9999px",
-              backgroundColor: "#485fc7"
-            }}
-          />
-        )}/>
-    </MenuItem>
+        defaultValue={1}
+        onChange={val => {
+          view3D.exposure = val as number;
+        }} />
+      <div className="is-flex is-flex-direction-row is-align-items-center mb-2">
+        <input className="checkbox mr-2" type="checkbox" defaultChecked={true} disabled={state.isLoading} onChange={e => {
+          const scene = view3D.scene;
+          const checked = e.currentTarget.checked;
+
+          if (checked && scene.root.environment) {
+            if (view3D.skyboxBlur) {
+              scene.root.background = Skybox.createBlurredHDR(view3D, scene.root.environment);
+            } else {
+              scene.root.background = scene.root.environment;
+            }
+          } else {
+            scene.root.background = null;
+          }
+          view3D.renderer.renderSingleFrame();
+        }}></input>
+        <span className="menu-label m-0">Show Skybox</span>
+      </div>
+      <div className="is-flex is-flex-direction-row is-align-items-center">
+        <input className="checkbox mr-2" type="checkbox" defaultChecked={false} disabled={state.isLoading} onChange={e => {
+          const checked = e.currentTarget.checked;
+
+          view3D.skyboxBlur = checked;
+          view3D.renderer.renderSingleFrame();
+        }}></input>
+        <span className="menu-label m-0">Blur skybox</span>
+      </div>
+    </Collapse>
   </>;
 };
