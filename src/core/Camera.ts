@@ -140,6 +140,7 @@ class Camera {
   public set pitch(val: number) { this._newPose.pitch = val; }
   public set zoom(val: number) { this._newPose.zoom = val; }
   public set pivot(val: THREE.Vector3) { this._newPose.pivot.copy(val); }
+  public set baseFov(val: number) { this._baseFov = val; }
 
   /**
    * Create new Camera instance

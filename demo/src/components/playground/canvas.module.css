@@ -1,5 +1,6 @@
 .container {
   flex: 1;
+  width: 100%;
   height: 100%;
   position: relative;
   display: flex;
@@ -17,6 +18,7 @@ html[data-theme='dark'] .head {
   align-items: center;
   height: 40px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }
 
 html[data-theme='dark'] .head {
@@ -50,6 +52,7 @@ html[data-theme='dark'] .head {
 .canvasWrapper {
   width: 100%;
   height: 100%;
+  max-width: 100%;
 }
 
 .dropdownOverlay {
@@ -84,19 +87,6 @@ html[data-theme='dark'] .dropdownBox {
 
 .dropdownFileInput {
   display: none;
-}
-
-.control {
-  width: 358px;
-  height: 100%;
-  box-shadow: -1px 0 2px 0 rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  font-weight: 500;
-}
-
-html[data-theme='dark'] .control {
-  box-shadow: -1px 0 2px 0 rgba(255, 255, 255, 0.1);
 }
 
 .resetBtn {
@@ -135,31 +125,4 @@ html[data-theme='dark'] .control {
 
 html[data-theme='dark'] .asideMenu *:not(:last-child) {
   border-right: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.asideMenuItem {
-  flex: 1;
-  display: flex;
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  background-color: rgba(0, 0, 0, 0.05);
-  font-weight: bold;
-}
-
-html[data-theme='dark'] .asideMenuItem {
-  background-color: rgba(255, 255, 255, 0.05);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.asideMenuItem.selected,
-html[data-theme='dark'] .asideMenuItem.selected {
-  border-bottom: none;
-  background-color: transparent;
-}
-
-.asideContent {
-  flex: 1;
-  overflow-y: auto;
 }

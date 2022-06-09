@@ -1,4 +1,5 @@
 import React from "react";
+import * as THREE from "three";
 import clsx from "clsx";
 
 import ModelInfo from "./ModelInfo";
@@ -6,7 +7,7 @@ import { Context } from "./context";
 import * as actions from "./action";
 import styles from "./canvas.module.css";
 
-import VanillaView3D, { GLTFLoader, LoadingBar } from "../../../../src";
+import VanillaView3D, { GLTFLoader, LoadingBar, FaceAnnotation } from "../../../../src";
 import ResetIcon from "../../../static/icon/reset.svg";
 
 class RenderSection extends React.Component<{}, {
@@ -45,6 +46,9 @@ class RenderSection extends React.Component<{}, {
       });
     });
 
+    this._widthRef.current!.value = view3D.rootEl.clientWidth.toString();
+    this._heightRef.current!.value = view3D.rootEl.clientHeight.toString();
+
     void GLTFLoader.setMeshoptDecoder("/egjs-view3d/lib/meshopt_decoder.js");
 
     const pageWrapper = document.querySelector("#playground-container");
@@ -70,7 +74,7 @@ class RenderSection extends React.Component<{}, {
       }
     });
 
-    // this._listenAnnotationAdd();
+    this._listenAnnotationAdd(view3D, dispatch);
 
     dispatch({
       type: "set_view3d",
@@ -87,13 +91,15 @@ class RenderSection extends React.Component<{}, {
               <span className="my-0 menu-label">Override canvas size</span>
               <input className="checkbox mr-2" type="checkbox" defaultChecked={this.state.overrideSize} onChange={e => {
                 const view3D = state.view3D!;
+                const width = parseFloat(this._widthRef.current!.value);
+                const height = parseFloat(this._heightRef.current!.value);
 
                 if (e.currentTarget.checked) {
-                  view3D.rootEl.style.width = `${this._widthRef.current?.value}px`;
-                  view3D.rootEl.style.height = `${this._heightRef.current?.value}px`;
+                  this._setNewCanvasSize(view3D, width, height);
                 } else {
-                  view3D.rootEl.style.width = "";
-                  view3D.rootEl.style.height = "";
+                  view3D.renderer.resize();
+                  view3D.autoResize = true;
+                  view3D.rootEl.style.cssText = "";
                 }
 
                 this.setState({
@@ -110,10 +116,15 @@ class RenderSection extends React.Component<{}, {
               <input ref={this._heightRef} className={clsx(styles.headInput, "input is-small")} disabled={!this.state.overrideSize} type="number" defaultValue={480} min={1}></input>
             </div>
             <div className={styles.headItem}>
-              <button className="button is-small menu-label">Apply</button>
+              <button className="button is-small menu-label" onClick={() => {
+                const view3D = state.view3D!;
+                const width = parseFloat(this._widthRef.current!.value);
+                const height = parseFloat(this._heightRef.current!.value);
+                this._setNewCanvasSize(view3D, width, height);
+              }}>Apply</button>
             </div>
           </div>
-          <div className={styles.body}>
+          <div id="canvas-body" className={styles.body}>
             {!state.initialized &&
               <div className={clsx("has-text-white is-size-3", styles.dropdownOverlay)}>
                 <label htmlFor="dropdown-file" className={clsx("p-2", styles.dropdownBox)}>
@@ -133,6 +144,84 @@ class RenderSection extends React.Component<{}, {
         </div>
       </>}
     </Context.Consumer>;
+  }
+
+  private _setNewCanvasSize(view3D: VanillaView3D, width: number, height: number) {
+    const rootEl = view3D.rootEl;
+    view3D.renderer.threeRenderer.setSize(width, height, false);
+    view3D.autoResize = false;
+
+    const bodyEl = document.querySelector("#canvas-body")!;
+    const origAspect = bodyEl.clientWidth / bodyEl.clientHeight;
+    const newAspect = width / height;
+
+    if (newAspect > origAspect) {
+      rootEl.style.paddingTop = `${100 / newAspect}%`;
+      rootEl.style.marginLeft = "";
+      rootEl.style.marginRight = "";
+      rootEl.style.height = "auto";
+    } else {
+      const halfAspect = (100 - newAspect * 100 / origAspect) * 0.5;
+      rootEl.style.paddingTop = "";
+      rootEl.style.marginLeft = `${halfAspect}%`;
+      rootEl.style.marginRight = `${halfAspect}%`;
+      rootEl.style.height = "";
+    }
+  }
+
+  private _listenAnnotationAdd(view3D: VanillaView3D, dispatch) {
+    const canvas = view3D.renderer.canvas;
+    const raycaster = new THREE.Raycaster();
+
+    canvas.addEventListener("dblclick", evt => {
+      const model = view3D.model;
+      if (!model) return;
+
+      const pointer = new THREE.Vector2();
+      const devicePixelRatio = window.devicePixelRatio;
+      pointer.x = (evt.offsetX / canvas.width) * 2 * devicePixelRatio - 1;
+      pointer.y = -(evt.offsetY / canvas.height) * 2 * devicePixelRatio + 1;
+
+      raycaster.setFromCamera(pointer, view3D.camera.threeCamera);
+
+      const intersects = raycaster.intersectObjects([model.scene]);
+
+      if (!intersects.length) return;
+
+      const currentPose = view3D.camera.currentPose;
+      const el = document.createElement("div");
+      el.classList.add("view3d-annotation");
+      el.classList.add("default");
+
+      const tooltip = document.createElement("div");
+      tooltip.classList.add("view3d-annotation-tooltip");
+      tooltip.classList.add("default");
+      el.appendChild(tooltip);
+
+      view3D.annotation.wrapper.appendChild(el);
+
+      const intersect = intersects[0];
+      const size = view3D.renderer.size;
+      const aspect = Math.max(size.height / size.width, 1);
+
+      const newAnnotation = new FaceAnnotation(view3D, {
+        element: el,
+        baseFov: view3D.camera.baseFov,
+        baseDistance: view3D.camera.baseDistance,
+        aspect,
+        focus: [currentPose.yaw, currentPose.pitch, currentPose.zoom],
+        meshIndex: model.meshes.findIndex(mesh => mesh === intersects[0].object),
+        faceIndex: intersect.faceIndex
+      });
+      view3D.annotation.add(newAnnotation);
+      view3D.renderer.renderSingleFrame();
+
+      // Force re-render
+      dispatch({
+        type: "set_loading",
+        val: false
+      });
+    });
   }
 }
 

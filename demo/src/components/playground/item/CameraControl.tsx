@@ -8,15 +8,21 @@ class CameraControl extends React.Component {
   private _yawRef = React.createRef<Range>();
   private _pitchRef = React.createRef<Range>();
   private _zoomRef = React.createRef<Range>();
+  private _fovRef = React.createRef<Range>();
 
   public componentDidMount() {
     const { state } = this.context;
     const view3D = state.view3D;
 
+    view3D.on("resize", () => {
+      this.forceUpdate();
+    });
+
     view3D.on("cameraChange", () => {
       this._yawRef.current?.setVal(view3D.camera.yaw.toFixed(0));
       this._pitchRef.current?.setVal(view3D.camera.pitch.toFixed(0));
       this._zoomRef.current?.setVal(view3D.camera.zoom.toFixed(1));
+      this._fovRef.current?.setVal(view3D.camera.baseFov.toFixed(0));
     });
   }
 
@@ -38,7 +44,6 @@ class CameraControl extends React.Component {
         onChange={val => {
           view3D.camera.yaw = val as number;
           view3D.renderer.renderSingleFrame(true);
-          this.forceUpdate();
         }} />
       <Range
         ref={this._pitchRef}
@@ -51,7 +56,6 @@ class CameraControl extends React.Component {
         onChange={val => {
           view3D.camera.pitch = val as number;
           view3D.renderer.renderSingleFrame(true);
-          this.forceUpdate();
         }} />
       <Range
         ref={this._zoomRef}
@@ -64,7 +68,18 @@ class CameraControl extends React.Component {
         onChange={val => {
           view3D.camera.zoom = val as number;
           view3D.renderer.renderSingleFrame(true);
-          this.forceUpdate();
+        }} />
+      <Range
+        ref={this._fovRef}
+        name="FOV"
+        className="mb-2"
+        step={0.1}
+        min={1}
+        max={179}
+        defaultValue={Math.floor(view3D?.camera.baseFov)}
+        onChange={val => {
+          view3D.camera.baseFov = val as number;
+          view3D.renderer.renderSingleFrame(true);
         }} />
     </Collapse>;
   }

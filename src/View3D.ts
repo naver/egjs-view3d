@@ -606,8 +606,18 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._control.updateCursor();
   }
 
-  public set maxDeltaTime(val: View3DOptions["maxDeltaTime"]) { this._maxDeltaTime = val; }
+  public set autoResize(val: View3DOptions["autoResize"]) {
+    this._autoResize = val;
+
+    if (val) {
+      this._autoResizer.enable();
+    } else {
+      this._autoResizer.disable();
+    }
+  }
+
   public set maintainSize(val: View3DOptions["maintainSize"]) { this._maintainSize = val; }
+  public set maxDeltaTime(val: View3DOptions["maxDeltaTime"]) { this._maxDeltaTime = val; }
 
   /**
    * Creates new View3D instance.
