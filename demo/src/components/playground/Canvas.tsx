@@ -31,7 +31,6 @@ class RenderSection extends React.Component<{}, {
 
     const view3D = new VanillaView3D("#playground-view3d", {
       src: "/egjs-view3d/model/cube.glb",
-      skybox: "/egjs-view3d/texture/artist_workshop_1k.hdr",
       autoplay: true,
       plugins: [new LoadingBar({ type: "top" })]
     }).on("ready", () => {

@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 
-import { PlaygroundAction, PlaygroundState } from "./context";
+import { PlaygroundAction } from "./context";
 import View3D, { GLTFLoader } from "../../../../src";
 
 export const onFileChange = async (view3D: View3D, dispatch: (action: PlaygroundAction) => null, fileMap: Map<string, any>) => {
@@ -46,17 +46,21 @@ export const onFileChange = async (view3D: View3D, dispatch: (action: Playground
 
 export const onEnvmapChange = async (view3D: View3D, dispatch: (action: PlaygroundAction) => null, url: string) => {
   try {
-    const wasSkyboxEnabled = view3D.scene.root.background !== null;
+    const wasSkyboxEnabled = (document.querySelector("#enable-skybox") as HTMLInputElement).checked;
 
     dispatch({
       type: "set_loading",
       val: true
     });
 
-    await view3D.scene.setSkybox(url);
-    (view3D as any)._skybox = url;
+    if (url) {
+      await view3D.scene.setSkybox(url);
+      (view3D as any)._skybox = url;
+    } else {
+      view3D.skybox = null;
+    }
 
-    if (!wasSkyboxEnabled) {
+    if (!wasSkyboxEnabled || !url) {
       view3D.scene.root.background = null;
     }
   } catch (err) {

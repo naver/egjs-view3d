@@ -8,6 +8,7 @@ import { Skybox } from "../../../../../src/core";
 import UploadIcon from "@site/static/icon/file_upload_black.svg";
 
 const envmaps = [
+  { name: "Default", path: "" },
   { name: "Artist Workshop", path: "/egjs-view3d/texture/artist_workshop_1k.hdr" },
   { name: "Comfy Cafe", path: "/egjs-view3d/texture/comfy_cafe_1k.hdr" },
   { name: "Dry Hay Field", path: "/egjs-view3d/texture/dry_hay_field_1k.hdr" },
@@ -68,11 +69,11 @@ export default () => {
           view3D.exposure = val as number;
         }} />
       <div className="is-flex is-flex-direction-row is-align-items-center mb-2">
-        <input className="checkbox mr-2" type="checkbox" defaultChecked={true} disabled={state.isLoading} onChange={e => {
+        <input id="enable-skybox" className="checkbox mr-2" type="checkbox" defaultChecked={true} disabled={state.isLoading || !view3D.skybox} onChange={e => {
           const scene = view3D.scene;
           const checked = e.currentTarget.checked;
 
-          if (checked && scene.root.environment) {
+          if (checked && scene.root.environment && view3D.skybox) {
             if (view3D.skyboxBlur) {
               scene.root.background = Skybox.createBlurredHDR(view3D, scene.root.environment);
             } else {
@@ -86,7 +87,7 @@ export default () => {
         <span className="menu-label m-0">Show Skybox</span>
       </div>
       <div className="is-flex is-flex-direction-row is-align-items-center">
-        <input className="checkbox mr-2" type="checkbox" defaultChecked={false} disabled={state.isLoading} onChange={e => {
+        <input className="checkbox mr-2" type="checkbox" defaultChecked={false} disabled={state.isLoading || !view3D.skybox} onChange={e => {
           const checked = e.currentTarget.checked;
 
           view3D.skyboxBlur = checked;

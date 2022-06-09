@@ -567,11 +567,19 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   public set skybox(val: View3DOptions["skybox"]) {
     void this._scene.setSkybox(val);
     this._skybox = val;
+
+    if (!val && this._useDefaultEnv) {
+      this._setDefaultEnv();
+    }
   }
 
   public set envmap(val: View3DOptions["envmap"]) {
     void this._scene.setEnvMap(val);
     this._envmap = val;
+
+    if (!val && this._useDefaultEnv) {
+      this._setDefaultEnv();
+    }
   }
 
   public set exposure(val: View3DOptions["exposure"]) {
@@ -795,8 +803,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     annotationManager.init();
 
     if (this._useDefaultEnv) {
-      const defaultEnv = Skybox.createDefaultEnv(renderer.threeRenderer);
-      scene.root.environment = defaultEnv;
+      this._setDefaultEnv();
     }
 
     if (this._autoResize) {
@@ -1099,6 +1106,13 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
       });
       this._loadingContext = [];
     });
+  }
+
+  private _setDefaultEnv() {
+    const scene = this._scene;
+    const renderer = this._renderer;
+    const defaultEnv = Skybox.createDefaultEnv(renderer.threeRenderer);
+    scene.root.environment = defaultEnv;
   }
 }
 
