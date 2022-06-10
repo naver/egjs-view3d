@@ -19,6 +19,7 @@ class Renderer {
   private _clock: THREE.Clock;
   private _halfFloatAvailable: boolean;
   private _renderQueued: boolean;
+  private _canvasSize: THREE.Vector2;
 
   /**
    * {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement HTMLCanvasElement} given when creating View3D instance
@@ -45,17 +46,24 @@ class Renderer {
    */
   public get defaultRenderLoop() { return this._defaultRenderLoop; }
   /**
-   * The width and height of the renderer's output canvas
+   * The rendering width and height of the canvas
    * @type {object}
    * @param {number} width Width of the canvas
    * @param {number} height Height of the canvas
    * @readonly
    */
   public get size() {
-    const canvasSize = this._renderer.getSize(new THREE.Vector2());
+    const renderingSize = this._renderer.getSize(new THREE.Vector2());
 
-    return { width: canvasSize.width, height: canvasSize.y };
+    return { width: renderingSize.width, height: renderingSize.y };
   }
+
+  /**
+   * Canvas element's actual size
+   * @type THREE.Vector2
+   * @readonly
+   */
+  public get canvasSize() { return this._canvasSize; }
 
   /**
    * An object containing details about the capabilities of the current RenderingContext.
@@ -94,6 +102,7 @@ class Renderer {
     this._halfFloatAvailable = checkHalfFloatAvailable(renderer);
     this._renderer = renderer;
     this._clock = new THREE.Clock(false);
+    this._canvasSize = new THREE.Vector2();
   }
 
   /**
@@ -106,8 +115,12 @@ class Renderer {
 
     if (renderer.xr.isPresenting) return;
 
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+
     renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+    renderer.setSize(width, height, false);
+    this._canvasSize.set(width, height);
   }
 
   public setAnimationLoop(callback: (delta: number, frame?: THREE.XRFrame) => void): void {

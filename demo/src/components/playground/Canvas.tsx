@@ -151,6 +151,7 @@ class RenderSection extends React.Component<{}, {
     view3D.autoResize = false;
 
     const bodyEl = document.querySelector("#canvas-body")!;
+    const canvasEl = view3D.renderer.canvas;
     const origAspect = bodyEl.clientWidth / bodyEl.clientHeight;
     const newAspect = width / height;
 
@@ -166,6 +167,9 @@ class RenderSection extends React.Component<{}, {
       rootEl.style.marginRight = `${halfAspect}%`;
       rootEl.style.height = "";
     }
+
+    view3D.renderer.canvasSize.set(canvasEl.clientWidth, canvasEl.clientHeight);
+    view3D.annotation.render();
   }
 
   private _listenAnnotationAdd(view3D: VanillaView3D, dispatch) {
