@@ -34,3 +34,11 @@ html[data-theme='dark'] {
 html[data-theme='dark'] .navbar {
   --ifm-navbar-shadow: 0 1px 2px 0 rgba(255, 255, 255, 0.1);
 }
+
+.icon {
+  fill: #000000;
+}
+
+html[data-theme='dark'] .icon {
+  fill: #ffffff;
+}

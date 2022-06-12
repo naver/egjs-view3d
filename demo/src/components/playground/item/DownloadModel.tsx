@@ -45,7 +45,7 @@ export default () => {
       <input id="model-tlod-1" className="input is-small" type="number" defaultValue={8192} min={1} disabled={isLoading}></input>
     </div>
     <button className="button is-small mt-2" disabled={state.isLoading} onClick={() => downloadModel(state, dispatch)}>
-      <DownloadIcon className="mr-2" />
+      <DownloadIcon className="icon mr-2" />
       <span>Download 3D Model (.zip)</span>
     </button>
     <ReactTooltip id="download-tip" effect="solid" place="right" />

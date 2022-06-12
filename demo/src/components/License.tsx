@@ -17,9 +17,12 @@ export default ({ items = [], className = "" }: {
     license: string;
   }>;
 }) => (<div className={className}>
-  <article className="message">
+  <article className="message is-info">
     <div className="message-body">
-      <div className="mb-2 is-flex is-align-items-center"><InfoSVG className="mr-1" /><span className="has-text-weight-bold">Assets Used</span></div>
+      <div className="mb-2 is-flex is-align-items-center">
+        <InfoSVG className="mr-1" />
+        <span className="has-text-weight-bold">Assets Used</span>
+      </div>
       {
         items.map((item, idx) => (
           <div key={idx}>

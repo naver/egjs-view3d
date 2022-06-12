@@ -3,6 +3,8 @@ import React from "react";
 import { Context } from "../context";
 import Collapse from "../Collapse";
 
+import DownloadIcon from "@site/static/icon/file_download_black.svg";
+
 export default () => {
   const { state } = React.useContext(Context);
 
@@ -21,7 +23,7 @@ export default () => {
       <input id="poster-height" className="input is-small" type="number" defaultValue={1024} min={1} disabled={isLoading}></input>
     </div>
     <button className="button is-small mt-2" disabled={isLoading} onClick={() => downloadPoster(state)}>
-      <img className="mr-2" src="/egjs-view3d/icon/image.svg" />
+      <DownloadIcon className="icon mr-2" />
       <span>Download Poster (.png)</span>
     </button>
   </Collapse>;
