@@ -205,6 +205,47 @@ class Scene {
     view3D.renderer.renderSingleFrame();
   }
 
+  /**
+   * @internal
+   */
+  public initTextures() {
+    const {
+      skybox,
+      envmap,
+      background,
+      useDefaultEnv
+    } = this._view3D;
+    const tasks: Array<Promise<any>> = [];
+
+    if (useDefaultEnv) {
+      this.setDefaultEnv();
+    }
+
+    const hasEnvmap = skybox || envmap;
+    if (hasEnvmap) {
+      const loadEnv = skybox
+        ? this.setSkybox(skybox)
+        : this.setEnvMap(envmap);
+
+      tasks.push(loadEnv);
+    }
+
+    if (!skybox && background) {
+      tasks.push(this.setBackground(background));
+    }
+
+    return tasks;
+  }
+
+  /**
+   * @internal
+   */
+  public setDefaultEnv() {
+    const renderer = this._view3D.renderer;
+    const defaultEnv = Skybox.createDefaultEnv(renderer.threeRenderer);
+    this._root.environment = defaultEnv;
+  }
+
   private _removeChildsOf(obj: THREE.Object3D) {
     obj.traverse(child => {
       if ((child as THREE.Mesh).isMesh) {

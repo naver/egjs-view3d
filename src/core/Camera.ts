@@ -144,7 +144,7 @@ class Camera {
 
   /**
    * Create new Camera instance
-   * @param canvas \<canvas\> element to render 3d model
+   * @param {View3D} view3D An instance of View3D
    */
   public constructor(view3D: View3D) {
     this._view3D = view3D;

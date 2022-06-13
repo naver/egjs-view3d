@@ -14,16 +14,16 @@ class CameraControl extends React.Component {
     const { state } = this.context;
     const view3D = state.view3D;
 
-    view3D.on("resize", () => {
-      this.forceUpdate();
-    });
+    view3D.on("resize", this._onResize);
+    view3D.on("cameraChange", this._onCameraChange);
+  }
 
-    view3D.on("cameraChange", () => {
-      this._yawRef.current?.setVal(view3D.camera.yaw.toFixed(0));
-      this._pitchRef.current?.setVal(view3D.camera.pitch.toFixed(0));
-      this._zoomRef.current?.setVal(view3D.camera.zoom.toFixed(1));
-      this._fovRef.current?.setVal(view3D.camera.baseFov.toFixed(0));
-    });
+  public componentWillUnmount() {
+    const { state } = this.context;
+    const view3D = state.view3D;
+
+    view3D.off("resize", this._onResize);
+    view3D.off("cameraChange", this._onCameraChange);
   }
 
   public render() {
@@ -83,6 +83,20 @@ class CameraControl extends React.Component {
         }} />
     </Collapse>;
   }
+
+  private _onResize = () => {
+    this.forceUpdate();
+  };
+
+  private _onCameraChange = () => {
+    const { state } = this.context;
+    const view3D = state.view3D!;
+
+    this._yawRef.current?.setVal(view3D.camera.yaw.toFixed(0));
+    this._pitchRef.current?.setVal(view3D.camera.pitch.toFixed(0));
+    this._zoomRef.current?.setVal(view3D.camera.zoom.toFixed(1));
+    this._fovRef.current?.setVal(view3D.camera.baseFov.toFixed(0));
+  };
 }
 
 CameraControl.contextType = Context;

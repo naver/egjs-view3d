@@ -569,7 +569,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._skybox = val;
 
     if (!val && this._useDefaultEnv) {
-      this._setDefaultEnv();
+      this._scene.setDefaultEnv();
     }
   }
 
@@ -578,7 +578,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._envmap = val;
 
     if (!val && this._useDefaultEnv) {
-      this._setDefaultEnv();
+      this._scene.setDefaultEnv();
     }
   }
 
@@ -770,7 +770,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public destroy(): void {
     this._scene.reset();
-    this._renderer.stopAnimationLoop();
+    this._renderer.destroy();
     this._control.destroy();
     this._autoResizer.disable();
     this._animator.reset();
@@ -793,18 +793,11 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     const renderer = this._renderer;
     const control = this._control;
     const annotationManager = this._annotationManager;
-    const skybox = this._skybox;
-    const envmap = this._envmap;
-    const background = this._background;
     const meshoptPath = this._meshoptPath;
     const tasks: Array<Promise<any>> = [];
 
     this.resize();
     annotationManager.init();
-
-    if (this._useDefaultEnv) {
-      this._setDefaultEnv();
-    }
 
     if (this._autoResize) {
       this._autoResizer.enable();
@@ -815,18 +808,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     }
 
     // Load & set skybox / envmap before displaying model
-    const hasEnvmap = skybox || envmap;
-    if (hasEnvmap) {
-      const loadEnv = skybox
-        ? scene.setSkybox(skybox)
-        : scene.setEnvMap(envmap);
-
-      tasks.push(loadEnv);
-    }
-
-    if (!skybox && background) {
-      tasks.push(scene.setBackground(background));
-    }
+    tasks.push(...scene.initTextures());
 
     const loadModel = this._loadModel(this._src);
     tasks.push(...loadModel);
@@ -1106,13 +1088,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
       });
       this._loadingContext = [];
     });
-  }
-
-  private _setDefaultEnv() {
-    const scene = this._scene;
-    const renderer = this._renderer;
-    const defaultEnv = Skybox.createDefaultEnv(renderer.threeRenderer);
-    scene.root.environment = defaultEnv;
   }
 }
 

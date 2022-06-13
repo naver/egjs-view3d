@@ -7,7 +7,7 @@ You can handle the events that View3D triggers with 3 methods: `on`, `once`, `of
 ```js
 import View3D, { EVENTS } from "@egjs/view3d";
 
-const view3D = new View3d(...);
+const view3D = new View3D(...);
 
 // EVENTS.MODEL_CHANGE = "modelChange"
 view3D.on(EVENTS.MODEL_CHANGE, evt => {
@@ -17,7 +17,7 @@ view3D.on(EVENTS.MODEL_CHANGE, evt => {
 });
 ```
 
-```js
+```ts
 import View3D, { EVENTS, RenderEvent } from "@egjs/view3d";
 
 // For Typescript users: You can specify event types like this
@@ -31,6 +31,20 @@ view3D.on(EVENTS.RENDER, onRender);
 view3D.once(EVENTS.LOAD, evt => {
   // Remove attached event handler
   view3D.off(EVENTS.RENDER, onRender);
+});
+```
+
+Or, you can use the option [on](/docs/options/miscellaneous/on) to add event handlers on component creation.
+
+```js
+import View3D, { EVENTS, RenderEvent } from "@egjs/view3d";
+
+const view3D = new View3D("#el-id", {
+  on: {
+    [EVENTS.LOAD]: evt => {
+      console.log(evt); // "load" triggered
+    }
+  }
 });
 ```
 

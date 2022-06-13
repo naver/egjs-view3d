@@ -24,7 +24,9 @@ export const EVENTS = {
   MOUSE_LEAVE: "mouseleave",
   LOAD: "load",
   ERROR: "error",
-  CLICK: "click"
+  CLICK: "click",
+  CONTEXT_LOST: "webglcontextlost",
+  CONTEXT_RESTORE: "webglcontextrestored"
 } as const;
 
 export const CURSOR = {

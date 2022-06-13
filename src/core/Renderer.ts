@@ -7,7 +7,8 @@ import * as THREE from "three";
 
 import View3D from "../View3D";
 import { checkHalfFloatAvailable, findCanvas } from "../utils";
-import { EVENTS } from "../const/external";
+import * as BROWSER from "../const/browser";
+import { DEFAULT_CLASS, EVENTS } from "../const/external";
 
 /**
  * Renderer that renders View3D's Scene
@@ -32,7 +33,7 @@ class Renderer {
    * @type WebGLRenderingContext
    * @readonly
    */
-  public get context() { return this._renderer.context; }
+  public get context() { return this._renderer.getContext(); }
   /**
    * Three.js {@link https://threejs.org/docs/#api/en/renderers/WebGLRenderer WebGLRenderer} instance
    * @type THREE.WebGLRenderer
@@ -80,15 +81,17 @@ class Renderer {
 
   /**
    * Create new Renderer instance
-   * @param canvas \<canvas\> element to render 3d model
+   * @param {View3D} view3D An instance of View3D
    */
   public constructor(view3D: View3D) {
+    const canvas = findCanvas(view3D.rootEl, view3D.canvasSelector);
+
+    this._canvas = canvas;
     this._view3D = view3D;
-    this._canvas = findCanvas(view3D.rootEl, view3D.canvasSelector);
     this._renderQueued = false;
 
     const renderer = new THREE.WebGLRenderer({
-      canvas: this._canvas,
+      canvas,
       alpha: true,
       antialias: true,
       preserveDrawingBuffer: true
@@ -103,6 +106,22 @@ class Renderer {
     this._renderer = renderer;
     this._clock = new THREE.Clock(false);
     this._canvasSize = new THREE.Vector2();
+
+    canvas.addEventListener(BROWSER.EVENTS.CONTEXT_LOST, this._onContextLost);
+    canvas.addEventListener(BROWSER.EVENTS.CONTEXT_RESTORE, this._onContextRestore);
+  }
+
+  /**
+   * Destroy the renderer and stop active animation loop
+   */
+  public destroy() {
+    const canvas = this._canvas;
+
+    this.stopAnimationLoop();
+    this._renderer.dispose();
+
+    canvas.removeEventListener(BROWSER.EVENTS.CONTEXT_LOST, this._onContextLost);
+    canvas.removeEventListener(BROWSER.EVENTS.CONTEXT_RESTORE, this._onContextRestore);
   }
 
   /**
@@ -183,6 +202,8 @@ class Renderer {
       annotation
     } = view3D;
 
+    if (threeRenderer.getContext().isContextLost()) return;
+
     const deltaMiliSec = delta * 1000;
 
     this._renderQueued = false;
@@ -211,6 +232,19 @@ class Renderer {
       delta: deltaMiliSec
     });
   }
+
+  private _onContextLost = () => {
+    const canvas = this._canvas;
+    canvas.classList.add(DEFAULT_CLASS.CTX_LOST);
+  };
+
+  private _onContextRestore = () => {
+    const canvas = this._canvas;
+    const scene = this._view3D.scene;
+
+    canvas.classList.remove(DEFAULT_CLASS.CTX_LOST);
+    scene.initTextures();
+  };
 }
 
 export default Renderer;
