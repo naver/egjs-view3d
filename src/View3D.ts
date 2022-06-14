@@ -558,9 +558,9 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   /**
    * Maximum delta time in any given frame
    * This can prevent a long frame hitch / lag
-   * The default value is 0.33333...(30 fps). Set this value to `Infinity` to disable
+   * The default value is 1/30(30 fps). Set this value to `Infinity` to disable
    * @type {number}
-   * @default 0.333333...
+   * @default 1/30
    */
   public get maxDeltaTime() { return this._maxDeltaTime; }
 
