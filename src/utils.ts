@@ -275,3 +275,36 @@ export const isSignedArrayBuffer = (buffer: TypedArray) => {
 
   return testBuffer[0] < 0;
 };
+
+export const checkHalfFloatAvailable = (renderer: THREE.WebGLRenderer) => {
+  if (renderer.capabilities.isWebGL2) {
+    return true;
+  } else {
+    const gl = renderer.getContext();
+    const texture = gl.createTexture();
+
+    let available = true;
+
+    try {
+      const data = new Uint16Array(4);
+      const ext = gl.getExtension("OES_texture_half_float");
+
+      if (!ext) {
+        available = false;
+      } else {
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, ext.HALF_FLOAT_OES, data);
+
+        const err = gl.getError();
+
+        available = err === gl.NO_ERROR;
+      }
+    } catch (err) {
+      available = false;
+    }
+
+    gl.deleteTexture(texture);
+
+    return available;
+  }
+};

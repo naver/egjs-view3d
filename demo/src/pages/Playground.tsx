@@ -183,7 +183,7 @@ class Playground extends React.Component<{}, {
   public onEnvmapChange = async (url) => {
     try {
       const view3D = this._view3D;
-      const wasSkyboxEnabled = view3D.scene.skybox.enabled;
+      const wasSkyboxEnabled = view3D.scene.root.background !== null;
 
       this.setState({ isLoading: true });
 
@@ -191,7 +191,7 @@ class Playground extends React.Component<{}, {
       (view3D as any)._skybox = url;
 
       if (!wasSkyboxEnabled) {
-        view3D.scene.skybox.disable();
+        view3D.scene.root.background = null;
       }
     } catch (err) {
       void Swal.fire({

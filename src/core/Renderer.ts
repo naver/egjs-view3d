@@ -6,7 +6,7 @@
 import * as THREE from "three";
 
 import View3D from "../View3D";
-import { findCanvas } from "../utils";
+import { checkHalfFloatAvailable, findCanvas } from "../utils";
 import { EVENTS } from "../const/external";
 
 /**
@@ -18,6 +18,7 @@ class Renderer {
   private _canvas: HTMLCanvasElement;
   private _clock: THREE.Clock;
   private _halfFloatAvailable: boolean;
+  private _renderQueued: boolean;
 
   /**
    * {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement HTMLCanvasElement} given when creating View3D instance
@@ -76,6 +77,7 @@ class Renderer {
   public constructor(view3D: View3D) {
     this._view3D = view3D;
     this._canvas = findCanvas(view3D.rootEl, view3D.canvasSelector);
+    this._renderQueued = false;
 
     const renderer = new THREE.WebGLRenderer({
       canvas: this._canvas,
@@ -89,33 +91,7 @@ class Renderer {
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.setClearColor(0x000000, 0);
 
-    if (renderer.capabilities.isWebGL2) {
-      this._halfFloatAvailable = true;
-    } else {
-      const gl = renderer.getContext();
-      const texture = gl.createTexture();
-
-      try {
-        const data = new Uint16Array(4);
-        const ext = gl.getExtension("OES_texture_half_float");
-
-        if (!ext) {
-          this._halfFloatAvailable = false;
-        } else {
-          gl.bindTexture(gl.TEXTURE_2D, texture);
-          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, ext.HALF_FLOAT_OES, data);
-
-          const err = gl.getError();
-
-          this._halfFloatAvailable = err === gl.NO_ERROR;
-        }
-      } catch (err) {
-        this._halfFloatAvailable = false;
-      }
-
-      gl.deleteTexture(texture);
-    }
-
+    this._halfFloatAvailable = checkHalfFloatAvailable(renderer);
     this._renderer = renderer;
     this._clock = new THREE.Clock(false);
   }
@@ -151,10 +127,17 @@ class Renderer {
     this._renderer.setAnimationLoop(null);
   }
 
-  public renderSingleFrame(): void {
+  public renderSingleFrame(immediate = false): void {
     const renderer = this._renderer;
     if (!renderer.xr.isPresenting) {
-      this._renderFrame(0);
+      if (immediate) {
+        this._renderFrame(0);
+      } else if (!this._renderQueued) {
+        requestAnimationFrame(() => {
+          this._renderFrame(0);
+        });
+        this._renderQueued = true;
+      }
     }
   }
 
@@ -189,6 +172,8 @@ class Renderer {
 
     const deltaMiliSec = delta * 1000;
 
+    this._renderQueued = false;
+
     animator.update(delta);
     control.update(deltaMiliSec);
     autoPlayer.update(deltaMiliSec);
@@ -201,17 +186,8 @@ class Renderer {
 
     camera.updatePosition();
 
-    threeRenderer.autoClear = false;
-    threeRenderer.clear();
-
-    if (scene.skybox && scene.skybox.enabled) {
-      scene.skybox.updateCamera();
-      threeRenderer.render(scene.skybox.scene, scene.skybox.camera);
-    }
-
     scene.shadowPlane.render();
     threeRenderer.render(scene.root, camera.threeCamera);
-    threeRenderer.autoClear = true;
 
     // Render annotations
     annotation.render();

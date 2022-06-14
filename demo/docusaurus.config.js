@@ -18,7 +18,6 @@ const config = {
   projectName: "naver.github.io",
   trailingSlash: false,
   plugins: ["docusaurus-plugin-sass", glslify],
-  trailingSlash: false,
   presets: [
     [
       "@docusaurus/preset-classic",

@@ -29,30 +29,35 @@ See [Official Page](https://developers.google.com/ar/develop/java/scene-viewer#s
 
 ## Example
 ### sceneViewer: true (default)
-<View3D src="/egjs-view3d/model/draco/alarm.glb" iosSrc="/egjs-view3d/model/usdz/alarm.usdz" envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" sceneViewer={true} webAR={false} showExampleCode showARButton />
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  iosSrc="/egjs-view3d/model/usdz/alarm.usdz"
+  sceneViewer={true}
+  webAR={false}
+  showExampleCode
+  showARButton />
 
 ### Detailed Options
-<View3D src="/egjs-view3d/model/draco/alarm.glb" iosSrc="/egjs-view3d/model/usdz/alarm.usdz" envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" sceneViewer={{
-  title: "CUSTOM TITLE",
-  link: "https://github.com/naver/egjs-view3d",
-  resizable: true,
-  vertical: true,
-  disableOcclusion: true,
-  initialScale: "2",
-  shareText: "CUSTOM SHARE TEXT"
-}} webAR={false} showExampleCode showARButton />
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  iosSrc="/egjs-view3d/model/usdz/alarm.usdz"
+  sceneViewer={{
+    title: "CUSTOM TITLE",
+    link: "https://github.com/naver/egjs-view3d",
+    resizable: true,
+    vertical: true,
+    disableOcclusion: true,
+    initialScale: "2",
+    shareText: "CUSTOM SHARE TEXT"
+  }}
+  webAR={false}
+  showExampleCode
+  showARButton />
 
 <License items={[
   {
     name: "Alarm Clock 01",
     link: "https://polyhaven.com/a/alarm_clock_01",
-    author: "Poly Haven",
-    authorLink: "https://polyhaven.com/",
-    license: "CC0"
-  },
-  {
-    name: "Artist Workshop",
-    link: "https://polyhaven.com/a/artist_workshop",
     author: "Poly Haven",
     authorLink: "https://polyhaven.com/",
     license: "CC0"

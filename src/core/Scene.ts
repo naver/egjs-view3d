@@ -20,7 +20,6 @@ import Skybox from "./Skybox";
 class Scene {
   private _view3D: View3D;
   private _root: THREE.Scene;
-  private _skybox: Skybox | null;
   private _shadowPlane: ShadowPlane;
   private _userObjects: THREE.Group;
   private _envObjects: THREE.Group;
@@ -31,13 +30,6 @@ class Scene {
    * @readonly
    */
   public get root() { return this._root; }
-
-  /**
-   * Skybox object for rendering background
-   * @type {Skybox}
-   * @readonly
-   */
-  public get skybox() { return this._skybox; }
 
   /**
    * Shadow plane & light
@@ -71,7 +63,6 @@ class Scene {
   public constructor(view3D: View3D) {
     this._view3D = view3D;
     this._root = new THREE.Scene();
-    this._skybox = null;
     this._userObjects = new THREE.Group();
     this._envObjects = new THREE.Group();
     this._fixedObjects = new THREE.Group();
@@ -145,19 +136,16 @@ class Scene {
    */
   public async setBackground(background: number | string): Promise<void> {
     const view3D = this._view3D;
-    const skybox = new Skybox(view3D);
-
-    this._skybox = skybox;
+    const root = this._root;
 
     if (typeof background === "number" || background.charAt(0) === "#") {
-      skybox.useColor(background);
+      root.background = new THREE.Color(background);
     } else {
       const textureLoader = new TextureLoader(view3D);
       const texture = await textureLoader.load(background);
 
       texture.encoding = THREE.sRGBEncoding;
-
-      skybox.useTexture(texture);
+      root.background = texture;
     }
 
     view3D.renderer.renderSingleFrame();
@@ -173,23 +161,23 @@ class Scene {
     const view3D = this._view3D;
 
     // Destroy previous skybox
-    this._skybox?.destroy();
+    if (root.background && (root.background as THREE.Texture).isTexture) {
+      (root.background as THREE.Texture).dispose();
+    }
 
     if (url) {
       const textureLoader = new TextureLoader(view3D);
       const texture = await textureLoader.loadHDRTexture(url);
-      const skybox = new Skybox(view3D);
 
       if (view3D.skyboxBlur) {
-        skybox.useBlurredHDR(texture);
+        root.background = Skybox.createBlurredHDR(view3D, texture);
       } else {
-        skybox.useTexture(texture);
+        root.background = texture;
       }
 
-      this._skybox = skybox;
       root.environment = texture;
     } else {
-      this._skybox = null;
+      root.background = null;
       root.environment = null;
     }
 
@@ -203,14 +191,15 @@ class Scene {
    */
   public async setEnvMap(url: string | null): Promise<void> {
     const view3D = this._view3D;
+    const root = this._root;
 
     if (url) {
       const textureLoader = new TextureLoader(view3D);
       const texture = await textureLoader.loadHDRTexture(url);
 
-      this._root.environment = texture;
+      root.environment = texture;
     } else {
-      this._root.environment = null;
+      root.environment = null;
     }
 
     view3D.renderer.renderSingleFrame();
@@ -218,7 +207,7 @@ class Scene {
 
   private _removeChildsOf(obj: THREE.Object3D) {
     obj.traverse(child => {
-      if ((child as any).isMesh) {
+      if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
 
         // Release geometry & material memory

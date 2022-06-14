@@ -14,6 +14,7 @@ import Annotation, { AnnotationOptions } from "./Annotation";
 
 /**
  * Options for {@link PointAnnotation}s
+ * @interface
  */
 export interface PointAnnotationOptions extends AnnotationOptions {
   position: number[];

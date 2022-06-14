@@ -6,6 +6,18 @@ sidebar_position: 6
 import View3D from "@site/src/components/View3D";
 import License from "@site/src/components/License";
 
+
+To use Annotations, you should include CSS/SASS file for them.
+
+```js
+// It's included in the bundle CSS
+import "@egjs/view3d/css/view3d-bundle.min.css";
+
+// Or you can use individual css/sass file
+import "@egjs/view3d/css/view3d-annotation.min.css"
+import "@egjs/view3d/sass/view3d-annotation.sass"
+```
+
 ## Annotations
 You can place the annotations above the 3D model by adding elements inside `".view3d-annotation-wrapper"` element.
 
@@ -27,7 +39,6 @@ Adding `default` class will render annotations in a default style, which renders
 
 <View3D
   src="/egjs-view3d/model/draco/payphone.glb"
-  envmap="/egjs-view3d/texture/sepulchral_chapel_rotunda_1k.hdr"
   poster="/egjs-view3d/poster/payphone.png"
   showExampleCode>
   <div className="view3d-annotation-wrapper">
@@ -65,7 +76,6 @@ In that case, you have to add correct CSS for each elements yourself.
   return <View3D
     ref={view3D}
     src="/egjs-view3d/model/RobotExpressive.glb"
-    envmap="/egjs-view3d/texture/sepulchral_chapel_rotunda_1k.hdr"
     on={{
       ready: (e) => { e.target.animator.mixer.timeScale = 0.3; }
     }}
@@ -126,8 +136,7 @@ Adding `default` class will render tooltips in a default style, which has transl
 
 <View3D
   src="/egjs-view3d/model/draco/alarm.glb"
-  envmap="/egjs-view3d/texture/sepulchral_chapel_rotunda_1k.hdr"
-  poster="/egjs-view3d/poster/alarm.png"
+  poster="/egjs-view3d/poster/alarm_default.png"
   showExampleCode>
   <div className="view3d-annotation-wrapper">
     <div className="view3d-annotation default" data-position="0.1 0 0">
@@ -158,7 +167,7 @@ Annotations can be included in glTF files when saving 3D models with [Playground
 
 <View3D
   src="/egjs-view3d/model/annotation/alarm/alarm.gltf"
-  envmap="/egjs-view3d/texture/sepulchral_chapel_rotunda_1k.hdr"
+  poster="/egjs-view3d/poster/alarm_default.png"
   showExampleCode />
 
 ## Load annotations from JSON file
@@ -167,7 +176,7 @@ Use [annotationURL](/docs/options/annotation/annotationURL) to load it.
 
 <View3D
   src="/egjs-view3d/model/draco/alarm.glb"
-  envmap="/egjs-view3d/texture/sepulchral_chapel_rotunda_1k.hdr"
+  poster="/egjs-view3d/poster/alarm_default.png"
   annotationURL="/egjs-view3d/model/annotation/alarm-annotations.json"
   showExampleCode />
 
@@ -191,13 +200,6 @@ Use [annotationURL](/docs/options/annotation/annotationURL) to load it.
     link: "https://github.com/mrdoob/three.js/tree/master/examples/models/gltf/RobotExpressive",
     author: "Tomás Laulhé",
     authorLink: "https://www.patreon.com/quaternius",
-    license: "CC0"
-  },
-  {
-    name: "Sepulchral Chapel Rotunda",
-    link: "https://polyhaven.com/a/sepulchral_chapel_rotunda",
-    author: "Poly Haven",
-    authorLink: "https://polyhaven.com/",
     license: "CC0"
   }
 ]} />

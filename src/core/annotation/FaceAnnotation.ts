@@ -15,6 +15,7 @@ import Annotation, { AnnotationOptions } from "./Annotation";
 
 /**
  * Options for {@link FaceAnnotation}s
+ * @interface
  */
 export interface FaceAnnotationOptions extends AnnotationOptions {
   meshIndex: number;

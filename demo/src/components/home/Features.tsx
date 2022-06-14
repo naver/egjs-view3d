@@ -18,8 +18,7 @@ export default () => <section className="py-4">
         className="image is-square m-0"
         src="/egjs-view3d/model/draco/plant.glb"
         poster="/egjs-view3d/poster/plant.png"
-        clickToLoad
-        envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" />
+        clickToLoad />
       <div className="block mt-4">View, rotate, translate and zoom your <strong>glTF 3D models</strong> in the web. Works on both <strong>🖥️ Desktop & 📱 Mobile</strong></div>
       <div className="block">Customize your viewer with <a href="docs/options/model/src">Options</a> like <strong>autoplay</strong>, <strong>skybox</strong>, and <strong>shadow</strong></div>
       <div className="block">

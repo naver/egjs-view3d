@@ -1,5 +1,6 @@
 import View3D from "@site/src/components/View3D";
 import ModelSwapper from "@site/src/components/ModelSwapper";
+import License from "@site/src/components/License";
 
 Tutorial for changing 3D models during the AR session.
 
@@ -55,7 +56,6 @@ buttons.forEach(btn => {
       src="/egjs-view3d/model/draco/alarm.glb"
       iosSrc="/egjs-view3d/model/usdz/alarm.usdz"
       ref={ref}
-      envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
       webAR={{ overlayRoot: ".view3d-ar-overlay" }}
       sceneViewer={false}
       quickLook={false}
@@ -72,3 +72,13 @@ buttons.forEach(btn => {
     </View3D>);
   })()}
 </>
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

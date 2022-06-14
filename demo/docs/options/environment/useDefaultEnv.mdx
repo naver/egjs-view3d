@@ -1,0 +1,41 @@
+---
+sidebar_position: 8
+---
+
+import View3D from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
+
+<OptionDescriptor type="boolean" defaultVal="true" />
+
+Use a generated envmap as a light source.
+Using `false` will make model unlitten.
+
+## Example
+
+<div className="columns">
+  <div className="column">
+    <View3D
+      src="/egjs-view3d/model/draco/alarm.glb"
+      useDefaultEnv={true}
+      showExampleCode
+    />
+  </div>
+  <div className="column">
+    <View3D
+      src="/egjs-view3d/model/draco/alarm.glb"
+      useDefaultEnv={false}
+      showExampleCode
+    />
+  </div>
+</div>
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

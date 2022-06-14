@@ -38,8 +38,7 @@ const ref = React.createRef();
 return <div>
   <View3D
     ref={ref}
-    src="/egjs-view3d/model/RobotExpressive.glb"
-    envmap="/egjs-view3d/texture/artist_workshop_1k.hdr" >
+    src="/egjs-view3d/model/RobotExpressive.glb" >
     <div className="view3d-demo-controls">
       <div className="is-flex is-flex-direction-row is-align-items-center">
         <span className="mr-2 has-text-weight-bold">Play:</span>
@@ -100,7 +99,6 @@ return <div>
   <View3D
     ref={ref}
     src="/egjs-view3d/model/RobotExpressive.glb"
-    envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
     on={{
       ready: (evt) => { evt.target.animator.play(2); },
       render: (evt) => {
@@ -152,13 +150,6 @@ view3D.animator.crossFade(1, 3000, { synchronize: true });
     link: "https://github.com/mrdoob/three.js/tree/master/examples/models/gltf/RobotExpressive",
     author: "Tomás Laulhé",
     authorLink: "https://www.patreon.com/quaternius",
-    license: "CC0"
-  },
-  {
-    name: "Artist Workshop",
-    link: "https://polyhaven.com/a/artist_workshop",
-    author: "Poly Haven",
-    authorLink: "https://polyhaven.com/",
     license: "CC0"
   }
 ]} />

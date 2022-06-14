@@ -180,14 +180,35 @@
             "format": ["camelCase", "UPPER_CASE"]
           },
           {
+            "selector": "classProperty",
+            "modifiers": ["static", "private"],
+            "leadingUnderscore": "require",
+            "trailingUnderscore": "forbid",
+            "format": ["camelCase", "UPPER_CASE"]
+          },
+          {
             "selector": "classMethod",
             "modifiers": ["static"],
+            "format": ["camelCase", "UPPER_CASE"]
+          },
+          {
+            "selector": "classMethod",
+            "modifiers": ["static", "private"],
+            "leadingUnderscore": "require",
+            "trailingUnderscore": "forbid",
             "format": ["camelCase", "UPPER_CASE"]
           },
           {
             "selector": "property",
             "modifiers": ["static"],
             "format": ["UPPER_CASE"]
+          },
+          {
+            "selector": "property",
+            "modifiers": ["static", "private"],
+            "leadingUnderscore": "require",
+            "trailingUnderscore": "forbid",
+            "format": ["camelCase", "UPPER_CASE"]
           },
           {
             "selector": "objectLiteralProperty",
