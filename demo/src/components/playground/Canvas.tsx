@@ -134,7 +134,7 @@ class RenderSection extends React.Component<{}, {
               </div>
             }
             <div id="playground-view3d" className={clsx("view3d-wrapper", styles.canvasWrapper)}>
-              <canvas className="view3d-canvas"></canvas>
+              <canvas className={clsx("view3d-canvas", styles.canvas)}></canvas>
             </div>
             <div data-tip="Reset Camera" className={clsx(styles.resetBtn, "button", "is-rounded")} onClick={() => { void state.view3D!.camera.reset(500); }}>
               <ResetIcon width="32" height="32" className={styles.resetIcon} />
@@ -148,7 +148,6 @@ class RenderSection extends React.Component<{}, {
 
   private _setNewCanvasSize(view3D: VanillaView3D, width: number, height: number) {
     const rootEl = view3D.rootEl;
-    view3D.renderer.threeRenderer.setSize(width, height, false);
     view3D.autoResize = false;
 
     const bodyEl = document.querySelector("#canvas-body")!;
@@ -169,8 +168,9 @@ class RenderSection extends React.Component<{}, {
       rootEl.style.height = "";
     }
 
+    view3D.resize();
+    view3D.renderer.threeRenderer.setSize(width, height, false);
     view3D.renderer.canvasSize.set(canvasEl.clientWidth, canvasEl.clientHeight);
-    view3D.annotation.render();
   }
 
   private _listenAnnotationAdd(view3D: VanillaView3D, dispatch) {

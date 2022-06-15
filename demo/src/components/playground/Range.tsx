@@ -65,7 +65,10 @@ class Range extends React.Component<SliderProps & {
 
             if (isNaN(newVal)) return;
 
-            onChange!(newVal);
+            if (onChange) {
+              onChange(newVal);
+            }
+
             this.setState({
               val: newVal
             });
