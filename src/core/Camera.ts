@@ -313,6 +313,8 @@ class Camera {
       const newFov = toDegree(2 * Math.atan(newViewHeight / (2 * camDist)));
 
       defaultPose.zoom = baseFov - newFov;
+    } else {
+      defaultPose.zoom = view3D.initialZoom;
     }
   }
 

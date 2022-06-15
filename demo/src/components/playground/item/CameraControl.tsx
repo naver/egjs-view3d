@@ -107,6 +107,16 @@ class CameraControl extends React.Component {
             const initialZoom = this._initialZoomRef.current?.val;
             if (!initialZoom) return;
             const zoomAxis = this._initialZoomAxisRef.current?.value;
+
+            view3D.initialZoom = {
+              axis: zoomAxis,
+              ratio: initialZoom
+            };
+
+            view3D.camera.fit(view3D.model, view3D.center);
+            view3D.camera.reset(0);
+
+            view3D.initialZoom = 0;
           }}>Apply</button>
         </div>
       </div>

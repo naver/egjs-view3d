@@ -564,6 +564,8 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get maxDeltaTime() { return this._maxDeltaTime; }
 
+  public set initialZoom(val: View3DOptions["initialZoom"]) { this._initialZoom = val; }
+
   public set skybox(val: View3DOptions["skybox"]) {
     void this._scene.setSkybox(val);
     this._skybox = val;
