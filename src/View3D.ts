@@ -636,10 +636,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    * @throws {View3DError}
    * |code|condition|
    * |---|---|
-   * |{@link ERROR_CODE WRONG_TYPE}|When the root is not either string or HTMLElement|
-   * |{@link ERROR_CODE ELEMENT_NOT_FOUND}|When the element with given CSS selector does not exist|
-   * |{@link ERROR_CODE ELEMENT_NOT_CANVAS}|When the element given is not a \<canvas\> element|
-   * |{@link ERROR_CODE WEBGL_NOT_SUPPORTED}|When the browser does not support WebGL|
+   * |{@link ERROR_CODES WRONG_TYPE}|When the root is not either string or HTMLElement|
+   * |{@link ERROR_CODES ELEMENT_NOT_FOUND}|When the element with given CSS selector does not exist|
+   * |{@link ERROR_CODES ELEMENT_NOT_CANVAS}|When the element given is not a \<canvas\> element|
+   * |{@link ERROR_CODES WEBGL_NOT_SUPPORTED}|When the browser does not support WebGL|
    */
   public constructor(root: string | HTMLElement, {
     src = null,
