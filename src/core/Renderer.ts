@@ -244,6 +244,7 @@ class Renderer {
 
     canvas.classList.remove(DEFAULT_CLASS.CTX_LOST);
     scene.initTextures();
+    this.renderSingleFrame();
   };
 }
 

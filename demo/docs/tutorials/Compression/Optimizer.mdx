@@ -1,2 +1,16 @@
 [view3d-optimizer](https://github.com/naver/egjs-view3d/tree/main/packages/view3d-optimizer) is a Nodej.js CLI tool that can be used along with View3D.
 It can optimize 3D models with compression methods like Draco, Meshopt, and BasisU.
+
+The followings are common instruction examples
+
+---
+
+#### Meshopt & Basis Universal & Maximum texture size to 2048
+```sh
+view3d-optimizer -i model.glb -tc -m -tm 2048
+```
+
+#### Draco & WebP Textures & Force JPG textures & Progressive texture loading (256 -> 2048)
+```sh
+view3d-optimizer -i model.glb -w --force-jpg -t0 256 -tm 2048
+```
