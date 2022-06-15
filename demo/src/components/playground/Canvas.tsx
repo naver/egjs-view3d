@@ -9,6 +9,7 @@ import styles from "./canvas.module.css";
 
 import VanillaView3D, { GLTFLoader, LoadingBar, FaceAnnotation } from "../../../../src";
 import ResetIcon from "../../../static/icon/reset.svg";
+import { getAnimatedFace } from "../../../../src/utils";
 
 class RenderSection extends React.Component<{}, {
   overrideSize: boolean;
@@ -207,15 +208,26 @@ class RenderSection extends React.Component<{}, {
       const size = view3D.renderer.size;
       const aspect = Math.max(size.height / size.width, 1);
 
+      const meshIndex = model.meshes.findIndex(mesh => mesh === intersects[0].object);
+      const faceIndex = intersect.faceIndex!;
+      const animatedVertices = getAnimatedFace(model, meshIndex, faceIndex);
+
+      if (!animatedVertices) return;
+
+      const weights = this._getBarycentricWeight(intersect.point, animatedVertices);
+
       const newAnnotation = new FaceAnnotation(view3D, {
         element: el,
         baseFov: view3D.camera.baseFov,
         baseDistance: view3D.camera.baseDistance,
         aspect,
         focus: [currentPose.yaw, currentPose.pitch, currentPose.zoom],
-        meshIndex: model.meshes.findIndex(mesh => mesh === intersects[0].object),
-        faceIndex: intersect.faceIndex
+        meshIndex,
+        faceIndex,
+        weights
       });
+
+      (newAnnotation as any).uuid = THREE.MathUtils.generateUUID();
       view3D.annotation.add(newAnnotation);
       view3D.renderer.renderSingleFrame();
 
@@ -225,6 +237,22 @@ class RenderSection extends React.Component<{}, {
         val: false
       });
     });
+  }
+
+  private _getBarycentricWeight(p: THREE.Vector3, vertices: THREE.Vector3[]) {
+    const v1 = new THREE.Vector3().subVectors(vertices[0], p);
+    const v2 = new THREE.Vector3().subVectors(vertices[1], p);
+    const v3 = new THREE.Vector3().subVectors(vertices[2], p);
+
+    const faceSize = new THREE.Vector3().crossVectors(
+      new THREE.Vector3().subVectors(v1, v2),
+      new THREE.Vector3().subVectors(v1, v3),
+    ).length();
+    const w1 = new THREE.Vector3().crossVectors(v2, v3).length() / faceSize;
+    const w2 = new THREE.Vector3().crossVectors(v1, v3).length() / faceSize;
+    const w3 = new THREE.Vector3().crossVectors(v1, v2).length() / faceSize;
+
+    return [w1, w2, w3];
   }
 }
 

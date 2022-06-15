@@ -9,6 +9,8 @@ class CameraControl extends React.Component {
   private _pitchRef = React.createRef<Range>();
   private _zoomRef = React.createRef<Range>();
   private _fovRef = React.createRef<Range>();
+  private _initialZoomAxisRef = React.createRef<HTMLSelectElement>();
+  private _initialZoomRef = React.createRef<Range>();
 
   public componentDidMount() {
     const { state } = this.context;
@@ -81,6 +83,33 @@ class CameraControl extends React.Component {
           view3D.camera.baseFov = val as number;
           view3D.renderer.renderSingleFrame(true);
         }} />
+      <div>
+        <div className="mb-1 menu-label">Initial Zoom</div>
+        <div className="is-flex is-flex-direction-row">
+          <div className="select is-primary">
+            <select ref={this._initialZoomAxisRef}>
+              <option value="x">x</option>
+              <option value="y">y</option>
+              <option value="z">z</option>
+            </select>
+          </div>
+          <Range
+            ref={this._initialZoomRef}
+            className="ml-2"
+            style={{ flex: "1" }}
+            step={0.01}
+            min={0}
+            max={1}
+            defaultValue={0.8} />
+        </div>
+        <div className="is-flex is-flex-direction-row is-justify-content-center mt-2">
+          <button className="button is-small" disabled={state.isLoading} onClick={() => {
+            const initialZoom = this._initialZoomRef.current?.val;
+            if (!initialZoom) return;
+            const zoomAxis = this._initialZoomAxisRef.current?.value;
+          }}>Apply</button>
+        </div>
+      </div>
     </Collapse>;
   }
 

@@ -8,8 +8,7 @@ import View3D from "../../View3D";
 import Pose from "../Pose";
 import AnimationControl from "../../control/AnimationControl";
 import { DEFAULT_CLASS } from "../../const/external";
-import { getAttributeScale, getSkinnedVertex, range } from "../../utils";
-import { TypedArray } from "../../type/utils";
+import { getAnimatedFace } from "../../utils";
 
 import Annotation, { AnnotationOptions } from "./Annotation";
 
@@ -20,6 +19,7 @@ import Annotation, { AnnotationOptions } from "./Annotation";
 export interface FaceAnnotationOptions extends AnnotationOptions {
   meshIndex: number;
   faceIndex: number;
+  weights: number[];
 }
 
 /**
@@ -28,6 +28,7 @@ export interface FaceAnnotationOptions extends AnnotationOptions {
 class FaceAnnotation extends Annotation {
   private _meshIndex: number;
   private _faceIndex: number;
+  private _weights: number[];
   private _trackingControl: AnimationControl | null;
 
   public get position() { return this._getPosition(); }
@@ -35,17 +36,20 @@ class FaceAnnotation extends Annotation {
 
   public get meshIndex() { return this._meshIndex; }
   public get faceIndex() { return this._faceIndex; }
+  public get weights() { return this._weights; }
 
   /** */
   public constructor(view3D: View3D, {
     meshIndex = -1,
     faceIndex = -1,
+    weights = [...new Array(3)].map(() => 1 / 3),
     ...commonOptions
   }: Partial<FaceAnnotationOptions> = {}) {
     super(view3D, commonOptions);
 
     this._meshIndex = meshIndex;
     this._faceIndex = faceIndex;
+    this._weights = weights;
     this._trackingControl = null;
   }
 
@@ -121,68 +125,20 @@ class FaceAnnotation extends Annotation {
   }
 
   private _getPosition(): THREE.Vector3 {
-    const vertices = this._getVertices();
-    if (!vertices) return new THREE.Vector3();
-
-    const animated = this._getAnimatedVertices(vertices);
-
-    return animated.reduce((summed, vertex) => {
-      return summed.add(vertex);
-    }, new THREE.Vector3()).divideScalar(3);
-  }
-
-  private _getAnimatedVertices(vertices: THREE.Vector3[]) {
-    const model = this._view3D.model!;
-    const faceIndex = this._faceIndex;
-    const mesh = model.meshes[this._meshIndex];
-    const indexes = mesh.geometry.getIndex()!;
-    const face = (indexes.array as TypedArray).slice(3 * faceIndex, 3 * faceIndex + 3);
-
-    if ((mesh as THREE.SkinnedMesh).isSkinnedMesh) {
-      const geometry = mesh.geometry;
-      const positions = geometry.attributes.position;
-      const skinWeights = geometry.attributes.skinWeight;
-
-      const positionScale = getAttributeScale(positions);
-      const skinWeightScale = getAttributeScale(skinWeights);
-
-      vertices.forEach((vertex, idx) => {
-        const posIdx = face[idx];
-        const transformed = getSkinnedVertex(posIdx, mesh as THREE.SkinnedMesh, positionScale, skinWeightScale);
-
-        vertex.copy(transformed);
-      });
-    } else {
-      vertices.forEach(vertex => {
-        vertex.applyMatrix4(mesh.matrixWorld);
-      });
-    }
-
-    return vertices;
-  }
-
-  private _getVertices() {
-    const view3D = this._view3D;
+    const model = this._view3D.model;
     const meshIndex = this._meshIndex;
     const faceIndex = this._faceIndex;
-    const model = view3D.model;
+    const weights = this._weights;
 
-    if (!model || meshIndex < 0 || faceIndex < 0) return null;
+    const animatedVertices = getAnimatedFace(model, meshIndex, faceIndex);
 
-    const mesh = model.meshes[meshIndex];
-    const indexes = mesh?.geometry.index?.array;
-    const face = indexes
-      ? range(3).map(idx => indexes[3 * faceIndex + idx])
-      : null;
+    if (!animatedVertices) return new THREE.Vector3();
 
-    if (!mesh || !indexes || !face || face.some(val => val == null)) return null;
-
-    const position = mesh.geometry.getAttribute("position");
-    const vertices = face.map((index: number) => {
-      return new THREE.Vector3().fromBufferAttribute(position, index);
-    });
-
-    return vertices;
+    // barycentric
+    return new THREE.Vector3()
+      .addScaledVector(animatedVertices[0], weights[0])
+      .addScaledVector(animatedVertices[1], weights[1])
+      .addScaledVector(animatedVertices[2], weights[2]);
   }
 }
 

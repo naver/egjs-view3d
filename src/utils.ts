@@ -9,6 +9,7 @@ import View3D from "./View3D";
 import View3DError from "./core/View3DError";
 import ERROR from "./const/error";
 import { NoBoolean, TypedArray } from "./type/utils";
+import { Model } from "./core";
 
 export const isNumber = (val: any): val is number => typeof val === "number";
 export const isString = (val: any): val is string => typeof val === "string";
@@ -307,4 +308,54 @@ export const checkHalfFloatAvailable = (renderer: THREE.WebGLRenderer) => {
 
     return available;
   }
+};
+
+export const getFaceVertices = (model: Model | null, meshIndex: number, faceIndex: number): THREE.Vector3[] | null => {
+  if (!model || meshIndex < 0 || faceIndex < 0) return null;
+
+  const mesh = model.meshes[meshIndex];
+  const indexes = mesh?.geometry.index?.array;
+  const face = indexes
+    ? range(3).map(idx => indexes[3 * faceIndex + idx])
+    : null;
+
+  if (!mesh || !indexes || !face || face.some(val => val == null)) return null;
+
+  const position = mesh.geometry.getAttribute("position");
+  const vertices = face.map((index: number) => {
+    return new THREE.Vector3().fromBufferAttribute(position, index);
+  });
+
+  return vertices;
+};
+
+export const getAnimatedFace = (model: Model | null, meshIndex: number, faceIndex: number): THREE.Vector3[] | null => {
+  const vertices = getFaceVertices(model, meshIndex, faceIndex);
+  if (!vertices) return null;
+
+  const mesh = model!.meshes[meshIndex];
+  const indexes = mesh.geometry.getIndex()!;
+  const face = (indexes.array as TypedArray).slice(3 * faceIndex, 3 * faceIndex + 3);
+
+  if ((mesh as THREE.SkinnedMesh).isSkinnedMesh) {
+    const geometry = mesh.geometry;
+    const positions = geometry.attributes.position;
+    const skinWeights = geometry.attributes.skinWeight;
+
+    const positionScale = getAttributeScale(positions);
+    const skinWeightScale = getAttributeScale(skinWeights);
+
+    vertices.forEach((vertex, idx) => {
+      const posIdx = face[idx];
+      const transformed = getSkinnedVertex(posIdx, mesh as THREE.SkinnedMesh, positionScale, skinWeightScale);
+
+      vertex.copy(transformed);
+    });
+  } else {
+    vertices.forEach(vertex => {
+      vertex.applyMatrix4(mesh.matrixWorld);
+    });
+  }
+
+  return vertices;
 };

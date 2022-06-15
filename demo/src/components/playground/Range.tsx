@@ -5,10 +5,12 @@ import styles from "./range.module.css";
 import { clamp } from "../../../../src/utils";
 
 class Range extends React.Component<SliderProps & {
-  name: string;
+  name?: string;
 }, {
   val: number;
 }> {
+  public get val() { return this.state.val; }
+
   public constructor(props) {
     super(props);
     this.state = {
@@ -30,18 +32,22 @@ class Range extends React.Component<SliderProps & {
       min,
       max,
       step,
+      style,
       ...otherProps
     } = this.props;
 
-    return <div>
-      <div className="mb-1 menu-label">{name}</div>
-      <div className={clsx(styles.wrapper, className)}>
+    return <div className={className} style={style}>
+      {name && <div className="mb-1 menu-label">{name}</div>}
+      <div className={styles.wrapper}>
         <Slider
           min={min}
           max={max}
           step={step}
           onChange={(val) => {
-            onChange!(val);
+            if (onChange) {
+              onChange(val);
+            }
+
             this.setState({
               val: val as number
             });
