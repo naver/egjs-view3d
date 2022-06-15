@@ -189,9 +189,7 @@ export const getRotatedPosition = (distance: number, yawDeg: number, pitchDeg: n
   return newPos;
 };
 
-/**
- * In Radians
- */
+// In Radians
 export const directionToYawPitch = (direction: THREE.Vector3) => {
   const xz = new THREE.Vector2(direction.x, direction.z);
   const origin = new THREE.Vector2();

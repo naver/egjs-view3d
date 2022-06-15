@@ -208,8 +208,8 @@ export const QUICK_LOOK_CUSTOM_BANNER_SIZE = {
  * @property {1} TRANSLATE Translate input
  * @property {2} ZOOM Zoom input
  */
-export enum INPUT_TYPE {
-  ROTATE,
-  TRANSLATE,
-  ZOOM
-}
+export const INPUT_TYPE = {
+  ROTATE: 0,
+  TRANSLATE: 1,
+  ZOOM: 2
+} as const;

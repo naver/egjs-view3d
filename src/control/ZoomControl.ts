@@ -68,6 +68,7 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
   private _prevTouchDistance: number = -1;
   private _enabled: boolean = false;
   private _isFirstTouch: boolean = true;
+  private _isWheelScrolling: boolean = false;
 
   /**
    * Whether this control is enabled or not
@@ -194,7 +195,18 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
    */
   public destroy(): void {
     this.disable();
+    this.reset();
     this.off();
+  }
+
+  /**
+   * Reset internal values
+   * @returns {void}
+   */
+  public reset(): void {
+    this._prevTouchDistance = -1;
+    this._isFirstTouch = true;
+    this._isWheelScrolling = false;
   }
 
   /**
@@ -206,9 +218,19 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
     const camera = this._view3D.camera;
     const newPose = camera.newPose;
     const motion = this._motion;
+    const prevProgress = motion.progress;
     const delta = motion.update(deltaTime);
+    const newProgress = motion.progress;
 
     newPose.zoom -= delta;
+
+    if (this._isWheelScrolling && prevProgress < 1 && newProgress >= 1) {
+      this.trigger(CONTROL_EVENTS.RELEASE, {
+        inputType: INPUT_TYPE.ZOOM,
+        isTouch: false
+      });
+      this._isWheelScrolling = false;
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -304,17 +326,18 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
     evt.preventDefault();
     evt.stopPropagation();
 
-    const animation = this._motion;
+    const motion = this._motion;
     const delta = -this._scale * this._scaleModifier * this._wheelModifier * evt.deltaY;
 
-    if (animation.progress <= 0 || animation.progress >= 1) {
+    if (!this._isWheelScrolling) {
       this.trigger(CONTROL_EVENTS.HOLD, {
         inputType: INPUT_TYPE.ZOOM,
         isTouch: false
       });
     }
+    this._isWheelScrolling = true;
 
-    animation.setEndDelta(delta);
+    motion.setEndDelta(delta);
   };
 
   private _onTouchMove = (evt: TouchEvent) => {
@@ -326,7 +349,7 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
     }
     evt.stopPropagation();
 
-    const animation = this._motion;
+    const motion = this._motion;
     const prevTouchDistance = this._prevTouchDistance;
 
     const touchPoint1 = new THREE.Vector2(touches[0].pageX, touches[0].pageY);
@@ -348,7 +371,7 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
 
     this._isFirstTouch = false;
 
-    animation.setEndDelta(delta);
+    motion.setEndDelta(delta);
   };
 
   private _onTouchEnd = (evt: TouchEvent) => {

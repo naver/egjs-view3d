@@ -122,7 +122,16 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
    */
   public destroy(): void {
     this.disable();
+    this.reset();
     this.off();
+  }
+
+  /**
+   * Reset internal values
+   * @returns {void}
+   */
+  public reset(): void {
+    this._touchInitialized = false;
   }
 
   /**

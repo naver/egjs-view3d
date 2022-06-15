@@ -1,26 +1,22 @@
 ---
-sidebar_position: 14
+sidebar_position: 12
 ---
 
 import View3D from "@site/src/components/View3D";
 import License from "@site/src/components/License";
 
-Emitted when [WebARSession](/docs/api/WebARSession) is started.
-Not available in SceneViewer or AR Quick Look.
+An event that fires at the end of every inputs.
 
 |Property|Type|Description|
 |:---:|:---:|---|
 |type|string|The type of event|
 |target|[View3D](/docs/api/View3D)|An instance of View3D that triggered this event|
-|session|[WebARSession](/docs/api/WebARSession)|An instance of WebARSession that triggered this event|
+|inputType|[INPUT_TYPE](/docs/api/INPUT_TYPE)|Type of the input|
 
 <View3D
   src="/egjs-view3d/model/draco/alarm.glb"
-  iosSrc="/egjs-view3d/model/usdz/alarm.usdz"
-  webAR={{ overlayRoot: ".view3d-events-overlay" }}
-  showARButton
   showExampleCode
-  showEventsTriggered={["arStart", "arEnd", "arModelPlaced"]} />
+  showEventsTriggered={["inputStart", "inputEnd"]} />
 
 <License items={[
   {
