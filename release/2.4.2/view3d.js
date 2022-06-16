@@ -212,10 +212,7 @@ version: 2.4.2
     newPos.x = newPos.z * Math.sin(-yaw);
     newPos.z = newPos.z * Math.cos(-yaw);
     return newPos;
-  };
-  /**
-   * In Radians
-   */
+  }; // In Radians
 
   const directionToYawPitch = direction => {
     const xz = new THREE.Vector2(direction.x, direction.z);
@@ -272,6 +269,74 @@ version: 2.4.2
     const testBuffer = new buffer.constructor(1);
     testBuffer[0] = -1;
     return testBuffer[0] < 0;
+  };
+  const checkHalfFloatAvailable = renderer => {
+    if (renderer.capabilities.isWebGL2) {
+      return true;
+    } else {
+      const gl = renderer.getContext();
+      const texture = gl.createTexture();
+      let available = true;
+
+      try {
+        const data = new Uint16Array(4);
+        const ext = gl.getExtension("OES_texture_half_float");
+
+        if (!ext) {
+          available = false;
+        } else {
+          gl.bindTexture(gl.TEXTURE_2D, texture);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, ext.HALF_FLOAT_OES, data);
+          const err = gl.getError();
+          available = err === gl.NO_ERROR;
+        }
+      } catch (err) {
+        available = false;
+      }
+
+      gl.deleteTexture(texture);
+      return available;
+    }
+  };
+  const getFaceVertices = (model, meshIndex, faceIndex) => {
+    var _a;
+
+    if (!model || meshIndex < 0 || faceIndex < 0) return null;
+    const mesh = model.meshes[meshIndex];
+    const indexes = (_a = mesh === null || mesh === void 0 ? void 0 : mesh.geometry.index) === null || _a === void 0 ? void 0 : _a.array;
+    const face = indexes ? range(3).map(idx => indexes[3 * faceIndex + idx]) : null;
+    if (!mesh || !indexes || !face || face.some(val => val == null)) return null;
+    const position = mesh.geometry.getAttribute("position");
+    const vertices = face.map(index => {
+      return new THREE.Vector3().fromBufferAttribute(position, index);
+    });
+    return vertices;
+  };
+  const getAnimatedFace = (model, meshIndex, faceIndex) => {
+    const vertices = getFaceVertices(model, meshIndex, faceIndex);
+    if (!vertices) return null;
+    const mesh = model.meshes[meshIndex];
+    const indexes = mesh.geometry.getIndex();
+    const face = indexes.array.slice(3 * faceIndex, 3 * faceIndex + 3);
+
+    if (mesh.isSkinnedMesh) {
+      const geometry = mesh.geometry;
+      const positions = geometry.attributes.position;
+      const skinWeights = geometry.attributes.skinWeight;
+      const positionScale = getAttributeScale(positions);
+      const skinWeightScale = getAttributeScale(skinWeights);
+      vertices.forEach((vertex, idx) => {
+        const posIdx = face[idx];
+        const transformed = getSkinnedVertex(posIdx, mesh, positionScale, skinWeightScale);
+        vertex.copy(transformed);
+      });
+    } else {
+      vertices.forEach(vertex => {
+        vertex.applyMatrix4(mesh.matrixWorld);
+      });
+    }
+
+    return vertices;
   };
 
   /*! *****************************************************************************
@@ -334,6 +399,46 @@ version: 2.4.2
    * Copyright (c) 2020 NAVER Corp.
    * egjs projects are licensed under the MIT license
    */
+  // Browser related constants
+  const IS_IOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+  const IS_ANDROID = () => /android/i.test(navigator.userAgent);
+  const EVENTS = {
+    MOUSE_DOWN: "mousedown",
+    MOUSE_MOVE: "mousemove",
+    MOUSE_UP: "mouseup",
+    TOUCH_START: "touchstart",
+    TOUCH_MOVE: "touchmove",
+    TOUCH_END: "touchend",
+    WHEEL: "wheel",
+    RESIZE: "resize",
+    CONTEXT_MENU: "contextmenu",
+    MOUSE_ENTER: "mouseenter",
+    MOUSE_LEAVE: "mouseleave",
+    LOAD: "load",
+    ERROR: "error",
+    CLICK: "click",
+    CONTEXT_LOST: "webglcontextlost",
+    CONTEXT_RESTORE: "webglcontextrestored"
+  };
+  const CURSOR = {
+    GRAB: "grab",
+    GRABBING: "grabbing",
+    NONE: ""
+  }; // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
+
+  var MOUSE_BUTTON;
+
+  (function (MOUSE_BUTTON) {
+    MOUSE_BUTTON[MOUSE_BUTTON["LEFT"] = 0] = "LEFT";
+    MOUSE_BUTTON[MOUSE_BUTTON["MIDDLE"] = 1] = "MIDDLE";
+    MOUSE_BUTTON[MOUSE_BUTTON["RIGHT"] = 2] = "RIGHT";
+  })(MOUSE_BUTTON || (MOUSE_BUTTON = {}));
+  const ANONYMOUS = "anonymous";
+
+  /*
+   * Copyright (c) 2020 NAVER Corp.
+   * egjs projects are licensed under the MIT license
+   */
   /**
    * "auto"
    * @type {"auto"}
@@ -362,7 +467,7 @@ version: 2.4.2
    * ```
    */
 
-  const EVENTS = {
+  const EVENTS$1 = {
     READY: "ready",
     LOAD_START: "loadStart",
     LOAD: "load",
@@ -426,6 +531,7 @@ version: 2.4.2
    * @property {"selected"} ANNOTATION_SELECTED A class name for selected annotation element
    * @property {"flip-x"} ANNOTATION_FLIP_X A class name for annotation element which has tooltip on the left side
    * @property {"flip-y"} ANNOTATION_FLIP_Y A class name for annotation element which has tooltip on the bottom side
+   * @property {"ctx-lost"} CTX_LOST A class name for canvas element which will be added on context lost
    */
 
   const DEFAULT_CLASS = {
@@ -437,7 +543,8 @@ version: 2.4.2
     ANNOTATION_DEFAULT: "default",
     ANNOTATION_SELECTED: "selected",
     ANNOTATION_FLIP_X: "flip-x",
-    ANNOTATION_FLIP_Y: "flip-y"
+    ANNOTATION_FLIP_Y: "flip-y",
+    CTX_LOST: "ctx-lost"
   };
   /**
    * Possible values for the toneMapping option.
@@ -535,13 +642,11 @@ version: 2.4.2
    * @property {2} ZOOM Zoom input
    */
 
-  var INPUT_TYPE;
-
-  (function (INPUT_TYPE) {
-    INPUT_TYPE[INPUT_TYPE["ROTATE"] = 0] = "ROTATE";
-    INPUT_TYPE[INPUT_TYPE["TRANSLATE"] = 1] = "TRANSLATE";
-    INPUT_TYPE[INPUT_TYPE["ZOOM"] = 2] = "ZOOM";
-  })(INPUT_TYPE || (INPUT_TYPE = {}));
+  const INPUT_TYPE = {
+    ROTATE: 0,
+    TRANSLATE: 1,
+    ZOOM: 2
+  };
 
   /*
    * Copyright (c) 2020 NAVER Corp.
@@ -554,7 +659,7 @@ version: 2.4.2
   class Renderer {
     /**
      * Create new Renderer instance
-     * @param canvas \<canvas\> element to render 3d model
+     * @param {View3D} view3D An instance of View3D
      */
     constructor(view3D) {
       this._defaultRenderLoop = delta => {
@@ -569,10 +674,25 @@ version: 2.4.2
         this._renderFrame(delta);
       };
 
+      this._onContextLost = () => {
+        const canvas = this._canvas;
+        canvas.classList.add(DEFAULT_CLASS.CTX_LOST);
+      };
+
+      this._onContextRestore = () => {
+        const canvas = this._canvas;
+        const scene = this._view3D.scene;
+        canvas.classList.remove(DEFAULT_CLASS.CTX_LOST);
+        scene.initTextures();
+        this.renderSingleFrame();
+      };
+
+      const canvas = findCanvas(view3D.rootEl, view3D.canvasSelector);
+      this._canvas = canvas;
       this._view3D = view3D;
-      this._canvas = findCanvas(view3D.rootEl, view3D.canvasSelector);
+      this._renderQueued = false;
       const renderer = new THREE.WebGLRenderer({
-        canvas: this._canvas,
+        canvas,
         alpha: true,
         antialias: true,
         preserveDrawingBuffer: true
@@ -581,34 +701,12 @@ version: 2.4.2
       renderer.toneMappingExposure = view3D.exposure;
       renderer.outputEncoding = THREE.sRGBEncoding;
       renderer.setClearColor(0x000000, 0);
-
-      if (renderer.capabilities.isWebGL2) {
-        this._halfFloatAvailable = true;
-      } else {
-        const gl = renderer.getContext();
-        const texture = gl.createTexture();
-
-        try {
-          const data = new Uint16Array(4);
-          const ext = gl.getExtension("OES_texture_half_float");
-
-          if (!ext) {
-            this._halfFloatAvailable = false;
-          } else {
-            gl.bindTexture(gl.TEXTURE_2D, texture);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, ext.HALF_FLOAT_OES, data);
-            const err = gl.getError();
-            this._halfFloatAvailable = err === gl.NO_ERROR;
-          }
-        } catch (err) {
-          this._halfFloatAvailable = false;
-        }
-
-        gl.deleteTexture(texture);
-      }
-
+      this._halfFloatAvailable = checkHalfFloatAvailable(renderer);
       this._renderer = renderer;
       this._clock = new THREE.Clock(false);
+      this._canvasSize = new THREE.Vector2();
+      canvas.addEventListener(EVENTS.CONTEXT_LOST, this._onContextLost);
+      canvas.addEventListener(EVENTS.CONTEXT_RESTORE, this._onContextRestore);
     }
     /**
      * {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement HTMLCanvasElement} given when creating View3D instance
@@ -628,7 +726,7 @@ version: 2.4.2
 
 
     get context() {
-      return this._renderer.context;
+      return this._renderer.getContext();
     }
     /**
      * Three.js {@link https://threejs.org/docs/#api/en/renderers/WebGLRenderer WebGLRenderer} instance
@@ -651,7 +749,7 @@ version: 2.4.2
       return this._defaultRenderLoop;
     }
     /**
-     * The width and height of the renderer's output canvas
+     * The rendering width and height of the canvas
      * @type {object}
      * @param {number} width Width of the canvas
      * @param {number} height Height of the canvas
@@ -660,12 +758,22 @@ version: 2.4.2
 
 
     get size() {
-      const canvasSize = this._renderer.getSize(new THREE.Vector2());
+      const renderingSize = this._renderer.getSize(new THREE.Vector2());
 
       return {
-        width: canvasSize.width,
-        height: canvasSize.y
+        width: renderingSize.width,
+        height: renderingSize.y
       };
+    }
+    /**
+     * Canvas element's actual size
+     * @type THREE.Vector2
+     * @readonly
+     */
+
+
+    get canvasSize() {
+      return this._canvasSize;
     }
     /**
      * An object containing details about the capabilities of the current RenderingContext.
@@ -680,6 +788,20 @@ version: 2.4.2
       });
     }
     /**
+     * Destroy the renderer and stop active animation loop
+     */
+
+
+    destroy() {
+      const canvas = this._canvas;
+      this.stopAnimationLoop();
+
+      this._renderer.dispose();
+
+      canvas.removeEventListener(EVENTS.CONTEXT_LOST, this._onContextLost);
+      canvas.removeEventListener(EVENTS.CONTEXT_RESTORE, this._onContextRestore);
+    }
+    /**
      * Resize the renderer based on current canvas width / height
      * @returns {void}
      */
@@ -689,8 +811,12 @@ version: 2.4.2
       const renderer = this._renderer;
       const canvas = this._canvas;
       if (renderer.xr.isPresenting) return;
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
       renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+      renderer.setSize(width, height, false);
+
+      this._canvasSize.set(width, height);
     }
 
     setAnimationLoop(callback) {
@@ -711,11 +837,18 @@ version: 2.4.2
       this._renderer.setAnimationLoop(null);
     }
 
-    renderSingleFrame() {
+    renderSingleFrame(immediate = false) {
       const renderer = this._renderer;
 
       if (!renderer.xr.isPresenting) {
-        this._renderFrame(0);
+        if (immediate) {
+          this._renderFrame(0);
+        } else if (!this._renderQueued) {
+          requestAnimationFrame(() => {
+            this._renderFrame(0);
+          });
+          this._renderQueued = true;
+        }
       }
     }
 
@@ -730,75 +863,30 @@ version: 2.4.2
         animator,
         annotation
       } = view3D;
+      if (threeRenderer.getContext().isContextLost()) return;
       const deltaMiliSec = delta * 1000;
+      this._renderQueued = false;
       animator.update(delta);
       control.update(deltaMiliSec);
       autoPlayer.update(deltaMiliSec);
-      view3D.trigger(EVENTS.BEFORE_RENDER, {
-        type: EVENTS.BEFORE_RENDER,
+      view3D.trigger(EVENTS$1.BEFORE_RENDER, {
+        type: EVENTS$1.BEFORE_RENDER,
         target: view3D,
         delta: deltaMiliSec
       });
       camera.updatePosition();
-      threeRenderer.autoClear = false;
-      threeRenderer.clear();
-
-      if (scene.skybox && scene.skybox.enabled) {
-        scene.skybox.updateCamera();
-        threeRenderer.render(scene.skybox.scene, scene.skybox.camera);
-      }
-
       scene.shadowPlane.render();
-      threeRenderer.render(scene.root, camera.threeCamera);
-      threeRenderer.autoClear = true; // Render annotations
+      threeRenderer.render(scene.root, camera.threeCamera); // Render annotations
 
       annotation.render();
-      view3D.trigger(EVENTS.RENDER, {
-        type: EVENTS.RENDER,
+      view3D.trigger(EVENTS$1.RENDER, {
+        type: EVENTS$1.RENDER,
         target: view3D,
         delta: deltaMiliSec
       });
     }
 
   }
-
-  /*
-   * Copyright (c) 2020 NAVER Corp.
-   * egjs projects are licensed under the MIT license
-   */
-  // Browser related constants
-  const IS_IOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
-  const IS_ANDROID = () => /android/i.test(navigator.userAgent);
-  const EVENTS$1 = {
-    MOUSE_DOWN: "mousedown",
-    MOUSE_MOVE: "mousemove",
-    MOUSE_UP: "mouseup",
-    TOUCH_START: "touchstart",
-    TOUCH_MOVE: "touchmove",
-    TOUCH_END: "touchend",
-    WHEEL: "wheel",
-    RESIZE: "resize",
-    CONTEXT_MENU: "contextmenu",
-    MOUSE_ENTER: "mouseenter",
-    MOUSE_LEAVE: "mouseleave",
-    LOAD: "load",
-    ERROR: "error",
-    CLICK: "click"
-  };
-  const CURSOR = {
-    GRAB: "grab",
-    GRABBING: "grabbing",
-    NONE: ""
-  }; // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent.button
-
-  var MOUSE_BUTTON;
-
-  (function (MOUSE_BUTTON) {
-    MOUSE_BUTTON[MOUSE_BUTTON["LEFT"] = 0] = "LEFT";
-    MOUSE_BUTTON[MOUSE_BUTTON["MIDDLE"] = 1] = "MIDDLE";
-    MOUSE_BUTTON[MOUSE_BUTTON["RIGHT"] = 2] = "RIGHT";
-  })(MOUSE_BUTTON || (MOUSE_BUTTON = {}));
-  const ANONYMOUS = "anonymous";
 
   /**
    * Base class for all loaders that View3D uses
@@ -812,8 +900,8 @@ version: 2.4.2
         context.lengthComputable = evt.lengthComputable;
         context.loaded = evt.loaded;
         context.total = evt.total;
-        view3D.trigger(EVENTS.PROGRESS, {
-          type: EVENTS.PROGRESS,
+        view3D.trigger(EVENTS$1.PROGRESS, {
+          type: EVENTS$1.PROGRESS,
           target: view3D,
           src,
           lengthComputable: evt.lengthComputable,
@@ -1177,70 +1265,89 @@ version: 2.4.2
   }
 
   /**
-   * Skybox that can renders background in a different scene.
+   * Skybox texture generator
    */
 
   class Skybox {
-    /** */
-    constructor(view3D) {
-      this._view3D = view3D;
-      this._scene = new THREE.Scene();
-      this._camera = new THREE.PerspectiveCamera();
-      this._enabled = true;
-    }
+    static createDefaultEnv(renderer) {
+      const envScene = new THREE.Scene();
+      const point = new THREE.PointLight(0xffffff, 0.8, 20);
+      point.decay = 2;
+      point.position.set(0, 7, 0);
+      envScene.add(point);
+      const boxGeo = new THREE.BoxBufferGeometry(1, 1, 1);
+      const boxMat = new THREE.MeshStandardMaterial({
+        side: THREE.BackSide
+      });
+      const box = new THREE.Mesh(boxGeo, boxMat);
+      box.castShadow = false;
+      box.scale.set(15, 45, 15);
+      box.position.set(0, 20, 0);
+      envScene.add(box);
 
-    get scene() {
-      return this._scene;
-    }
+      const topLight = Skybox._createRectAreaLightSource({
+        intensity: 4.5,
+        width: 4,
+        height: 4
+      });
 
-    get camera() {
-      return this._camera;
-    }
+      topLight.position.set(0, 2.5, 0);
+      topLight.rotateX(Math.PI / 2);
+      const frontLightIntensity = 3;
 
-    get enabled() {
-      return this._enabled;
-    }
-    /**
-     * Destroy skybox and release all memories
-     */
+      const frontLight0 = Skybox._createRectAreaLightSource({
+        intensity: frontLightIntensity,
+        width: 2,
+        height: 2
+      });
 
+      frontLight0.position.set(0, 1, 4);
+      frontLight0.lookAt(0, 0, 0);
 
-    destroy() {
-      this._disposeOldSkybox();
-    }
-    /**
-     * Enable skybox rendering
-     */
+      const frontLight1 = Skybox._createRectAreaLightSource({
+        intensity: frontLightIntensity,
+        width: 2,
+        height: 2
+      });
 
+      frontLight1.position.set(-4, 1, 1);
+      frontLight1.lookAt(0, 0, 0);
 
-    enable() {
-      this._enabled = true;
+      const frontLight2 = Skybox._createRectAreaLightSource({
+        intensity: frontLightIntensity,
+        width: 2,
+        height: 2
+      });
 
-      this._view3D.renderer.renderSingleFrame();
-    }
-    /**
-     * Disable skybox rendering
-     */
+      frontLight2.position.set(4, 1, 1);
+      frontLight2.lookAt(0, 0, 0);
 
+      const backLight1 = Skybox._createRectAreaLightSource({
+        intensity: 2.5,
+        width: 2,
+        height: 2
+      });
 
-    disable() {
-      this._enabled = false;
+      backLight1.position.set(1.5, 1, -4);
+      backLight1.lookAt(0, 0, 0);
 
-      this._view3D.renderer.renderSingleFrame();
-    }
-    /**
-     * Update current skybox camera to match main camera & apply rotation
-     */
+      const backLight2 = Skybox._createRectAreaLightSource({
+        intensity: 2.5,
+        width: 2,
+        height: 2
+      });
 
-
-    updateCamera() {
-      const view3D = this._view3D;
-      const bgCam = this._camera;
-      const camera = view3D.camera;
-      const pivot = camera.currentPose.pivot;
-      bgCam.copy(camera.threeCamera);
-      bgCam.lookAt(pivot);
-      bgCam.updateProjectionMatrix();
+      backLight2.position.set(-1.5, 1, -4);
+      backLight2.lookAt(0, 0, 0);
+      envScene.add(topLight, frontLight0, frontLight1, frontLight2, backLight1, backLight2);
+      const outputEncoding = renderer.outputEncoding;
+      const toneMapping = renderer.toneMapping;
+      renderer.outputEncoding = THREE.LinearEncoding;
+      renderer.toneMapping = THREE.NoToneMapping;
+      const renderTarget = new THREE.PMREMGenerator(renderer).fromScene(envScene, 0.035);
+      renderer.outputEncoding = outputEncoding;
+      renderer.toneMapping = toneMapping;
+      return renderTarget.texture;
     }
     /**
      * Create blurred cubemap texture of the given texture and use that as the skybox
@@ -1249,10 +1356,8 @@ version: 2.4.2
      */
 
 
-    useBlurredHDR(texture) {
-      this._disposeOldSkybox();
-
-      const threeRenderer = this._view3D.renderer.threeRenderer;
+    static createBlurredHDR(view3D, texture) {
+      const threeRenderer = view3D.renderer.threeRenderer;
       const bgScene = new THREE.Scene();
       bgScene.background = texture; // To prevent exposure applied twice
 
@@ -1281,43 +1386,18 @@ version: 2.4.2
       skyboxScene.add(lightProbe);
       cubeCamera.update(threeRenderer, skyboxScene);
       threeRenderer.toneMappingExposure = origExposure;
-      this._scene.background = cubeRenderTarget.texture;
-
-      this._view3D.renderer.renderSingleFrame();
-
-      return this;
-    }
-    /**
-     * Use the given texture as a skybox scene background
-     * @param {THREE.Texture} texture A texture that compatible for scene background
-     * @returns {this}
-     */
-
-
-    useTexture(texture) {
-      this._scene.background = texture;
-
-      this._view3D.renderer.renderSingleFrame();
-
-      return this;
-    }
-    /**
-     * Use the given color as a skybox scene background
-     * @param {number | string} color A hexadecimal number or string that represents color
-     * @returns {this}
-     */
-
-
-    useColor(color) {
-      this._scene.background = new THREE.Color(color);
-      return this;
+      return cubeRenderTarget.texture;
     }
 
-    _disposeOldSkybox() {
-      const skyboxTexture = this._scene.background;
-      if (!skyboxTexture) return;
-      skyboxTexture.dispose();
-      this._scene.background = null;
+    static _createRectAreaLightSource({
+      intensity,
+      width,
+      height
+    }) {
+      const planeBufferGeo = new THREE.PlaneBufferGeometry(width, height);
+      const mat = new THREE.MeshBasicMaterial();
+      mat.color.setScalar(intensity);
+      return new THREE.Mesh(planeBufferGeo, mat);
     }
 
   }
@@ -1339,7 +1419,6 @@ version: 2.4.2
     constructor(view3D) {
       this._view3D = view3D;
       this._root = new THREE.Scene();
-      this._skybox = null;
       this._userObjects = new THREE.Group();
       this._envObjects = new THREE.Group();
       this._fixedObjects = new THREE.Group();
@@ -1366,16 +1445,6 @@ version: 2.4.2
 
     get root() {
       return this._root;
-    }
-    /**
-     * Skybox object for rendering background
-     * @type {Skybox}
-     * @readonly
-     */
-
-
-    get skybox() {
-      return this._skybox;
     }
     /**
      * Shadow plane & light
@@ -1468,16 +1537,15 @@ version: 2.4.2
     setBackground(background) {
       return __awaiter(this, void 0, void 0, function* () {
         const view3D = this._view3D;
-        const skybox = new Skybox(view3D);
-        this._skybox = skybox;
+        const root = this._root;
 
         if (typeof background === "number" || background.charAt(0) === "#") {
-          skybox.useColor(background);
+          root.background = new THREE.Color(background);
         } else {
           const textureLoader = new TextureLoader(view3D);
           const texture = yield textureLoader.load(background);
           texture.encoding = THREE.sRGBEncoding;
-          skybox.useTexture(texture);
+          root.background = texture;
         }
 
         view3D.renderer.renderSingleFrame();
@@ -1491,29 +1559,27 @@ version: 2.4.2
 
 
     setSkybox(url) {
-      var _a;
-
       return __awaiter(this, void 0, void 0, function* () {
         const root = this._root;
         const view3D = this._view3D; // Destroy previous skybox
 
-        (_a = this._skybox) === null || _a === void 0 ? void 0 : _a.destroy();
+        if (root.background && root.background.isTexture) {
+          root.background.dispose();
+        }
 
         if (url) {
           const textureLoader = new TextureLoader(view3D);
           const texture = yield textureLoader.loadHDRTexture(url);
-          const skybox = new Skybox(view3D);
 
           if (view3D.skyboxBlur) {
-            skybox.useBlurredHDR(texture);
+            root.background = Skybox.createBlurredHDR(view3D, texture);
           } else {
-            skybox.useTexture(texture);
+            root.background = texture;
           }
 
-          this._skybox = skybox;
           root.environment = texture;
         } else {
-          this._skybox = null;
+          root.background = null;
           root.environment = null;
         }
 
@@ -1530,17 +1596,59 @@ version: 2.4.2
     setEnvMap(url) {
       return __awaiter(this, void 0, void 0, function* () {
         const view3D = this._view3D;
+        const root = this._root;
 
         if (url) {
           const textureLoader = new TextureLoader(view3D);
           const texture = yield textureLoader.loadHDRTexture(url);
-          this._root.environment = texture;
+          root.environment = texture;
         } else {
-          this._root.environment = null;
+          root.environment = null;
         }
 
         view3D.renderer.renderSingleFrame();
       });
+    }
+    /**
+     * @internal
+     */
+
+
+    initTextures() {
+      const {
+        skybox,
+        envmap,
+        background,
+        useDefaultEnv
+      } = this._view3D;
+      const tasks = [];
+
+      if (useDefaultEnv) {
+        this.setDefaultEnv();
+      }
+
+      const hasEnvmap = skybox || envmap;
+
+      if (hasEnvmap) {
+        const loadEnv = skybox ? this.setSkybox(skybox) : this.setEnvMap(envmap);
+        tasks.push(loadEnv);
+      }
+
+      if (!skybox && background) {
+        tasks.push(this.setBackground(background));
+      }
+
+      return tasks;
+    }
+    /**
+     * @internal
+     */
+
+
+    setDefaultEnv() {
+      const renderer = this._view3D.renderer;
+      const defaultEnv = Skybox.createDefaultEnv(renderer.threeRenderer);
+      this._root.environment = defaultEnv;
     }
 
     _removeChildsOf(obj) {
@@ -1983,7 +2091,7 @@ version: 2.4.2
   class Camera {
     /**
      * Create new Camera instance
-     * @param canvas \<canvas\> element to render 3d model
+     * @param {View3D} view3D An instance of View3D
      */
     constructor(view3D) {
       this._view3D = view3D;
@@ -2157,6 +2265,10 @@ version: 2.4.2
     set pivot(val) {
       this._newPose.pivot.copy(val);
     }
+
+    set baseFov(val) {
+      this._baseFov = val;
+    }
     /**
      * Reset camera to default pose
      * @param {number} [duration=0] Duration of the reset animation
@@ -2298,6 +2410,8 @@ version: 2.4.2
         const camDist = alignAxis !== "z" ? effectiveCamDist - bboxDiff.z / 2 : effectiveCamDist - bboxDiff.x / 2;
         const newFov = toDegree(2 * Math.atan(newViewHeight / (2 * camDist)));
         defaultPose.zoom = baseFov - newFov;
+      } else {
+        defaultPose.zoom = view3D.initialZoom;
       }
     }
     /**
@@ -2330,8 +2444,8 @@ version: 2.4.2
       threeCamera.lookAt(currentPose.pivot);
       threeCamera.updateProjectionMatrix();
       newPose.copy(currentPose);
-      view3D.trigger(EVENTS.CAMERA_CHANGE, {
-        type: EVENTS.CAMERA_CHANGE,
+      view3D.trigger(EVENTS$1.CAMERA_CHANGE, {
+        type: EVENTS$1.CAMERA_CHANGE,
         target: view3D,
         pose: currentPose.clone(),
         prevPose
@@ -2397,7 +2511,7 @@ version: 2.4.2
         this._resizeObserver = resizeObserver;
       } else {
         view3d.resize();
-        window.addEventListener(EVENTS$1.RESIZE, this._onResize);
+        window.addEventListener(EVENTS.RESIZE, this._onResize);
       }
 
       this._enabled = true;
@@ -2412,7 +2526,7 @@ version: 2.4.2
         resizeObserver.disconnect();
         this._resizeObserver = null;
       } else {
-        window.removeEventListener(EVENTS$1.RESIZE, this._onResize);
+        window.removeEventListener(EVENTS.RESIZE, this._onResize);
       }
 
       this._enabled = false;
@@ -2618,11 +2732,11 @@ version: 2.4.2
         const fadePromise = new Promise(resolve => {
           const onFrame = () => {
             if (endAction.getEffectiveWeight() < 1) return;
-            view3D.off(EVENTS.BEFORE_RENDER, onFrame);
+            view3D.off(EVENTS$1.BEFORE_RENDER, onFrame);
             resolve(true);
           };
 
-          view3D.on(EVENTS.BEFORE_RENDER, onFrame);
+          view3D.on(EVENTS$1.BEFORE_RENDER, onFrame);
 
           this._fadePromises.push({
             listener: onFrame,
@@ -2654,12 +2768,12 @@ version: 2.4.2
         const fadePromise = new Promise(resolve => {
           const onFrame = () => {
             if (activeAction.getEffectiveWeight() > 0) return;
-            view3D.off(EVENTS.BEFORE_RENDER, onFrame);
+            view3D.off(EVENTS$1.BEFORE_RENDER, onFrame);
             this._activeAnimationIdx = -1;
             resolve(true);
           };
 
-          view3D.on(EVENTS.BEFORE_RENDER, onFrame);
+          view3D.on(EVENTS$1.BEFORE_RENDER, onFrame);
 
           this._fadePromises.push({
             listener: onFrame,
@@ -2746,7 +2860,7 @@ version: 2.4.2
         listener
       }) => {
         resolve(false);
-        view3D.off(EVENTS.BEFORE_RENDER, listener);
+        view3D.off(EVENTS$1.BEFORE_RENDER, listener);
       });
       this._fadePromises = [];
     }
@@ -4700,9 +4814,9 @@ version: 2.4.2
 
           renderer.stopAnimationLoop();
           renderer.setAnimationLoop(renderer.defaultRenderLoop);
-          view3D.trigger(EVENTS.AR_END, {
+          view3D.trigger(EVENTS$1.AR_END, {
             target: view3D,
-            type: EVENTS.AR_END,
+            type: EVENTS$1.AR_END,
             session: this
           });
         });
@@ -4739,8 +4853,8 @@ version: 2.4.2
             size
           };
           const deltaMiliSec = delta * 1000;
-          view3D.trigger(EVENTS.BEFORE_RENDER, {
-            type: EVENTS.BEFORE_RENDER,
+          view3D.trigger(EVENTS$1.BEFORE_RENDER, {
+            type: EVENTS$1.BEFORE_RENDER,
             target: view3D,
             delta: deltaMiliSec
           });
@@ -4754,14 +4868,14 @@ version: 2.4.2
             threeRenderer.render(arScene.root, xrCam);
           }
 
-          view3D.trigger(EVENTS.RENDER, {
-            type: EVENTS.RENDER,
+          view3D.trigger(EVENTS$1.RENDER, {
+            type: EVENTS$1.RENDER,
             target: view3D,
             delta: deltaMiliSec
           });
         });
-        view3D.trigger(EVENTS.AR_START, {
-          type: EVENTS.AR_START,
+        view3D.trigger(EVENTS$1.AR_START, {
+          type: EVENTS$1.AR_START,
           target: view3D,
           session: this
         });
@@ -4834,8 +4948,8 @@ version: 2.4.2
 
       hitTest.destroy();
       this._modelPlaced = true;
-      view3D.trigger(EVENTS.AR_MODEL_PLACED, {
-        type: EVENTS.AR_MODEL_PLACED,
+      view3D.trigger(EVENTS$1.AR_MODEL_PLACED, {
+        type: EVENTS$1.AR_MODEL_PLACED,
         target: view3D,
         session: this,
         model
@@ -4869,7 +4983,7 @@ version: 2.4.2
       const root = document.createElement("div");
       root.classList.add(AR_OVERLAY_CLASS);
       view3D.rootEl.appendChild(root);
-      view3D.once(EVENTS.AR_END, () => {
+      view3D.once(EVENTS$1.AR_END, () => {
         view3D.rootEl.removeChild(root);
       });
       return root;
@@ -5095,8 +5209,8 @@ version: 2.4.2
       anchor.addEventListener("message", evt => {
         if (evt.data === "_apple_ar_quicklook_button_tapped") {
           // User tapped either Apple pay button / Custom action button
-          view3D.trigger(EVENTS.QUICK_LOOK_TAP, Object.assign(Object.assign({}, evt), {
-            type: EVENTS.QUICK_LOOK_TAP,
+          view3D.trigger(EVENTS$1.QUICK_LOOK_TAP, Object.assign(Object.assign({}, evt), {
+            type: EVENTS$1.QUICK_LOOK_TAP,
             target: view3D
           }));
         }
@@ -5134,12 +5248,12 @@ version: 2.4.2
     constructor(view3D) {
       this._view3D = view3D;
       this._activeSession = null;
-      view3D.on(EVENTS.AR_START, ({
+      view3D.on(EVENTS$1.AR_START, ({
         session
       }) => {
         this._activeSession = session;
       });
-      view3D.on(EVENTS.AR_END, () => {
+      view3D.on(EVENTS$1.AR_END, () => {
         this._activeSession = null;
       });
     }
@@ -5283,6 +5397,25 @@ version: 2.4.2
       return !!this._element;
     }
     /**
+     * An array of values in order of [yaw, pitch, zoom]
+     * @type {number[]}
+     * @readonly
+     */
+
+
+    get focusPose() {
+      return this._focus;
+    }
+    /**
+     * Duration of the focus animation
+     * @type {number}
+     */
+
+
+    get focusDuration() {
+      return this._focusDuration;
+    }
+    /**
      * Base fov value that annotation is referencing
      * @type {number}
      */
@@ -5308,6 +5441,10 @@ version: 2.4.2
 
     get aspect() {
       return this._aspect;
+    }
+
+    set focusDuration(val) {
+      this._focusDuration = val;
     }
 
     set baseFov(val) {
@@ -5400,8 +5537,8 @@ version: 2.4.2
     enableEvents() {
       const el = this._element;
       if (!el || this._enabled) return;
-      el.addEventListener(EVENTS$1.CLICK, this._onClick);
-      el.addEventListener(EVENTS$1.WHEEL, this._onWheel);
+      el.addEventListener(EVENTS.CLICK, this._onClick);
+      el.addEventListener(EVENTS.WHEEL, this._onWheel);
       this._enabled = true;
     }
     /**
@@ -5413,8 +5550,8 @@ version: 2.4.2
     disableEvents() {
       const el = this._element;
       if (!el || !this._enabled) return;
-      el.removeEventListener(EVENTS$1.CLICK, this._onClick);
-      el.removeEventListener(EVENTS$1.WHEEL, this._onWheel);
+      el.removeEventListener(EVENTS.CLICK, this._onClick);
+      el.removeEventListener(EVENTS.WHEEL, this._onWheel);
       this._enabled = false;
     }
 
@@ -5533,13 +5670,15 @@ version: 2.4.2
     constructor(view3D, _a = {}) {
       var {
         meshIndex = -1,
-        faceIndex = -1
+        faceIndex = -1,
+        weights = [...new Array(3)].map(() => 1 / 3)
       } = _a,
-          commonOptions = __rest(_a, ["meshIndex", "faceIndex"]);
+          commonOptions = __rest(_a, ["meshIndex", "faceIndex", "weights"]);
 
       super(view3D, commonOptions);
       this._meshIndex = meshIndex;
       this._faceIndex = faceIndex;
+      this._weights = weights;
       this._trackingControl = null;
     }
 
@@ -5557,6 +5696,10 @@ version: 2.4.2
 
     get faceIndex() {
       return this._faceIndex;
+    }
+
+    get weights() {
+      return this._weights;
     }
 
     focus() {
@@ -5640,61 +5783,14 @@ version: 2.4.2
     }
 
     _getPosition() {
-      const vertices = this._getVertices();
-
-      if (!vertices) return new THREE.Vector3();
-
-      const animated = this._getAnimatedVertices(vertices);
-
-      return animated.reduce((summed, vertex) => {
-        return summed.add(vertex);
-      }, new THREE.Vector3()).divideScalar(3);
-    }
-
-    _getAnimatedVertices(vertices) {
       const model = this._view3D.model;
-      const faceIndex = this._faceIndex;
-      const mesh = model.meshes[this._meshIndex];
-      const indexes = mesh.geometry.getIndex();
-      const face = indexes.array.slice(3 * faceIndex, 3 * faceIndex + 3);
-
-      if (mesh.isSkinnedMesh) {
-        const geometry = mesh.geometry;
-        const positions = geometry.attributes.position;
-        const skinWeights = geometry.attributes.skinWeight;
-        const positionScale = getAttributeScale(positions);
-        const skinWeightScale = getAttributeScale(skinWeights);
-        vertices.forEach((vertex, idx) => {
-          const posIdx = face[idx];
-          const transformed = getSkinnedVertex(posIdx, mesh, positionScale, skinWeightScale);
-          vertex.copy(transformed);
-        });
-      } else {
-        vertices.forEach(vertex => {
-          vertex.applyMatrix4(mesh.matrixWorld);
-        });
-      }
-
-      return vertices;
-    }
-
-    _getVertices() {
-      var _a;
-
-      const view3D = this._view3D;
       const meshIndex = this._meshIndex;
       const faceIndex = this._faceIndex;
-      const model = view3D.model;
-      if (!model || meshIndex < 0 || faceIndex < 0) return null;
-      const mesh = model.meshes[meshIndex];
-      const indexes = (_a = mesh === null || mesh === void 0 ? void 0 : mesh.geometry.index) === null || _a === void 0 ? void 0 : _a.array;
-      const face = indexes ? range(3).map(idx => indexes[3 * faceIndex + idx]) : null;
-      if (!mesh || !indexes || !face || face.some(val => val == null)) return null;
-      const position = mesh.geometry.getAttribute("position");
-      const vertices = face.map(index => {
-        return new THREE.Vector3().fromBufferAttribute(position, index);
-      });
-      return vertices;
+      const weights = this._weights;
+      const animatedVertices = getAnimatedFace(model, meshIndex, faceIndex);
+      if (!animatedVertices) return new THREE.Vector3(); // barycentric
+
+      return new THREE.Vector3().addScaledVector(animatedVertices[0], weights[0]).addScaledVector(animatedVertices[1], weights[1]).addScaledVector(animatedVertices[2], weights[2]);
     }
 
   }
@@ -5888,8 +5984,7 @@ version: 2.4.2
       const model = view3D.model;
       if (!model) return;
       const camera = view3D.camera;
-      const threeRenderer = view3D.renderer.threeRenderer;
-      const screenSize = threeRenderer.getSize(new THREE.Vector2());
+      const screenSize = view3D.renderer.canvasSize;
       const halfScreenSize = screenSize.clone().multiplyScalar(0.5);
       const threeCamera = camera.threeCamera;
       const camPos = threeCamera.position;
@@ -6051,6 +6146,8 @@ version: 2.4.2
       super();
       this._screenScale = new THREE.Vector2(0, 0);
       this._prevPos = new THREE.Vector2(0, 0);
+      this._isFirstTouch = false;
+      this._isScrolling = false;
       this._enabled = false;
 
       this._onMouseDown = evt => {
@@ -6066,8 +6163,8 @@ version: 2.4.2
 
         this._prevPos.set(evt.clientX, evt.clientY);
 
-        window.addEventListener(EVENTS$1.MOUSE_MOVE, this._onMouseMove, false);
-        window.addEventListener(EVENTS$1.MOUSE_UP, this._onMouseUp, false);
+        window.addEventListener(EVENTS.MOUSE_MOVE, this._onMouseMove, false);
+        window.addEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
         this.trigger(CONTROL_EVENTS.HOLD, {
           inputType: INPUT_TYPE.ROTATE,
           isTouch: false
@@ -6090,8 +6187,8 @@ version: 2.4.2
       this._onMouseUp = () => {
         this._prevPos.set(0, 0);
 
-        window.removeEventListener(EVENTS$1.MOUSE_MOVE, this._onMouseMove, false);
-        window.removeEventListener(EVENTS$1.MOUSE_UP, this._onMouseUp, false);
+        window.removeEventListener(EVENTS.MOUSE_MOVE, this._onMouseMove, false);
+        window.removeEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
         this.trigger(CONTROL_EVENTS.RELEASE, {
           inputType: INPUT_TYPE.ROTATE,
           isTouch: false
@@ -6169,8 +6266,6 @@ version: 2.4.2
       this._easing = easing;
       this._disablePitch = disablePitch;
       this._disableYaw = disableYaw;
-      this._isFirstTouch = false;
-      this._isScrolling = false;
       this._xMotion = new Motion({
         duration,
         range: INFINITE_RANGE,
@@ -6277,7 +6372,18 @@ version: 2.4.2
 
     destroy() {
       this.disable();
+      this.reset();
       this.off();
+    }
+    /**
+     * Reset internal values
+     * @returns {void}
+     */
+
+
+    reset() {
+      this._isFirstTouch = false;
+      this._isScrolling = false;
     }
     /**
      * Update control by given deltaTime
@@ -6323,14 +6429,14 @@ version: 2.4.2
     enable() {
       if (this._enabled) return;
       const targetEl = this._view3D.renderer.canvas;
-      targetEl.addEventListener(EVENTS$1.MOUSE_DOWN, this._onMouseDown);
-      targetEl.addEventListener(EVENTS$1.TOUCH_START, this._onTouchStart, {
+      targetEl.addEventListener(EVENTS.MOUSE_DOWN, this._onMouseDown);
+      targetEl.addEventListener(EVENTS.TOUCH_START, this._onTouchStart, {
         passive: true
       });
-      targetEl.addEventListener(EVENTS$1.TOUCH_MOVE, this._onTouchMove, {
+      targetEl.addEventListener(EVENTS.TOUCH_MOVE, this._onTouchMove, {
         passive: this._view3D.scrollable
       });
-      targetEl.addEventListener(EVENTS$1.TOUCH_END, this._onTouchEnd);
+      targetEl.addEventListener(EVENTS.TOUCH_END, this._onTouchEnd);
       this._enabled = true;
       this.sync();
       this.trigger(CONTROL_EVENTS.ENABLE, {
@@ -6346,12 +6452,12 @@ version: 2.4.2
     disable() {
       if (!this._enabled) return;
       const targetEl = this._view3D.renderer.canvas;
-      targetEl.removeEventListener(EVENTS$1.MOUSE_DOWN, this._onMouseDown);
-      window.removeEventListener(EVENTS$1.MOUSE_MOVE, this._onMouseMove);
-      window.removeEventListener(EVENTS$1.MOUSE_UP, this._onMouseUp);
-      targetEl.removeEventListener(EVENTS$1.TOUCH_START, this._onTouchStart);
-      targetEl.removeEventListener(EVENTS$1.TOUCH_MOVE, this._onTouchMove);
-      targetEl.removeEventListener(EVENTS$1.TOUCH_END, this._onTouchEnd);
+      targetEl.removeEventListener(EVENTS.MOUSE_DOWN, this._onMouseDown);
+      window.removeEventListener(EVENTS.MOUSE_MOVE, this._onMouseMove);
+      window.removeEventListener(EVENTS.MOUSE_UP, this._onMouseUp);
+      targetEl.removeEventListener(EVENTS.TOUCH_START, this._onTouchStart);
+      targetEl.removeEventListener(EVENTS.TOUCH_MOVE, this._onTouchMove);
+      targetEl.removeEventListener(EVENTS.TOUCH_END, this._onTouchEnd);
       this._enabled = false;
       this.trigger(CONTROL_EVENTS.DISABLE, {
         inputType: INPUT_TYPE.ROTATE
@@ -6413,9 +6519,9 @@ version: 2.4.2
 
         this._prevPos.set(evt.clientX, evt.clientY);
 
-        window.addEventListener(EVENTS$1.MOUSE_MOVE, this._onMouseMove, false);
-        window.addEventListener(EVENTS$1.MOUSE_UP, this._onMouseUp, false);
-        window.addEventListener(EVENTS$1.CONTEXT_MENU, this._onContextMenu, false);
+        window.addEventListener(EVENTS.MOUSE_MOVE, this._onMouseMove, false);
+        window.addEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
+        window.addEventListener(EVENTS.CONTEXT_MENU, this._onContextMenu, false);
         this.trigger(CONTROL_EVENTS.HOLD, {
           inputType: INPUT_TYPE.TRANSLATE,
           isTouch: false
@@ -6437,8 +6543,8 @@ version: 2.4.2
       this._onMouseUp = () => {
         this._prevPos.set(0, 0);
 
-        window.removeEventListener(EVENTS$1.MOUSE_MOVE, this._onMouseMove, false);
-        window.removeEventListener(EVENTS$1.MOUSE_UP, this._onMouseUp, false);
+        window.removeEventListener(EVENTS.MOUSE_MOVE, this._onMouseMove, false);
+        window.removeEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
         this.trigger(CONTROL_EVENTS.RELEASE, {
           inputType: INPUT_TYPE.TRANSLATE,
           isTouch: false
@@ -6512,7 +6618,7 @@ version: 2.4.2
 
       this._onContextMenu = evt => {
         evt.preventDefault();
-        window.removeEventListener(EVENTS$1.CONTEXT_MENU, this._onContextMenu, false);
+        window.removeEventListener(EVENTS.CONTEXT_MENU, this._onContextMenu, false);
       };
 
       this._view3D = view3D;
@@ -6604,7 +6710,17 @@ version: 2.4.2
 
     destroy() {
       this.disable();
+      this.reset();
       this.off();
+    }
+    /**
+     * Reset internal values
+     * @returns {void}
+     */
+
+
+    reset() {
+      this._touchInitialized = false;
     }
     /**
      * Update control by given deltaTime
@@ -6646,16 +6762,16 @@ version: 2.4.2
     enable() {
       if (this._enabled) return;
       const targetEl = this._view3D.renderer.canvas;
-      targetEl.addEventListener(EVENTS$1.MOUSE_DOWN, this._onMouseDown, false);
-      targetEl.addEventListener(EVENTS$1.TOUCH_START, this._onTouchStart, {
+      targetEl.addEventListener(EVENTS.MOUSE_DOWN, this._onMouseDown, false);
+      targetEl.addEventListener(EVENTS.TOUCH_START, this._onTouchStart, {
         passive: false,
         capture: false
       });
-      targetEl.addEventListener(EVENTS$1.TOUCH_MOVE, this._onTouchMove, {
+      targetEl.addEventListener(EVENTS.TOUCH_MOVE, this._onTouchMove, {
         passive: false,
         capture: false
       });
-      targetEl.addEventListener(EVENTS$1.TOUCH_END, this._onTouchEnd, {
+      targetEl.addEventListener(EVENTS.TOUCH_END, this._onTouchEnd, {
         passive: false,
         capture: false
       });
@@ -6674,13 +6790,13 @@ version: 2.4.2
     disable() {
       if (!this._enabled) return;
       const targetEl = this._view3D.renderer.canvas;
-      targetEl.removeEventListener(EVENTS$1.MOUSE_DOWN, this._onMouseDown, false);
-      window.removeEventListener(EVENTS$1.MOUSE_MOVE, this._onMouseMove, false);
-      window.removeEventListener(EVENTS$1.MOUSE_UP, this._onMouseUp, false);
-      targetEl.removeEventListener(EVENTS$1.TOUCH_START, this._onTouchStart, false);
-      targetEl.removeEventListener(EVENTS$1.TOUCH_MOVE, this._onTouchMove, false);
-      targetEl.removeEventListener(EVENTS$1.TOUCH_END, this._onTouchEnd, false);
-      window.removeEventListener(EVENTS$1.CONTEXT_MENU, this._onContextMenu, false);
+      targetEl.removeEventListener(EVENTS.MOUSE_DOWN, this._onMouseDown, false);
+      window.removeEventListener(EVENTS.MOUSE_MOVE, this._onMouseMove, false);
+      window.removeEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
+      targetEl.removeEventListener(EVENTS.TOUCH_START, this._onTouchStart, false);
+      targetEl.removeEventListener(EVENTS.TOUCH_MOVE, this._onTouchMove, false);
+      targetEl.removeEventListener(EVENTS.TOUCH_END, this._onTouchEnd, false);
+      window.removeEventListener(EVENTS.CONTEXT_MENU, this._onContextMenu, false);
       this._enabled = false;
       this.trigger(CONTROL_EVENTS.DISABLE, {
         inputType: INPUT_TYPE.TRANSLATE
@@ -6735,23 +6851,25 @@ version: 2.4.2
       this._prevTouchDistance = -1;
       this._enabled = false;
       this._isFirstTouch = true;
+      this._isWheelScrolling = false;
 
       this._onWheel = evt => {
         const wheelScrollable = this._view3D.wheelScrollable;
         if (evt.deltaY === 0 || wheelScrollable) return;
         evt.preventDefault();
         evt.stopPropagation();
-        const animation = this._motion;
+        const motion = this._motion;
         const delta = -this._scale * this._scaleModifier * this._wheelModifier * evt.deltaY;
 
-        if (animation.progress <= 0) {
+        if (!this._isWheelScrolling) {
           this.trigger(CONTROL_EVENTS.HOLD, {
             inputType: INPUT_TYPE.ZOOM,
             isTouch: false
           });
         }
 
-        animation.setEndDelta(delta);
+        this._isWheelScrolling = true;
+        motion.setEndDelta(delta);
       };
 
       this._onTouchMove = evt => {
@@ -6763,7 +6881,7 @@ version: 2.4.2
         }
 
         evt.stopPropagation();
-        const animation = this._motion;
+        const motion = this._motion;
         const prevTouchDistance = this._prevTouchDistance;
         const touchPoint1 = new THREE.Vector2(touches[0].pageX, touches[0].pageY);
         const touchPoint2 = new THREE.Vector2(touches[1].pageX, touches[1].pageY);
@@ -6773,8 +6891,16 @@ version: 2.4.2
 
         const delta = this._isFirstTouch ? 0 : touchDistance - prevTouchDistance;
         this._prevTouchDistance = touchDistance;
+
+        if (this._isFirstTouch) {
+          this.trigger(CONTROL_EVENTS.HOLD, {
+            inputType: INPUT_TYPE.ZOOM,
+            isTouch: true
+          });
+        }
+
         this._isFirstTouch = false;
-        animation.setEndDelta(delta);
+        motion.setEndDelta(delta);
       };
 
       this._onTouchEnd = evt => {
@@ -6939,7 +7065,19 @@ version: 2.4.2
 
     destroy() {
       this.disable();
+      this.reset();
       this.off();
+    }
+    /**
+     * Reset internal values
+     * @returns {void}
+     */
+
+
+    reset() {
+      this._prevTouchDistance = -1;
+      this._isFirstTouch = true;
+      this._isWheelScrolling = false;
     }
     /**
      * Update control by given deltaTime
@@ -6952,8 +7090,18 @@ version: 2.4.2
       const camera = this._view3D.camera;
       const newPose = camera.newPose;
       const motion = this._motion;
+      const prevProgress = motion.progress;
       const delta = motion.update(deltaTime);
+      const newProgress = motion.progress;
       newPose.zoom -= delta;
+
+      if (this._isWheelScrolling && prevProgress < 1 && newProgress >= 1) {
+        this.trigger(CONTROL_EVENTS.RELEASE, {
+          inputType: INPUT_TYPE.ZOOM,
+          isTouch: false
+        });
+        this._isWheelScrolling = false;
+      }
     } // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
 
@@ -6968,15 +7116,15 @@ version: 2.4.2
     enable() {
       if (this._enabled) return;
       const targetEl = this._view3D.renderer.canvas;
-      targetEl.addEventListener(EVENTS$1.WHEEL, this._onWheel, {
+      targetEl.addEventListener(EVENTS.WHEEL, this._onWheel, {
         passive: false,
         capture: false
       });
-      targetEl.addEventListener(EVENTS$1.TOUCH_MOVE, this._onTouchMove, {
+      targetEl.addEventListener(EVENTS.TOUCH_MOVE, this._onTouchMove, {
         passive: false,
         capture: false
       });
-      targetEl.addEventListener(EVENTS$1.TOUCH_END, this._onTouchEnd, {
+      targetEl.addEventListener(EVENTS.TOUCH_END, this._onTouchEnd, {
         passive: false,
         capture: false
       });
@@ -6995,9 +7143,9 @@ version: 2.4.2
     disable() {
       if (!this._enabled) return;
       const targetEl = this._view3D.renderer.canvas;
-      targetEl.removeEventListener(EVENTS$1.WHEEL, this._onWheel, false);
-      targetEl.removeEventListener(EVENTS$1.TOUCH_MOVE, this._onTouchMove, false);
-      targetEl.removeEventListener(EVENTS$1.TOUCH_END, this._onTouchEnd, false);
+      targetEl.removeEventListener(EVENTS.WHEEL, this._onWheel, false);
+      targetEl.removeEventListener(EVENTS.TOUCH_MOVE, this._onTouchMove, false);
+      targetEl.removeEventListener(EVENTS.TOUCH_END, this._onTouchEnd, false);
       this._enabled = false;
       this.trigger(CONTROL_EVENTS.DISABLE, {
         inputType: INPUT_TYPE.ZOOM
@@ -7098,8 +7246,8 @@ version: 2.4.2
           }
         }
 
-        view3D.trigger(EVENTS.INPUT_START, {
-          type: EVENTS.INPUT_START,
+        view3D.trigger(EVENTS$1.INPUT_START, {
+          type: EVENTS$1.INPUT_START,
           target: view3D,
           inputType
         });
@@ -7119,8 +7267,8 @@ version: 2.4.2
           }
         }
 
-        view3D.trigger(EVENTS.INPUT_END, {
-          type: EVENTS.INPUT_END,
+        view3D.trigger(EVENTS$1.INPUT_END, {
+          type: EVENTS$1.INPUT_END,
           target: view3D,
           inputType
         });
@@ -7392,11 +7540,11 @@ version: 2.4.2
 
         this._clearTimeout();
 
-        window.addEventListener(EVENTS$1.MOUSE_UP, this._onMouseUp, false);
+        window.addEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
       };
 
       this._onMouseUp = () => {
-        window.removeEventListener(EVENTS$1.MOUSE_UP, this._onMouseUp, false);
+        window.removeEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
 
         this._setUninterruptedAfterDelay(this._delay);
       };
@@ -7576,18 +7724,18 @@ version: 2.4.2
     enable() {
       if (this._enabled) return;
       const targetEl = this._view3D.renderer.canvas;
-      targetEl.addEventListener(EVENTS$1.MOUSE_DOWN, this._onMouseDown, false);
-      targetEl.addEventListener(EVENTS$1.TOUCH_START, this._onTouchStart, {
+      targetEl.addEventListener(EVENTS.MOUSE_DOWN, this._onMouseDown, false);
+      targetEl.addEventListener(EVENTS.TOUCH_START, this._onTouchStart, {
         passive: false,
         capture: false
       });
-      targetEl.addEventListener(EVENTS$1.TOUCH_END, this._onTouchEnd, {
+      targetEl.addEventListener(EVENTS.TOUCH_END, this._onTouchEnd, {
         passive: false,
         capture: false
       });
-      targetEl.addEventListener(EVENTS$1.MOUSE_ENTER, this._onMouseEnter, false);
-      targetEl.addEventListener(EVENTS$1.MOUSE_LEAVE, this._onMouseLeave, false);
-      targetEl.addEventListener(EVENTS$1.WHEEL, this._onWheel, {
+      targetEl.addEventListener(EVENTS.MOUSE_ENTER, this._onMouseEnter, false);
+      targetEl.addEventListener(EVENTS.MOUSE_LEAVE, this._onMouseLeave, false);
+      targetEl.addEventListener(EVENTS.WHEEL, this._onWheel, {
         passive: false,
         capture: false
       });
@@ -7614,13 +7762,13 @@ version: 2.4.2
     disable() {
       if (!this._enabled) return;
       const targetEl = this._view3D.renderer.canvas;
-      targetEl.removeEventListener(EVENTS$1.MOUSE_DOWN, this._onMouseDown, false);
-      window.removeEventListener(EVENTS$1.MOUSE_UP, this._onMouseUp, false);
-      targetEl.removeEventListener(EVENTS$1.TOUCH_START, this._onTouchStart, false);
-      targetEl.removeEventListener(EVENTS$1.TOUCH_END, this._onTouchEnd, false);
-      targetEl.removeEventListener(EVENTS$1.MOUSE_ENTER, this._onMouseEnter, false);
-      targetEl.removeEventListener(EVENTS$1.MOUSE_LEAVE, this._onMouseLeave, false);
-      targetEl.removeEventListener(EVENTS$1.WHEEL, this._onWheel, false);
+      targetEl.removeEventListener(EVENTS.MOUSE_DOWN, this._onMouseDown, false);
+      window.removeEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
+      targetEl.removeEventListener(EVENTS.TOUCH_START, this._onTouchStart, false);
+      targetEl.removeEventListener(EVENTS.TOUCH_END, this._onTouchEnd, false);
+      targetEl.removeEventListener(EVENTS.MOUSE_ENTER, this._onMouseEnter, false);
+      targetEl.removeEventListener(EVENTS.MOUSE_LEAVE, this._onMouseLeave, false);
+      targetEl.removeEventListener(EVENTS.WHEEL, this._onWheel, false);
       this._enabled = false;
       this._interrupted = false;
       this._hovering = false;
@@ -8126,10 +8274,10 @@ version: 2.4.2
      * @throws {View3DError}
      * |code|condition|
      * |---|---|
-     * |{@link ERROR_CODE WRONG_TYPE}|When the root is not either string or HTMLElement|
-     * |{@link ERROR_CODE ELEMENT_NOT_FOUND}|When the element with given CSS selector does not exist|
-     * |{@link ERROR_CODE ELEMENT_NOT_CANVAS}|When the element given is not a \<canvas\> element|
-     * |{@link ERROR_CODE WEBGL_NOT_SUPPORTED}|When the browser does not support WebGL|
+     * |{@link ERROR_CODES WRONG_TYPE}|When the root is not either string or HTMLElement|
+     * |{@link ERROR_CODES ELEMENT_NOT_FOUND}|When the element with given CSS selector does not exist|
+     * |{@link ERROR_CODES ELEMENT_NOT_CANVAS}|When the element given is not a \<canvas\> element|
+     * |{@link ERROR_CODES WEBGL_NOT_SUPPORTED}|When the browser does not support WebGL|
      */
     constructor(root, {
       src = null,
@@ -8157,6 +8305,7 @@ version: 2.4.2
       shadow = true,
       skyboxBlur = false,
       toneMapping = TONE_MAPPING.LINEAR,
+      useDefaultEnv = true,
       annotationURL = null,
       annotationWrapper = `.${DEFAULT_CLASS.ANNOTATION_WRAPPER}`,
       annotationSelector = `.${DEFAULT_CLASS.ANNOTATION}`,
@@ -8203,6 +8352,7 @@ version: 2.4.2
       this._shadow = shadow;
       this._skyboxBlur = skyboxBlur;
       this._toneMapping = toneMapping;
+      this._useDefaultEnv = useDefaultEnv;
       this._annotationURL = annotationURL;
       this._annotationWrapper = annotationWrapper;
       this._annotationSelector = annotationSelector;
@@ -8650,6 +8800,16 @@ version: 2.4.2
       return this._toneMapping;
     }
     /**
+     *
+     * @type {boolean}
+     * @default true
+     */
+
+
+    get useDefaultEnv() {
+      return this._useDefaultEnv;
+    }
+    /**
      * An URL to the JSON file that has annotation informations.
      * @type {string | null}
      * @default null
@@ -8803,9 +8963,9 @@ version: 2.4.2
     /**
      * Maximum delta time in any given frame
      * This can prevent a long frame hitch / lag
-     * The default value is 0.33333...(30 fps). Set this value to `Infinity` to disable
+     * The default value is 1/30(30 fps). Set this value to `Infinity` to disable
      * @type {number}
-     * @default 0.333333...
+     * @default 1/30
      */
 
 
@@ -8813,31 +8973,46 @@ version: 2.4.2
       return this._maxDeltaTime;
     }
 
+    set initialZoom(val) {
+      this._initialZoom = val;
+    }
+
     set skybox(val) {
       void this._scene.setSkybox(val);
       this._skybox = val;
+
+      if (!val && this._useDefaultEnv) {
+        this._scene.setDefaultEnv();
+      }
     }
 
     set envmap(val) {
       void this._scene.setEnvMap(val);
       this._envmap = val;
+
+      if (!val && this._useDefaultEnv) {
+        this._scene.setDefaultEnv();
+      }
     }
 
     set exposure(val) {
-      this._renderer.threeRenderer.toneMappingExposure = val;
       this._exposure = val;
+      this._renderer.threeRenderer.toneMappingExposure = val;
+
+      this._renderer.renderSingleFrame();
     }
 
     set skyboxBlur(val) {
       this._skyboxBlur = val;
       const scene = this._scene;
+      const root = scene.root;
       const origEnvmapTexture = scene.root.environment;
 
-      if (origEnvmapTexture && !!scene.skybox) {
+      if (origEnvmapTexture && root.background !== null) {
         if (val) {
-          scene.skybox.useBlurredHDR(origEnvmapTexture);
+          root.background = Skybox.createBlurredHDR(this, origEnvmapTexture);
         } else {
-          scene.skybox.useTexture(origEnvmapTexture);
+          root.background = origEnvmapTexture;
         }
       }
     }
@@ -8845,6 +9020,8 @@ version: 2.4.2
     set toneMapping(val) {
       this._toneMapping = val;
       this._renderer.threeRenderer.toneMapping = val;
+
+      this._renderer.renderSingleFrame();
     }
 
     set useGrabCursor(val) {
@@ -8853,12 +9030,22 @@ version: 2.4.2
       this._control.updateCursor();
     }
 
-    set maxDeltaTime(val) {
-      this._maxDeltaTime = val;
+    set autoResize(val) {
+      this._autoResize = val;
+
+      if (val) {
+        this._autoResizer.enable();
+      } else {
+        this._autoResizer.disable();
+      }
     }
 
     set maintainSize(val) {
       this._maintainSize = val;
+    }
+
+    set maxDeltaTime(val) {
+      this._maxDeltaTime = val;
     }
     /**
      * Destroy View3D instance and remove all events attached to it
@@ -8869,7 +9056,7 @@ version: 2.4.2
     destroy() {
       this._scene.reset();
 
-      this._renderer.stopAnimationLoop();
+      this._renderer.destroy();
 
       this._control.destroy();
 
@@ -8900,9 +9087,6 @@ version: 2.4.2
         const renderer = this._renderer;
         const control = this._control;
         const annotationManager = this._annotationManager;
-        const skybox = this._skybox;
-        const envmap = this._envmap;
-        const background = this._background;
         const meshoptPath = this._meshoptPath;
         const tasks = [];
         this.resize();
@@ -8917,20 +9101,7 @@ version: 2.4.2
         } // Load & set skybox / envmap before displaying model
 
 
-        const hasEnvmap = skybox || envmap;
-
-        if (hasEnvmap) {
-          const tempLight = new THREE.AmbientLight();
-          scene.add(tempLight, false);
-          const loadEnv = skybox ? scene.setSkybox(skybox) : scene.setEnvMap(envmap);
-          tasks.push(loadEnv.then(() => {
-            scene.remove(tempLight);
-          }));
-        }
-
-        if (!skybox && background) {
-          tasks.push(scene.setBackground(background));
-        }
+        tasks.push(...scene.initTextures());
 
         const loadModel = this._loadModel(this._src);
 
@@ -8953,8 +9124,8 @@ version: 2.4.2
         renderer.setAnimationLoop(renderer.defaultRenderLoop);
         renderer.renderSingleFrame();
         this._initialized = true;
-        this.trigger(EVENTS.READY, {
-          type: EVENTS.READY,
+        this.trigger(EVENTS$1.READY, {
+          type: EVENTS$1.READY,
           target: this
         });
       });
@@ -8978,9 +9149,9 @@ version: 2.4.2
       this._annotationManager.resize(); // Prevent flickering on resize
 
 
-      renderer.renderSingleFrame();
-      this.trigger(EVENTS.RESIZE, Object.assign(Object.assign({}, newSize), {
-        type: EVENTS.RESIZE,
+      renderer.renderSingleFrame(true);
+      this.trigger(EVENTS$1.RESIZE, Object.assign(Object.assign({}, newSize), {
+        type: EVENTS$1.RESIZE,
         target: this
       }));
     }
@@ -9052,8 +9223,8 @@ version: 2.4.2
       }
 
       renderer.renderSingleFrame();
-      this.trigger(EVENTS.MODEL_CHANGE, {
-        type: EVENTS.MODEL_CHANGE,
+      this.trigger(EVENTS$1.MODEL_CHANGE, {
+        type: EVENTS$1.MODEL_CHANGE,
         target: this,
         model
       });
@@ -9120,8 +9291,8 @@ version: 2.4.2
     _loadSingleModel(loader, src, level, loaded) {
       return __awaiter(this, void 0, void 0, function* () {
         const maxLevel = loaded.length - 1;
-        this.trigger(EVENTS.LOAD_START, {
-          type: EVENTS.LOAD_START,
+        this.trigger(EVENTS$1.LOAD_START, {
+          type: EVENTS$1.LOAD_START,
           target: this,
           src,
           level,
@@ -9132,8 +9303,8 @@ version: 2.4.2
           const model = yield loader.load(src);
           const higherLevelLoaded = loaded.slice(level + 1).some(val => !!val);
           const modelLoadedBefore = loaded.some(val => !!val);
-          this.trigger(EVENTS.LOAD, {
-            type: EVENTS.LOAD,
+          this.trigger(EVENTS$1.LOAD, {
+            type: EVENTS$1.LOAD,
             target: this,
             model,
             level,
@@ -9145,8 +9316,8 @@ version: 2.4.2
             resetCamera: !modelLoadedBefore
           });
         } catch (error) {
-          this.trigger(EVENTS.LOAD_ERROR, {
-            type: EVENTS.LOAD_ERROR,
+          this.trigger(EVENTS$1.LOAD_ERROR, {
+            type: EVENTS$1.LOAD_ERROR,
             target: this,
             level,
             maxLevel,
@@ -9184,13 +9355,13 @@ version: 2.4.2
         imgEl.src = poster;
         rootEl.appendChild(imgEl);
         posterEl = imgEl;
-        this.once(EVENTS.READY, () => {
+        this.once(EVENTS$1.READY, () => {
           if (imgEl.parentElement !== rootEl) return;
           rootEl.removeChild(imgEl);
         });
       }
 
-      this.once(EVENTS.READY, () => {
+      this.once(EVENTS$1.READY, () => {
         if (!posterEl.parentElement) return; // Remove that element from the parent element
 
         posterEl.parentElement.removeChild(posterEl);
@@ -9206,8 +9377,8 @@ version: 2.4.2
     _resetLoadingContextOnFinish(tasks) {
       return __awaiter(this, void 0, void 0, function* () {
         void Promise.all(tasks).then(() => {
-          this.trigger(EVENTS.LOAD_FINISH, {
-            type: EVENTS.LOAD_FINISH,
+          this.trigger(EVENTS$1.LOAD_FINISH, {
+            type: EVENTS$1.LOAD_FINISH,
             target: this
           });
           this._loadingContext = [];
@@ -9293,7 +9464,7 @@ version: 2.4.2
         if (view3D.initialized) {
           yield this._setAvailable(view3D, button, arAvailable);
         } else {
-          view3D.once(EVENTS.MODEL_CHANGE, () => {
+          view3D.once(EVENTS$1.MODEL_CHANGE, () => {
             void this._setAvailable(view3D, button, arAvailable);
           });
         }
@@ -9338,7 +9509,7 @@ version: 2.4.2
 
     init(view3D) {
       return __awaiter(this, void 0, void 0, function* () {
-        view3D.on(EVENTS.AR_START, ({
+        view3D.on(EVENTS$1.AR_START, ({
           session
         }) => {
           const overlayRoot = session.domOverlay.root;
@@ -9369,7 +9540,7 @@ version: 2.4.2
           };
 
           closeButton.addEventListener("click", closeButtonHandler);
-          view3D.once(EVENTS.AR_END, () => {
+          view3D.once(EVENTS$1.AR_END, () => {
             if (closeButton.parentElement) {
               closeButton.parentElement.removeChild(closeButton);
             }
@@ -9468,13 +9639,13 @@ version: 2.4.2
             }
           };
 
-          view3D.on(EVENTS.PROGRESS, onProgress);
-          view3D.once(EVENTS.LOAD_FINISH, () => {
-            view3D.off(EVENTS.PROGRESS, onProgress);
+          view3D.on(EVENTS$1.PROGRESS, onProgress);
+          view3D.once(EVENTS$1.LOAD_FINISH, () => {
+            view3D.off(EVENTS$1.PROGRESS, onProgress);
           });
         }
 
-        view3D.once(EVENTS.LOAD_FINISH, () => {
+        view3D.once(EVENTS$1.LOAD_FINISH, () => {
           this._removeOverlay(view3D);
         });
         this._overlay = loadingOverlay;
@@ -9485,12 +9656,12 @@ version: 2.4.2
 
     init(view3D) {
       return __awaiter(this, void 0, void 0, function* () {
-        view3D.on(EVENTS.LOAD_START, this._startLoading);
+        view3D.on(EVENTS$1.LOAD_START, this._startLoading);
       });
     }
 
     teardown(view3D) {
-      view3D.off(EVENTS.LOAD_START, this._startLoading);
+      view3D.off(EVENTS$1.LOAD_START, this._startLoading);
 
       this._removeOverlay(view3D);
     }
@@ -9618,7 +9789,7 @@ version: 2.4.2
     AROverlay: AROverlay,
     LoadingBar: LoadingBar,
     AUTO: AUTO,
-    EVENTS: EVENTS,
+    EVENTS: EVENTS$1,
     EASING: EASING,
     DEFAULT_CLASS: DEFAULT_CLASS,
     TONE_MAPPING: TONE_MAPPING,
@@ -9627,7 +9798,7 @@ version: 2.4.2
     SCENE_VIEWER_MODE: SCENE_VIEWER_MODE,
     QUICK_LOOK_APPLE_PAY_BUTTON_TYPE: QUICK_LOOK_APPLE_PAY_BUTTON_TYPE,
     QUICK_LOOK_CUSTOM_BANNER_SIZE: QUICK_LOOK_CUSTOM_BANNER_SIZE,
-    get INPUT_TYPE () { return INPUT_TYPE; },
+    INPUT_TYPE: INPUT_TYPE,
     ERROR_CODES: ERROR_CODES,
     isAvailable: isAvailable
   };
