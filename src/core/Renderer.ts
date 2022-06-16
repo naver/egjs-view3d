@@ -108,7 +108,7 @@ class Renderer {
     this._canvasSize = new THREE.Vector2();
 
     canvas.addEventListener(BROWSER.EVENTS.CONTEXT_LOST, this._onContextLost);
-    canvas.addEventListener(BROWSER.EVENTS.CONTEXT_RESTORE, this._onContextRestore);
+    canvas.addEventListener(BROWSER.EVENTS.CONTEXT_RESTORED, this._onContextRestore);
   }
 
   /**
@@ -121,7 +121,7 @@ class Renderer {
     this._renderer.dispose();
 
     canvas.removeEventListener(BROWSER.EVENTS.CONTEXT_LOST, this._onContextLost);
-    canvas.removeEventListener(BROWSER.EVENTS.CONTEXT_RESTORE, this._onContextRestore);
+    canvas.removeEventListener(BROWSER.EVENTS.CONTEXT_RESTORED, this._onContextRestore);
   }
 
   /**

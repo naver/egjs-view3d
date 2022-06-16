@@ -26,7 +26,7 @@ export const EVENTS = {
   ERROR: "error",
   CLICK: "click",
   CONTEXT_LOST: "webglcontextlost",
-  CONTEXT_RESTORE: "webglcontextrestored"
+  CONTEXT_RESTORED: "webglcontextrestored"
 } as const;
 
 export const CURSOR = {
