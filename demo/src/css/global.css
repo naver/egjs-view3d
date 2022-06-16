@@ -64,3 +64,17 @@ html[data-theme='dark'] .header-github-link::before {
   right: 0;
   flex-direction: column;
 }
+
+/* rc-slider override */
+.rc-slider-track {
+  background-color: var(--ifm-color-primary) !important;
+}
+
+.rc-slider-handle {
+  border: solid 2px var(--ifm-color-primary) !important;
+  opacity: 1 !important;
+}
+
+.rc-slider-handle-dragging.rc-slider-handle-dragging.rc-slider-handle-dragging {
+  box-shadow: 0 0 0 5px var(--ifm-color-primary) !important;
+}

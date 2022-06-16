@@ -1,0 +1,30 @@
+---
+sidebar_position: 13
+---
+
+import View3D from "@site/src/components/View3D";
+import License from "@site/src/components/License";
+
+An event that fires on every camera movement.
+
+|Property|Type|Description|
+|:---:|:---:|---|
+|type|string|The type of event|
+|target|[View3D](/docs/api/View3D)|An instance of View3D that triggered this event|
+|pose|[Pose](/docs/api/Pose)|Current yaw, pitch, zoom, and pivot value|
+|prevPose|[Pose](/docs/api/Pose)|Previous yaw, pitch, zoom, and pivot value|
+
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  showExampleCode
+  showEventsTriggered={["cameraChange"]} />
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

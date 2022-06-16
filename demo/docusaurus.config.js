@@ -38,7 +38,8 @@ const config = {
             require.resolve("./src/css/custom.css"),
             require.resolve("./src/css/global.css"),
             require.resolve("../sass/view3d-bundle.sass"),
-            require.resolve("./src/css/bulma-override.sass")
+            require.resolve("./src/css/bulma-override.sass"),
+            require.resolve("rc-slider/assets/index.css")
           ]
         }
       })

@@ -558,20 +558,30 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   /**
    * Maximum delta time in any given frame
    * This can prevent a long frame hitch / lag
-   * The default value is 0.33333...(30 fps). Set this value to `Infinity` to disable
+   * The default value is 1/30(30 fps). Set this value to `Infinity` to disable
    * @type {number}
-   * @default 0.333333...
+   * @default 1/30
    */
   public get maxDeltaTime() { return this._maxDeltaTime; }
+
+  public set initialZoom(val: View3DOptions["initialZoom"]) { this._initialZoom = val; }
 
   public set skybox(val: View3DOptions["skybox"]) {
     void this._scene.setSkybox(val);
     this._skybox = val;
+
+    if (!val && this._useDefaultEnv) {
+      this._scene.setDefaultEnv();
+    }
   }
 
   public set envmap(val: View3DOptions["envmap"]) {
     void this._scene.setEnvMap(val);
     this._envmap = val;
+
+    if (!val && this._useDefaultEnv) {
+      this._scene.setDefaultEnv();
+    }
   }
 
   public set exposure(val: View3DOptions["exposure"]) {
@@ -606,8 +616,18 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._control.updateCursor();
   }
 
-  public set maxDeltaTime(val: View3DOptions["maxDeltaTime"]) { this._maxDeltaTime = val; }
+  public set autoResize(val: View3DOptions["autoResize"]) {
+    this._autoResize = val;
+
+    if (val) {
+      this._autoResizer.enable();
+    } else {
+      this._autoResizer.disable();
+    }
+  }
+
   public set maintainSize(val: View3DOptions["maintainSize"]) { this._maintainSize = val; }
+  public set maxDeltaTime(val: View3DOptions["maxDeltaTime"]) { this._maxDeltaTime = val; }
 
   /**
    * Creates new View3D instance.
@@ -616,10 +636,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    * @throws {View3DError}
    * |code|condition|
    * |---|---|
-   * |{@link ERROR_CODE WRONG_TYPE}|When the root is not either string or HTMLElement|
-   * |{@link ERROR_CODE ELEMENT_NOT_FOUND}|When the element with given CSS selector does not exist|
-   * |{@link ERROR_CODE ELEMENT_NOT_CANVAS}|When the element given is not a \<canvas\> element|
-   * |{@link ERROR_CODE WEBGL_NOT_SUPPORTED}|When the browser does not support WebGL|
+   * |{@link ERROR_CODES WRONG_TYPE}|When the root is not either string or HTMLElement|
+   * |{@link ERROR_CODES ELEMENT_NOT_FOUND}|When the element with given CSS selector does not exist|
+   * |{@link ERROR_CODES ELEMENT_NOT_CANVAS}|When the element given is not a \<canvas\> element|
+   * |{@link ERROR_CODES WEBGL_NOT_SUPPORTED}|When the browser does not support WebGL|
    */
   public constructor(root: string | HTMLElement, {
     src = null,
@@ -752,7 +772,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public destroy(): void {
     this._scene.reset();
-    this._renderer.stopAnimationLoop();
+    this._renderer.destroy();
     this._control.destroy();
     this._autoResizer.disable();
     this._animator.reset();
@@ -775,19 +795,11 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     const renderer = this._renderer;
     const control = this._control;
     const annotationManager = this._annotationManager;
-    const skybox = this._skybox;
-    const envmap = this._envmap;
-    const background = this._background;
     const meshoptPath = this._meshoptPath;
     const tasks: Array<Promise<any>> = [];
 
     this.resize();
     annotationManager.init();
-
-    if (this._useDefaultEnv) {
-      const defaultEnv = Skybox.createDefaultEnv(renderer.threeRenderer);
-      scene.root.environment = defaultEnv;
-    }
 
     if (this._autoResize) {
       this._autoResizer.enable();
@@ -798,18 +810,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     }
 
     // Load & set skybox / envmap before displaying model
-    const hasEnvmap = skybox || envmap;
-    if (hasEnvmap) {
-      const loadEnv = skybox
-        ? scene.setSkybox(skybox)
-        : scene.setEnvMap(envmap);
-
-      tasks.push(loadEnv);
-    }
-
-    if (!skybox && background) {
-      tasks.push(scene.setBackground(background));
-    }
+    tasks.push(...scene.initTextures());
 
     const loadModel = this._loadModel(this._src);
     tasks.push(...loadModel);

@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import React, { useRef, useState } from "react";
+import Slider from "rc-slider";
 import View3D, { TONE_MAPPING } from "../View3D";
-import { Range } from "react-range";
 import License from "../License";
 
 const envmaps = [
@@ -22,7 +22,7 @@ const envmaps = [
 export default () => {
   const [exposure, setExposure] = useState(1);
   const [toneMapping, setToneMapping] = useState(TONE_MAPPING.LINEAR);
-  const view3D = useRef<View3D>();
+  const view3D = useRef<View3D>(null);
 
   return <>
     <section>
@@ -36,7 +36,7 @@ export default () => {
                   <select defaultValue={4} onChange={e => {
                     const newToneMapping = Object.values(TONE_MAPPING)[e.target.value];
                     setToneMapping(newToneMapping);
-                    view3D.current.view3D.toneMapping = newToneMapping;
+                    view3D.current!.view3D.toneMapping = newToneMapping;
                   }}>
                     { Object.keys(TONE_MAPPING).map((name, idx) => (
                       <option key={idx} value={idx}>{name}</option>
@@ -51,7 +51,7 @@ export default () => {
                 <div className={clsx({ select: true, "mr-1": true })}>
                   <select defaultValue={4} onChange={e => {
                     const path = envmaps[e.target.value].path;
-                    view3D.current.view3D.skybox = path;
+                    view3D.current!.view3D.skybox = path;
                   }}>
                     { envmaps.map((env, idx) => (
                       <option key={idx} value={idx}>{env.name}</option>
@@ -63,41 +63,17 @@ export default () => {
             <tr>
               <td className="mr-2">Exposure: {exposure}</td>
               <td>
-                <Range
+                <Slider
                   step={0.01}
                   min={0}
                   max={3}
-                  values={[exposure]}
-                  onChange={(values) => {
-                    const newExposure = values[0];
+                  defaultValue={exposure}
+                  onChange={val => {
+                    const newExposure = val as number;
                     setExposure(newExposure);
-                    view3D.current.view3D.exposure = newExposure;
+                    view3D.current!.view3D.exposure = newExposure;
                   }}
-                  renderTrack={({ props, children }) => {
-                    return <div
-                      {...props}
-                      style={{
-                        ...props.style,
-                        height: "6px",
-                        width: "100%",
-                        backgroundColor: "#ccc"
-                      }}
-                    >
-                      {children}
-                    </div>;
-                  }}
-                  renderThumb={({ props }) => (
-                    <div
-                      {...props}
-                      style={{
-                        ...props.style,
-                        height: "15px",
-                        width: "15px",
-                        borderRadius: "9999px",
-                        backgroundColor: "#485fc7"
-                      }}
-                    />
-                  )}/>
+                />
               </td>
             </tr>
           </tbody>
@@ -120,7 +96,7 @@ export default () => {
       },
       ...envmaps.map(envmap => ({
         name: envmap.name,
-        link: `https://polyhaven.com/a/${/(\w+)_1k.hdr$/.exec(envmap.path)[1]}`,
+        link: `https://polyhaven.com/a/${/(\w+)_1k.hdr$/.exec(envmap.path)![1]}`,
         author: "Poly Haven",
         authorLink: "https://polyhaven.com/",
         license: "CC0"

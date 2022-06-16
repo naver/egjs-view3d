@@ -8,6 +8,8 @@ import Pose from "../core/Pose";
 import { INPUT_TYPE } from "../const/external";
 import WebARSession from "../xr/WebARSession";
 
+import { ValueOf } from "./utils";
+
 /**
  * An event that fires when View3D is initialized.
  * This will be called once after the first 3D model is loaded.
@@ -169,7 +171,7 @@ export interface LoadProgressEvent {
 }
 
 /**
- * An event that fires on the start of every inputs
+ * An event that fires at the start of every inputs
  * @event View3D#inputStart
  * @type {object}
  * @property {string} type A type of the event.
@@ -179,11 +181,11 @@ export interface LoadProgressEvent {
 export interface InputStartEvent {
   type: string;
   target: View3D;
-  inputType: INPUT_TYPE;
+  inputType: ValueOf<typeof INPUT_TYPE>;
 }
 
 /**
- * An event that fires on the end of every inputs
+ * An event that fires at the end of every inputs
  * @event View3D#inputEnd
  * @type {object}
  * @property {string} type A type of the event.
@@ -193,11 +195,11 @@ export interface InputStartEvent {
 export interface InputEndEvent {
   type: string;
   target: View3D;
-  inputType: INPUT_TYPE;
+  inputType: ValueOf<typeof INPUT_TYPE>;
 }
 
 /**
- * An event that fires on camera movement
+ * An event that fires on every camera movement
  * @event View3D#cameraChange
  * @type {object}
  * @property {string} type A type of the event.

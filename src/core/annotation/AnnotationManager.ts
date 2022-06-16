@@ -205,8 +205,7 @@ class AnnotationManager {
     if (!model) return;
 
     const camera = view3D.camera;
-    const threeRenderer = view3D.renderer.threeRenderer;
-    const screenSize = threeRenderer.getSize(new THREE.Vector2());
+    const screenSize = view3D.renderer.canvasSize;
     const halfScreenSize = screenSize.clone().multiplyScalar(0.5);
     const threeCamera = camera.threeCamera;
     const camPos = threeCamera.position;

@@ -140,10 +140,11 @@ class Camera {
   public set pitch(val: number) { this._newPose.pitch = val; }
   public set zoom(val: number) { this._newPose.zoom = val; }
   public set pivot(val: THREE.Vector3) { this._newPose.pivot.copy(val); }
+  public set baseFov(val: number) { this._baseFov = val; }
 
   /**
    * Create new Camera instance
-   * @param canvas \<canvas\> element to render 3d model
+   * @param {View3D} view3D An instance of View3D
    */
   public constructor(view3D: View3D) {
     this._view3D = view3D;
@@ -312,6 +313,8 @@ class Camera {
       const newFov = toDegree(2 * Math.atan(newViewHeight / (2 * camDist)));
 
       defaultPose.zoom = baseFov - newFov;
+    } else {
+      defaultPose.zoom = view3D.initialZoom;
     }
   }
 

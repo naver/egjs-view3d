@@ -98,6 +98,7 @@ export const EASING = {
  * @property {"selected"} ANNOTATION_SELECTED A class name for selected annotation element
  * @property {"flip-x"} ANNOTATION_FLIP_X A class name for annotation element which has tooltip on the left side
  * @property {"flip-y"} ANNOTATION_FLIP_Y A class name for annotation element which has tooltip on the bottom side
+ * @property {"ctx-lost"} CTX_LOST A class name for canvas element which will be added on context lost
  */
 export const DEFAULT_CLASS = {
   POSTER: "view3d-poster",
@@ -108,7 +109,8 @@ export const DEFAULT_CLASS = {
   ANNOTATION_DEFAULT: "default",
   ANNOTATION_SELECTED: "selected",
   ANNOTATION_FLIP_X: "flip-x",
-  ANNOTATION_FLIP_Y: "flip-y"
+  ANNOTATION_FLIP_Y: "flip-y",
+  CTX_LOST: "ctx-lost"
 } as const;
 
 /**
@@ -206,8 +208,8 @@ export const QUICK_LOOK_CUSTOM_BANNER_SIZE = {
  * @property {1} TRANSLATE Translate input
  * @property {2} ZOOM Zoom input
  */
-export enum INPUT_TYPE {
-  ROTATE,
-  TRANSLATE,
-  ZOOM
-}
+export const INPUT_TYPE = {
+  ROTATE: 0,
+  TRANSLATE: 1,
+  ZOOM: 2
+} as const;

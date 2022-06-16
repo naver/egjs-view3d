@@ -49,8 +49,8 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
   private _yMotion: Motion;
   private _screenScale: THREE.Vector2 = new THREE.Vector2(0, 0);
   private _prevPos: THREE.Vector2 = new THREE.Vector2(0, 0);
-  private _isFirstTouch: boolean;
-  private _isScrolling: boolean;
+  private _isFirstTouch: boolean = false;
+  private _isScrolling: boolean = false;
   private _enabled: boolean = false;
 
   /**
@@ -135,8 +135,6 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
     this._disablePitch = disablePitch;
     this._disableYaw = disableYaw;
 
-    this._isFirstTouch = false;
-    this._isScrolling = false;
     this._xMotion = new Motion({ duration, range: DEFAULT.INFINITE_RANGE, easing });
     this._yMotion = new Motion({ duration, range: DEFAULT.PITCH_RANGE, easing });
   }
@@ -147,7 +145,17 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
    */
   public destroy(): void {
     this.disable();
+    this.reset();
     this.off();
+  }
+
+  /**
+   * Reset internal values
+   * @returns {void}
+   */
+  public reset(): void {
+    this._isFirstTouch = false;
+    this._isScrolling = false;
   }
 
   /**

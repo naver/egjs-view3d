@@ -1,23 +1,20 @@
 import React from "react";
 import { Model } from "../../../../src";
 
-import Playground from "../../pages/Playground";
-
-// @ts-ignore
 import styles from "./model-info.module.css";
+import { Context } from "./context";
+
 import RightArrowIcon from "../../../static/icon/arrow_right_white.svg";
 
 
-class ModelInfo extends React.Component<{
-  playground: Playground;
-}> {
+class ModelInfo extends React.Component {
   public render() {
-    const { playground } = this.props;
-    const originalModel = playground.originalModel;
+    const { state } = this.context;
+    const originalModel = state.originalModel;
     if (!originalModel) return <></>;
 
-    const simplifiedModel = playground.view3D.model !== originalModel
-      ? playground.view3D.model
+    const simplifiedModel = state.view3D.model !== originalModel
+      ? state.view3D.model
       : null;
 
     return <div className={styles.modelInfo}>
@@ -55,5 +52,7 @@ class ModelInfo extends React.Component<{
     }, 0);
   }
 }
+
+ModelInfo.contextType = Context;
 
 export default ModelInfo;

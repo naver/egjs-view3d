@@ -56,6 +56,17 @@ abstract class Annotation {
    */
   public get renderable() { return !!this._element; }
   /**
+   * An array of values in order of [yaw, pitch, zoom]
+   * @type {number[]}
+   * @readonly
+   */
+  public get focusPose() { return this._focus; }
+  /**
+   * Duration of the focus animation
+   * @type {number}
+   */
+  public get focusDuration() { return this._focusDuration; }
+  /**
    * Base fov value that annotation is referencing
    * @type {number}
    */
@@ -71,6 +82,7 @@ abstract class Annotation {
    */
   public get aspect() { return this._aspect; }
 
+  public set focusDuration(val: number) { this._focusDuration = val; }
   public set baseFov(val: number) { this._baseFov = val; }
   public set baseDistance(val: number | null) { this._baseDistance = val; }
   public set aspect(val: number) { this._aspect = val; }

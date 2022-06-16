@@ -7,7 +7,8 @@ import * as THREE from "three";
 
 import View3D from "../View3D";
 import { checkHalfFloatAvailable, findCanvas } from "../utils";
-import { EVENTS } from "../const/external";
+import * as BROWSER from "../const/browser";
+import { DEFAULT_CLASS, EVENTS } from "../const/external";
 
 /**
  * Renderer that renders View3D's Scene
@@ -19,6 +20,7 @@ class Renderer {
   private _clock: THREE.Clock;
   private _halfFloatAvailable: boolean;
   private _renderQueued: boolean;
+  private _canvasSize: THREE.Vector2;
 
   /**
    * {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement HTMLCanvasElement} given when creating View3D instance
@@ -31,7 +33,7 @@ class Renderer {
    * @type WebGLRenderingContext
    * @readonly
    */
-  public get context() { return this._renderer.context; }
+  public get context() { return this._renderer.getContext(); }
   /**
    * Three.js {@link https://threejs.org/docs/#api/en/renderers/WebGLRenderer WebGLRenderer} instance
    * @type THREE.WebGLRenderer
@@ -45,17 +47,24 @@ class Renderer {
    */
   public get defaultRenderLoop() { return this._defaultRenderLoop; }
   /**
-   * The width and height of the renderer's output canvas
+   * The rendering width and height of the canvas
    * @type {object}
    * @param {number} width Width of the canvas
    * @param {number} height Height of the canvas
    * @readonly
    */
   public get size() {
-    const canvasSize = this._renderer.getSize(new THREE.Vector2());
+    const renderingSize = this._renderer.getSize(new THREE.Vector2());
 
-    return { width: canvasSize.width, height: canvasSize.y };
+    return { width: renderingSize.width, height: renderingSize.y };
   }
+
+  /**
+   * Canvas element's actual size
+   * @type THREE.Vector2
+   * @readonly
+   */
+  public get canvasSize() { return this._canvasSize; }
 
   /**
    * An object containing details about the capabilities of the current RenderingContext.
@@ -72,15 +81,17 @@ class Renderer {
 
   /**
    * Create new Renderer instance
-   * @param canvas \<canvas\> element to render 3d model
+   * @param {View3D} view3D An instance of View3D
    */
   public constructor(view3D: View3D) {
+    const canvas = findCanvas(view3D.rootEl, view3D.canvasSelector);
+
+    this._canvas = canvas;
     this._view3D = view3D;
-    this._canvas = findCanvas(view3D.rootEl, view3D.canvasSelector);
     this._renderQueued = false;
 
     const renderer = new THREE.WebGLRenderer({
-      canvas: this._canvas,
+      canvas,
       alpha: true,
       antialias: true,
       preserveDrawingBuffer: true
@@ -94,6 +105,23 @@ class Renderer {
     this._halfFloatAvailable = checkHalfFloatAvailable(renderer);
     this._renderer = renderer;
     this._clock = new THREE.Clock(false);
+    this._canvasSize = new THREE.Vector2();
+
+    canvas.addEventListener(BROWSER.EVENTS.CONTEXT_LOST, this._onContextLost);
+    canvas.addEventListener(BROWSER.EVENTS.CONTEXT_RESTORED, this._onContextRestore);
+  }
+
+  /**
+   * Destroy the renderer and stop active animation loop
+   */
+  public destroy() {
+    const canvas = this._canvas;
+
+    this.stopAnimationLoop();
+    this._renderer.dispose();
+
+    canvas.removeEventListener(BROWSER.EVENTS.CONTEXT_LOST, this._onContextLost);
+    canvas.removeEventListener(BROWSER.EVENTS.CONTEXT_RESTORED, this._onContextRestore);
   }
 
   /**
@@ -106,8 +134,12 @@ class Renderer {
 
     if (renderer.xr.isPresenting) return;
 
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+
     renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+    renderer.setSize(width, height, false);
+    this._canvasSize.set(width, height);
   }
 
   public setAnimationLoop(callback: (delta: number, frame?: THREE.XRFrame) => void): void {
@@ -170,6 +202,8 @@ class Renderer {
       annotation
     } = view3D;
 
+    if (threeRenderer.getContext().isContextLost()) return;
+
     const deltaMiliSec = delta * 1000;
 
     this._renderQueued = false;
@@ -198,6 +232,20 @@ class Renderer {
       delta: deltaMiliSec
     });
   }
+
+  private _onContextLost = () => {
+    const canvas = this._canvas;
+    canvas.classList.add(DEFAULT_CLASS.CTX_LOST);
+  };
+
+  private _onContextRestore = () => {
+    const canvas = this._canvas;
+    const scene = this._view3D.scene;
+
+    canvas.classList.remove(DEFAULT_CLASS.CTX_LOST);
+    scene.initTextures();
+    this.renderSingleFrame();
+  };
 }
 
 export default Renderer;

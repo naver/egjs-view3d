@@ -19,10 +19,10 @@ export interface Range {
 }
 
 export interface ControlEvents {
-  hold: { inputType: INPUT_TYPE; isTouch: boolean };
-  release: { inputType: INPUT_TYPE; isTouch: boolean };
-  enable: { inputType: INPUT_TYPE };
-  disable: { inputType: INPUT_TYPE };
+  hold: { inputType: ValueOf<typeof INPUT_TYPE>; isTouch: boolean };
+  release: { inputType: ValueOf<typeof INPUT_TYPE>; isTouch: boolean };
+  enable: { inputType: ValueOf<typeof INPUT_TYPE> };
+  disable: { inputType: ValueOf<typeof INPUT_TYPE> };
 }
 
 export type TypedArray =
