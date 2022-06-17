@@ -2,7 +2,7 @@ import React from "react";
 import clsx from "clsx";
 import Swal from "sweetalert2";
 import * as THREE from "three";
-import VanillaView3D, { View3DOptions, ARButton, AROverlay, LoadingBar, View3DPlugin, LoadingBarOptions } from "../../../src";
+import VanillaView3D, { View3DOptions, ARButton, AROverlay, LoadingBar, ControlBar, View3DPlugin, LoadingBarOptions, ControlBarOptions } from "../../../src";
 import DownloadIcon from "../../static/icon/file_download_black.svg";
 
 import OptionExample from "./OptionExample";
@@ -13,6 +13,7 @@ interface DemoOptions extends Partial<View3DOptions> {
   clickToLoad: boolean;
   showARButton: boolean;
   showLoadingBar: LoadingBarOptions | null;
+  showControlBar: ControlBarOptions | null;
   showBbox: boolean;
   showExampleCode: boolean | string[];
   showEventsTriggered: null | string[];
@@ -27,6 +28,7 @@ class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivE
     clickToLoad: false,
     showARButton: false,
     showLoadingBar: null,
+    showControlBar: null,
     showBbox: false,
     showExampleCode: false,
     showEventsTriggered: null,
@@ -55,6 +57,7 @@ class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivE
       showBbox,
       showARButton,
       showLoadingBar,
+      showControlBar,
       showExampleCode,
       clickToLoad,
       ...restProps
@@ -68,6 +71,10 @@ class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivE
 
     if (showLoadingBar) {
       plugins.push(new LoadingBar(showLoadingBar));
+    }
+
+    if (showControlBar) {
+      plugins.push(new ControlBar(showControlBar));
     }
 
     const options = {
@@ -102,7 +109,19 @@ class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivE
 
   public render() {
     const { initialized } = this.state;
-    const { children, className, showExampleCode, clickToLoad, showEventsTriggered, style, ...restProps } = this.props;
+    const {
+      children,
+      className,
+      clickToLoad,
+      showBbox,
+      showARButton,
+      showLoadingBar,
+      showControlBar,
+      showExampleCode,
+      showEventsTriggered,
+      style,
+      ...restProps
+    } = this.props;
 
     const optionsToInclude = Array.isArray(showExampleCode) ? showExampleCode : [];
     const view3DOptions = Object.keys(restProps)

@@ -53,8 +53,8 @@ class LoadingBar implements View3DPlugin {
   private _overlay: HTMLElement | null;
 
   /**
-   * Create new instance of Spinner
-   * @param {LoadingBarOptions} [options={}] Options for the Spinner
+   * Create new instance of LoadingBar
+   * @param {LoadingBarOptions} [options={}] Options for the LoadingBar
    */
   public constructor(options: Partial<LoadingBarOptions> = {}) {
     this._options = options;
