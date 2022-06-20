@@ -99,6 +99,17 @@ export const EASING = {
  * @property {"flip-x"} ANNOTATION_FLIP_X A class name for annotation element which has tooltip on the left side
  * @property {"flip-y"} ANNOTATION_FLIP_Y A class name for annotation element which has tooltip on the bottom side
  * @property {"ctx-lost"} CTX_LOST A class name for canvas element which will be added on context lost
+ * @property {"view3d-lb-overlay"} LOADING_BAR_OVERLAY A class name for overlay element of LoadingBar plugin
+ * @property {"view3d-lb-wrapper"} LOADING_BAR_WRAPPER A class name for wrapper element of LoadingBar plugin
+ * @property {"view3d-lb-base"} LOADING_BAR_BASE A class name for progress bar base element of LoadingBar plugin
+ * @property {"view3d-lb-label"} LOADING_BAR_LABEL A class name for label element of LoadingBar plugin
+ * @property {"view3d-lb-filler"} LOADING_BAR_FILLER A class name for progress bar filler element  of LoadingBar plugin
+ * @property {"type-spinner"} LOADING_BAR_TYPE_SPINNER A class name for LoadingBar plugin when the type is "spinner"
+ * @property {"type-top"} LOADING_BAR_TYPE_TOP A class name for LoadingBar plugin when the type is "top"
+ * @property {"view3d-control-bar"} CONTROL_BAR_WRAPPER A class name for wrapper element of ControlBar plugin
+ * @property {"view3d-top-controls"} CONTROL_BAR_TOP A class name for controls wrapper element of ControlBar plugin that will be placed on the top inside the control bar
+ * @property {"view3d-left-controls"} CONTROL_BAR_LEFT A class name for controls wrapper element of ControlBar plugin that will be placed on the left inside the control bar
+ * @property {"view3d-right-controls"} CONTROL_BAR_RIGHT A class name for controls wrapper element of ControlBar plugin that will be placed on the right inside the control bar
  */
 export const DEFAULT_CLASS = {
   POSTER: "view3d-poster",
@@ -110,7 +121,18 @@ export const DEFAULT_CLASS = {
   ANNOTATION_SELECTED: "selected",
   ANNOTATION_FLIP_X: "flip-x",
   ANNOTATION_FLIP_Y: "flip-y",
-  CTX_LOST: "ctx-lost"
+  CTX_LOST: "ctx-lost",
+  LOADING_BAR_OVERLAY: "view3d-lb-overlay",
+  LOADING_BAR_WRAPPER: "view3d-lb-wrapper",
+  LOADING_BAR_BASE: "view3d-lb-base",
+  LOADING_BAR_LABEL: "view3d-lb-label",
+  LOADING_BAR_FILLER: "view3d-lb-filler",
+  LOADING_BAR_TYPE_SPINNER: "type-spinner",
+  LOADING_BAR_TYPE_TOP: "type-top",
+  CONTROL_BAR_WRAPPER: "view3d-control-bar",
+  CONTROL_BAR_TOP: "view3d-top-controls",
+  CONTROL_BAR_LEFT: "view3d-left-controls",
+  CONTROL_BAR_RIGHT: "view3d-right-controls"
 } as const;
 
 /**

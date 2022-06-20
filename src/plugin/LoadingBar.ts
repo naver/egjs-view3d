@@ -3,7 +3,7 @@
  * egjs projects are licensed under the MIT license
  */
 import View3D from "../View3D";
-import { EVENTS } from "../const/external";
+import { DEFAULT_CLASS, EVENTS } from "../const/external";
 import { LoadStartEvent } from "../type/event";
 import { ValueOf } from "../type/utils";
 
@@ -91,11 +91,11 @@ class LoadingBar implements View3DPlugin {
     const loadingBar = document.createElement("div");
     const loadingFiller = document.createElement("div");
 
-    loadingOverlay.classList.add("view3d-lb-overlay");
-    loadingWrapper.classList.add("view3d-lb-wrapper");
-    loadingBar.classList.add("view3d-lb-base");
-    loadingLabelEl.classList.add("view3d-lb-label");
-    loadingFiller.classList.add("view3d-lb-filler");
+    loadingOverlay.classList.add(DEFAULT_CLASS.LOADING_BAR_OVERLAY);
+    loadingWrapper.classList.add(DEFAULT_CLASS.LOADING_BAR_WRAPPER);
+    loadingBar.classList.add(DEFAULT_CLASS.LOADING_BAR_BASE);
+    loadingLabelEl.classList.add(DEFAULT_CLASS.LOADING_BAR_LABEL);
+    loadingFiller.classList.add(DEFAULT_CLASS.LOADING_BAR_FILLER);
 
     loadingOverlay.style.backgroundColor = overlayBackground;
     if (type !== LoadingBar.TYPE.SPINNER) {
@@ -103,7 +103,7 @@ class LoadingBar implements View3DPlugin {
       loadingBar.style.backgroundColor = barBackground;
       loadingFiller.style.backgroundColor = barForeground;
     } else {
-      loadingBar.classList.add("type-spinner");
+      loadingBar.classList.add(DEFAULT_CLASS.LOADING_BAR_TYPE_SPINNER);
       loadingBar.style.width = spinnerWidth;
       loadingBar.style.paddingTop = spinnerWidth;
       loadingFiller.style.borderWidth = barHeight;
@@ -112,7 +112,7 @@ class LoadingBar implements View3DPlugin {
     }
 
     if (type === LoadingBar.TYPE.TOP) {
-      loadingOverlay.classList.add("type-top");
+      loadingOverlay.classList.add(DEFAULT_CLASS.LOADING_BAR_TYPE_TOP);
     } else if (type === LoadingBar.TYPE.DEFAULT) {
       loadingBar.style.width = barWidth;
     }
