@@ -1,7 +1,7 @@
 import AnnotationManager from "./AnnotationManager";
 import Annotation, { AnnotationOptions } from "./Annotation";
-import PointAnnotation from "./PointAnnotation";
-import FaceAnnotation from "./FaceAnnotation";
+import PointAnnotation, { PointAnnotationOptions } from "./PointAnnotation";
+import FaceAnnotation, { FaceAnnotationOptions } from "./FaceAnnotation";
 
 export {
   Annotation,
@@ -11,5 +11,7 @@ export {
 };
 
 export type {
-  AnnotationOptions
+  AnnotationOptions,
+  PointAnnotationOptions,
+  FaceAnnotationOptions
 };

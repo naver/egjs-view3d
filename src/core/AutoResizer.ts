@@ -6,19 +6,29 @@
 import View3D from "../View3D";
 import * as BROWSER from "../const/browser";
 
+/**
+ * Automatic resizer that uses both ResizeObserver and window resize event
+ */
 class AutoResizer {
   private _view3d: View3D;
   private _enabled: boolean;
   private _resizeObserver: ResizeObserver | null;
 
+  /**
+   * Returns whether AutoResizer is enabled
+   */
   public get enabled() { return this._enabled; }
 
+  /** */
   public constructor(view3d: View3D) {
     this._view3d = view3d;
     this._enabled = false;
     this._resizeObserver = null;
   }
 
+  /**
+   * Enable resizer
+   */
   public enable(): this {
     const view3d = this._view3d;
 
@@ -47,6 +57,9 @@ class AutoResizer {
     return this;
   }
 
+  /**
+   * Disable resizer
+   */
   public disable(): this {
     if (!this._enabled) return this;
 

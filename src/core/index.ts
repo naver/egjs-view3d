@@ -14,7 +14,7 @@ import Motion from "./Motion";
 import Pose from "./Pose";
 import Renderer from "./Renderer";
 import Scene from "./Scene";
-import ShadowPlane from "./ShadowPlane";
+import ShadowPlane, { ShadowOptions } from "./ShadowPlane";
 import Skybox from "./Skybox";
 import View3DError from "./View3DError";
 
@@ -36,7 +36,8 @@ export {
 };
 
 export type {
-  AutoplayOptions
+  AutoplayOptions,
+  ShadowOptions
 };
 
 export * from "./annotation";

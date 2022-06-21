@@ -11,6 +11,7 @@ import { EVENTS } from "../const/external";
 abstract class Loader {
   protected _view3D: View3D;
 
+  /** */
   public constructor(view3D: View3D) {
     this._view3D = view3D;
   }

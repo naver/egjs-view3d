@@ -30,8 +30,7 @@ const plugins = [
   }),
   serve({
     open: true,
-    contentBase: ".",
-    openPage: "/test/manual/index.html"
+    contentBase: "."
   }),
   livereload(".")
 ];

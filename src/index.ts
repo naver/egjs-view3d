@@ -9,6 +9,7 @@ export * from "./core";
 export * from "./control";
 export * from "./loader";
 export * from "./plugin";
+export * from "./xr";
 export * from "./const/external";
 export * from "./helper";
 export * from "./type/event";
