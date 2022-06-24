@@ -226,8 +226,7 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
 
     if (this._isWheelScrolling && prevProgress < 1 && newProgress >= 1) {
       this.trigger(CONTROL_EVENTS.RELEASE, {
-        inputType: INPUT_TYPE.ZOOM,
-        isTouch: false
+        inputType: INPUT_TYPE.ZOOM
       });
       this._isWheelScrolling = false;
     }
@@ -331,8 +330,7 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
 
     if (!this._isWheelScrolling) {
       this.trigger(CONTROL_EVENTS.HOLD, {
-        inputType: INPUT_TYPE.ZOOM,
-        isTouch: false
+        inputType: INPUT_TYPE.ZOOM
       });
     }
     this._isWheelScrolling = true;
@@ -364,8 +362,7 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
 
     if (this._isFirstTouch) {
       this.trigger(CONTROL_EVENTS.HOLD, {
-        inputType: INPUT_TYPE.ZOOM,
-        isTouch: true
+        inputType: INPUT_TYPE.ZOOM
       });
     }
 
@@ -378,8 +375,7 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
     if (evt.touches.length !== 0) return;
 
     this.trigger(CONTROL_EVENTS.RELEASE, {
-      inputType: INPUT_TYPE.ZOOM,
-      isTouch: true
+      inputType: INPUT_TYPE.ZOOM
     });
 
     this._prevTouchDistance = -1;

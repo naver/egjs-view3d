@@ -50,7 +50,7 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
   private _screenScale: THREE.Vector2 = new THREE.Vector2(0, 0);
   private _prevPos: THREE.Vector2 = new THREE.Vector2(0, 0);
   private _isFirstTouch: boolean = false;
-  private _isScrolling: boolean = false;
+  private _scrolling: boolean = false;
   private _enabled: boolean = false;
 
   /**
@@ -155,7 +155,7 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
    */
   public reset(): void {
     this._isFirstTouch = false;
-    this._isScrolling = false;
+    this._scrolling = false;
   }
 
   /**
@@ -206,8 +206,8 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
 
     targetEl.addEventListener(BROWSER.EVENTS.MOUSE_DOWN, this._onMouseDown);
 
-    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_START, this._onTouchStart, { passive: true });
-    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove, { passive: this._view3D.scrollable });
+    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_START, this._onTouchStart, { passive: false });
+    targetEl.addEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove, { passive: false });
     targetEl.addEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd);
 
     this._enabled = true;
@@ -228,8 +228,8 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
     const targetEl = this._view3D.renderer.canvas;
 
     targetEl.removeEventListener(BROWSER.EVENTS.MOUSE_DOWN, this._onMouseDown);
-    window.removeEventListener(BROWSER.EVENTS.MOUSE_MOVE, this._onMouseMove);
-    window.removeEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp);
+    window.removeEventListener(BROWSER.EVENTS.MOUSE_MOVE, this._onMouseMove, false);
+    window.removeEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
 
     targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_START, this._onTouchStart);
     targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove);
@@ -270,8 +270,7 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
     window.addEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
 
     this.trigger(CONTROL_EVENTS.HOLD, {
-      inputType: INPUT_TYPE.ROTATE,
-      isTouch: false
+      inputType: INPUT_TYPE.ROTATE
     });
   };
 
@@ -297,8 +296,7 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
     window.removeEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
 
     this.trigger(CONTROL_EVENTS.RELEASE, {
-      inputType: INPUT_TYPE.ROTATE,
-      isTouch: false
+      inputType: INPUT_TYPE.ROTATE
     });
   };
 
@@ -309,14 +307,13 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
     this._prevPos.set(touch.clientX, touch.clientY);
 
     this.trigger(CONTROL_EVENTS.HOLD, {
-      inputType: INPUT_TYPE.ROTATE,
-      isTouch: true
+      inputType: INPUT_TYPE.ROTATE
     });
   };
 
   private _onTouchMove = (evt: TouchEvent) => {
     // Only the one finger motion should be considered
-    if (evt.touches.length > 1 || this._isScrolling) return;
+    if (evt.touches.length > 1 || this._scrolling || !evt.cancelable) return;
 
     const touch = evt.touches[0];
     const scrollable = this._view3D.scrollable;
@@ -328,7 +325,7 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
 
         if (Math.abs(delta.y) > Math.abs(delta.x)) {
           // Assume Scrolling
-          this._isScrolling = true;
+          this._scrolling = true;
           return;
         }
       }
@@ -336,10 +333,7 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
       this._isFirstTouch = false;
     }
 
-    if (!scrollable && evt.cancelable) {
-      evt.preventDefault();
-    }
-
+    evt.preventDefault();
     evt.stopPropagation();
 
     const prevPos = this._prevPos;
@@ -362,12 +356,11 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
     } else {
       this._prevPos.set(0, 0);
       this.trigger(CONTROL_EVENTS.RELEASE, {
-        inputType: INPUT_TYPE.ROTATE,
-        isTouch: true
+        inputType: INPUT_TYPE.ROTATE
       });
     }
 
-    this._isScrolling = false;
+    this._scrolling = false;
   };
 }
 

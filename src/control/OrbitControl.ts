@@ -243,10 +243,10 @@ class OrbitControl {
     }
   };
 
-  private _onHold = ({ inputType, isTouch }: ControlEvents["hold"]) => {
+  private _onHold = ({ inputType }: ControlEvents["hold"]) => {
     const view3D = this._view3D;
 
-    if (inputType !== INPUT_TYPE.ZOOM && !isTouch) {
+    if (inputType !== INPUT_TYPE.ZOOM) {
       const grabCursorEnabled = view3D.useGrabCursor
         && (this._rotateControl.enabled || this._translateControl.enabled);
 
@@ -262,10 +262,10 @@ class OrbitControl {
     });
   };
 
-  private _onRelease = ({ inputType, isTouch }: ControlEvents["release"]) => {
+  private _onRelease = ({ inputType }: ControlEvents["release"]) => {
     const view3D = this._view3D;
 
-    if (inputType !== INPUT_TYPE.ZOOM && !isTouch) {
+    if (inputType !== INPUT_TYPE.ZOOM) {
       const grabCursorEnabled = view3D.useGrabCursor
         && (this._rotateControl.enabled || this._translateControl.enabled);
 

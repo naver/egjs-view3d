@@ -5,6 +5,7 @@
 import View3D from "../View3D";
 import ARIcon from "../asset/ar-icon";
 import { EVENTS } from "../const/external";
+import * as BROWSER from "../const/browser";
 
 import View3DPlugin from "./View3DPlugin";
 
@@ -70,8 +71,8 @@ class ARButton implements View3DPlugin {
     } = this._options;
     const arAvailable = await view3D.ar.isAvailable();
 
-    const button = document.createElement("button");
-    const tooltip = document.createElement("div");
+    const button = document.createElement(BROWSER.EL_BUTTON);
+    const tooltip = document.createElement(BROWSER.EL_DIV);
     const tooltipText = document.createTextNode(arAvailable ? availableText : unavailableText);
 
     button.classList.add(buttonClass);

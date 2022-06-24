@@ -22,6 +22,11 @@ export const EVENTS = {
   CONTEXT_MENU: "contextmenu",
   MOUSE_ENTER: "mouseenter",
   MOUSE_LEAVE: "mouseleave",
+  POINTER_DOWN: "pointerdown",
+  POINTER_MOVE: "pointermove",
+  POINTER_UP: "pointerup",
+  POINTER_ENTER: "pointerenter",
+  POINTER_LEAVE: "pointerleave",
   LOAD: "load",
   ERROR: "error",
   CLICK: "click",
@@ -44,3 +49,6 @@ export enum MOUSE_BUTTON {
 
 export const MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER  || 9007199254740991;
 export const ANONYMOUS = "anonymous";
+
+export const EL_DIV = "div";
+export const EL_BUTTON = "button";

@@ -2,8 +2,10 @@
  * Copyright (c) 2020 NAVER Corp.
  * egjs projects are licensed under the MIT license
  */
+/* eslint-disable @typescript-eslint/naming-convention */
 import View3D from "../View3D";
-import { DEFAULT_CLASS, EVENTS } from "../const/external";
+import { EVENTS } from "../const/external";
+import * as BROWSER from "../const/browser";
 import { LoadStartEvent } from "../type/event";
 import { ValueOf } from "../type/utils";
 
@@ -13,6 +15,7 @@ import View3DPlugin from "./View3DPlugin";
  * Options for the {@link LoadingBar}
  * @interface
  * @param {string} [type="default"] A type(style) of the loading bar.
+ * @param {object} [className=LoadingBar.DEFAULT_CLASS] Class names of the loading bar elements.
  * @param {string} [loadingLabel="Loading 3D Model..."] A text to display while loading 3D model.
  * @param {string} [parsingLabel="Parsing 3D Model..."] A text to display while parsing the model after loading is done.
  * @param {string} [labelColor="#ffffff"] A text color in CSS string.
@@ -25,6 +28,7 @@ import View3DPlugin from "./View3DPlugin";
  */
 export interface LoadingBarOptions {
   type: ValueOf<typeof LoadingBar.TYPE>;
+  className: Partial<{ -readonly [key in keyof typeof LoadingBar.DEFAULT_CLASS]: string }>;
   loadingLabel: string;
   parsingLabel: string;
   labelColor: string;
@@ -40,6 +44,27 @@ export interface LoadingBarOptions {
  * A plugin that displays loading bar while
  */
 class LoadingBar implements View3DPlugin {
+  /**
+   * Default class names that LoadingBar uses
+   * @type {object}
+   * @property {"view3d-lb-overlay"} OVERLAY A class name for overlay element of LoadingBar plugin
+   * @property {"view3d-lb-wrapper"} WRAPPER A class name for wrapper element of LoadingBar plugin
+   * @property {"view3d-lb-base"} BASE A class name for progress bar base element of LoadingBar plugin
+   * @property {"view3d-lb-label"} LABEL A class name for label element of LoadingBar plugin
+   * @property {"view3d-lb-filler"} FILLER A class name for progress bar filler element  of LoadingBar plugin
+   * @property {"is-spinner"} TYPE_SPINNER A class name for LoadingBar plugin when the type is "spinner"
+   * @property {"is-top"} TYPE_TOP A class name for LoadingBar plugin when the type is "top"
+   */
+  public static readonly DEFAULT_CLASS = {
+    OVERLAY: "view3d-lb-overlay",
+    WRAPPER: "view3d-lb-wrapper",
+    BASE: "view3d-lb-base",
+    LABEL: "view3d-lb-label",
+    FILLER: "view3d-lb-filler",
+    TYPE_SPINNER: "is-spinner",
+    TYPE_TOP: "is-top"
+  } as const;
+
   /**
    * Available styles of loading bar
    */
@@ -73,7 +98,7 @@ class LoadingBar implements View3DPlugin {
     if (level !== 0) return;
 
     const {
-      type = "default",
+      type = LoadingBar.TYPE.DEFAULT,
       loadingLabel = "Loading 3D Model...",
       parsingLabel = "Parsing 3D Model...",
       labelColor = "#ffffff",
@@ -85,17 +110,22 @@ class LoadingBar implements View3DPlugin {
       overlayBackground = "rgba(0, 0, 0, 0.3)"
     } = this._options;
 
-    const loadingOverlay = document.createElement("div");
-    const loadingWrapper = document.createElement("div");
-    const loadingLabelEl = document.createElement("div");
-    const loadingBar = document.createElement("div");
-    const loadingFiller = document.createElement("div");
+    const loadingOverlay = document.createElement(BROWSER.EL_DIV);
+    const loadingWrapper = document.createElement(BROWSER.EL_DIV);
+    const loadingLabelEl = document.createElement(BROWSER.EL_DIV);
+    const loadingBar = document.createElement(BROWSER.EL_DIV);
+    const loadingFiller = document.createElement(BROWSER.EL_DIV);
 
-    loadingOverlay.classList.add(DEFAULT_CLASS.LOADING_BAR_OVERLAY);
-    loadingWrapper.classList.add(DEFAULT_CLASS.LOADING_BAR_WRAPPER);
-    loadingBar.classList.add(DEFAULT_CLASS.LOADING_BAR_BASE);
-    loadingLabelEl.classList.add(DEFAULT_CLASS.LOADING_BAR_LABEL);
-    loadingFiller.classList.add(DEFAULT_CLASS.LOADING_BAR_FILLER);
+    const className = {
+      ...this._options.className,
+      ...LoadingBar.DEFAULT_CLASS
+    };
+
+    loadingOverlay.classList.add(className.OVERLAY);
+    loadingWrapper.classList.add(className.WRAPPER);
+    loadingBar.classList.add(className.BASE);
+    loadingLabelEl.classList.add(className.LABEL);
+    loadingFiller.classList.add(className.FILLER);
 
     loadingOverlay.style.backgroundColor = overlayBackground;
     if (type !== LoadingBar.TYPE.SPINNER) {
@@ -103,7 +133,7 @@ class LoadingBar implements View3DPlugin {
       loadingBar.style.backgroundColor = barBackground;
       loadingFiller.style.backgroundColor = barForeground;
     } else {
-      loadingBar.classList.add(DEFAULT_CLASS.LOADING_BAR_TYPE_SPINNER);
+      loadingBar.classList.add(className.TYPE_SPINNER);
       loadingBar.style.width = spinnerWidth;
       loadingBar.style.paddingTop = spinnerWidth;
       loadingFiller.style.borderWidth = barHeight;
@@ -112,7 +142,7 @@ class LoadingBar implements View3DPlugin {
     }
 
     if (type === LoadingBar.TYPE.TOP) {
-      loadingOverlay.classList.add(DEFAULT_CLASS.LOADING_BAR_TYPE_TOP);
+      loadingOverlay.classList.add(className.TYPE_TOP);
     } else if (type === LoadingBar.TYPE.DEFAULT) {
       loadingBar.style.width = barWidth;
     }

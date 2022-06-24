@@ -55,7 +55,7 @@ class ModelAnimator {
    * @see {@link https://threejs.org/docs/#api/en/animation/AnimationClip AnimationClip}
    * @type {THREE.AnimationClip | null}
    */
-  public get activeAnimation() { return this._clips[this._activeAnimationIdx] ?? null; }
+  public get activeAnimation() { return (this._clips[this._activeAnimationIdx] ?? null) as THREE.AnimationClip | null; }
 
   /**
    * An index of the animation currently playing.
