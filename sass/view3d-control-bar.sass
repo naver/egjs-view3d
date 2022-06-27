@@ -1,9 +1,14 @@
 :root
-  --view3d-cb-color: #87be6f
+  --view3d-cb-primary: #ffffff
+  --view3d-cb-bg: rgba(0, 0, 0, 0.3)
+  --view3d-cb-track: rgba(230, 230, 230, 0.4)
+  --view3d-cb-knob-bg: rgba(30, 30, 30, 0.4)
+  --view3d-cb-knob-text: rgba(255, 255, 255, 0.8)
 
 .view3d-control-bar
   position: absolute
-  left: 12px
+  padding: 14px 12px 8px 12px
+  left: 0
   bottom: 0
   width: calc(100% - 24px)
   box-sizing: border-box
@@ -11,27 +16,43 @@
   flex-direction: column
   user-select: none
   -webkit-user-drag: none
+  font-size: 16px
+
+.view3d-controls-gradient
+  width: 100%
+  height: 150%
+  position: absolute
+  left: 0
+  bottom: 0
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0) 100%)
 
 .view3d-side-controls
   display: flex
   flex-direction: row
-  height: 48px
+  height: 32px
+  position: relative
 
 .view3d-left-controls
   display: flex
   flex: 1
   white-space: nowrap
-  overflow: hidden
   text-overflow: ellipsis
 
-.view3d-control-button
+.view3d-control-item
   display: inline-block
   background-color: transparent
   cursor: pointer
   border: 0
   padding: 0
   margin: 0
-  fill: var(--view3d-cb-color)
+  height: 100%
+  position: relative
+  fill: var(--view3d-cb-primary)
+  > svg
+    width: 32px
+    height: 32px
+  &:not(:first-child)
+    margin-left: 1em
 
 .view3d-progress-bar
   flex: 1
@@ -47,7 +68,7 @@
   position: absolute
   top: 5px
   left: 0
-  background-color: rgba(230, 230, 230, 0.4)
+  background-color: var(--view3d-cb-track)
 
 .view3d-progress-filler
   position: absolute
@@ -55,7 +76,7 @@
   top: 0
   width: 0
   height: 100%
-  background-color: var(--view3d-cb-color)
+  background-color: var(--view3d-cb-primary)
 
 .view3d-progress-knob
   width: 13px
@@ -64,10 +85,7 @@
   top: -5px
   left: -6.5px
   border-radius: 50%
-  background-color: white
-  border-width: 4px
-  border-style: solid
-  border-color: var(--view3d-cb-color)
+  background-color: var(--view3d-cb-primary)
   box-sizing: border-box
   &::before
     content: attr(data-time)
@@ -76,14 +94,63 @@
     font-size: 12px
     display: inline-block
     position: absolute
-    top: -35px
+    top: -45px
     left: 50%
     transform: translateX(-50%)
-    background-color: rgba(30, 30, 30, 0.4)
+    background-color: var(--view3d-cb-knob-bg)
     padding: 4px 8px
     border-radius: 5px
-    color: rgba(255, 255, 255, 0.8)
+    color: var(--view3d-cb-knob-text)
     box-sizing: border-box
   &.time-visible
     &::before
       opacity: 1
+
+.view3d-animation-name
+  display: inline-flex
+  align-items: center
+  height: 100%
+  color: var(--view3d-cb-primary)
+  padding-right: 12px
+  position: relative
+  &::after
+    content: ""
+    display: inline-block
+    width: 0
+    height: 0
+    border: 4px solid transparent
+    border-top: 4px solid var(--view3d-cb-primary)
+    position: absolute
+    top: 50%
+    right: 0px
+
+.view3d-animation-list
+  position: absolute
+  left: 0
+  bottom: 100%
+  background-color: rgba(0, 0, 0, 0.3)
+  padding: 0.5em
+  display: none
+  border-radius: 5px
+  &.visible
+    display: block
+
+.view3d-animation-item
+  height: 100%
+  color: var(--view3d-cb-primary)
+  padding: 0 1em
+  position: relative
+  border-radius: 5px
+  &.selected
+    font-weight: bold
+    &::before
+      position: absolute
+      left: 6px
+      top: calc(50% - 2px)
+      content: ""
+      width: 4px
+      height: 4px
+      border-radius: 50%
+      background-color: var(--view3d-cb-primary)
+  &:hover
+    background-color: rgba(255, 255, 255, 0.3)

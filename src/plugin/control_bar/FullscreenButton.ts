@@ -1,20 +1,18 @@
 import View3D from "../../View3D";
-import { EVENTS } from "../../const/external";
 import * as BROWSER from "../../const/browser";
-import PlayIcon from "../../asset/play-icon";
-import PauseIcon from "../../asset/pause-icon";
+import FullscreenIcon from "../../asset/fullscreeen-icon";
 
 import ControlBar from "./ControlBar";
 import ControlBarItem from "./ControlBarItem";
 
-export interface PlayButtonOptions {
+export interface FullscreenButtonOptions {
   position: ControlBarItem["position"];
   order: ControlBarItem["order"];
 }
 
-class PlayButton implements ControlBarItem {
-  public position: PlayButtonOptions["position"];
-  public order: PlayButtonOptions["order"];
+class FullscreenButton implements ControlBarItem {
+  public position: FullscreenButtonOptions["position"];
+  public order: FullscreenButtonOptions["order"];
 
   public get element() { return this._element; }
   public get enabled() { return this._enabled; }
@@ -22,25 +20,22 @@ class PlayButton implements ControlBarItem {
   private _view3D: View3D;
   private _element: HTMLElement;
   private _enabled: boolean;
-  private _paused: boolean;
 
   public constructor(view3D: View3D, controlBar: ControlBar, {
-    position = ControlBar.POSITION.LEFT,
+    position = ControlBar.POSITION.RIGHT,
     order = 9999
-  }: Partial<PlayButtonOptions> = {}) {
+  }: Partial<FullscreenButtonOptions> = {}) {
     this.position = position;
     this.order = order;
 
     this._view3D = view3D;
     this._element = this._createButton(controlBar);
     this._enabled = false;
-    this._paused = true;
   }
 
   public enable() {
     if (this._enabled) return;
 
-    this._view3D.on(EVENTS.RENDER, this._updateIcon);
     this._element.addEventListener(BROWSER.EVENTS.CLICK, this._onClick);
     this._enabled = true;
   }
@@ -48,33 +43,18 @@ class PlayButton implements ControlBarItem {
   public disable() {
     if (!this._enabled) return;
 
-    this._view3D.off(EVENTS.RENDER, this._updateIcon);
     this._element.removeEventListener(BROWSER.EVENTS.CLICK, this._onClick);
     this._enabled = false;
   }
 
-  private _updateIcon = () => {
-    const view3D = this._view3D;
-
-    if (view3D.animator.paused !== this._paused) {
-      this._paused = view3D.animator.paused;
-
-      this._element.innerHTML = this._paused
-        ? PlayIcon
-        : PauseIcon;
-    }
-  };
-
   private _onClick = () => {
-    const animator = this._view3D.animator;
+    const root = this._view3D.rootEl;
 
-    if (animator.paused) {
-      animator.resume();
+    if (document.fullscreenElement) {
+      void document.exitFullscreen();
     } else {
-      animator.pause();
+      void root.requestFullscreen();
     }
-
-    this._updateIcon();
   };
 
   private _createButton(controlBar: ControlBar) {
@@ -85,10 +65,10 @@ class PlayButton implements ControlBarItem {
     };
 
     root.classList.add(className.CONTROLS_ITEM);
-    root.innerHTML = PlayIcon;
+    root.innerHTML = FullscreenIcon;
 
     return root;
   }
 }
 
-export default PlayButton;
+export default FullscreenButton;

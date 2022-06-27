@@ -12,6 +12,8 @@ import { getObjectOption } from "../../utils";
 import ControlBarItem from "./ControlBarItem";
 import AnimationProgressBar, { AnimationProgressBarOptions } from "./AnimationProgressBar";
 import PlayButton, { PlayButtonOptions } from "./PlayButton";
+import AnimationSelector, { AnimationSelectorOptions } from "./AnimationSelector";
+import FullscreenButton, { FullscreenButtonOptions } from "./FullscreenButton";
 
 export interface ControlBarOptions {
   autoHide: boolean | {
@@ -21,6 +23,8 @@ export interface ControlBarOptions {
   className: Partial<{ -readonly [key in keyof typeof ControlBar.DEFAULT_CLASS]: string }>;
   progressBar: boolean | Partial<AnimationProgressBarOptions>;
   playButton: boolean | Partial<PlayButtonOptions>;
+  animationSelector: boolean | Partial<AnimationSelectorOptions>;
+  fullscreen: boolean | Partial<FullscreenButtonOptions>;
 }
 
 class ControlBar implements View3DPlugin {
@@ -35,16 +39,21 @@ class ControlBar implements View3DPlugin {
    */
   public static readonly DEFAULT_CLASS = {
     ROOT: "view3d-control-bar",
+    VISIBLE: "visible",
+    CONTROLS_GRADIENT: "view3d-controls-gradient",
     CONTROLS_SIDE: "view3d-side-controls",
     CONTROLS_TOP: "view3d-top-controls",
     CONTROLS_LEFT: "view3d-left-controls",
     CONTROLS_RIGHT: "view3d-right-controls",
-    CONTROLS_BUTTON: "view3d-control-button",
+    CONTROLS_ITEM: "view3d-control-item",
     PROGRESS_ROOT: "view3d-progress-bar",
     PROGRESS_TRACK: "view3d-progress-track",
     PROGRESS_KNOB: "view3d-progress-knob",
     PROGRESS_FILLER: "view3d-progress-filler",
-    PROGRESS_TIME_VISIBLE: "time-visible"
+    ANIMATION_NAME: "view3d-animation-name",
+    ANIMATION_LIST: "view3d-animation-list",
+    ANIMATION_ITEM: "view3d-animation-item",
+    ANIMATION_SELECTED: "selected"
   } as const;
 
   public static readonly POSITION = {
@@ -57,6 +66,8 @@ class ControlBar implements View3DPlugin {
   public className: ControlBarOptions["className"];
   public progressBar: ControlBarOptions["progressBar"];
   public playButton: ControlBarOptions["playButton"];
+  public animationSelector: ControlBarOptions["animationSelector"];
+  public fullscreen: ControlBarOptions["fullscreen"];
 
   private _wrapperEl: HTMLElement;
   private _topControlsWrapper: HTMLElement;
@@ -68,12 +79,16 @@ class ControlBar implements View3DPlugin {
     autoHide = true,
     className = {},
     progressBar = true,
-    playButton = true
+    playButton = true,
+    animationSelector = true,
+    fullscreen = true
   }: Partial<ControlBarOptions> = {}) {
     this.autoHide = autoHide;
     this.className = className;
     this.progressBar = progressBar;
     this.playButton = playButton;
+    this.animationSelector = animationSelector;
+    this.fullscreen = fullscreen;
 
     this._items = [];
     this._initElements();
@@ -113,6 +128,10 @@ class ControlBar implements View3DPlugin {
     const wrapperEl = document.createElement(BROWSER.EL_DIV);
     wrapperEl.classList.add(className.ROOT);
     this._wrapperEl = wrapperEl;
+
+    const gradientEl = document.createElement(BROWSER.EL_DIV);
+    gradientEl.classList.add(className.CONTROLS_GRADIENT);
+    wrapperEl.appendChild(gradientEl);
 
     const topControlsWrapper = document.createElement(BROWSER.EL_DIV);
     const sideControlsWrapper = document.createElement(BROWSER.EL_DIV);
@@ -203,6 +222,14 @@ class ControlBar implements View3DPlugin {
 
     if (this.playButton) {
       items.push(new PlayButton(view3D, this, getObjectOption(this.playButton)));
+    }
+
+    if (this.animationSelector) {
+      items.push(new AnimationSelector(view3D, this, getObjectOption(this.animationSelector)));
+    }
+
+    if (this.fullscreen) {
+      items.push(new FullscreenButton(view3D, this, getObjectOption(this.fullscreen)));
     }
 
     return items;

@@ -3,7 +3,6 @@ import * as THREE from "three";
 import View3D from "../../View3D";
 import { EVENTS } from "../../const/external";
 import * as BROWSER from "../../const/browser";
-import { ValueOf } from "../../type/utils";
 import { RenderEvent } from "../../type/event";
 import { clamp } from "../../utils";
 
@@ -13,21 +12,11 @@ import ControlBarItem from "./ControlBarItem";
 export interface AnimationProgressBarOptions {
   position: ControlBarItem["position"];
   order: ControlBarItem["order"];
-  type: ValueOf<typeof AnimationProgressBar["TYPE"]>;
 }
 
 class AnimationProgressBar implements ControlBarItem {
-  /**
-   * Available styles of loading bar
-   */
-  public static TYPE = {
-    KNOB: "knob",
-    BAR: "bar"
-  } as const;
-
   public position: AnimationProgressBarOptions["position"];
   public order: AnimationProgressBarOptions["order"];
-  public type: AnimationProgressBarOptions["type"];
 
   public get element() { return this._rootEl; }
   public get enabled() { return this._enabled; }
@@ -36,6 +25,7 @@ class AnimationProgressBar implements ControlBarItem {
   private _controlBar: ControlBar;
   private _rootEl: HTMLElement;
   private _knobEl: HTMLElement;
+  private _trackEl: HTMLElement;
   private _fillerEl: HTMLElement;
   private _rootBbox: DOMRect;
   private _enabled: boolean;
@@ -45,12 +35,10 @@ class AnimationProgressBar implements ControlBarItem {
 
   public constructor(view3D: View3D, controlBar: ControlBar, {
     position = ControlBar.POSITION.TOP,
-    order = Infinity,
-    type = AnimationProgressBar.TYPE.KNOB
+    order = 9999
   }: Partial<AnimationProgressBarOptions> = {}) {
     this.position = position;
     this.order = order;
-    this.type = type;
 
     this._view3D = view3D;
     this._controlBar = controlBar;
@@ -65,7 +53,7 @@ class AnimationProgressBar implements ControlBarItem {
     const view3D = this._view3D;
     if (this._enabled) return;
 
-    this._rootBbox = this._rootEl.getBoundingClientRect();
+    this._onResize();
     this._enabled = true;
 
     view3D.on(EVENTS.RENDER, this._onRender);
@@ -136,6 +124,7 @@ class AnimationProgressBar implements ControlBarItem {
     root.appendChild(track);
 
     this._rootEl = root;
+    this._trackEl = track;
     this._knobEl = knob;
     this._fillerEl = filler;
   }
@@ -155,7 +144,7 @@ class AnimationProgressBar implements ControlBarItem {
   };
 
   private _onResize = () => {
-    this._rootBbox = this._rootEl.getBoundingClientRect();
+    this._rootBbox = this._trackEl.getBoundingClientRect();
   };
 
   private _onMouseDown = (evt: MouseEvent) => {
@@ -255,7 +244,7 @@ class AnimationProgressBar implements ControlBarItem {
       ...ControlBar.DEFAULT_CLASS
     };
 
-    knob.classList.add(className.PROGRESS_TIME_VISIBLE);
+    knob.classList.add(className.VISIBLE);
   }
 
   private _hideKnob() {
@@ -266,7 +255,7 @@ class AnimationProgressBar implements ControlBarItem {
       ...ControlBar.DEFAULT_CLASS
     };
 
-    knob.classList.remove(className.PROGRESS_TIME_VISIBLE);
+    knob.classList.remove(className.VISIBLE);
   }
 
   private _updateAnimationProgress = (x: number) => {
