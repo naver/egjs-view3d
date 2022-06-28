@@ -41,6 +41,10 @@ const config = {
             require.resolve("./src/css/bulma-override.sass"),
             require.resolve("rc-slider/assets/index.css")
           ]
+        },
+        googleAnalytics: {
+          trackingID: "G-9T7J510DSM",
+          anonymizeIP: true
         }
       })
     ]
