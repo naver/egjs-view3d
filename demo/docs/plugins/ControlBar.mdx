@@ -5,12 +5,32 @@ sidebar_position: 3
 import View3D, { ControlBar } from "@site/src/components/View3D";
 import License from "@site/src/components/License";
 
+ControlBar adds a bar at the bottom of the canvas that can control animation and other things.
+
+```js
+import View3D, { ControlBar } from "@egjs/view3d";
+import "@egjs/view3d/css/view3d-control-bar.min.css"; // If you're not using bundled CSS
+
+const view3D = new View3D(...);
+
+view3D.loadPlugins(new ControlBar({
+  autoHide: {
+    delay: 0
+  },
+  playButton: false
+}));
+```
+
 <View3D
-  src="/egjs-view3d/model/draco/alarm.glb"
+  src="/egjs-view3d/model/RobotExpressive.glb"
   showControlBar />
 
 ### Options
-
-### Classes
-
-### Styles
+|Option|Type|Default|Description|
+|:---:|---|:---:|---|
+|autoHide|boolean \| [AutoHideOptions](/docs/api/AutoHideOptions)|true|Show control bar only on mouse over|
+|className|object|[ControlBar.DEFAULT_CLASS](/docs/api/ControlBar#DEFAULT_CLASS)|Override default class names|
+|progressBar|boolean \| [AnimationProgressBarOptions](/docs/api/AnimationProgressBarOptions)|true|Show animation progress ba|
+|playButton|boolean \| [PlayButtonOptions](/docs/api/PlayButtonOptions)|true|Show animation play / pause button|
+|animationSelector|boolean \| [AnimationSelectorOptions](/docs/api/AnimationSelectorOptions)|true|Show animation selector|
+|fullscreen|boolean \| [FullscreenButtonOptions](/docs/api/FullscreenButtonOptions)|true|Show fullscreen button|

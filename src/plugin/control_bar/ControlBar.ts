@@ -15,11 +15,25 @@ import PlayButton, { PlayButtonOptions } from "./PlayButton";
 import AnimationSelector, { AnimationSelectorOptions } from "./AnimationSelector";
 import FullscreenButton, { FullscreenButtonOptions } from "./FullscreenButton";
 
+/**
+ * @param {number} [initialDelay=3000] Intiial delay before the control bar hides (ms)
+ * @param {number} [delay=0] Delay time before hiding the control bar after mouse leave (ms)
+ */
+interface AutoHideOptions {
+  initialDelay: number;
+  delay: number;
+}
+
+/**
+ * @param {boolean | AutoHideOptions} [autoHide=true] Show control bar only on mouse over
+ * @param {ControlBar.DEFAULT_CLASS} [className={}] Override default class names
+ * @param {boolean | AnimationProgressBarOptions} [progressBar=true] Show animation progress ba
+ * @param {boolean | PlayButtonOptions} [playButton=true] Show animation play / pause button
+ * @param {boolean | AnimationSelectorOptions} [animationSelector=true] Show animation selector
+ * @param {boolean | FullscreenButtonOptions} [fullscreen=true] Show fullscreen button
+ */
 export interface ControlBarOptions {
-  autoHide: boolean | {
-    delay: number;
-    opacity: number;
-  };
+  autoHide: boolean | AutoHideOptions;
   className: Partial<{ -readonly [key in keyof typeof ControlBar.DEFAULT_CLASS]: string }>;
   progressBar: boolean | Partial<AnimationProgressBarOptions>;
   playButton: boolean | Partial<PlayButtonOptions>;
@@ -27,21 +41,36 @@ export interface ControlBarOptions {
   fullscreen: boolean | Partial<FullscreenButtonOptions>;
 }
 
+/**
+ * Add a bar at the bottom of the canvas that can control animation and other things
+ */
 class ControlBar implements View3DPlugin {
   /**
    * Default class names that LoadingBar uses
    * @type {object}
    * @property {"view3d-control-bar"} ROOT A class name for wrapper element
+   * @property {"visible"} VISIBLE A class name for visible elements
+   * @property {"disabled"} DISABLED A class name for disabled elements
+   * @property {"view3d-controls-background"} CONTROLS_BG A class name for background element
    * @property {"view3d-side-controls"} CONTROLS_SIDE A class name for controls wrapper element that includes both left & right controls
    * @property {"view3d-top-controls"} CONTROLS_TOP A class name for controls wrapper element that is placed on the top inside the control bar
    * @property {"view3d-left-controls"} CONTROLS_LEFT A class name for controls wrapper element that is placed on the left inside the control bar
    * @property {"view3d-right-controls"} CONTROLS_RIGHT A class name for controls wrapper element that is placed on the right inside the control bar
+   * @property {"view3d-control-item"} CONTROLS_ITEM A class name for control item elements
+   * @property {"view3d-progress-bar"} PROGRESS_ROOT A class name for root element of the progress bar
+   * @property {"view3d-progress-track"} PROGRESS_TRACK A class name for progress track element of the progress bar
+   * @property {"view3d-progress-knob"} PROGRESS_KNOB A class name for knob element of the progress bar
+   * @property {"view3d-progress-filler"} PROGRESS_FILLER A class name for progress filler element of the progress bar
+   * @property {"view3d-animation-name"} ANIMATION_NAME A class name for animation name element of the animation selector
+   * @property {"view3d-animation-list"} ANIMATION_LIST A class name for animation list element of the animation selector
+   * @property {"view3d-animation-item"} ANIMATION_ITEM A class name for animation list item element of the animation selector
+   * @property {"selected"} ANIMATION_SELECTED A class name for selected animation list item element of the animation selector
    */
   public static readonly DEFAULT_CLASS = {
     ROOT: "view3d-control-bar",
     VISIBLE: "visible",
     DISABLED: "disabled",
-    CONTROLS_GRADIENT: "view3d-controls-gradient",
+    CONTROLS_BG: "view3d-controls-background",
     CONTROLS_SIDE: "view3d-side-controls",
     CONTROLS_TOP: "view3d-top-controls",
     CONTROLS_LEFT: "view3d-left-controls",
@@ -57,6 +86,13 @@ class ControlBar implements View3DPlugin {
     ANIMATION_SELECTED: "selected"
   } as const;
 
+  /**
+   * Position constant
+   * @type {object}
+   * @property {"top"} TOP
+   * @property {"left"} LEFT
+   * @property {"right"} RIGHT
+   */
   public static readonly POSITION = {
     TOP: "top",
     LEFT: "left",
@@ -75,7 +111,9 @@ class ControlBar implements View3DPlugin {
   private _leftControlsWrapper: HTMLElement;
   private _rightControlsWrapper: HTMLElement;
   private _items: ControlBarItem[];
+  private _autoHideTimer: number;
 
+  /** */
   public constructor({
     autoHide = true,
     className = {},
@@ -93,6 +131,7 @@ class ControlBar implements View3DPlugin {
 
     this._items = [];
     this._initElements();
+    this._autoHideTimer = -1;
   }
 
   public async init(view3D: View3D) {
@@ -109,9 +148,16 @@ class ControlBar implements View3DPlugin {
       item.enable();
     });
     view3D.on(EVENTS.MODEL_CHANGE, this._updateModelParams);
+
+    this.show();
+    this._setupAutoHide(view3D);
   }
 
   public teardown(view3D: View3D) {
+    const root = view3D.rootEl;
+    root.removeEventListener(BROWSER.EVENTS.POINTER_ENTER, this.show);
+    root.removeEventListener(BROWSER.EVENTS.POINTER_LEAVE, this._hideAfterDelay);
+
     this._removeElements(view3D);
     this._items.forEach(item => {
       item.disable();
@@ -119,7 +165,34 @@ class ControlBar implements View3DPlugin {
     this._items = [];
 
     view3D.off(EVENTS.MODEL_CHANGE, this._updateModelParams);
+    window.clearTimeout(this._autoHideTimer);
   }
+
+  /**
+   * Show control bar
+   */
+  public show = () => {
+    const wrapper = this._wrapperEl;
+    const className = {
+      ...this.className,
+      ...ControlBar.DEFAULT_CLASS
+    };
+
+    wrapper.classList.add(className.VISIBLE);
+  };
+
+  /**
+   * Hide control bar
+   */
+  public hide = () => {
+    const wrapper = this._wrapperEl;
+    const className = {
+      ...this.className,
+      ...ControlBar.DEFAULT_CLASS
+    };
+
+    wrapper.classList.remove(className.VISIBLE);
+  };
 
   private _initElements() {
     const className = {
@@ -130,9 +203,9 @@ class ControlBar implements View3DPlugin {
     wrapperEl.classList.add(className.ROOT);
     this._wrapperEl = wrapperEl;
 
-    const gradientEl = document.createElement(BROWSER.EL_DIV);
-    gradientEl.classList.add(className.CONTROLS_GRADIENT);
-    wrapperEl.appendChild(gradientEl);
+    const bgEl = document.createElement(BROWSER.EL_DIV);
+    bgEl.classList.add(className.CONTROLS_BG);
+    wrapperEl.appendChild(bgEl);
 
     const topControlsWrapper = document.createElement(BROWSER.EL_DIV);
     const sideControlsWrapper = document.createElement(BROWSER.EL_DIV);
@@ -212,6 +285,39 @@ class ControlBar implements View3DPlugin {
       item.disable();
       item.enable();
     });
+  };
+
+  private _setupAutoHide(view3D: View3D) {
+    if (!this.autoHide) return;
+
+    const {
+      initialDelay = 3000
+    } = getObjectOption(this.autoHide);
+    const root = view3D.rootEl;
+
+    this._autoHideTimer = window.setTimeout(() => {
+      this.hide();
+    }, initialDelay);
+
+    root.addEventListener(BROWSER.EVENTS.POINTER_ENTER, this.show);
+    root.addEventListener(BROWSER.EVENTS.POINTER_LEAVE, this._hideAfterDelay);
+  }
+
+  private _hideAfterDelay = () => {
+    const {
+      delay = 0
+    } = getObjectOption(this.autoHide);
+
+    if (this._autoHideTimer) {
+      window.clearTimeout(this._autoHideTimer);
+      this._autoHideTimer = -1;
+    }
+
+    if (delay <= 0) {
+      this.hide();
+    } else {
+      this._autoHideTimer = window.setTimeout(this.hide, delay);
+    }
   };
 
   private _createDefaultItems(view3D: View3D): ControlBarItem[] {

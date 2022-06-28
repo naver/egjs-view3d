@@ -1,6 +1,6 @@
-:root
+\:root
   --view3d-cb-primary: #ffffff
-  --view3d-cb-bg: rgba(0, 0, 0, 0.3)
+  --view3d-cb-bg: linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%)
   --view3d-cb-track: rgba(230, 230, 230, 0.4)
   --view3d-cb-knob-bg: rgba(30, 30, 30, 0.4)
   --view3d-cb-knob-text: rgba(255, 255, 255, 0.8)
@@ -10,21 +10,27 @@
   padding: 14px 12px 8px 12px
   left: 0
   bottom: 0
+  display: flex
+  opacity: 0
   width: calc(100% - 24px)
   box-sizing: border-box
-  display: flex
   flex-direction: column
   user-select: none
   -webkit-user-drag: none
   font-size: 16px
+  transition: opacity 300ms
+  &.visible
+    opacity: 1
+  @media (max-width: 996px)
+    opacity: 1 !important
 
-.view3d-controls-gradient
+.view3d-controls-background
   width: 100%
   height: 120%
   position: absolute
   left: 0
   bottom: 0
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%)
+  background: var(--view3d-cb-bg)
 
 .view3d-top-controls
   margin-bottom: 8px

@@ -9,11 +9,18 @@ import { clamp } from "../../utils";
 import ControlBar from "./ControlBar";
 import ControlBarItem from "./ControlBarItem";
 
+/**
+ * @param {string} [position="top"] Position inside the control bar
+ * @param {number} [order=9999] Order within the current position, items will be sorted in ascending order
+ */
 export interface AnimationProgressBarOptions {
   position: ControlBarItem["position"];
   order: ControlBarItem["order"];
 }
 
+/**
+ * Show animation progress bar, use with ControlBar
+ */
 class AnimationProgressBar implements ControlBarItem {
   public position: AnimationProgressBarOptions["position"];
   public order: AnimationProgressBarOptions["order"];
@@ -33,6 +40,7 @@ class AnimationProgressBar implements ControlBarItem {
   private _scrolling: boolean;
   private _origTimeScale: number;
 
+  /** */
   public constructor(view3D: View3D, controlBar: ControlBar, {
     position = ControlBar.POSITION.TOP,
     order = 9999
@@ -49,6 +57,9 @@ class AnimationProgressBar implements ControlBarItem {
     this._origTimeScale = 1;
   }
 
+  /**
+   * Enable control item
+   */
   public enable() {
     const view3D = this._view3D;
     if (this._enabled) return;
@@ -63,6 +74,9 @@ class AnimationProgressBar implements ControlBarItem {
     this.enableInput();
   }
 
+  /**
+   * Disable control item
+   */
   public disable() {
     const view3D = this._view3D;
     if (!this._enabled) return;
@@ -76,6 +90,9 @@ class AnimationProgressBar implements ControlBarItem {
     this.disableInput();
   }
 
+  /**
+   * Enable mouse / touch inputs
+   */
   public enableInput() {
     const root = this._rootEl;
     const view3D = this._view3D;
@@ -92,6 +109,9 @@ class AnimationProgressBar implements ControlBarItem {
     root.addEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd);
   }
 
+  /**
+   * Disable mouse / touch inputs
+   */
   public disableInput() {
     const root = this._rootEl;
 

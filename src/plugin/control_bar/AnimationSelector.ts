@@ -5,11 +5,18 @@ import * as BROWSER from "../../const/browser";
 import ControlBar from "./ControlBar";
 import ControlBarItem from "./ControlBarItem";
 
+/**
+ * @param {string} [position="top"] Position inside the control bar
+ * @param {number} [order=9999] Order within the current position, items will be sorted in ascending order
+ */
 export interface AnimationSelectorOptions {
   position: ControlBarItem["position"];
   order: ControlBarItem["order"];
 }
 
+/**
+ * Show animation selector, use with ControlBar
+ */
 class AnimationSelector implements ControlBarItem {
   public position: AnimationSelectorOptions["position"];
   public order: AnimationSelectorOptions["order"];
@@ -24,6 +31,7 @@ class AnimationSelector implements ControlBarItem {
   private _itemListEl: HTMLElement;
   private _enabled: boolean;
 
+  /** */
   public constructor(view3D: View3D, controlBar: ControlBar, {
     position = ControlBar.POSITION.LEFT,
     order = 9999
@@ -37,14 +45,24 @@ class AnimationSelector implements ControlBarItem {
     this._enabled = false;
   }
 
+  /**
+   * Enable control item
+   */
   public enable() {
     if (this._enabled) return;
+
+    if (this._view3D.initialized) {
+      this._updateAnimations();
+    }
 
     this._view3D.on(EVENTS.MODEL_CHANGE, this._updateAnimations);
     this._nameEl.addEventListener(BROWSER.EVENTS.CLICK, this._toggleList);
     this._enabled = true;
   }
 
+  /**
+   * Disable control item
+   */
   public disable() {
     if (!this._enabled) return;
 
@@ -96,7 +114,7 @@ class AnimationSelector implements ControlBarItem {
       return;
     }
 
-    root.classList.remove(className.VISIBLE);
+    root.classList.remove(className.DISABLED);
 
     const elements = animations.map(animation => {
       const el = document.createElement(BROWSER.EL_DIV);

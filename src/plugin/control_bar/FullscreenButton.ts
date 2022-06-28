@@ -5,11 +5,43 @@ import FullscreenIcon from "../../asset/fullscreeen-icon";
 import ControlBar from "./ControlBar";
 import ControlBarItem from "./ControlBarItem";
 
+const requestFullscreen = [
+  "requestFullscreen",
+  "webkitRequestFullscreen",
+  "webkitRequestFullScreen",
+  "webkitCancelFullScreen",
+  "mozRequestFullScreen",
+  "msRequestFullscreen"
+];
+
+const fullscreenElement = [
+  "fullscreenElement",
+  "webkitFullscreenElement",
+  "webkitCurrentFullScreenElement",
+  "mozFullScreenElement",
+  "msFullscreenElement"
+];
+
+const exitFullscreen = [
+  "exitFullscreen",
+  "webkitExitFullscreen",
+  "webkitCancelFullScreen",
+  "mozCancelFullScreen",
+  "msExitFullscreen"
+];
+
+/**
+ * @param {number} [initialDelay=3000] Intiial delay before the control bar hides (ms)
+ * @param {number} [delay=0] Delay time before hiding the control bar after mouse leave (ms)
+ */
 export interface FullscreenButtonOptions {
   position: ControlBarItem["position"];
   order: ControlBarItem["order"];
 }
 
+/**
+ * Show fullscreen enter / exit button, use with ControlBar
+ */
 class FullscreenButton implements ControlBarItem {
   public position: FullscreenButtonOptions["position"];
   public order: FullscreenButtonOptions["order"];
@@ -21,6 +53,7 @@ class FullscreenButton implements ControlBarItem {
   private _element: HTMLElement;
   private _enabled: boolean;
 
+  /** */
   public constructor(view3D: View3D, controlBar: ControlBar, {
     position = ControlBar.POSITION.RIGHT,
     order = 9999
@@ -33,6 +66,9 @@ class FullscreenButton implements ControlBarItem {
     this._enabled = false;
   }
 
+  /**
+   * Enable control item
+   */
   public enable() {
     if (this._enabled) return;
 
@@ -40,6 +76,9 @@ class FullscreenButton implements ControlBarItem {
     this._enabled = true;
   }
 
+  /**
+   * Disable control item
+   */
   public disable() {
     if (!this._enabled) return;
 
@@ -50,12 +89,41 @@ class FullscreenButton implements ControlBarItem {
   private _onClick = () => {
     const root = this._view3D.rootEl;
 
-    if (document.fullscreenElement) {
-      void document.exitFullscreen();
+    if (this._isFullscreen()) {
+      this._exitFullscreen();
     } else {
-      void root.requestFullscreen();
+      this._requestFullscreen(root);
     }
   };
+
+  private _isFullscreen() {
+    if (!document) return false;
+
+    for (const key of fullscreenElement) {
+      if (document[key]) return true;
+    }
+
+    return false;
+  }
+
+  private _requestFullscreen(el: HTMLElement) {
+    for (const key of requestFullscreen) {
+      const request = el[key];
+      if (request) {
+        request.call(el);
+      }
+    }
+  }
+
+  private _exitFullscreen() {
+    for (const key of exitFullscreen) {
+      const exit = document[key];
+
+      if (exit) {
+        exit.call(document);
+      }
+    }
+  }
 
   private _createButton(controlBar: ControlBar) {
     const root = document.createElement(BROWSER.EL_BUTTON);
