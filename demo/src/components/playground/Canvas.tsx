@@ -137,7 +137,7 @@ class RenderSection extends React.Component<{}, {
             <div id="playground-view3d" className={clsx("view3d-wrapper", styles.canvasWrapper)}>
               <canvas className={clsx("view3d-canvas", styles.canvas)}></canvas>
             </div>
-            <div data-tip="Reset Camera" className={clsx(styles.resetBtn, "button", "is-rounded")} onClick={() => { void state.view3D!.camera.reset(500); }}>
+            <div data-tip="Reset Camera" data-place="top" className={clsx(styles.resetBtn, "button", "is-rounded")} onClick={() => { void state.view3D!.camera.reset(500); }}>
               <ResetIcon width="32" height="32" className={styles.resetIcon} />
             </div>
             <ModelInfo />
