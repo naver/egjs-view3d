@@ -8224,7 +8224,7 @@ version: 2.5.0-snapshot
       const gltfTextures = textures.filter(texture => associations.has(texture)).map(texture => {
         return gltfJSON.textures[associations.get(texture).textures];
       });
-      const texturesByLevel = [...new Set(gltfTextures).values()].reduce((levels, texture, texIdx) => {
+      const texturesByLevel = Array.from(new Set(gltfTextures).values()).reduce((levels, texture, texIdx) => {
         const hasExtension = texture.extensions && texture.extensions[CUSTOM_TEXTURE_LOD_EXTENSION];
         const hasExtra = texture.extras && texture.extras[TEXTURE_LOD_EXTRA];
         if (!hasExtension && !hasExtra) return levels;
