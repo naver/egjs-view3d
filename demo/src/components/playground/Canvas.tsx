@@ -3,6 +3,7 @@ import * as THREE from "three";
 import clsx from "clsx";
 
 import ModelInfo from "./ModelInfo";
+import FixedRaycaster from "./FixedRaycaster";
 import { Context } from "./context";
 import * as actions from "./action";
 import styles from "./canvas.module.css";
@@ -175,7 +176,7 @@ class RenderSection extends React.Component<{}, {
 
   private _listenAnnotationAdd(view3D: VanillaView3D, dispatch) {
     const canvas = view3D.renderer.canvas;
-    const raycaster = new THREE.Raycaster();
+    const raycaster = new FixedRaycaster();
 
     canvas.addEventListener("dblclick", evt => {
       const model = view3D.model;
@@ -187,7 +188,7 @@ class RenderSection extends React.Component<{}, {
 
       raycaster.setFromCamera(pointer, view3D.camera.threeCamera);
 
-      const intersects = raycaster.intersectObjects([model.scene]);
+      const intersects = raycaster.intersectObject(model.scene);
 
       if (!intersects.length) return;
 

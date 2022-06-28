@@ -8,6 +8,9 @@ import * as THREE from "three";
 import View3D from "../View3D";
 import Model from "../core/Model";
 
+/**
+ * A dedicated scene for WebXR-based AR session
+ */
 class ARScene {
   private _root: THREE.Scene;
   private _modelRoot: THREE.Group;
@@ -20,6 +23,7 @@ class ARScene {
   public get modelMovable() { return this._modelMovable; }
   public get arRoot() { return this._arRoot; }
 
+  /** */
   public constructor() {
     this._root = new THREE.Scene();
 
