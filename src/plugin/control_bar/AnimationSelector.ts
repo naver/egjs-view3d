@@ -65,6 +65,7 @@ class AnimationSelector implements ControlBarItem {
     };
 
     root.classList.add(className.CONTROLS_ITEM);
+    root.classList.add(className.DISABLED);
     name.classList.add(className.ANIMATION_NAME);
     itemList.classList.add(className.ANIMATION_LIST);
 
@@ -81,6 +82,7 @@ class AnimationSelector implements ControlBarItem {
     const controlBar = this._controlBar;
     const animator = view3D.animator;
 
+    const root = this._rootEl;
     const name = this._nameEl;
     const itemList = this._itemListEl;
     const animations = animator.clips;
@@ -88,6 +90,13 @@ class AnimationSelector implements ControlBarItem {
       ...controlBar.className,
       ...ControlBar.DEFAULT_CLASS
     };
+
+    if (animations.length <= 0) {
+      root.classList.add(className.DISABLED);
+      return;
+    }
+
+    root.classList.remove(className.VISIBLE);
 
     const elements = animations.map(animation => {
       const el = document.createElement(BROWSER.EL_DIV);
@@ -110,7 +119,12 @@ class AnimationSelector implements ControlBarItem {
       }
 
       el.addEventListener(BROWSER.EVENTS.CLICK, evt => {
+        const wasPaused = animator.paused;
         animator.play(idx);
+        if (wasPaused) {
+          animator.pause();
+        }
+
         elements.forEach(element => {
           element.classList.remove(className.ANIMATION_SELECTED);
         });

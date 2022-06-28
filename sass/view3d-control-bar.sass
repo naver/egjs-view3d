@@ -20,11 +20,14 @@
 
 .view3d-controls-gradient
   width: 100%
-  height: 150%
+  height: 120%
   position: absolute
   left: 0
   bottom: 0
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0) 100%)
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%)
+
+.view3d-top-controls
+  margin-bottom: 8px
 
 .view3d-side-controls
   display: flex
@@ -47,12 +50,17 @@
   margin: 0
   height: 100%
   position: relative
+  border-radius: 16px
   fill: var(--view3d-cb-primary)
   > svg
     width: 32px
     height: 32px
+  &.disabled
+    display: none
   &:not(:first-child)
     margin-left: 1em
+  &:hover
+    background-color: rgba(0, 0, 0, 0.3)
 
 .view3d-progress-bar
   flex: 1
@@ -102,7 +110,7 @@
     border-radius: 5px
     color: var(--view3d-cb-knob-text)
     box-sizing: border-box
-  &.time-visible
+  &.visible
     &::before
       opacity: 1
 
@@ -111,7 +119,8 @@
   align-items: center
   height: 100%
   color: var(--view3d-cb-primary)
-  padding-right: 12px
+  padding-left: 12px
+  padding-right: 24px
   position: relative
   &::after
     content: ""
@@ -122,12 +131,12 @@
     border-top: 4px solid var(--view3d-cb-primary)
     position: absolute
     top: 50%
-    right: 0px
+    right: 12px
 
 .view3d-animation-list
   position: absolute
   left: 0
-  bottom: 100%
+  bottom: calc(100% + 5px)
   background-color: rgba(0, 0, 0, 0.3)
   padding: 0.5em
   display: none

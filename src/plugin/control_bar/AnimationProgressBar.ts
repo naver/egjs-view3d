@@ -58,6 +58,7 @@ class AnimationProgressBar implements ControlBarItem {
 
     view3D.on(EVENTS.RENDER, this._onRender);
     view3D.on(EVENTS.RESIZE, this._onResize);
+    view3D.on(EVENTS.MODEL_CHANGE, this._onModelChange);
 
     this.enableInput();
   }
@@ -70,15 +71,19 @@ class AnimationProgressBar implements ControlBarItem {
 
     view3D.off(EVENTS.RENDER, this._onRender);
     view3D.off(EVENTS.RESIZE, this._onResize);
+    view3D.off(EVENTS.MODEL_CHANGE, this._onModelChange);
 
     this.disableInput();
   }
 
   public enableInput() {
     const root = this._rootEl;
+    const view3D = this._view3D;
 
     this._firstTouch = null;
     this._scrolling = false;
+
+    if (view3D.animator.animationCount <= 0) return;
 
     root.addEventListener(BROWSER.EVENTS.MOUSE_DOWN, this._onMouseDown);
 
@@ -145,6 +150,12 @@ class AnimationProgressBar implements ControlBarItem {
 
   private _onResize = () => {
     this._rootBbox = this._trackEl.getBoundingClientRect();
+  };
+
+  private _onModelChange = () => {
+    this._onResize();
+    this.disableInput();
+    this.enableInput();
   };
 
   private _onMouseDown = (evt: MouseEvent) => {

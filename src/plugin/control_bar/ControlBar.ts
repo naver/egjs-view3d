@@ -40,6 +40,7 @@ class ControlBar implements View3DPlugin {
   public static readonly DEFAULT_CLASS = {
     ROOT: "view3d-control-bar",
     VISIBLE: "visible",
+    DISABLED: "disabled",
     CONTROLS_GRADIENT: "view3d-controls-gradient",
     CONTROLS_SIDE: "view3d-side-controls",
     CONTROLS_TOP: "view3d-top-controls",
