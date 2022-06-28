@@ -4,7 +4,7 @@ name: @egjs/view3d
 license: MIT
 author: NAVER Corp.
 repository: https://github.com/naver/egjs-view3d
-version: 2.5.0
+version: 2.5.0-snapshot
 */
 import Component from '@egjs/component';
 import { Vector3, Vector2, Vector4, Matrix4, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, WebGLRenderer, sRGBEncoding, Clock, TextureLoader as TextureLoader$1, FloatType, EquirectangularReflectionMapping, Group, WebGLRenderTarget, RGBAFormat, OrthographicCamera, Sphere, PlaneBufferGeometry, MeshBasicMaterial, BackSide, Mesh, MeshDepthMaterial, ShaderMaterial, Scene as Scene$1, PointLight, BoxBufferGeometry, MeshStandardMaterial, LinearEncoding, NoToneMapping, PMREMGenerator, WebGLCubeRenderTarget, CubeCamera, IcosahedronBufferGeometry, Color, PerspectiveCamera, AnimationMixer, Quaternion, Plane, Ray, Euler, CanvasTexture, PlaneGeometry, RingGeometry, FileLoader, Box3, DefaultLoadingManager, LoadingManager } from 'three';
@@ -897,6 +897,7 @@ class Renderer {
  */
 
 class Loader {
+  /** */
   constructor(view3D) {
     this._onLoadingProgress = (evt, src, context) => {
       const view3D = this._view3D;
@@ -2469,8 +2470,12 @@ class Camera {
  * Copyright (c) 2020 NAVER Corp.
  * egjs projects are licensed under the MIT license
  */
+/**
+ * Automatic resizer that uses both ResizeObserver and window resize event
+ */
 
 class AutoResizer {
+  /** */
   constructor(view3d) {
     this._onResize = () => {
       this._view3d.resize();
@@ -2493,10 +2498,18 @@ class AutoResizer {
     this._enabled = false;
     this._resizeObserver = null;
   }
+  /**
+   * Returns whether AutoResizer is enabled
+   */
+
 
   get enabled() {
     return this._enabled;
   }
+  /**
+   * Enable resizer
+   */
+
 
   enable() {
     const view3d = this._view3d;
@@ -2521,6 +2534,10 @@ class AutoResizer {
     this._enabled = true;
     return this;
   }
+  /**
+   * Disable resizer
+   */
+
 
   disable() {
     if (!this._enabled) return this;
@@ -4461,8 +4478,12 @@ class WebARControl {
  * Copyright (c) 2020 NAVER Corp.
  * egjs projects are licensed under the MIT license
  */
+/**
+ * A dedicated scene for WebXR-based AR session
+ */
 
 class ARScene {
+  /** */
   constructor() {
     this._root = new Scene$1();
     this._modelRoot = new Group();
@@ -9398,7 +9419,7 @@ class View3D extends Component {
  */
 
 
-View3D.VERSION = "2.5.0";
+View3D.VERSION = "2.5.0-snapshot";
 
 /*
  * "View In Ar" Icon from [Google Material Design Icons](https://github.com/google/material-design-icons)
@@ -9762,4 +9783,4 @@ const checkWASMAvailability = () => {
  */
 
 export default View3D;
-export { ARButton, ARManager, AROverlay, AR_SESSION_TYPE, AUTO, Animation, AnimationControl, Annotation, AnnotationManager, AutoPlayer, AutoResizer, Camera, DEFAULT_CLASS, EASING, ERROR_CODES, EVENTS$1 as EVENTS, FaceAnnotation, GLTFLoader, INPUT_TYPE, LoadingBar, Model, ModelAnimator, Motion, OrbitControl, PointAnnotation, Pose, QUICK_LOOK_APPLE_PAY_BUTTON_TYPE, QUICK_LOOK_CUSTOM_BANNER_SIZE, Renderer, RotateControl, SCENE_VIEWER_MODE, Scene, ShadowPlane, Skybox, TONE_MAPPING, TextureLoader, TranslateControl, View3DError, ZOOM_TYPE, ZoomControl, isAvailable };
+export { ARButton, ARManager, AROverlay, ARScene, AR_SESSION_TYPE, AUTO, Animation, AnimationControl, Annotation, AnnotationManager, AutoPlayer, AutoResizer, Camera, DEFAULT_CLASS, DOMOverlay, EASING, ERROR_CODES, EVENTS$1 as EVENTS, FaceAnnotation, GLTFLoader, HitTest, INPUT_TYPE, Loader, LoadingBar, Model, ModelAnimator, Motion, OrbitControl, PointAnnotation, Pose, QUICK_LOOK_APPLE_PAY_BUTTON_TYPE, QUICK_LOOK_CUSTOM_BANNER_SIZE, QuickLookSession, Renderer, RotateControl, SCENE_VIEWER_MODE, Scene, SceneViewerSession, ShadowPlane, Skybox, TONE_MAPPING, TextureLoader, TranslateControl, View3DError, WebARSession, ZOOM_TYPE, ZoomControl, isAvailable };

@@ -4,7 +4,7 @@ name: @egjs/view3d
 license: MIT
 author: NAVER Corp.
 repository: https://github.com/naver/egjs-view3d
-version: 2.5.0
+version: 2.5.0-snapshot
 */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('three'), require('@egjs/component'), require('three/examples/jsm/loaders/RGBELoader'), require('three/examples/jsm/shaders/HorizontalBlurShader'), require('three/examples/jsm/shaders/VerticalBlurShader'), require('three/examples/jsm/lights/LightProbeGenerator'), require('three/examples/jsm/loaders/GLTFLoader'), require('three/examples/jsm/loaders/DRACOLoader'), require('three/examples/jsm/loaders/KTX2Loader')) :
@@ -893,6 +893,7 @@ version: 2.5.0
    */
 
   class Loader {
+    /** */
     constructor(view3D) {
       this._onLoadingProgress = (evt, src, context) => {
         const view3D = this._view3D;
@@ -2465,8 +2466,12 @@ version: 2.5.0
    * Copyright (c) 2020 NAVER Corp.
    * egjs projects are licensed under the MIT license
    */
+  /**
+   * Automatic resizer that uses both ResizeObserver and window resize event
+   */
 
   class AutoResizer {
+    /** */
     constructor(view3d) {
       this._onResize = () => {
         this._view3d.resize();
@@ -2489,10 +2494,18 @@ version: 2.5.0
       this._enabled = false;
       this._resizeObserver = null;
     }
+    /**
+     * Returns whether AutoResizer is enabled
+     */
+
 
     get enabled() {
       return this._enabled;
     }
+    /**
+     * Enable resizer
+     */
+
 
     enable() {
       const view3d = this._view3d;
@@ -2517,6 +2530,10 @@ version: 2.5.0
       this._enabled = true;
       return this;
     }
+    /**
+     * Disable resizer
+     */
+
 
     disable() {
       if (!this._enabled) return this;
@@ -4457,8 +4474,12 @@ version: 2.5.0
    * Copyright (c) 2020 NAVER Corp.
    * egjs projects are licensed under the MIT license
    */
+  /**
+   * A dedicated scene for WebXR-based AR session
+   */
 
   class ARScene {
+    /** */
     constructor() {
       this._root = new THREE.Scene();
       this._modelRoot = new THREE.Group();
@@ -9394,7 +9415,7 @@ version: 2.5.0
    */
 
 
-  View3D.VERSION = "2.5.0";
+  View3D.VERSION = "2.5.0-snapshot";
 
   /*
    * "View In Ar" Icon from [Google Material Design Icons](https://github.com/google/material-design-icons)
@@ -9783,11 +9804,18 @@ version: 2.5.0
     RotateControl: RotateControl,
     TranslateControl: TranslateControl,
     ZoomControl: ZoomControl,
+    Loader: Loader,
     GLTFLoader: GLTFLoader,
     TextureLoader: TextureLoader,
     ARButton: ARButton,
     AROverlay: AROverlay,
     LoadingBar: LoadingBar,
+    ARScene: ARScene,
+    WebARSession: WebARSession,
+    SceneViewerSession: SceneViewerSession,
+    QuickLookSession: QuickLookSession,
+    DOMOverlay: DOMOverlay,
+    HitTest: HitTest,
     AUTO: AUTO,
     EVENTS: EVENTS$1,
     EASING: EASING,
