@@ -106,7 +106,10 @@ class ControlBar implements View3DPlugin {
   public animationSelector: ControlBarOptions["animationSelector"];
   public fullscreen: ControlBarOptions["fullscreen"];
 
-  private _wrapperEl: HTMLElement;
+  public get rootEl() { return this._rootEl; }
+  public get items() { return this._items; }
+
+  private _rootEl: HTMLElement;
   private _topControlsWrapper: HTMLElement;
   private _leftControlsWrapper: HTMLElement;
   private _rightControlsWrapper: HTMLElement;
@@ -172,20 +175,20 @@ class ControlBar implements View3DPlugin {
    * Show control bar
    */
   public show = () => {
-    const wrapper = this._wrapperEl;
+    const root = this._rootEl;
     const className = {
       ...this.className,
       ...ControlBar.DEFAULT_CLASS
     };
 
-    wrapper.classList.add(className.VISIBLE);
+    root.classList.add(className.VISIBLE);
   };
 
   /**
    * Hide control bar
    */
   public hide = () => {
-    const wrapper = this._wrapperEl;
+    const wrapper = this._rootEl;
     const className = {
       ...this.className,
       ...ControlBar.DEFAULT_CLASS
@@ -199,13 +202,13 @@ class ControlBar implements View3DPlugin {
       ...this.className,
       ...ControlBar.DEFAULT_CLASS
     };
-    const wrapperEl = document.createElement(BROWSER.EL_DIV);
-    wrapperEl.classList.add(className.ROOT);
-    this._wrapperEl = wrapperEl;
+    const rootEl = document.createElement(BROWSER.EL_DIV);
+    rootEl.classList.add(className.ROOT);
+    this._rootEl = rootEl;
 
     const bgEl = document.createElement(BROWSER.EL_DIV);
     bgEl.classList.add(className.CONTROLS_BG);
-    wrapperEl.appendChild(bgEl);
+    rootEl.appendChild(bgEl);
 
     const topControlsWrapper = document.createElement(BROWSER.EL_DIV);
     const sideControlsWrapper = document.createElement(BROWSER.EL_DIV);
@@ -217,10 +220,10 @@ class ControlBar implements View3DPlugin {
     leftControlsWrapper.classList.add(className.CONTROLS_LEFT);
     rightControlsWrapper.classList.add(className.CONTROLS_RIGHT);
 
-    wrapperEl.appendChild(topControlsWrapper);
+    rootEl.appendChild(topControlsWrapper);
     sideControlsWrapper.appendChild(leftControlsWrapper);
     sideControlsWrapper.appendChild(rightControlsWrapper);
-    wrapperEl.appendChild(sideControlsWrapper);
+    rootEl.appendChild(sideControlsWrapper);
 
     this._topControlsWrapper = topControlsWrapper;
     this._leftControlsWrapper = leftControlsWrapper;
@@ -268,11 +271,11 @@ class ControlBar implements View3DPlugin {
   }
 
   private _attachElements(view3D: View3D) {
-    view3D.rootEl.appendChild(this._wrapperEl);
+    view3D.rootEl.appendChild(this._rootEl);
   }
 
   private _removeElements(view3D: View3D) {
-    const wrapper = this._wrapperEl;
+    const wrapper = this._rootEl;
 
     if (wrapper.parentElement === view3D.rootEl) {
       view3D.rootEl.removeChild(wrapper);
