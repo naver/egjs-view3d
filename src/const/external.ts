@@ -47,6 +47,8 @@ export const EVENTS = {
   INPUT_START: "inputStart",
   INPUT_END: "inputEnd",
   CAMERA_CHANGE: "cameraChange",
+  ANIMATION_LOOP: "animationLoop",
+  ANIMATION_FINISHED: "animationFinished",
   AR_START: "arStart",
   AR_END: "arEnd",
   AR_MODEL_PLACED: "arModelPlaced",
@@ -212,4 +214,17 @@ export const INPUT_TYPE = {
   ROTATE: 0,
   TRANSLATE: 1,
   ZOOM: 2
+} as const;
+
+/**
+ * Animation repeat modes
+ * @type {object}
+ * @property {"one"} ONE Repeat single animation
+ * @property {"none"} NONE Pause on animation's last frame
+ * @property {"all"} ALL Repeat all animations
+ */
+export const ANIMATION_REPEAT_MODE = {
+  ONE: "one",
+  NONE: "none",
+  ALL: "all"
 } as const;
