@@ -94,6 +94,13 @@ class ARScene {
     this._arRoot.add(...objects);
   }
 
+  /**
+   * Remove objects from scene
+   */
+  public remove(...objects: THREE.Object3D[]) {
+    this._arRoot.remove(...objects);
+  }
+
   public setRootPosition(pos: THREE.Vector3) {
     const root = this._root;
 

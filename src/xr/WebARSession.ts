@@ -19,6 +19,7 @@ import ARSession from "./ARSession";
 import ARScene from "./ARScene";
 import DOMOverlay from "./features/DOMOverlay";
 import HitTest from "./features/HitTest";
+import LightEstimation from "./features/LightEstimation";
 
 declare global {
   interface Navigator { xr: XRSystem }
@@ -29,7 +30,9 @@ declare global {
  * @interface
  * @extends WebARControlOptions
  * @param {object} [features={}] Additional features(see {@link https://developer.mozilla.org/en-US/docs/Web/API/XRSessionInit XRSessionInit}) of the WebXR session.
+ * @param {boolean} [vertical=false] Whether to place 3D model vertically on the wall.
  * @param {HTMLElement|string|null} [overlayRoot=null] `dom-overlay`'s root element. You can set either HTMLElement or query selector for that element.
+ * @param {boolean} [useLightEstimation=true] Whether to use `light-estimation` feature.
  * @param {boolean|ARSwirlControlOptions} [rotate=true] Options for the rotate control inside the AR session. You can disable rotate control by giving `false`.
  * @param {boolean|ARTranslateControlOptions} [translate=true] Options for the translate control inside the AR session. You can disable translate control by giving `false`.
  * @param {boolean|ARScaleControlOptions} [scale=true] Options for the scale control inside the AR session. You can disable scale control by giving `false`.
@@ -41,6 +44,7 @@ export interface WebARSessionOptions extends WebARControlOptions {
   features: typeof XR.EMPTY_FEATURES;
   vertical: boolean;
   overlayRoot: HTMLElement | string | null;
+  useLightEstimation: boolean;
 }
 
 /**
@@ -68,6 +72,7 @@ class WebARSession implements ARSession {
   public features: WebARSessionOptions["features"];
   public vertical: WebARSessionOptions["vertical"];
   public overlayRoot: WebARSessionOptions["overlayRoot"];
+  public useLightEstimation: WebARSessionOptions["useLightEstimation"];
 
   // Internal Components
   private _view3D: View3D;
@@ -75,6 +80,7 @@ class WebARSession implements ARSession {
   private _control: WebARControl;
   private _hitTest: HitTest;
   private _domOverlay: DOMOverlay;
+  private _lightEstimation: LightEstimation;
 
   // Internal States
   private _modelPlaced: boolean;
@@ -88,13 +94,16 @@ class WebARSession implements ARSession {
   public get arScene() { return this._arScene; }
   public get hitTest() { return this._hitTest; }
   public get domOverlay() { return this._domOverlay; }
+  public get lightEstimation() { return this._lightEstimation; }
 
   /**
    * Create new instance of WebARSession
    * @param {View3D} view3D Instance of the View3D
    * @param {object} [options={}] Options
    * @param {object} [options.features={}] Additional features(see {@link https://developer.mozilla.org/en-US/docs/Web/API/XRSessionInit XRSessionInit}) of the WebXR session.
+   * @param {boolean} [options.vertical=false] Whether to place 3D model vertically on the wall.
    * @param {HTMLElement|string|null} [options.overlayRoot=null] `dom-overlay`'s root element. You can set either HTMLElement or query selector for that element.
+   * @param {boolean} [options.useLightEstimation=true] Whether to use `light-estimation` feature.
    * @param {boolean|ARSwirlControlOptions} [options.rotate=true] Options for the rotate control inside the AR session. You can disable rotate control by giving `false`.
    * @param {boolean|ARTranslateControlOptions} [options.translate=true] Options for the translate control inside the AR session. You can disable translate control by giving `false`.
    * @param {boolean|ARScaleControlOptions} [options.scale=true] Options for the scale control inside the AR session. You can disable scale control by giving `false`.
@@ -106,6 +115,7 @@ class WebARSession implements ARSession {
     features = XR.EMPTY_FEATURES,
     vertical = false,
     overlayRoot = null,
+    useLightEstimation = true,
     rotate = true,
     translate = true,
     scale = true,
@@ -122,6 +132,7 @@ class WebARSession implements ARSession {
     this.features = features;
     this.vertical = vertical;
     this.overlayRoot = overlayRoot;
+    this.useLightEstimation = useLightEstimation;
 
     // Create internal components
     this._arScene = new ARScene();
@@ -135,6 +146,7 @@ class WebARSession implements ARSession {
     });
     this._hitTest = new HitTest();
     this._domOverlay = new DOMOverlay();
+    this._lightEstimation = new LightEstimation(view3D, this._arScene);
   }
 
   /**
@@ -151,11 +163,16 @@ class WebARSession implements ARSession {
     const control = this._control;
     const hitTest = this._hitTest;
     const domOverlay = this._domOverlay;
+    const lightEstimation = this._lightEstimation;
     const vertical = this.vertical;
     const features = this._getAllXRFeatures();
 
     // Enable xr
     threeRenderer.xr.enabled = true;
+
+    // Estimation requires "sessionstart" event of the renderer
+    // So it should be initialized before requesting session
+    lightEstimation.init();
 
     const session = await navigator.xr.requestSession(XR.SESSION.AR, features) as unknown as THREE.XRSession;
 
@@ -172,6 +189,7 @@ class WebARSession implements ARSession {
     const onSessionEnd = async () => {
       control.destroy(session);
       arScene.destroy(view3D);
+      lightEstimation.destroy();
 
       domOverlay.destroy();
 
@@ -267,6 +285,7 @@ class WebARSession implements ARSession {
       {},
       this._domOverlay.getFeatures(overlayRoot),
       this._hitTest.getFeatures(),
+      this._lightEstimation.getFeatures(),
       userFeatures
     );
   }

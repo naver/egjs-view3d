@@ -9,6 +9,7 @@ import SceneViewerSession, { SceneViewerSessionOptions } from "./SceneViewerSess
 import QuickLookSession, { QuickLookSessionOptions } from "./QuickLookSession";
 import DOMOverlay from "./features/DOMOverlay";
 import HitTest from "./features/HitTest";
+import LightEstimation from "./features/LightEstimation";
 
 export {
   ARScene,
@@ -16,7 +17,8 @@ export {
   SceneViewerSession,
   QuickLookSession,
   DOMOverlay,
-  HitTest
+  HitTest,
+  LightEstimation
 };
 
 export type {
