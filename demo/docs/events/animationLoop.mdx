@@ -1,0 +1,31 @@
+---
+sidebar_position: 14
+---
+
+import View3D from "@site/src/components/View3D";
+import License from "@site/src/components/License";
+
+An event that fires on single animation loop.
+
+|Property|Type|Description|
+|:---:|:---:|---|
+|type|string|The type of event|
+|target|[View3D](/docs/api/View3D)|An instance of View3D that triggered this event|
+|index|[Pose](/docs/api/Pose)|An index of the animation|
+|clip|[THREE.AnimationClip](https://threejs.org/docs/#api/en/animation/AnimationClip)|An AnimationClip instance of the animation|
+|action|[THREE.AnimationAction](https://threejs.org/docs/#api/en/animation/AnimationAction)|An AnimationAction instance of the animation|
+
+<View3D
+  src="/egjs-view3d/model/RobotExpressive.glb"
+  showExampleCode
+  showEventsTriggered={["animationLoop"]} />
+
+<License items={[
+  {
+    name: "RobotExpressive",
+    link: "https://github.com/mrdoob/three.js/tree/master/examples/models/gltf/RobotExpressive",
+    author: "Tomás Laulhé",
+    authorLink: "https://www.patreon.com/quaternius",
+    license: "CC0"
+  }
+]} />

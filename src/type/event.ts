@@ -215,14 +215,14 @@ export interface CameraChangeEvent {
 }
 
 /**
- * An event that fires on animation loop
+ * An event that fires on single animation loop
  * @event View3D#animationLoop
  * @type {object}
  * @property {string} type A type of the event.
  * @property {View3D} target An instance of View3D that triggered this event.
  * @property {number} index An index of the animation.
- * @property {THREE.AnimationClip} clip An {@link AnimationClip https://threejs.org/docs/#api/en/animation/AnimationClip} instance of the animation.
- * @property {THREE.AnimationAction} action An {@link AnimationAction https://threejs.org/docs/#api/en/animation/AnimationAction} instance of the animation.
+ * @property {THREE.AnimationClip} clip An {@link https://threejs.org/docs/#api/en/animation/AnimationClip AnimationClip} instance of the animation.
+ * @property {THREE.AnimationAction} action An {@link https://threejs.org/docs/#api/en/animation/AnimationAction AnimationAction} instance of the animation.
  */
 export interface AnimationLoopEvent {
   type: string;
@@ -239,8 +239,8 @@ export interface AnimationLoopEvent {
  * @property {string} type A type of the event.
  * @property {View3D} target An instance of View3D that triggered this event.
  * @property {number} index An index of the animation.
- * @property {THREE.AnimationClip} clip An {@link AnimationClip https://threejs.org/docs/#api/en/animation/AnimationClip} instance of the animation.
- * @property {THREE.AnimationAction} action An {@link AnimationAction https://threejs.org/docs/#api/en/animation/AnimationAction} instance of the animation.
+ * @property {THREE.AnimationClip} clip An {@link https://threejs.org/docs/#api/en/animation/AnimationClip AnimationClip} instance of the animation.
+ * @property {THREE.AnimationAction} action An {@link https://threejs.org/docs/#api/en/animation/AnimationAction AnimationAction} instance of the animation.
  */
 export interface AnimationFinishedEvent {
   type: string;
