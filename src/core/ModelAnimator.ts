@@ -135,7 +135,7 @@ class ModelAnimator {
       return action;
     });
 
-    this._updateRepeatMode();
+    this.updateRepeatMode();
   }
 
   /**
@@ -310,6 +310,27 @@ class ModelAnimator {
   }
 
   /**
+   * Update animation repeat mode of the animation actions
+   */
+  public updateRepeatMode() {
+    const view3D = this._view3D;
+    const actions = this._actions;
+    const repeatMode = view3D.animationRepeatMode;
+
+    if (repeatMode === ANIMATION_REPEAT_MODE.NONE) {
+      actions.forEach(action => {
+        action.clampWhenFinished = true;
+        action.loop = THREE.LoopOnce;
+      });
+    } else {
+      actions.forEach(action => {
+        action.clampWhenFinished = false;
+        action.loop = THREE.LoopRepeat;
+      });
+    }
+  }
+
+  /**
    * Reset the instance and remove all cached animation clips attached to it
    * @returns {void}
    */
@@ -337,24 +358,6 @@ class ModelAnimator {
     });
 
     this._fadePromises = [];
-  }
-
-  private _updateRepeatMode() {
-    const view3D = this._view3D;
-    const actions = this._actions;
-    const repeatMode = view3D.animationRepeatMode;
-
-    if (repeatMode === ANIMATION_REPEAT_MODE.NONE) {
-      actions.forEach(action => {
-        action.clampWhenFinished = true;
-        action.loop = THREE.LoopOnce;
-      });
-    } else {
-      actions.forEach(action => {
-        action.clampWhenFinished = false;
-        action.loop = THREE.LoopRepeat;
-      });
-    }
   }
 
   private _onAnimationLoop = (evt: THREE.Event) => {

@@ -641,6 +641,11 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._control.updateCursor();
   }
 
+  public set animationRepeatMode(val: View3DOptions["animationRepeatMode"]) {
+    this._animationRepeatMode = val;
+    this._animator.updateRepeatMode();
+  }
+
   public set autoResize(val: View3DOptions["autoResize"]) {
     this._autoResize = val;
 
