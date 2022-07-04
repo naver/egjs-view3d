@@ -387,7 +387,7 @@ class ModelAnimator {
     const index = actions.findIndex(action => action === evt.action);
 
     view3D.trigger(EVENTS.ANIMATION_FINISHED, {
-      type: EVENTS.ANIMATION_LOOP,
+      type: EVENTS.ANIMATION_FINISHED,
       target: view3D,
       index,
       action: evt.action,
