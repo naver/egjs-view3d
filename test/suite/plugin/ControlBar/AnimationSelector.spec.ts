@@ -1,4 +1,4 @@
-import ControlBar, { AnimationSelector } from "~/plugin/ControlBar";
+import { ControlBar, AnimationSelector } from "~/plugin/ControlBar";
 
 import { createView3D } from "../../../test-utils";
 

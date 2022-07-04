@@ -14,6 +14,7 @@ import AnimationProgressBar, { AnimationProgressBarOptions } from "./AnimationPr
 import PlayButton, { PlayButtonOptions } from "./PlayButton";
 import AnimationSelector, { AnimationSelectorOptions } from "./AnimationSelector";
 import FullscreenButton, { FullscreenButtonOptions } from "./FullscreenButton";
+import NavigationGizmo, { NavigationGizmoOptions } from "./NavigationGizmo";
 
 /**
  * @param {number} [initialDelay=3000] Intiial delay before the control bar hides (ms)
@@ -31,6 +32,7 @@ interface AutoHideOptions {
  * @param {boolean | PlayButtonOptions} [playButton=true] Show animation play / pause button
  * @param {boolean | AnimationSelectorOptions} [animationSelector=true] Show animation selector
  * @param {boolean | FullscreenButtonOptions} [fullscreen=true] Show fullscreen button
+ * @param {boolean | NavigationGizmoOptions} [navigationGizmo=true] Show navigation gizmo
  */
 export interface ControlBarOptions {
   autoHide: boolean | AutoHideOptions;
@@ -39,6 +41,7 @@ export interface ControlBarOptions {
   playButton: boolean | Partial<PlayButtonOptions>;
   animationSelector: boolean | Partial<AnimationSelectorOptions>;
   fullscreen: boolean | Partial<FullscreenButtonOptions>;
+  navigationGizmo: boolean | Partial<NavigationGizmoOptions>;
 }
 
 /**
@@ -65,6 +68,8 @@ class ControlBar implements View3DPlugin {
    * @property {"view3d-animation-list"} ANIMATION_LIST A class name for animation list element of the animation selector
    * @property {"view3d-animation-item"} ANIMATION_ITEM A class name for animation list item element of the animation selector
    * @property {"selected"} ANIMATION_SELECTED A class name for selected animation list item element of the animation selector
+   * @property {"view3d-gizmo"} GIZMO_ROOT A class name for root element of the navigation gizmo
+   * @property {"view3d-gizmo-axis"} GIZMO_AXIS A class name for axis button element of the navigation gizmo
    */
   public static readonly DEFAULT_CLASS = {
     ROOT: "view3d-control-bar",
@@ -83,7 +88,9 @@ class ControlBar implements View3DPlugin {
     ANIMATION_NAME: "view3d-animation-name",
     ANIMATION_LIST: "view3d-animation-list",
     ANIMATION_ITEM: "view3d-animation-item",
-    ANIMATION_SELECTED: "selected"
+    ANIMATION_SELECTED: "selected",
+    GIZMO_ROOT: "view3d-gizmo",
+    GIZMO_AXIS: "view3d-gizmo-axis"
   } as const;
 
   /**
@@ -105,6 +112,7 @@ class ControlBar implements View3DPlugin {
   public playButton: ControlBarOptions["playButton"];
   public animationSelector: ControlBarOptions["animationSelector"];
   public fullscreen: ControlBarOptions["fullscreen"];
+  public navigationGizmo: ControlBarOptions["navigationGizmo"];
 
   public get rootEl() { return this._rootEl; }
   public get items() { return this._items; }
@@ -123,7 +131,8 @@ class ControlBar implements View3DPlugin {
     progressBar = true,
     playButton = true,
     animationSelector = true,
-    fullscreen = true
+    fullscreen = true,
+    navigationGizmo = true
   }: Partial<ControlBarOptions> = {}) {
     this.autoHide = autoHide;
     this.className = className;
@@ -131,6 +140,7 @@ class ControlBar implements View3DPlugin {
     this.playButton = playButton;
     this.animationSelector = animationSelector;
     this.fullscreen = fullscreen;
+    this.navigationGizmo = navigationGizmo;
 
     this._items = [];
     this._initElements();
@@ -235,6 +245,7 @@ class ControlBar implements View3DPlugin {
     const leftControlsWrapper = this._leftControlsWrapper;
     const rightControlsWrapper = this._rightControlsWrapper;
 
+    const positionedItems = this._items.filter(item => item.position && item.order);
     const posMap: {
       [key: string]: {
         parentEl: HTMLElement;
@@ -255,15 +266,15 @@ class ControlBar implements View3DPlugin {
       }
     };
 
-    this._items.forEach(item => {
-      posMap[item.position].items.push(item);
+    positionedItems.forEach(item => {
+      posMap[item.position!].items.push(item);
     });
 
     Object.keys(posMap).forEach(posKey => {
       const position = posMap[posKey];
       const { parentEl, items } = position;
 
-      items.sort((a, b) => a.order - b.order);
+      items.sort((a, b) => a.order! - b.order!);
       items.forEach(item => {
         parentEl.appendChild(item.element);
       });
@@ -340,6 +351,10 @@ class ControlBar implements View3DPlugin {
 
     if (this.fullscreen) {
       items.push(new FullscreenButton(view3D, this, getObjectOption(this.fullscreen)));
+    }
+
+    if (this.navigationGizmo) {
+      items.push(new NavigationGizmo(view3D, this, getObjectOption(this.navigationGizmo)));
     }
 
     return items;

@@ -1,4 +1,4 @@
-import ControlBar, { FullscreenButton } from "~/plugin/ControlBar";
+import { ControlBar, FullscreenButton } from "~/plugin/ControlBar";
 
 import { createView3D } from "../../../test-utils";
 

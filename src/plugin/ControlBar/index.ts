@@ -8,14 +8,15 @@ import AnimationProgressBar, { AnimationProgressBarOptions } from "./AnimationPr
 import AnimationSelector, { AnimationSelectorOptions } from "./AnimationSelector";
 import FullscreenButton, { FullscreenButtonOptions } from "./FullscreenButton";
 import PlayButton, { PlayButtonOptions } from "./PlayButton";
-
-export default ControlBar;
+import NavigationGizmo, { NavigationGizmoOptions } from "./NavigationGizmo";
 
 export {
+  ControlBar,
   AnimationProgressBar,
   AnimationSelector,
   FullscreenButton,
-  PlayButton
+  PlayButton,
+  NavigationGizmo
 };
 
 export type {
@@ -24,5 +25,6 @@ export type {
   AnimationProgressBarOptions,
   AnimationSelectorOptions,
   FullscreenButtonOptions,
-  PlayButtonOptions
+  PlayButtonOptions,
+  NavigationGizmoOptions
 };

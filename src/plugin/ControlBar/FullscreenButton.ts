@@ -35,8 +35,8 @@ const exitFullscreen = [
 ];
 
 /**
- * @param {number} [initialDelay=3000] Intiial delay before the control bar hides (ms)
- * @param {number} [delay=0] Delay time before hiding the control bar after mouse leave (ms)
+ * @param {string} [position="right"] Position inside the control bar
+ * @param {number} [order=9999] Order within the current position, items will be sorted in ascending order
  */
 export interface FullscreenButtonOptions {
   position: ControlBarItem["position"];

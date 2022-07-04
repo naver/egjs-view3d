@@ -7,9 +7,9 @@
  * Interface of the ControlBar items
  */
 interface ControlBarItem {
-  position: "top" | "left" | "right";
+  position?: "top" | "left" | "right";
+  order?: number;
   element: HTMLElement;
-  order: number;
   enabled: boolean;
   enable(): void;
   disable(): void;
