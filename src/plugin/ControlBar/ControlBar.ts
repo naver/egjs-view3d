@@ -15,6 +15,7 @@ import PlayButton, { PlayButtonOptions } from "./PlayButton";
 import AnimationSelector, { AnimationSelectorOptions } from "./AnimationSelector";
 import FullscreenButton, { FullscreenButtonOptions } from "./FullscreenButton";
 import NavigationGizmo, { NavigationGizmoOptions } from "./NavigationGizmo";
+import CameraResetButton, { CameraResetButtonOptions } from "./CameraResetButton";
 
 /**
  * @param {number} [initialDelay=3000] Intiial delay before the control bar hides (ms)
@@ -31,8 +32,9 @@ interface AutoHideOptions {
  * @param {boolean | AnimationProgressBarOptions} [progressBar=true] Show animation progress ba
  * @param {boolean | PlayButtonOptions} [playButton=true] Show animation play / pause button
  * @param {boolean | AnimationSelectorOptions} [animationSelector=true] Show animation selector
- * @param {boolean | FullscreenButtonOptions} [fullscreen=true] Show fullscreen button
+ * @param {boolean | FullscreenButtonOptions} [fullscreenButton=true] Show fullscreen button
  * @param {boolean | NavigationGizmoOptions} [navigationGizmo=true] Show navigation gizmo
+ * @param {boolean | CameraResetButtonOptions} [cameraResetButton=true] Show camera reset button
  */
 export interface ControlBarOptions {
   autoHide: boolean | AutoHideOptions;
@@ -40,8 +42,9 @@ export interface ControlBarOptions {
   progressBar: boolean | Partial<AnimationProgressBarOptions>;
   playButton: boolean | Partial<PlayButtonOptions>;
   animationSelector: boolean | Partial<AnimationSelectorOptions>;
-  fullscreen: boolean | Partial<FullscreenButtonOptions>;
+  fullscreenButton: boolean | Partial<FullscreenButtonOptions>;
   navigationGizmo: boolean | Partial<NavigationGizmoOptions>;
+  cameraResetButton: boolean | Partial<CameraResetButtonOptions>;
 }
 
 /**
@@ -111,8 +114,9 @@ class ControlBar implements View3DPlugin {
   public progressBar: ControlBarOptions["progressBar"];
   public playButton: ControlBarOptions["playButton"];
   public animationSelector: ControlBarOptions["animationSelector"];
-  public fullscreen: ControlBarOptions["fullscreen"];
+  public fullscreenButton: ControlBarOptions["fullscreenButton"];
   public navigationGizmo: ControlBarOptions["navigationGizmo"];
+  public cameraResetButton: ControlBarOptions["cameraResetButton"];
 
   public get rootEl() { return this._rootEl; }
   public get items() { return this._items; }
@@ -131,16 +135,18 @@ class ControlBar implements View3DPlugin {
     progressBar = true,
     playButton = true,
     animationSelector = true,
-    fullscreen = true,
-    navigationGizmo = true
+    fullscreenButton = true,
+    navigationGizmo = true,
+    cameraResetButton = true
   }: Partial<ControlBarOptions> = {}) {
     this.autoHide = autoHide;
     this.className = className;
     this.progressBar = progressBar;
     this.playButton = playButton;
     this.animationSelector = animationSelector;
-    this.fullscreen = fullscreen;
+    this.fullscreenButton = fullscreenButton;
     this.navigationGizmo = navigationGizmo;
+    this.cameraResetButton = cameraResetButton;
 
     this._items = [];
     this._initElements();
@@ -349,8 +355,12 @@ class ControlBar implements View3DPlugin {
       items.push(new AnimationSelector(view3D, this, getObjectOption(this.animationSelector)));
     }
 
-    if (this.fullscreen) {
-      items.push(new FullscreenButton(view3D, this, getObjectOption(this.fullscreen)));
+    if (this.cameraResetButton) {
+      items.push(new CameraResetButton(view3D, this, getObjectOption(this.cameraResetButton)));
+    }
+
+    if (this.fullscreenButton) {
+      items.push(new FullscreenButton(view3D, this, getObjectOption(this.fullscreenButton)));
     }
 
     if (this.navigationGizmo) {

@@ -113,6 +113,10 @@ class AnimationSelector implements ControlBarItem {
       ...ControlBar.DEFAULT_CLASS
     };
 
+    while (itemList.firstChild) {
+      itemList.removeChild(itemList.firstChild);
+    }
+
     if (animations.length <= 0) {
       root.classList.add(className.DISABLED);
       return;

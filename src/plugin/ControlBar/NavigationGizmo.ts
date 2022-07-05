@@ -16,17 +16,21 @@ import ControlBarItem from "./ControlBarItem";
 
 /**
  * @param {number} [strokeWidth=5] Width of the axis
+ * @param {string} [font="14px sans-serif"] Font of the axis text
+ * @param {number | string} [xAxisColor="ef2746"] Color of the X-axis
+ * @param {number | string} [yAxisColor="a7c031"] Color of the Y-axis
+ * @param {number | string} [zAxisColor="6571a6"] Color of the Z-axis
  */
 export interface NavigationGizmoOptions {
   axisWidth: number;
   font: string;
-  xAxisColor: string;
-  yAxisColor: string;
-  zAxisColor: string;
+  xAxisColor: number | string;
+  yAxisColor: number | string;
+  zAxisColor: number | string;
 }
 
 /**
- * Show fullscreen enter / exit button, use with ControlBar
+ * Show navigation gizmos, use with ControlBar
  */
 class NavigationGizmo implements ControlBarItem {
   public axisWidth: NavigationGizmoOptions["axisWidth"];
@@ -77,7 +81,6 @@ class NavigationGizmo implements ControlBarItem {
     const root = this._rootEl;
     const canvas = this._canvasEl;
     const view3D = this._view3D;
-    const devicePixelRatio = window.devicePixelRatio;
 
     this._enabled = true;
     view3D.rootEl.appendChild(root);
@@ -88,8 +91,8 @@ class NavigationGizmo implements ControlBarItem {
       canvas.clientHeight
     );
 
-    canvas.width = this._canvasSize.x * devicePixelRatio;
-    canvas.height = this._canvasSize.y * devicePixelRatio;
+    canvas.width = this._canvasSize.x;
+    canvas.height = this._canvasSize.y;
 
     const poses = [
       new Pose(-90, 0, 0),

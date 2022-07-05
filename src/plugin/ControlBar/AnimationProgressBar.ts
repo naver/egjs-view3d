@@ -72,8 +72,8 @@ class AnimationProgressBar implements ControlBarItem {
     this._enabled = true;
 
     view3D.on(EVENTS.RENDER, this._onRender);
-    view3D.on(EVENTS.MODEL_CHANGE, this._onModelChange);
 
+    this._fill(0);
     this.enableInput();
   }
 
@@ -87,7 +87,6 @@ class AnimationProgressBar implements ControlBarItem {
     this._enabled = false;
 
     view3D.off(EVENTS.RENDER, this._onRender);
-    view3D.off(EVENTS.MODEL_CHANGE, this._onModelChange);
 
     this.disableInput();
   }
@@ -164,16 +163,15 @@ class AnimationProgressBar implements ControlBarItem {
 
     if (!activeAnimationClip || !activeAnimationAction) return;
 
-    const progressed = activeAnimationAction.time / activeAnimationClip.duration;
+    const progress = activeAnimationAction.time / activeAnimationClip.duration;
 
-    this._fillerEl.style.width = `${progressed * 100}%`;
-    this._knobEl.style.transform = `translateX(${progressed * this._rootBbox.width}px)`;
+    this._fill(progress);
   };
 
-  private _onModelChange = () => {
-    this.disableInput();
-    this.enableInput();
-  };
+  private _fill(progress: number) {
+    this._fillerEl.style.width = `${progress * 100}%`;
+    this._knobEl.style.transform = `translateX(${progress * this._rootBbox.width}px)`;
+  }
 
   private _onMouseDown = (evt: MouseEvent) => {
     if (evt.button !== BROWSER.MOUSE_BUTTON.LEFT) return;

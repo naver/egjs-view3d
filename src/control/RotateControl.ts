@@ -313,7 +313,7 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
 
   private _onTouchMove = (evt: TouchEvent) => {
     // Only the one finger motion should be considered
-    if (evt.touches.length > 1 || this._scrolling || !evt.cancelable) return;
+    if (evt.touches.length > 1 || this._scrolling) return;
 
     const touch = evt.touches[0];
     const scrollable = this._view3D.scrollable;
