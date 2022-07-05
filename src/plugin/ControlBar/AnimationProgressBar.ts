@@ -68,11 +68,10 @@ class AnimationProgressBar implements ControlBarItem {
     const view3D = this._view3D;
     if (this._enabled) return;
 
-    this._onResize();
+    this._rootBbox = this._trackEl.getBoundingClientRect();
     this._enabled = true;
 
     view3D.on(EVENTS.RENDER, this._onRender);
-    view3D.on(EVENTS.RESIZE, this._onResize);
     view3D.on(EVENTS.MODEL_CHANGE, this._onModelChange);
 
     this.enableInput();
@@ -88,7 +87,6 @@ class AnimationProgressBar implements ControlBarItem {
     this._enabled = false;
 
     view3D.off(EVENTS.RENDER, this._onRender);
-    view3D.off(EVENTS.RESIZE, this._onResize);
     view3D.off(EVENTS.MODEL_CHANGE, this._onModelChange);
 
     this.disableInput();
@@ -172,12 +170,7 @@ class AnimationProgressBar implements ControlBarItem {
     this._knobEl.style.transform = `translateX(${progressed * this._rootBbox.width}px)`;
   };
 
-  private _onResize = () => {
-    this._rootBbox = this._trackEl.getBoundingClientRect();
-  };
-
   private _onModelChange = () => {
-    this._onResize();
     this.disableInput();
     this.enableInput();
   };
@@ -193,6 +186,7 @@ class AnimationProgressBar implements ControlBarItem {
     window.addEventListener(BROWSER.EVENTS.MOUSE_MOVE, this._onMouseMove, false);
     window.addEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
 
+    this._rootBbox = this._trackEl.getBoundingClientRect();
     this._showKnob();
     this._origTimeScale = activeAnimationAction.getEffectiveTimeScale();
     this._setAnimationTimeScale(0);
@@ -219,6 +213,7 @@ class AnimationProgressBar implements ControlBarItem {
     const activeAnimationIdx = animator.activeAnimationIndex;
     const activeAnimationAction = animator.actions[activeAnimationIdx];
 
+    this._rootBbox = this._trackEl.getBoundingClientRect();
     this._showKnob();
     this._firstTouch = { x: touch.pageX, y: touch.pageY };
     this._origTimeScale = activeAnimationAction.getEffectiveTimeScale();
