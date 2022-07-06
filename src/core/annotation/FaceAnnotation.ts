@@ -23,7 +23,7 @@ export interface FaceAnnotationOptions extends AnnotationOptions {
 }
 
 /**
- *
+ * {@link Annotation} that tracks position of mesh face(triangle)
  */
 class FaceAnnotation extends Annotation {
   private _meshIndex: number;

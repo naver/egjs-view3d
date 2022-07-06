@@ -6,7 +6,7 @@
 import * as THREE from "three";
 
 import View3D from "../View3D";
-import { EVENTS } from "../const/external";
+import { ANIMATION_REPEAT_MODE, EVENTS } from "../const/external";
 
 /**
  * Component that manages animations of the 3D Model
@@ -58,6 +58,13 @@ class ModelAnimator {
   public get activeAnimation() { return this._clips[this._activeAnimationIdx] ?? null; }
 
   /**
+   * THREE.AnimationAction instance of the animation currently playing, `null` if there're no animation or stopped.
+   * @see {@link https://threejs.org/docs/#api/en/animation/AnimationAction AnimationAction}
+   * @type {THREE.AnimationAction | null}
+   */
+  public get activeAction() { return this._actions[this._activeAnimationIdx] ?? null; }
+
+  /**
    * An index of the animation currently playing.
    * @type {number}
    * @readonly
@@ -91,6 +98,23 @@ class ModelAnimator {
   }
 
   /**
+   * Initialize ModelAnimator
+   */
+  public init() {
+    this._mixer.addEventListener("loop", this._onAnimationLoop);
+    this._mixer.addEventListener("finished", this._onAnimationFinished);
+  }
+
+  /**
+   * Destroy ModelAnimator instance
+   */
+  public destroy() {
+    this.reset();
+    this._mixer.removeEventListener("loop", this._onAnimationLoop);
+    this._mixer.removeEventListener("finished", this._onAnimationFinished);
+  }
+
+  /**
    * Store the given clips
    * @param clips Three.js {@link https://threejs.org/docs/#api/en/animation/AnimationClip AnimationClip}s of the model
    * @returns {void}
@@ -110,6 +134,8 @@ class ModelAnimator {
 
       return action;
     });
+
+    this._updateRepeatMode();
   }
 
   /**
@@ -312,6 +338,62 @@ class ModelAnimator {
 
     this._fadePromises = [];
   }
+
+  private _updateRepeatMode() {
+    const view3D = this._view3D;
+    const actions = this._actions;
+    const repeatMode = view3D.animationRepeatMode;
+
+    if (repeatMode === ANIMATION_REPEAT_MODE.NONE) {
+      actions.forEach(action => {
+        action.clampWhenFinished = true;
+        action.loop = THREE.LoopOnce;
+      });
+    } else {
+      actions.forEach(action => {
+        action.clampWhenFinished = false;
+        action.loop = THREE.LoopRepeat;
+      });
+    }
+  }
+
+  private _onAnimationLoop = (evt: THREE.Event) => {
+    const view3D = this._view3D;
+    const actions = this._actions;
+    const clips = this._clips;
+    const index = actions.findIndex(action => action === evt.action);
+
+    if (view3D.animationRepeatMode === ANIMATION_REPEAT_MODE.ALL) {
+      const nextIndex = (index + 1) >= clips.length
+        ? 0
+        : index + 1;
+
+      this.play(nextIndex);
+    }
+
+    view3D.trigger(EVENTS.ANIMATION_LOOP, {
+      type: EVENTS.ANIMATION_LOOP,
+      target: view3D,
+      index,
+      action: evt.action,
+      clip: clips[index]
+    });
+  };
+
+  private _onAnimationFinished = (evt: THREE.Event) => {
+    const view3D = this._view3D;
+    const actions = this._actions;
+    const clips = this._clips;
+    const index = actions.findIndex(action => action === evt.action);
+
+    view3D.trigger(EVENTS.ANIMATION_FINISHED, {
+      type: EVENTS.ANIMATION_FINISHED,
+      target: view3D,
+      index,
+      action: evt.action,
+      clip: clips[index]
+    });
+  };
 }
 
 export default ModelAnimator;

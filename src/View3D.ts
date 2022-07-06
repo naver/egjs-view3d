@@ -24,7 +24,7 @@ import AutoPlayer, { AutoplayOptions } from "./core/AutoPlayer";
 import { WebARSessionOptions } from "./xr/WebARSession";
 import { SceneViewerSessionOptions } from "./xr/SceneViewerSession";
 import { QuickLookSessionOptions } from "./xr/QuickLookSession";
-import { EVENTS, AUTO, AR_SESSION_TYPE, DEFAULT_CLASS, TONE_MAPPING } from "./const/external";
+import { EVENTS, AUTO, AR_SESSION_TYPE, DEFAULT_CLASS, TONE_MAPPING, ANIMATION_REPEAT_MODE } from "./const/external";
 import ERROR from "./const/error";
 import * as DEFAULT from "./const/default";
 import * as EVENT_TYPES from "./type/event";
@@ -52,6 +52,8 @@ export interface View3DEvents {
   [EVENTS.INPUT_START]: EVENT_TYPES.InputStartEvent;
   [EVENTS.INPUT_END]: EVENT_TYPES.InputEndEvent;
   [EVENTS.CAMERA_CHANGE]: EVENT_TYPES.CameraChangeEvent;
+  [EVENTS.ANIMATION_LOOP]: EVENT_TYPES.AnimationLoopEvent;
+  [EVENTS.ANIMATION_FINISHED]: EVENT_TYPES.AnimationFinishedEvent;
   [EVENTS.AR_START]: EVENT_TYPES.ARStartEvent;
   [EVENTS.AR_END]: EVENT_TYPES.AREndEvent;
   [EVENTS.AR_MODEL_PLACED]: EVENT_TYPES.ARModelPlacedEvent;
@@ -97,6 +99,9 @@ export interface View3DOptions {
   skyboxBlur: boolean;
   toneMapping: LiteralUnion<ValueOf<typeof TONE_MAPPING>, THREE.ToneMapping>;
   useDefaultEnv: boolean;
+
+  // Animation
+  animationRepeatMode: ValueOf<typeof ANIMATION_REPEAT_MODE>;
 
   // Annotation
   annotationURL: string | null;
@@ -181,6 +186,8 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _skyboxBlur: View3DOptions["skyboxBlur"];
   private _toneMapping: View3DOptions["toneMapping"];
   private _useDefaultEnv: View3DOptions["useDefaultEnv"];
+
+  private _animationRepeatMode: View3DOptions["animationRepeatMode"];
 
   private _annotationURL: View3DOptions["annotationURL"];
   private _annotationWrapper: View3DOptions["annotationWrapper"];
@@ -455,11 +462,20 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get toneMapping() { return this._toneMapping; }
   /**
-   *
+   * Whether to use generated default environment map.
    * @type {boolean}
    * @default true
    */
   public get useDefaultEnv() { return this._useDefaultEnv; }
+  /**
+   * Repeat mode of the animator.
+   * "one" will repeat single animation, and "all" will repeat all animations.
+   * "none" will make animation to automatically paused on its last frame.
+   * @see ANIMATION_REPEAT_MODE
+   * @type {string}
+   * @default "one"
+   */
+  public get animationRepeatMode() { return this._animationRepeatMode; }
   /**
    * An URL to the JSON file that has annotation informations.
    * @type {string | null}
@@ -668,6 +684,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     skyboxBlur = false,
     toneMapping = TONE_MAPPING.LINEAR,
     useDefaultEnv = true,
+    animationRepeatMode = ANIMATION_REPEAT_MODE.ONE,
     annotationURL = null,
     annotationWrapper = `.${DEFAULT_CLASS.ANNOTATION_WRAPPER}`,
     annotationSelector = `.${DEFAULT_CLASS.ANNOTATION}`,
@@ -719,6 +736,8 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._skyboxBlur = skyboxBlur;
     this._toneMapping = toneMapping;
     this._useDefaultEnv = useDefaultEnv;
+
+    this._animationRepeatMode = animationRepeatMode;
 
     this._annotationURL = annotationURL;
     this._annotationWrapper = annotationWrapper;
@@ -775,7 +794,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._renderer.destroy();
     this._control.destroy();
     this._autoResizer.disable();
-    this._animator.reset();
+    this._animator.destroy();
     this._annotationManager.destroy();
     this._plugins.forEach(plugin => plugin.teardown(this));
     this._plugins = [];
@@ -794,11 +813,13 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     const scene = this._scene;
     const renderer = this._renderer;
     const control = this._control;
+    const animator = this._animator;
     const annotationManager = this._annotationManager;
     const meshoptPath = this._meshoptPath;
     const tasks: Array<Promise<any>> = [];
 
     this.resize();
+    animator.init();
     annotationManager.init();
 
     if (this._autoResize) {
