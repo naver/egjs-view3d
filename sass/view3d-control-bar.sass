@@ -2,8 +2,8 @@
   --view3d-cb-primary: #ffffff
   --view3d-cb-bg: rgba(0, 0, 0, 0.3)
   --view3d-cb-track: rgba(230, 230, 230, 0.4)
-  --view3d-cb-knob-bg: rgba(30, 30, 30, 0.4)
-  --view3d-cb-knob-text: rgba(255, 255, 255, 0.8)
+  --view3d-cb-thumb-bg: rgba(30, 30, 30, 0.4)
+  --view3d-cb-thumb-text: rgba(255, 255, 255, 0.8)
 
 .view3d-control-bar
   position: absolute
@@ -93,7 +93,7 @@
   height: 100%
   background-color: var(--view3d-cb-primary)
 
-.view3d-progress-knob
+.view3d-progress-thumb
   width: 13px
   height: 13px
   position: absolute
@@ -112,10 +112,10 @@
     top: -45px
     left: 50%
     transform: translateX(-50%)
-    background-color: var(--view3d-cb-knob-bg)
+    background-color: var(--view3d-cb-thumb-bg)
     padding: 4px 8px
     border-radius: 5px
-    color: var(--view3d-cb-knob-text)
+    color: var(--view3d-cb-thumb-text)
     box-sizing: border-box
   &.visible
     &::before
