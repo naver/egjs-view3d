@@ -249,8 +249,7 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
     window.addEventListener(BROWSER.EVENTS.CONTEXT_MENU, this._onContextMenu, false);
 
     this.trigger(CONTROL_EVENTS.HOLD, {
-      inputType: INPUT_TYPE.TRANSLATE,
-      isTouch: false
+      inputType: INPUT_TYPE.TRANSLATE
     });
   };
 
@@ -275,8 +274,7 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
     window.removeEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
 
     this.trigger(CONTROL_EVENTS.RELEASE, {
-      inputType: INPUT_TYPE.TRANSLATE,
-      isTouch: false
+      inputType: INPUT_TYPE.TRANSLATE
     });
   };
 
@@ -292,8 +290,7 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
     this._touchInitialized = true;
 
     this.trigger(CONTROL_EVENTS.HOLD, {
-      inputType: INPUT_TYPE.TRANSLATE,
-      isTouch: true
+      inputType: INPUT_TYPE.TRANSLATE
     });
   };
 
@@ -332,8 +329,7 @@ class TranslateControl extends Component<ControlEvents> implements CameraControl
       if (this._touchInitialized) {
         this._touchInitialized = false;
         this.trigger(CONTROL_EVENTS.RELEASE, {
-          inputType: INPUT_TYPE.TRANSLATE,
-          isTouch: true
+          inputType: INPUT_TYPE.TRANSLATE
         });
       }
       return;

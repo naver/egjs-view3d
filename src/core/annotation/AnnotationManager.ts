@@ -7,6 +7,7 @@ import * as THREE from "three";
 import View3D from "../../View3D";
 import { DEFAULT_CLASS } from "../../const/external";
 import { CONTROL_EVENTS } from "../../const/internal";
+import * as BROWSER from "../../const/browser";
 import { getNullableElement, toDegree } from "../../utils";
 
 import Annotation from "./Annotation";
@@ -324,7 +325,7 @@ class AnnotationManager {
 
   private _createWrapper(): HTMLElement {
     const view3D = this._view3D;
-    const wrapper = document.createElement("div");
+    const wrapper = document.createElement(BROWSER.EL_DIV);
 
     wrapper.classList.add(DEFAULT_CLASS.ANNOTATION_WRAPPER);
     view3D.rootEl.appendChild(wrapper);
@@ -333,13 +334,13 @@ class AnnotationManager {
   }
 
   private _createDefaultAnnotationElement(label: string | null): HTMLElement {
-    const annotation = document.createElement("div");
+    const annotation = document.createElement(BROWSER.EL_DIV);
 
     annotation.classList.add(DEFAULT_CLASS.ANNOTATION);
     annotation.classList.add(DEFAULT_CLASS.ANNOTATION_DEFAULT);
 
     if (label) {
-      const tooltip = document.createElement("div");
+      const tooltip = document.createElement(BROWSER.EL_DIV);
       tooltip.classList.add(DEFAULT_CLASS.ANNOTATION_TOOLTIP);
       tooltip.classList.add(DEFAULT_CLASS.ANNOTATION_DEFAULT);
       tooltip.innerHTML = label;

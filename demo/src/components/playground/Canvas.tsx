@@ -8,7 +8,7 @@ import { Context } from "./context";
 import * as actions from "./action";
 import styles from "./canvas.module.css";
 
-import VanillaView3D, { GLTFLoader, LoadingBar, FaceAnnotation } from "../../../../src";
+import VanillaView3D, { GLTFLoader, LoadingBar, FaceAnnotation, ControlBar } from "../../../../src";
 import ResetIcon from "../../../static/icon/reset.svg";
 import { getAnimatedFace } from "../../../../src/utils";
 
@@ -34,7 +34,7 @@ class RenderSection extends React.Component<{}, {
     const view3D = new VanillaView3D("#playground-view3d", {
       src: "/egjs-view3d/model/cube.glb",
       autoplay: true,
-      plugins: [new LoadingBar({ type: "top" })]
+      plugins: [new LoadingBar({ type: "top" }), new ControlBar()]
     }).on("ready", () => {
       dispatch({
         type: "set_orig_model",
@@ -136,9 +136,6 @@ class RenderSection extends React.Component<{}, {
             }
             <div id="playground-view3d" className={clsx("view3d-wrapper", styles.canvasWrapper)}>
               <canvas className={clsx("view3d-canvas", styles.canvas)}></canvas>
-            </div>
-            <div data-tip="Reset Camera" data-place="top" className={clsx(styles.resetBtn, "button", "is-rounded")} onClick={() => { void state.view3D!.camera.reset(500); }}>
-              <ResetIcon width="32" height="32" className={styles.resetIcon} />
             </div>
             <ModelInfo />
           </div>

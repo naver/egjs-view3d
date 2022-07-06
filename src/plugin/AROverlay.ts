@@ -5,6 +5,7 @@
 import View3D from "../View3D";
 import CloseIcon from "../asset/close-icon";
 import { EVENTS } from "../const/external";
+import * as BROWSER from "../const/browser";
 
 import View3DPlugin from "./View3DPlugin";
 
@@ -47,7 +48,7 @@ class AROverlay implements View3DPlugin {
           }
         });
       } else {
-        const closeButton = document.createElement("div");
+        const closeButton = document.createElement(BROWSER.EL_DIV);
 
         closeButton.innerHTML = CloseIcon;
         closeButton.classList.add("view3d-ar-close");

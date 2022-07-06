@@ -11,6 +11,7 @@ import Animation from "../core/Animation";
 import WebARControl, { WebARControlOptions } from "../control/ar/WebARControl";
 import * as DEFAULT from "../const/default";
 import * as XR from "../const/xr";
+import * as BROWSER from "../const/browser";
 import { AR_SESSION_TYPE, AUTO, EVENTS } from "../const/external";
 import { getNullableElement, merge } from "../utils";
 import { XRRenderContext } from "../type/xr";
@@ -387,7 +388,7 @@ class WebARSession implements ARSession {
 
   private _createARRootElement(): HTMLElement {
     const view3D = this._view3D;
-    const root = document.createElement("div");
+    const root = document.createElement(BROWSER.EL_DIV);
 
     root.classList.add(DEFAULT.AR_OVERLAY_CLASS);
     view3D.rootEl.appendChild(root);

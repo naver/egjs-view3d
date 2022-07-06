@@ -7,6 +7,8 @@ import ARButton, { ARButtonOptions } from "./ARButton";
 import AROverlay, { AROverlayOptions } from "./AROverlay";
 import LoadingBar, { LoadingBarOptions } from "./LoadingBar";
 
+export * from "./ControlBar";
+
 export {
   ARButton,
   AROverlay,
@@ -14,8 +16,8 @@ export {
 };
 
 export type {
+  View3DPlugin,
   ARButtonOptions,
   AROverlayOptions,
-  LoadingBarOptions,
-  View3DPlugin
+  LoadingBarOptions
 };

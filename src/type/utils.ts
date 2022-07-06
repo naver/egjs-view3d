@@ -12,15 +12,14 @@ export type OptionGetters<T> = {
   [key in keyof T]: T[key]
 };
 
-
 export interface Range {
   min: number;
   max: number;
 }
 
 export interface ControlEvents {
-  hold: { inputType: ValueOf<typeof INPUT_TYPE>; isTouch: boolean };
-  release: { inputType: ValueOf<typeof INPUT_TYPE>; isTouch: boolean };
+  hold: { inputType: ValueOf<typeof INPUT_TYPE> };
+  release: { inputType: ValueOf<typeof INPUT_TYPE> };
   enable: { inputType: ValueOf<typeof INPUT_TYPE> };
   disable: { inputType: ValueOf<typeof INPUT_TYPE> };
 }

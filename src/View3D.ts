@@ -89,6 +89,7 @@ export interface View3DOptions {
   scrollable: boolean;
   wheelScrollable: boolean;
   useGrabCursor: boolean;
+  defaultAnimationIndex: number;
 
   // Environment
   skybox: string | null;
@@ -177,6 +178,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _scrollable: View3DOptions["scrollable"];
   private _wheelScrollable: View3DOptions["scrollable"];
   private _useGrabCursor: View3DOptions["useGrabCursor"];
+  private _defaultAnimationIndex: View3DOptions["defaultAnimationIndex"];
 
   private _skybox: View3DOptions["skybox"];
   private _envmap: View3DOptions["envmap"];
@@ -414,6 +416,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get useGrabCursor() { return this._useGrabCursor; }
   /**
+   * Index of the animation to play after the model is loaded
+   * @type {number}
+   * @default 0
+   */
+  public get defaultAnimationIndex() { return this._defaultAnimationIndex; }
+  /**
    * Source to the HDR texture image (RGBE), which will used as the scene environment map & background.
    * `envmap` will be ignored if this value is not `null`.
    * @type {string | null}
@@ -580,6 +588,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get maxDeltaTime() { return this._maxDeltaTime; }
 
+  public set defaultAnimationIndex(val: View3DOptions["defaultAnimationIndex"]) { this._defaultAnimationIndex = val; }
   public set initialZoom(val: View3DOptions["initialZoom"]) { this._initialZoom = val; }
 
   public set skybox(val: View3DOptions["skybox"]) {
@@ -676,6 +685,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     scrollable = true,
     wheelScrollable = false,
     useGrabCursor = true,
+    defaultAnimationIndex = 0,
     skybox = null,
     envmap = null,
     background = null,
@@ -727,6 +737,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._scrollable = scrollable;
     this._wheelScrollable = wheelScrollable;
     this._useGrabCursor = useGrabCursor;
+    this._defaultAnimationIndex = defaultAnimationIndex;
 
     this._skybox = skybox;
     this._envmap = envmap;
@@ -930,7 +941,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     animator.setClips(model.animations);
 
     if (model.animations.length > 0) {
-      animator.play(0);
+      animator.play(this._defaultAnimationIndex);
     }
 
     annotationManager.reset();
