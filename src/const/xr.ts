@@ -34,7 +34,9 @@ export const REFERENCE_SPACE = {
 export const EVENTS = {
   SELECT_START: "selectstart",
   SELECT: "select",
-  SELECT_END: "selectend"
+  SELECT_END: "selectend",
+  ESTIMATION_START: "estimationstart",
+  ESTIMATION_END: "estimationend"
 } as const;
 
 export const INPUT_PROFILE = {
@@ -46,7 +48,10 @@ export const FEATURES = {
   DOM_OVERLAY: (root: HTMLElement | null) => root ? ({
     requiredFeatures: ["dom-overlay"],
     domOverlay: { root }
-  }) : {}
+  }) : {},
+  LIGHT_ESTIMATION: {
+    optionalFeatures: ["light-estimation"]
+  }
 } as const;
 
 // For type definition
