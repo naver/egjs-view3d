@@ -48,6 +48,16 @@ It is possible to deactivate only one axis of the rotation with `disablePitch` (
   </div>
 </div>
 
+### Disabling double-tap to zoom behavior
+Setting `doubleTap=false` on `zoom` option will do the job.
+
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  poster="/egjs-view3d/poster/alarm_default.png"
+  zoom={{ doubleTap: false }}
+  clickToLoad
+  showExampleCode />
+
 ## Scrolling
 ### Mobile
 By default, [scrollable](/docs/options/control/scrollable) is enabled to enable scrolling on the canvas area for mobile(touch) devices.
