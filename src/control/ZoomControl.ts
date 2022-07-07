@@ -49,12 +49,12 @@ export interface ZoomControlOptions {
   maxFov: typeof AUTO | number;
   minDistance: number;
   maxDistance: number;
-  doubleTap: boolean | {
+  doubleTap: boolean | Partial<{
     zoomIn: number;
     useZoomOut: boolean;
     duration: number;
     easing: (x: number) => number;
-  };
+  }>;
   easing: (x: number) => number;
 }
 
