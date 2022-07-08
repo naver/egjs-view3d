@@ -251,7 +251,7 @@ class ControlBar implements View3DPlugin {
     const leftControlsWrapper = this._leftControlsWrapper;
     const rightControlsWrapper = this._rightControlsWrapper;
 
-    const positionedItems = this._items.filter(item => item.position && item.order);
+    const positionedItems = this._items.filter(item => item.position && item.order != null);
     const posMap: {
       [key: string]: {
         parentEl: HTMLElement;

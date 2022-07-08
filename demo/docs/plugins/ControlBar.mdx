@@ -9,7 +9,7 @@ ControlBar adds a bar at the bottom of the canvas that can control animation and
 
 ```js
 import View3D, { ControlBar } from "@egjs/view3d";
-import "@egjs/view3d/css/view3d-control-bar.min.css"; // If you're not using bundled CSS
+import "@egjs/view3d/css/view3d-control-bar.min.css"; // If you're not using the bundled CSS (view3d-bundle.css)
 
 const view3D = new View3D(...);
 
@@ -35,3 +35,29 @@ view3D.loadPlugins(new ControlBar({
 |animationSelector|boolean \| [AnimationSelectorOptions](/docs/api/AnimationSelectorOptions)|true|Show animation selector|
 |fullscreen|boolean \| [FullscreenButtonOptions](/docs/api/FullscreenButtonOptions)|true|Show fullscreen button|
 |navigationGizmo|boolean \| [NavigationGizmoOptions](/docs/api/NavigationGizmoOptions)|true|Show navigation gizmo|
+
+### Customizing
+<>
+  {(() => {
+    const plugin = new ControlBar({
+      autoHide: false,
+      progressBar: { position: "left" },
+      playButton: { order: 0 },
+      animationSelector: false,
+      navigationGizmo: false,
+      cameraResetButton: false
+    });
+    return <View3D
+      src="/egjs-view3d/model/RobotExpressive.glb"
+      plugins={[plugin]} />
+  })()}
+</>
+
+```json
+autoHide: false,
+progressBar: { position: "left" },
+playButton: { order: 0 },
+animationSelector: false,
+navigationGizmo: false,
+cameraResetButton: false
+```
