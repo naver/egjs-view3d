@@ -30,6 +30,7 @@ export const EVENTS = {
   LOAD: "load",
   ERROR: "error",
   CLICK: "click",
+  DOUBLE_CLICK: "dblclick",
   CONTEXT_LOST: "webglcontextlost",
   CONTEXT_RESTORED: "webglcontextrestored"
 } as const;

@@ -65,7 +65,7 @@ class ControlBar implements View3DPlugin {
    * @property {"view3d-control-item"} CONTROLS_ITEM A class name for control item elements
    * @property {"view3d-progress-bar"} PROGRESS_ROOT A class name for root element of the progress bar
    * @property {"view3d-progress-track"} PROGRESS_TRACK A class name for progress track element of the progress bar
-   * @property {"view3d-progress-knob"} PROGRESS_KNOB A class name for knob element of the progress bar
+   * @property {"view3d-progress-thumb"} PROGRESS_THUMB A class name for thumb element of the progress bar
    * @property {"view3d-progress-filler"} PROGRESS_FILLER A class name for progress filler element of the progress bar
    * @property {"view3d-animation-name"} ANIMATION_NAME A class name for animation name element of the animation selector
    * @property {"view3d-animation-list"} ANIMATION_LIST A class name for animation list element of the animation selector
@@ -86,7 +86,7 @@ class ControlBar implements View3DPlugin {
     CONTROLS_ITEM: "view3d-control-item",
     PROGRESS_ROOT: "view3d-progress-bar",
     PROGRESS_TRACK: "view3d-progress-track",
-    PROGRESS_KNOB: "view3d-progress-knob",
+    PROGRESS_THUMB: "view3d-progress-thumb",
     PROGRESS_FILLER: "view3d-progress-filler",
     ANIMATION_NAME: "view3d-animation-name",
     ANIMATION_LIST: "view3d-animation-list",

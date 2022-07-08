@@ -164,6 +164,7 @@ class WebARSession implements ARSession {
     const control = this._control;
     const hitTest = this._hitTest;
     const domOverlay = this._domOverlay;
+    const useLightEstimation = this.useLightEstimation;
     const lightEstimation = this._lightEstimation;
     const vertical = this.vertical;
     const features = this._getAllXRFeatures();
@@ -171,9 +172,11 @@ class WebARSession implements ARSession {
     // Enable xr
     threeRenderer.xr.enabled = true;
 
-    // Estimation requires "sessionstart" event of the renderer
-    // So it should be initialized before requesting session
-    lightEstimation.init();
+    if (useLightEstimation) {
+      // Estimation requires "sessionstart" event of the renderer
+      // So it should be initialized before requesting session
+      lightEstimation.init();
+    }
 
     const session = await navigator.xr.requestSession(XR.SESSION.AR, features) as unknown as THREE.XRSession;
 

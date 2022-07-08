@@ -1,7 +1,7 @@
 import ZoomControl from "~/control/ZoomControl";
 import * as BROWSER from "~/const/browser";
 import * as DEFAULT from "~/const/default";
-import { createView3D } from "../../test-utils";
+import { createView3D, wait } from "../../test-utils";
 
 describe("ZoomControl", () => {
   describe("Initial state", () => {
@@ -23,6 +23,11 @@ describe("ZoomControl", () => {
     it("should have 'auto' as default maximum fov", async () => {
       const view3D = await createView3D();
       expect(new ZoomControl(view3D).maxFov).to.equal("auto");
+    });
+
+    it("should have true as default doubleTap", async () => {
+      const view3D = await createView3D();
+      expect(new ZoomControl(view3D).doubleTap).to.be.true;
     });
 
     it("should have 'DEFAULT.EASING' as default easing", async () => {
@@ -56,11 +61,11 @@ describe("ZoomControl", () => {
 
       zoomControl.enable();
 
-      const listenersShouldBeAdded = new Set([BROWSER.EVENTS.TOUCH_MOVE, BROWSER.EVENTS.TOUCH_END, BROWSER.EVENTS.WHEEL]);
+      const listenersShouldBeAdded = [BROWSER.EVENTS.TOUCH_MOVE, BROWSER.EVENTS.TOUCH_END, BROWSER.EVENTS.WHEEL, BROWSER.EVENTS.DOUBLE_CLICK];
       const listenersAdded = addEventSpy.args.map(args => args[0]); // Take the first argument(event name) only
 
       expect(listenersAdded.length).to.greaterThan(0);
-      expect(listenersAdded.every(eventName => listenersShouldBeAdded.has(eventName))).to.be.true;
+      expect(listenersShouldBeAdded.every(eventName => listenersAdded.findIndex(listener => listener === eventName) >= 0)).to.be.true;
     });
 
     it("should return enabled as true after enabling it", async () => {
@@ -82,12 +87,13 @@ describe("ZoomControl", () => {
       zoomControl.enable(); // It should be enabled first
       zoomControl.disable();
 
-      const listenersShouldBeRemoved = new Set([
-        BROWSER.EVENTS.TOUCH_START, BROWSER.EVENTS.TOUCH_MOVE, BROWSER.EVENTS.TOUCH_END, BROWSER.EVENTS.WHEEL
-      ]);
+      const listenersShouldBeRemoved = [
+        BROWSER.EVENTS.TOUCH_MOVE, BROWSER.EVENTS.TOUCH_END, BROWSER.EVENTS.WHEEL, BROWSER.EVENTS.DOUBLE_CLICK
+      ];
       const listenersRemoved = removeEventSpy.args.map(args => args[0]); // Take the first argument(event name) only
+
       expect(listenersRemoved.length).to.greaterThan(0);
-      expect(listenersRemoved.every(eventName => listenersShouldBeRemoved.has(eventName))).to.be.true;
+      expect(listenersShouldBeRemoved.every(eventName => listenersRemoved.findIndex(listener => listener === eventName) >= 0)).to.be.true;
     });
 
     it("should return enabled as false after disabling it", async () => {
@@ -164,6 +170,77 @@ describe("ZoomControl", () => {
       zoomControl.updateRange();
 
       expect(zoomControl.range.max).to.equal(100 - 45);
+    });
+  });
+
+  describe("Double tap to zoom", () => {
+    it("should zoom in on double tap", async () => {
+      const view3D = await createView3D({ src: "/alarm.glb", zoom: { doubleTap: { duration: 0 } } });
+      const canvas = view3D.renderer.canvas;
+
+      const prevZoom = view3D.camera.zoom;
+      const doubleTapEvt = new MouseEvent("dblclick", {
+        offsetX: canvas.clientWidth / 2,
+        offsetY: canvas.clientWidth / 2
+      } as any);
+      view3D.renderer.canvas.dispatchEvent(doubleTapEvt);
+
+      const newZoom = view3D.camera.zoom;
+
+      expect(newZoom).not.to.equal(prevZoom);
+      expect(newZoom).to.equal(-view3D.control.zoom.range.min * 0.8);
+    });
+
+    it("should not zoom in on double tap if doubleTap is false", async () => {
+      const view3D = await createView3D({ src: "/alarm.glb", zoom: { doubleTap: false } });
+      const canvas = view3D.renderer.canvas;
+
+      const prevZoom = view3D.camera.zoom;
+      const doubleTapEvt = new MouseEvent("dblclick", {
+        offsetX: canvas.clientWidth / 2,
+        offsetY: canvas.clientWidth / 2
+      } as any);
+      view3D.renderer.canvas.dispatchEvent(doubleTapEvt);
+      await wait(1000);
+
+      const newZoom = view3D.camera.zoom;
+
+      expect(newZoom).to.equal(prevZoom);
+    });
+
+    it("should zoom out on second double tap", async () => {
+      const view3D = await createView3D({ src: "/alarm.glb", zoom: { doubleTap: { duration: 0 } } });
+      const canvas = view3D.renderer.canvas;
+
+      const prevZoom = view3D.camera.zoom;
+      const doubleTapEvt = new MouseEvent("dblclick", {
+        offsetX: canvas.clientWidth / 2,
+        offsetY: canvas.clientWidth / 2
+      } as any);
+      view3D.renderer.canvas.dispatchEvent(doubleTapEvt);
+      view3D.renderer.canvas.dispatchEvent(doubleTapEvt);
+
+      const newZoom = view3D.camera.zoom;
+
+      expect(newZoom).to.equal(0);
+    });
+
+    it("should not zoom out on second double tap when useZoomOut is false", async () => {
+      const view3D = await createView3D({ src: "/alarm.glb", zoom: { doubleTap: { duration: 0, useZoomOut: false } } });
+      const canvas = view3D.renderer.canvas;
+
+      const prevZoom = view3D.camera.zoom;
+      const doubleTapEvt = new MouseEvent("dblclick", {
+        offsetX: canvas.clientWidth / 2,
+        offsetY: canvas.clientWidth / 2
+      } as any);
+      view3D.renderer.canvas.dispatchEvent(doubleTapEvt);
+      view3D.renderer.canvas.dispatchEvent(doubleTapEvt);
+
+      const newZoom = view3D.camera.zoom;
+
+      expect(newZoom).not.to.equal(prevZoom);
+      expect(newZoom).to.equal(-view3D.control.zoom.range.min * 0.8);
     });
   });
 });

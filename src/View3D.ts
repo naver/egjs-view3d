@@ -89,7 +89,6 @@ export interface View3DOptions {
   scrollable: boolean;
   wheelScrollable: boolean;
   useGrabCursor: boolean;
-  defaultAnimationIndex: number;
 
   // Environment
   skybox: string | null;
@@ -102,6 +101,7 @@ export interface View3DOptions {
   useDefaultEnv: boolean;
 
   // Animation
+  defaultAnimationIndex: number;
   animationRepeatMode: ValueOf<typeof ANIMATION_REPEAT_MODE>;
 
   // Annotation
@@ -178,7 +178,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _scrollable: View3DOptions["scrollable"];
   private _wheelScrollable: View3DOptions["scrollable"];
   private _useGrabCursor: View3DOptions["useGrabCursor"];
-  private _defaultAnimationIndex: View3DOptions["defaultAnimationIndex"];
 
   private _skybox: View3DOptions["skybox"];
   private _envmap: View3DOptions["envmap"];
@@ -189,6 +188,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _toneMapping: View3DOptions["toneMapping"];
   private _useDefaultEnv: View3DOptions["useDefaultEnv"];
 
+  private _defaultAnimationIndex: View3DOptions["defaultAnimationIndex"];
   private _animationRepeatMode: View3DOptions["animationRepeatMode"];
 
   private _annotationURL: View3DOptions["annotationURL"];
@@ -416,12 +416,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get useGrabCursor() { return this._useGrabCursor; }
   /**
-   * Index of the animation to play after the model is loaded
-   * @type {number}
-   * @default 0
-   */
-  public get defaultAnimationIndex() { return this._defaultAnimationIndex; }
-  /**
    * Source to the HDR texture image (RGBE), which will used as the scene environment map & background.
    * `envmap` will be ignored if this value is not `null`.
    * @type {string | null}
@@ -475,6 +469,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    * @default true
    */
   public get useDefaultEnv() { return this._useDefaultEnv; }
+  /**
+   * Index of the animation to play after the model is loaded
+   * @type {number}
+   * @default 0
+   */
+  public get defaultAnimationIndex() { return this._defaultAnimationIndex; }
   /**
    * Repeat mode of the animator.
    * "one" will repeat single animation, and "all" will repeat all animations.
@@ -639,6 +639,11 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   public set useGrabCursor(val: View3DOptions["useGrabCursor"]) {
     this._useGrabCursor = val;
     this._control.updateCursor();
+  }
+
+  public set animationRepeatMode(val: View3DOptions["animationRepeatMode"]) {
+    this._animationRepeatMode = val;
+    this._animator.updateRepeatMode();
   }
 
   public set autoResize(val: View3DOptions["autoResize"]) {

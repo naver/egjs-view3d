@@ -1,41 +1,29 @@
 ---
-sidebar_position: 2
+sidebar_position: 1
 ---
+
 
 import View3D from "@site/src/components/View3D";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
 import License from "@site/src/components/License";
 
-<OptionDescriptor type="string" defaultVal={'"one"'} />
+<OptionDescriptor type="number" defaultVal={"0"} />
 
-Repeat mode of the animator.
-"one" will repeat single animation, and "all" will repeat all animations.
-"none" will make animation to automatically paused on its last frame.
-
-Constants are available with [ANIMATION_REPEAT_MODE](/docs/api/ANIMATION_REPEAT_MODE)
+Index of the animation to play after the model is loaded
 
 <div className="columns">
   <div className="column">
     <View3D
       src="/egjs-view3d/model/RobotExpressive.glb"
-      animationRepeatMode={"one"}
+      defaultAnimationIndex={0}
       showExampleCode />
   </div>
   <div className="column">
     <View3D
       src="/egjs-view3d/model/RobotExpressive.glb"
-      animationRepeatMode={"all"}
+      defaultAnimationIndex={1}
       showExampleCode />
   </div>
-</div>
-<div className="columns">
-  <div className="column">
-    <View3D
-      src="/egjs-view3d/model/RobotExpressive.glb"
-      animationRepeatMode={"none"}
-      showExampleCode />
-  </div>
-  <div className="column"></div>
 </div>
 
 <License items={[

@@ -35,7 +35,7 @@ class AnimationProgressBar implements ControlBarItem {
   private _view3D: View3D;
   private _controlBar: ControlBar;
   private _rootEl: HTMLElement;
-  private _knobEl: HTMLElement;
+  private _thumbEl: HTMLElement;
   private _trackEl: HTMLElement;
   private _fillerEl: HTMLElement;
   private _rootBbox: DOMRect;
@@ -139,19 +139,19 @@ class AnimationProgressBar implements ControlBarItem {
     const track = document.createElement(BROWSER.EL_DIV);
     track.classList.add(className.PROGRESS_TRACK);
 
-    const knob = document.createElement(BROWSER.EL_DIV);
-    knob.classList.add(className.PROGRESS_KNOB);
+    const thumb = document.createElement(BROWSER.EL_DIV);
+    thumb.classList.add(className.PROGRESS_THUMB);
 
     const filler = document.createElement(BROWSER.EL_DIV);
     filler.classList.add(className.PROGRESS_FILLER);
 
     track.appendChild(filler);
-    track.appendChild(knob);
+    track.appendChild(thumb);
     root.appendChild(track);
 
     this._rootEl = root;
     this._trackEl = track;
-    this._knobEl = knob;
+    this._thumbEl = thumb;
     this._fillerEl = filler;
   }
 
@@ -170,7 +170,7 @@ class AnimationProgressBar implements ControlBarItem {
 
   private _fill(progress: number) {
     this._fillerEl.style.width = `${progress * 100}%`;
-    this._knobEl.style.transform = `translateX(${progress * this._rootBbox.width}px)`;
+    this._thumbEl.style.transform = `translateX(${progress * this._rootBbox.width}px)`;
   }
 
   private _onMouseDown = (evt: MouseEvent) => {
@@ -185,7 +185,7 @@ class AnimationProgressBar implements ControlBarItem {
     window.addEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
 
     this._rootBbox = this._trackEl.getBoundingClientRect();
-    this._showKnob();
+    this._showThumb();
     this._origTimeScale = activeAnimationAction.getEffectiveTimeScale();
     this._setAnimationTimeScale(0);
     this._updateAnimationProgress(evt.pageX);
@@ -199,7 +199,7 @@ class AnimationProgressBar implements ControlBarItem {
   private _onMouseUp = () => {
     window.removeEventListener(BROWSER.EVENTS.MOUSE_MOVE, this._onMouseMove, false);
     window.removeEventListener(BROWSER.EVENTS.MOUSE_UP, this._onMouseUp, false);
-    this._hideKnob();
+    this._hideThumb();
     this._setAnimationTimeScale(this._origTimeScale);
   };
 
@@ -212,7 +212,7 @@ class AnimationProgressBar implements ControlBarItem {
     const activeAnimationAction = animator.actions[activeAnimationIdx];
 
     this._rootBbox = this._trackEl.getBoundingClientRect();
-    this._showKnob();
+    this._showThumb();
     this._firstTouch = { x: touch.pageX, y: touch.pageY };
     this._origTimeScale = activeAnimationAction.getEffectiveTimeScale();
     this._setAnimationTimeScale(0);
@@ -260,36 +260,36 @@ class AnimationProgressBar implements ControlBarItem {
   };
 
   private _release() {
-    this._hideKnob();
+    this._hideThumb();
     this._setAnimationTimeScale(this._origTimeScale);
   }
 
-  private _showKnob() {
-    const knob = this._knobEl;
+  private _showThumb() {
+    const thumb = this._thumbEl;
     const controlBar = this._controlBar;
     const className = {
       ...controlBar.className,
       ...ControlBar.DEFAULT_CLASS
     };
 
-    knob.classList.add(className.VISIBLE);
+    thumb.classList.add(className.VISIBLE);
   }
 
-  private _hideKnob() {
-    const knob = this._knobEl;
+  private _hideThumb() {
+    const thumb = this._thumbEl;
     const controlBar = this._controlBar;
     const className = {
       ...controlBar.className,
       ...ControlBar.DEFAULT_CLASS
     };
 
-    knob.classList.remove(className.VISIBLE);
+    thumb.classList.remove(className.VISIBLE);
   }
 
   private _updateAnimationProgress = (x: number) => {
     const view3D = this._view3D;
     const rootBbox = this._rootBbox;
-    const knob = this._knobEl;
+    const thumb = this._thumbEl;
 
     const animator = view3D.animator;
     const activeAnimationIdx = animator.activeAnimationIndex;
@@ -306,7 +306,7 @@ class AnimationProgressBar implements ControlBarItem {
     const newTimeFractions = Math.floor(100 * (newTime - newTimeSeconds));
     const padNumber = (val: number) => `${"0".repeat(Math.max(2 - val.toString().length, 0))}${val}`;
 
-    knob.setAttribute("data-time", `${padNumber(newTimeSeconds)}:${padNumber(newTimeFractions)}`);
+    thumb.setAttribute("data-time", `${padNumber(newTimeSeconds)}:${padNumber(newTimeFractions)}`);
 
     view3D.renderer.renderSingleFrame();
   };

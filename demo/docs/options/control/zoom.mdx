@@ -19,6 +19,11 @@ If `false` is given, it will disable the zoom control.
 |maxFov|number|"auto"|Maximum vertical fov(field of view).<div className="admonition admonition-caution alert alert--warning"><div className="admonition-heading"><h5><span className="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fillRule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>caution</h5></div><div className="admonition-content"><p>Only available when type is "fov"</p></div></div>You can get a smaller image with the bigger value of this.<br />If `"auto"` is given, it will use `Math.min(default fov + 45, 175)`|
 |minDistance|number|0.1|Minimum camera distance.<div className="admonition admonition-caution alert alert--warning"><div className="admonition-heading"><h5><span className="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fillRule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>caution</h5></div><div className="admonition-content"><p>Only available when type is "distance"</p></div></div>This will be scaled to camera's default distance([camera.baseDistance](/docs/api/Camera#baseDistance))|
 |maxDistance|number|2|Maximum camera distance.<div className="admonition admonition-caution alert alert--warning"><div className="admonition-heading"><h5><span className="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fillRule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>caution</h5></div><div className="admonition-content"><p>Only available when type is "distance"</p></div></div>This will be scaled to camera's default distance([camera.baseDistance](/docs/api/Camera#baseDistance))|
+|doubleTap|boolean\|object|true|Configures double tap to zoom behavior, `false` to disable|
+|doubleTap.zoomIn|number|0.8|Zoom-in value, relative to fov/distance range.max|
+|doubleTap.useZoomOut|number|true|Whether to use zoom-out behavior on double tap|
+|doubleTap.duration|number|300|Duration of the zoom-in and zoom-out animation|
+|doubleTap.easing|function|EASING.EASE_OUT_CUBIC|Zoom-in value, relative to fov/distance range.max|
 |easing|function|EASING.EASE_OUT_CUBIC|Easing function of the animation|
 
 ## Example
@@ -60,6 +65,32 @@ If `false` is given, it will disable the zoom control.
       zoom={{
         type: "distance"
       }}
+      showExampleCode
+      clickToLoad />
+  </div>
+</div>
+
+### Double tap to zoom
+<div className="columns">
+  <div className="column">
+    <View3D
+      src="/egjs-view3d/model/draco/alarm.glb"
+      poster="/egjs-view3d/poster/alarm.png"
+      zoom={{
+        doubleTap: {
+          zoomIn: 0.5,
+          useZoomOut: false,
+          duration: 100
+        }
+      }}
+      showExampleCode
+      clickToLoad />
+  </div>
+  <div className="column">
+    <View3D
+      src="/egjs-view3d/model/draco/alarm.glb"
+      poster="/egjs-view3d/poster/alarm.png"
+      zoom={{ doubleTap: false }}
       showExampleCode
       clickToLoad />
   </div>

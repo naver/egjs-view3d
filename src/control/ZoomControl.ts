@@ -8,10 +8,12 @@ import Component from "@egjs/component";
 
 import View3D from "../View3D";
 import Motion from "../core/Motion";
+import Pose from "../core/Pose";
 import * as BROWSER from "../const/browser";
 import * as DEFAULT from "../const/default";
 import { CONTROL_EVENTS } from "../const/internal";
 import { AUTO, INPUT_TYPE, ZOOM_TYPE } from "../const/external";
+import { getObjectOption } from "../utils";
 import { ControlEvents, OptionGetters, ValueOf } from "../type/utils";
 
 import CameraControl from "./CameraControl";
@@ -32,6 +34,11 @@ import CameraControl from "./CameraControl";
  * Only available when type is "distance".
  * @param {number} [maxDistance=2] Maximum camera distance. This will be scaled to camera's default distance({@link camera.baseDistance Camera#baseDistance})
  * Only available when type is "distance".
+ * @param {boolean|object} [doubleTap=true] Configures double tap to zoom behavior, `false` to disable.
+ * @param {number} [doubleTap.zoomIn=0.8] Zoom-in value, relative to fov/distance range.max.
+ * @param {boolean} [doubleTap.useZoomOut=true] Whether to use zoom-out behavior on double tap.
+ * @param {number} [doubleTap.duration=300] Duration of the zoom-in and zoom-out animation.
+ * @param {number} [doubleTap.easing=EASING.EASE_OUT_CUBIC] Easing function of the zoom-in and zoom-out animation.
  * @param {function} [easing=EASING.EASE_OUT_CUBIC] Easing function of the animation.
  */
 export interface ZoomControlOptions {
@@ -42,6 +49,12 @@ export interface ZoomControlOptions {
   maxFov: typeof AUTO | number;
   minDistance: number;
   maxDistance: number;
+  doubleTap: boolean | Partial<{
+    zoomIn: number;
+    useZoomOut: boolean;
+    duration: number;
+    easing: (x: number) => number;
+  }>;
   easing: (x: number) => number;
 }
 
@@ -57,6 +70,7 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
   private _maxFov: ZoomControlOptions["maxFov"];
   private _minDistance: ZoomControlOptions["minDistance"];
   private _maxDistance: ZoomControlOptions["maxDistance"];
+  private _doubleTap: ZoomControlOptions["doubleTap"];
   private _easing: ZoomControlOptions["easing"];
 
   // Internal values
@@ -138,6 +152,7 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
    * @default 2
    */
   public get maxDistance() { return this._maxDistance; }
+  public get doubleTap() { return this._doubleTap; }
   /**
    * Easing function of the animation
    * @type {function}
@@ -165,6 +180,7 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
     maxFov = AUTO,
     minDistance = 0.1,
     maxDistance = 2,
+    doubleTap = true,
     easing = DEFAULT.EASING
   }: Partial<ZoomControlOptions> = {}) {
     super();
@@ -177,6 +193,7 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
     this._maxFov = maxFov;
     this._minDistance = minDistance;
     this._maxDistance = maxDistance;
+    this._doubleTap = doubleTap;
     this._easing = easing;
 
     this._motion = new Motion({
@@ -249,6 +266,7 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
     targetEl.addEventListener(BROWSER.EVENTS.WHEEL, this._onWheel, { passive: false, capture: false });
     targetEl.addEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove, { passive: false, capture: false });
     targetEl.addEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, { passive: false, capture: false });
+    targetEl.addEventListener(BROWSER.EVENTS.DOUBLE_CLICK, this._onDoubleClick);
 
     this._enabled = true;
     this.sync();
@@ -270,6 +288,7 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
     targetEl.removeEventListener(BROWSER.EVENTS.WHEEL, this._onWheel, false);
     targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_MOVE, this._onTouchMove, false);
     targetEl.removeEventListener(BROWSER.EVENTS.TOUCH_END, this._onTouchEnd, false);
+    targetEl.removeEventListener(BROWSER.EVENTS.DOUBLE_CLICK, this._onDoubleClick);
 
     this._enabled = false;
 
@@ -380,6 +399,49 @@ class ZoomControl extends Component<ControlEvents> implements CameraControl, Opt
 
     this._prevTouchDistance = -1;
     this._isFirstTouch = true;
+  };
+
+  private _onDoubleClick = (evt: MouseEvent) => {
+    const view3D = this._view3D;
+    if (!this._doubleTap || !view3D.model) return;
+
+    const {
+      zoomIn = 0.8,
+      duration = DEFAULT.ANIMATION_DURATION,
+      easing = DEFAULT.EASING,
+      useZoomOut = true
+    } = getObjectOption(this._doubleTap);
+    const zoomRange = this._motion.range;
+    const maxZoom = -zoomRange.min * zoomIn;
+
+    if (view3D.camera.zoom >= maxZoom && useZoomOut) {
+      const resetPose = view3D.camera.currentPose.clone();
+      resetPose.zoom = 0;
+
+      void view3D.camera.reset(duration, easing, resetPose);
+      return;
+    }
+
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    const canvasSize = view3D.renderer.canvasSize;
+    pointer.x = (evt.offsetX / canvasSize.x) * 2 - 1;
+    pointer.y = -(evt.offsetY / canvasSize.y) * 2 + 1;
+
+    raycaster.setFromCamera(pointer, view3D.camera.threeCamera);
+
+    const intersects = raycaster.intersectObject(view3D.model.scene);
+
+    if (!intersects.length) return;
+
+    // Nearest
+    const intersect = intersects[0];
+    const newPivot = intersect.point;
+
+    const { yaw, pitch } = view3D.camera;
+    const resetPose = new Pose(yaw, pitch, maxZoom, newPivot.toArray());
+
+    void view3D.camera.reset(duration, easing, resetPose);
   };
 }
 
