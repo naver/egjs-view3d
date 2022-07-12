@@ -1,0 +1,15 @@
+---
+sidebar_position: 4
+---
+
+import View3D, { AROverlay } from "@site/src/components/View3D";
+import License from "@site/src/components/License";
+
+<>
+  {(() => {
+    const plugin = new AROverlay();
+    return <View3D
+      src="/egjs-view3d/model/draco/alarm.glb"
+      plugins={[plugin]} />
+  })()}
+</>

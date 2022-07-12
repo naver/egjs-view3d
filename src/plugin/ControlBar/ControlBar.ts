@@ -52,7 +52,7 @@ export interface ControlBarOptions {
  */
 class ControlBar implements View3DPlugin {
   /**
-   * Default class names that LoadingBar uses
+   * Default class names that ControlBar uses
    * @type {object}
    * @property {"view3d-control-bar"} ROOT A class name for wrapper element
    * @property {"visible"} VISIBLE A class name for visible elements
@@ -193,8 +193,8 @@ class ControlBar implements View3DPlugin {
   public show = () => {
     const root = this._rootEl;
     const className = {
-      ...this.className,
-      ...ControlBar.DEFAULT_CLASS
+      ...ControlBar.DEFAULT_CLASS,
+      ...this.className
     };
 
     root.classList.add(className.VISIBLE);
@@ -206,8 +206,8 @@ class ControlBar implements View3DPlugin {
   public hide = () => {
     const wrapper = this._rootEl;
     const className = {
-      ...this.className,
-      ...ControlBar.DEFAULT_CLASS
+      ...ControlBar.DEFAULT_CLASS,
+      ...this.className
     };
 
     wrapper.classList.remove(className.VISIBLE);
@@ -215,8 +215,8 @@ class ControlBar implements View3DPlugin {
 
   private _initElements() {
     const className = {
-      ...this.className,
-      ...ControlBar.DEFAULT_CLASS
+      ...ControlBar.DEFAULT_CLASS,
+      ...this.className
     };
     const rootEl = document.createElement(BROWSER.EL_DIV);
     rootEl.classList.add(className.ROOT);
