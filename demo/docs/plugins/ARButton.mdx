@@ -1,0 +1,31 @@
+---
+sidebar_position: 5
+---
+
+import View3D, { AROverlay, ARButton } from "@site/src/components/View3D";
+import License from "@site/src/components/License";
+
+ARButton adds a small "Enter AR" button at the right-bottom of your canvas, which can automatically detect AR availability.
+
+```js
+import View3D, { ARButton } from "@egjs/view3d";
+import "@egjs/view3d/css/view3d-ar.min.css"; // If you're not using the bundled CSS (view3d-bundle.css)
+
+const view3D = new View3D(...);
+
+view3D.loadPlugins(new ARButton({
+  unavailableText: "A text that will be shown above the button when AR is not available"
+}));
+```
+
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  showARButton />
+
+### Options
+|Option|Type|Default|Description|
+|:---:|---|:---:|---|
+|availableText|string|"View in AR"|A text that will be shown on mouse hover when it's available to enter the AR session|
+|unavailableText|string|"AR is not available in this browser"|A text that will be shown on mouse hover when it's not available to enter the AR session|
+|buttonClass|string|"view3d-ar-button"|A class that will be applied to the button element|
+|tooltipClass|string|"view3d-tooltip"|A class that will be applied to the tooltip element|
