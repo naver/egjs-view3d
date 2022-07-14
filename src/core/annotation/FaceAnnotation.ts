@@ -7,7 +7,6 @@ import * as THREE from "three";
 import View3D from "../../View3D";
 import Pose from "../Pose";
 import AnimationControl from "../../control/AnimationControl";
-import { DEFAULT_CLASS } from "../../const/external";
 import { getAnimatedFace } from "../../utils";
 
 import Annotation, { AnnotationOptions } from "./Annotation";

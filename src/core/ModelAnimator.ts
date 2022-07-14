@@ -385,14 +385,6 @@ class ModelAnimator {
     const clips = this._clips;
     const index = actions.findIndex(action => action === evt.action);
 
-    if (view3D.animationRepeatMode === ANIMATION_REPEAT_MODE.ALL) {
-      const nextIndex = (index + 1) >= clips.length
-        ? 0
-        : index + 1;
-
-      this.play(nextIndex);
-    }
-
     view3D.trigger(EVENTS.ANIMATION_LOOP, {
       type: EVENTS.ANIMATION_LOOP,
       target: view3D,
@@ -400,6 +392,14 @@ class ModelAnimator {
       action: evt.action,
       clip: clips[index]
     });
+
+    if (view3D.animationRepeatMode === ANIMATION_REPEAT_MODE.ALL) {
+      const nextIndex = (index + 1) >= clips.length
+        ? 0
+        : index + 1;
+
+      this.play(nextIndex);
+    }
   };
 
   private _onAnimationFinished = (evt: THREE.Event) => {

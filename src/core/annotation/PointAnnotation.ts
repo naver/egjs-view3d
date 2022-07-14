@@ -7,7 +7,6 @@ import * as THREE from "three";
 import View3D from "../../View3D";
 import Pose from "../Pose";
 import * as DEFAULT from "../../const/default";
-import { DEFAULT_CLASS } from "../../const/external";
 import { directionToYawPitch, toDegree } from "../../utils";
 
 import Annotation, { AnnotationOptions } from "./Annotation";
