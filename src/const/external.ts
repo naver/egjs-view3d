@@ -29,6 +29,8 @@ export const AUTO = "auto";
  * @property {"animationStart"} ANIMATION_START {@link /docs/events/animationStart Animation start event}
  * @property {"animationLoop"} ANIMATION_LOOP {@link /docs/events/animationLoop Animation loop event}
  * @property {"animationFinished"} ANIMATION_FINISHED {@link /docs/events/animationFinished Animation finished event}
+ * @property {"annotationFocus"} ANNOTATION_FOCUS {@link /docs/events/annotationFocus Annotation focus event}
+ * @property {"annotationUnfocus"} ANNOTATION_UNFOCUS {@link /docs/events/annotationUnfocus Annotation unfocus event}
  * @property {"quickLookTap"} QUICK_LOOK_TAP {@link /docs/events/quickLookTap Quick Look Tap event}
  * @property {"arStart"} AR_START {@link /docs/events/arStart AR start evemt}
  * @property {"arEnd"} AR_END {@link /docs/events/arEnd AR end event}
@@ -56,6 +58,8 @@ export const EVENTS = {
   ANIMATION_START: "animationStart",
   ANIMATION_LOOP: "animationLoop",
   ANIMATION_FINISHED: "animationFinished",
+  ANNOTATION_FOCUS: "annotationFocus",
+  ANNOTATION_UNFOCUS: "annotationUnfocus",
   AR_START: "arStart",
   AR_END: "arEnd",
   AR_MODEL_PLACED: "arModelPlaced",

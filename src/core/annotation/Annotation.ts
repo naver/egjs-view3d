@@ -6,7 +6,7 @@ import * as THREE from "three";
 
 import View3D from "../../View3D";
 import * as BROWSER from "../../const/browser";
-import { DEFAULT_CLASS } from "../../const/external";
+import { DEFAULT_CLASS, EVENTS } from "../../const/external";
 import { toDegree, toRadian } from "../../utils";
 
 /**
@@ -42,6 +42,7 @@ abstract class Annotation {
   protected _aspect: number;
   protected _enabled: boolean;
   protected _hidden: boolean;
+  protected _focusing: boolean;
   protected _tooltipSize: THREE.Vector2;
 
   /**
@@ -115,6 +116,7 @@ abstract class Annotation {
     this._aspect = aspect;
     this._enabled = false;
     this._hidden = false;
+    this._focusing = false;
     this._tooltipSize = new THREE.Vector2();
 
     if (element) {
@@ -306,6 +308,36 @@ abstract class Annotation {
     evt.preventDefault();
     evt.stopPropagation();
   };
+
+  protected _onFocus() {
+    const view3D = this._view3D;
+    const el = this._element;
+
+    if (el) {
+      el.classList.add(DEFAULT_CLASS.ANNOTATION_SELECTED);
+    }
+    this._focusing = true;
+    view3D.trigger(EVENTS.ANNOTATION_FOCUS, {
+      type: EVENTS.ANNOTATION_FOCUS,
+      target: view3D,
+      annotation: this
+    });
+  }
+
+  protected _onUnfocus() {
+    const view3D = this._view3D;
+    const el = this._element;
+
+    if (el) {
+      el.classList.remove(DEFAULT_CLASS.ANNOTATION_SELECTED);
+    }
+    this._focusing = false;
+    view3D.trigger(EVENTS.ANNOTATION_UNFOCUS, {
+      type: EVENTS.ANNOTATION_UNFOCUS,
+      target: view3D,
+      annotation: this
+    });
+  }
 }
 
 export default Annotation;

@@ -39,8 +39,9 @@ class PointAnnotation extends Annotation {
   }
 
   public async focus() {
+    if (this._focusing) return;
+
     const { camera } = this._view3D;
-    const el = this._element;
     const focus = this._focus;
 
     let targetPose: Pose;
@@ -57,13 +58,11 @@ class PointAnnotation extends Annotation {
       targetPose = new Pose(toDegree(yaw), toDegree(pitch), 0, this._position.toArray());
     }
 
-    if (el) {
-      el.classList.add(DEFAULT_CLASS.ANNOTATION_SELECTED);
+    window.addEventListener("click", () => {
+      this.unfocus();
+    }, { once: true, capture: true });
 
-      window.addEventListener("click", () => {
-        this.unfocus();
-      }, { once: true, capture: true });
-    }
+    this._onFocus();
 
     if (!targetPose.equals(camera.currentPose)) {
       return camera.reset(this._focusDuration, DEFAULT.EASING, targetPose);
@@ -73,10 +72,9 @@ class PointAnnotation extends Annotation {
   }
 
   public unfocus(): void {
-    const el = this._element;
+    if (!this._focusing) return;
 
-    if (!el) return;
-    el.classList.remove(DEFAULT_CLASS.ANNOTATION_SELECTED);
+    this._onUnfocus();
   }
 
   public toJSON() {
