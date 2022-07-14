@@ -17,6 +17,7 @@ class ModelAnimator {
   private _clips: THREE.AnimationClip[];
   private _actions: THREE.AnimationAction[];
   private _activeAnimationIdx: number;
+  private _timeScale: number;
   private _fadePromises: Array<{
     listener: () => any;
     resolve: (value: boolean | PromiseLike<boolean>) => void;
@@ -86,6 +87,14 @@ class ModelAnimator {
   public get animating() { return this.activeAnimation && !this.paused; }
 
   /**
+   * Current time scale when playing animations
+   * @type {number}
+   */
+  public get timeScale() { return this._timeScale; }
+
+  public set timeScale(val: number) { this._timeScale = val; }
+
+  /**
    * Create new ModelAnimator instance
    */
   public constructor(view3D: View3D) {
@@ -94,6 +103,7 @@ class ModelAnimator {
     this._clips = [];
     this._actions = [];
     this._activeAnimationIdx = -1;
+    this._timeScale = 1;
     this._fadePromises = [];
   }
 
@@ -144,6 +154,7 @@ class ModelAnimator {
    * @returns {void}
    */
   public play(index: number): void {
+    const view3D = this._view3D;
     const action = this._actions[index];
 
     if (!action) return;
@@ -158,6 +169,14 @@ class ModelAnimator {
     this._activeAnimationIdx = index;
 
     this._flushFadePromises();
+
+    view3D.trigger(EVENTS.ANIMATION_START, {
+      type: EVENTS.ANIMATION_START,
+      target: view3D,
+      index,
+      action,
+      clip: this._clips[index]
+    });
   }
 
   /**
@@ -345,7 +364,7 @@ class ModelAnimator {
   }
 
   private _restoreTimeScale() {
-    this._mixer.timeScale = 1;
+    this._mixer.timeScale = this._timeScale;
   }
 
   private _flushFadePromises() {

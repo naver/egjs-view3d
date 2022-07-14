@@ -52,6 +52,7 @@ export interface View3DEvents {
   [EVENTS.INPUT_START]: EVENT_TYPES.InputStartEvent;
   [EVENTS.INPUT_END]: EVENT_TYPES.InputEndEvent;
   [EVENTS.CAMERA_CHANGE]: EVENT_TYPES.CameraChangeEvent;
+  [EVENTS.ANIMATION_START]: EVENT_TYPES.AnimationStartEvent;
   [EVENTS.ANIMATION_LOOP]: EVENT_TYPES.AnimationLoopEvent;
   [EVENTS.ANIMATION_FINISHED]: EVENT_TYPES.AnimationFinishedEvent;
   [EVENTS.AR_START]: EVENT_TYPES.ARStartEvent;
