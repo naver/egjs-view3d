@@ -1,0 +1,34 @@
+---
+sidebar_position: 4
+---
+
+import View3D, { AROverlay, ARButton } from "@site/src/components/View3D";
+import License from "@site/src/components/License";
+
+AROverlay adds a close button & floor detection icon & toast on [WebXR Device API](https://developer.mozilla.org/en-US/docs/Web/API/WebXR_Device_API) based [webAR](/docs/options/ar/webAR) session.
+
+```js
+import View3D, { AROverlay } from "@egjs/view3d";
+import "@egjs/view3d/css/view3d-ar.min.css"; // If you're not using the bundled CSS (view3d-bundle.css)
+
+const view3D = new View3D(...);
+
+view3D.loadPlugins(new AROverlay({
+  toastText: "New toast message that will be placed on the bottom of the screen"
+}));
+```
+
+<>
+  {(() => {
+    const plugins = [new AROverlay(), new ARButton()];
+    return <View3D
+      src="/egjs-view3d/model/draco/alarm.glb"
+      plugins={plugins} />
+  })()}
+</>
+
+### Options
+|Option|Type|Default|Description|
+|:---:|---|:---:|---|
+|className|object|AROverlay.DEFAULT_CLASS|Override default class names|
+|toastText|string|"Point your device downwards to find the ground and move it around."|Toast text|

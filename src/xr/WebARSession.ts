@@ -43,9 +43,9 @@ declare global {
  */
 export interface WebARSessionOptions extends WebARControlOptions {
   features: typeof XR.EMPTY_FEATURES;
+  useLightEstimation: boolean;
   vertical: boolean;
   overlayRoot: HTMLElement | string | null;
-  useLightEstimation: boolean;
 }
 
 /**

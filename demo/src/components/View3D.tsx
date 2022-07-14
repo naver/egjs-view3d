@@ -63,7 +63,7 @@ class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivE
       ...restProps
     } = this.props;
 
-    const plugins: View3DPlugin[] = [];
+    const plugins: View3DPlugin[] = restProps.plugins ?? [];
 
     if (showARButton) {
       plugins.push(new ARButton(), new AROverlay());

@@ -71,6 +71,7 @@ class AnimationProgressBar implements ControlBarItem {
     this._rootBbox = this._trackEl.getBoundingClientRect();
     this._enabled = true;
 
+    view3D.on(EVENTS.RESIZE, this._onResize);
     view3D.on(EVENTS.RENDER, this._onRender);
 
     this._fill(0);
@@ -86,6 +87,7 @@ class AnimationProgressBar implements ControlBarItem {
 
     this._enabled = false;
 
+    view3D.off(EVENTS.RESIZE, this._onResize);
     view3D.off(EVENTS.RENDER, this._onRender);
 
     this.disableInput();
@@ -154,6 +156,10 @@ class AnimationProgressBar implements ControlBarItem {
     this._thumbEl = thumb;
     this._fillerEl = filler;
   }
+
+  private _onResize = () => {
+    this._rootBbox = this._trackEl.getBoundingClientRect();
+  };
 
   private _onRender = ({ target: view3D }: RenderEvent) => {
     const animator = view3D.animator;

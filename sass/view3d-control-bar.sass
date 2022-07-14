@@ -7,7 +7,7 @@
 
 .view3d-control-bar
   position: absolute
-  padding: 14px 12px 8px 12px
+  padding: 8px 12px 8px 12px
   left: 0
   bottom: 0
   display: flex
@@ -34,6 +34,10 @@
 
 .view3d-top-controls
   margin-bottom: 8px
+  &:empty
+    margin-bottom: 0px
+  > .view3d-progress-bar
+    margin-top: 8px
 
 .view3d-side-controls
   display: flex
@@ -46,6 +50,18 @@
   flex: 1
   white-space: nowrap
   text-overflow: ellipsis
+  align-items: center
+  &:not(:only-child)
+    margin-right: 8px
+  > *
+    &:not(:last-child)
+      margin-right: 8px
+
+.view3d-right-controls
+  > *
+    &:not(:last-child)
+      margin-right: 8px
+
 
 .view3d-control-item
   display: inline-block
@@ -109,7 +125,7 @@
     font-size: 12px
     display: inline-block
     position: absolute
-    top: -45px
+    top: -48px
     left: 50%
     transform: translateX(-50%)
     background-color: var(--view3d-cb-thumb-bg)
