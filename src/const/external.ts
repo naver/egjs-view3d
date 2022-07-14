@@ -117,6 +117,7 @@ export const DEFAULT_CLASS = {
   ANNOTATION_TOOLTIP: "view3d-annotation-tooltip",
   ANNOTATION_DEFAULT: "default",
   ANNOTATION_SELECTED: "selected",
+  ANNOTATION_HIDDEN: "hidden",
   ANNOTATION_FLIP_X: "flip-x",
   ANNOTATION_FLIP_Y: "flip-y",
   CTX_LOST: "ctx-lost"
