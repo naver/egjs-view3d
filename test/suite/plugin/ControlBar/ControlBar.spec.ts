@@ -1,4 +1,5 @@
-import { ControlBar, AnimationProgressBar, AnimationSelector, FullscreenButton, PlayButton } from "~/plugin/ControlBar";
+import { ControlBar, AnimationProgressBar, AnimationSelector, FullscreenButton, PlayButton, NavigationGizmo } from "~/plugin/ControlBar";
+import CameraResetButton from "~/plugin/ControlBar/CameraResetButton";
 
 import { createView3D } from "../../../test-utils";
 
@@ -43,9 +44,11 @@ describe("ControlBar", () => {
     it("should not add item if the option is false", async () => {
       const options = [
         { name: "progressBar", component: AnimationProgressBar },
-        { name: "playButton", component: AnimationSelector },
-        { name: "animationSelector", component: FullscreenButton },
-        { name: "fullscreen", component: PlayButton }
+        { name: "playButton", component: PlayButton },
+        { name: "animationSelector", component: AnimationSelector },
+        { name: "fullscreenButton", component: FullscreenButton },
+        { name: "navigationGizmo", component: NavigationGizmo },
+        { name: "cameraResetButton", component: CameraResetButton }
       ];
 
       const view3D = await createView3D();
