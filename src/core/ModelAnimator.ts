@@ -87,7 +87,7 @@ class ModelAnimator {
   public get animating() { return this.activeAnimation && !this.paused; }
 
   /**
-   * Current time scale when playing animations
+   * Global time scale for animations
    * @type {number}
    */
   public get timeScale() { return this._timeScale; }

@@ -7,6 +7,7 @@ import * as THREE from "three";
 import View3D from "../../View3D";
 import Pose from "../Pose";
 import * as DEFAULT from "../../const/default";
+import * as BROWSER from "../../const/browser";
 import { directionToYawPitch, toDegree } from "../../utils";
 
 import Annotation, { AnnotationOptions } from "./Annotation";
@@ -57,7 +58,7 @@ class PointAnnotation extends Annotation {
       targetPose = new Pose(toDegree(yaw), toDegree(pitch), 0, this._position.toArray());
     }
 
-    window.addEventListener("click", () => {
+    window.addEventListener(BROWSER.EVENTS.CLICK, () => {
       this.unfocus();
     }, { once: true, capture: true });
 
