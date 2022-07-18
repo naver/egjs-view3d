@@ -6,7 +6,7 @@ import * as THREE from "three";
 
 import View3D from "../../View3D";
 import * as BROWSER from "../../const/browser";
-import { DEFAULT_CLASS } from "../../const/external";
+import { DEFAULT_CLASS, EVENTS } from "../../const/external";
 import { toDegree, toRadian } from "../../utils";
 
 /**
@@ -41,6 +41,8 @@ abstract class Annotation {
   protected _baseDistance: number | null;
   protected _aspect: number;
   protected _enabled: boolean;
+  protected _hidden: boolean;
+  protected _focusing: boolean;
   protected _tooltipSize: THREE.Vector2;
 
   /**
@@ -81,6 +83,12 @@ abstract class Annotation {
    * @type {number}
    */
   public get aspect() { return this._aspect; }
+  /**
+   * Whether the annotation is hidden and not rendered
+   * @type {boolean}
+   * @readonly
+   */
+  public get hidden() { return this._hidden; }
 
   public set focusDuration(val: number) { this._focusDuration = val; }
   public set baseFov(val: number) { this._baseFov = val; }
@@ -107,6 +115,8 @@ abstract class Annotation {
     this._baseDistance = baseDistance;
     this._aspect = aspect;
     this._enabled = false;
+    this._hidden = false;
+    this._focusing = false;
     this._tooltipSize = new THREE.Vector2();
 
     if (element) {
@@ -183,7 +193,7 @@ abstract class Annotation {
     const el = this._element;
     const tooltipSize = this._tooltipSize;
 
-    if (!el) return;
+    if (!el || this._hidden) return;
 
     el.style.zIndex = `${renderOrder + 1}`;
     el.style.transform = `translate(-50%, -50%) translate(${screenPos.x}px, ${screenPos.y}px)`;
@@ -198,6 +208,32 @@ abstract class Annotation {
       el.classList.add(DEFAULT_CLASS.ANNOTATION_FLIP_X);
     } else {
       el.classList.remove(DEFAULT_CLASS.ANNOTATION_FLIP_X);
+    }
+  }
+
+  /**
+   * Show annotation.
+   * A class "hidden" will be removed from the annotation element.
+   */
+  public show() {
+    const el = this._element;
+    this._hidden = false;
+
+    if (el) {
+      el.classList.remove(DEFAULT_CLASS.ANNOTATION_HIDDEN);
+    }
+  }
+
+  /**
+   * Hide annotation and prevent it from being rendered.
+   * A class "hidden" will be added to the annotation element.
+   */
+  public hide() {
+    const el = this._element;
+    this._hidden = true;
+
+    if (el) {
+      el.classList.add(DEFAULT_CLASS.ANNOTATION_HIDDEN);
     }
   }
 
@@ -272,6 +308,36 @@ abstract class Annotation {
     evt.preventDefault();
     evt.stopPropagation();
   };
+
+  protected _onFocus() {
+    const view3D = this._view3D;
+    const el = this._element;
+
+    if (el) {
+      el.classList.add(DEFAULT_CLASS.ANNOTATION_SELECTED);
+    }
+    this._focusing = true;
+    view3D.trigger(EVENTS.ANNOTATION_FOCUS, {
+      type: EVENTS.ANNOTATION_FOCUS,
+      target: view3D,
+      annotation: this
+    });
+  }
+
+  protected _onUnfocus() {
+    const view3D = this._view3D;
+    const el = this._element;
+
+    if (el) {
+      el.classList.remove(DEFAULT_CLASS.ANNOTATION_SELECTED);
+    }
+    this._focusing = false;
+    view3D.trigger(EVENTS.ANNOTATION_UNFOCUS, {
+      type: EVENTS.ANNOTATION_UNFOCUS,
+      target: view3D,
+      annotation: this
+    });
+  }
 }
 
 export default Annotation;

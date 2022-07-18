@@ -23,6 +23,14 @@ export const AUTO = "auto";
  * @property {"beforeRender"} BEFORE_RENDER {@link /docs/events/beforeRender Before render event}
  * @property {"render"} RENDER {@link /docs/events/render Render event}
  * @property {"progress"} PROGRESS {@link /docs/events/progress Progress event}
+ * @property {"inputStart"} INPUT_START {@link /docs/events/inputStart Input start event}
+ * @property {"inputEnd"} INPUT_END {@link /docs/events/inputEnd Input end event}
+ * @property {"cameraChange"} CAMERA_CHANGE {@link /docs/events/cameraChange Camera change event}
+ * @property {"animationStart"} ANIMATION_START {@link /docs/events/animationStart Animation start event}
+ * @property {"animationLoop"} ANIMATION_LOOP {@link /docs/events/animationLoop Animation loop event}
+ * @property {"animationFinished"} ANIMATION_FINISHED {@link /docs/events/animationFinished Animation finished event}
+ * @property {"annotationFocus"} ANNOTATION_FOCUS {@link /docs/events/annotationFocus Annotation focus event}
+ * @property {"annotationUnfocus"} ANNOTATION_UNFOCUS {@link /docs/events/annotationUnfocus Annotation unfocus event}
  * @property {"quickLookTap"} QUICK_LOOK_TAP {@link /docs/events/quickLookTap Quick Look Tap event}
  * @property {"arStart"} AR_START {@link /docs/events/arStart AR start evemt}
  * @property {"arEnd"} AR_END {@link /docs/events/arEnd AR end event}
@@ -47,8 +55,11 @@ export const EVENTS = {
   INPUT_START: "inputStart",
   INPUT_END: "inputEnd",
   CAMERA_CHANGE: "cameraChange",
+  ANIMATION_START: "animationStart",
   ANIMATION_LOOP: "animationLoop",
   ANIMATION_FINISHED: "animationFinished",
+  ANNOTATION_FOCUS: "annotationFocus",
+  ANNOTATION_UNFOCUS: "annotationUnfocus",
   AR_START: "arStart",
   AR_END: "arEnd",
   AR_MODEL_PLACED: "arModelPlaced",
@@ -110,6 +121,7 @@ export const DEFAULT_CLASS = {
   ANNOTATION_TOOLTIP: "view3d-annotation-tooltip",
   ANNOTATION_DEFAULT: "default",
   ANNOTATION_SELECTED: "selected",
+  ANNOTATION_HIDDEN: "hidden",
   ANNOTATION_FLIP_X: "flip-x",
   ANNOTATION_FLIP_Y: "flip-y",
   CTX_LOST: "ctx-lost"

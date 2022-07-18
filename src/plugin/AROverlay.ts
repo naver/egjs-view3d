@@ -14,10 +14,12 @@ import View3DPlugin from "./View3DPlugin";
  * Options for the {@link AROverlay}
  * @interface
  * @param {AROverlay.DEFAULT_CLASS} [className={}] Override default class names
+ * @param {boolean} [showPlaneDetection=true] Whether to show plane detection icon / toast before placing the model
  * @param {string} [toastText="Point your device downwards to find the ground and move it around."] Toast text
  */
 export interface AROverlayOptions {
   className: Partial<{ -readonly [key in keyof typeof AROverlay.DEFAULT_CLASS]: string }>;
+  showPlaneDetection: boolean;
   toastText: string;
 }
 
@@ -53,11 +55,12 @@ class AROverlay implements View3DPlugin {
   } as const;
 
   public className: AROverlayOptions["className"];
+  public showPlaneDetection: AROverlayOptions["showPlaneDetection"];
   public toastText: AROverlayOptions["toastText"];
 
   private _rootEl: HTMLElement;
   private _closeButtonEl: HTMLElement;
-  private _detectionRootEl: HTMLElement;
+  private _detectionRootEl: HTMLElement | null;
 
   /**
    * Create new instance of AROverlay
@@ -65,9 +68,11 @@ class AROverlay implements View3DPlugin {
    */
   public constructor({
     className = {},
+    showPlaneDetection = true,
     toastText = "Point your device downwards to find the ground and move it around."
   }: Partial<AROverlayOptions> = {}) {
     this.className = className;
+    this.showPlaneDetection = showPlaneDetection;
     this.toastText = toastText;
     this._createElements();
   }
@@ -87,15 +92,15 @@ class AROverlay implements View3DPlugin {
 
       if (!overlayRoot) return;
 
-      detectionRoot.classList.add(className.DETECTION_VISIBLE);
       overlayRoot.appendChild(rootEl);
 
       const closeButtonHandler = () => {
         void session.exit();
       };
 
+      detectionRoot?.classList.add(className.DETECTION_VISIBLE);
       const onPlacedHandler = () => {
-        detectionRoot.classList.remove(className.DETECTION_VISIBLE);
+        detectionRoot?.classList.remove(className.DETECTION_VISIBLE);
       };
 
       view3D.once(EVENTS.AR_MODEL_PLACED, onPlacedHandler);
@@ -123,6 +128,27 @@ class AROverlay implements View3DPlugin {
 
     const root = document.createElement(BROWSER.EL_DIV);
     const closeButton = document.createElement(BROWSER.EL_DIV);
+
+    closeButton.classList.add(className.CLOSE_BUTTON);
+    closeButton.innerHTML = CloseIcon;
+
+    root.classList.add(className.ROOT);
+    root.appendChild(closeButton);
+
+    if (this.showPlaneDetection) {
+      this._detectionRootEl = this._createPlaneDetectionElements();
+      root.appendChild(this._detectionRootEl);
+    }
+
+    this._rootEl = root;
+    this._closeButtonEl = closeButton;
+  }
+
+  private _createPlaneDetectionElements() {
+    const className = {
+      ...AROverlay.DEFAULT_CLASS,
+      ...this.className
+    };
     const detectionRoot = document.createElement(BROWSER.EL_DIV);
     const detectionIcon = document.createElement(BROWSER.EL_DIV);
     const detectionLabel = document.createElement(BROWSER.EL_DIV);
@@ -131,15 +157,12 @@ class AROverlay implements View3DPlugin {
     const detectionPlane = document.createElement(BROWSER.EL_DIV);
     const cubeFaces = range(5).map(() => document.createElement(BROWSER.EL_DIV));
 
-    closeButton.innerHTML = CloseIcon;
-    closeButton.classList.add(className.CLOSE_BUTTON);
     detectionRoot.classList.add(className.DETECTION_ROOT);
     detectionIcon.classList.add(className.DETECTION_ICON);
     detectionLabel.classList.add(className.DETECTION_TOAST);
     detectionPhone.classList.add(className.DETECTION_PHONE);
     detectionCube.classList.add(className.DETECTION_CUBE);
     detectionPlane.classList.add(className.DETECTION_PLANE);
-    root.classList.add(className.ROOT);
 
     detectionLabel.innerHTML = this.toastText;
 
@@ -152,12 +175,8 @@ class AROverlay implements View3DPlugin {
     detectionIcon.appendChild(detectionPlane);
     detectionRoot.appendChild(detectionIcon);
     detectionRoot.appendChild(detectionLabel);
-    root.appendChild(closeButton);
-    root.appendChild(detectionRoot);
 
-    this._rootEl = root;
-    this._closeButtonEl = closeButton;
-    this._detectionRootEl = detectionRoot;
+    return detectionRoot;
   }
 }
 

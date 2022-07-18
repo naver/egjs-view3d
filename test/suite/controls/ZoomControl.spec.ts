@@ -1,7 +1,7 @@
 import ZoomControl from "~/control/ZoomControl";
 import * as BROWSER from "~/const/browser";
 import * as DEFAULT from "~/const/default";
-import { createView3D, wait } from "../../test-utils";
+import { createView3D, loadDefaultModel, wait } from "../../test-utils";
 
 describe("ZoomControl", () => {
   describe("Initial state", () => {
@@ -175,13 +175,14 @@ describe("ZoomControl", () => {
 
   describe("Double tap to zoom", () => {
     it("should zoom in on double tap", async () => {
-      const view3D = await createView3D({ src: "/alarm.glb", zoom: { doubleTap: { duration: 0 } } });
+      const view3D = await createView3D({ zoom: { doubleTap: { duration: 0 } } });
       const canvas = view3D.renderer.canvas;
+      await loadDefaultModel(view3D);
 
       const prevZoom = view3D.camera.zoom;
       const doubleTapEvt = new MouseEvent("dblclick", {
-        offsetX: canvas.clientWidth / 2,
-        offsetY: canvas.clientWidth / 2
+        clientX: canvas.clientWidth / 2,
+        clientY: canvas.clientHeight / 2
       } as any);
       view3D.renderer.canvas.dispatchEvent(doubleTapEvt);
 
@@ -192,13 +193,15 @@ describe("ZoomControl", () => {
     });
 
     it("should not zoom in on double tap if doubleTap is false", async () => {
-      const view3D = await createView3D({ src: "/alarm.glb", zoom: { doubleTap: false } });
+      const view3D = await createView3D({ zoom: { doubleTap: false } });
       const canvas = view3D.renderer.canvas;
+
+      await loadDefaultModel(view3D);
 
       const prevZoom = view3D.camera.zoom;
       const doubleTapEvt = new MouseEvent("dblclick", {
-        offsetX: canvas.clientWidth / 2,
-        offsetY: canvas.clientWidth / 2
+        clientX: canvas.clientWidth / 2,
+        clientY: canvas.clientHeight / 2
       } as any);
       view3D.renderer.canvas.dispatchEvent(doubleTapEvt);
       await wait(1000);
@@ -212,10 +215,9 @@ describe("ZoomControl", () => {
       const view3D = await createView3D({ src: "/alarm.glb", zoom: { doubleTap: { duration: 0 } } });
       const canvas = view3D.renderer.canvas;
 
-      const prevZoom = view3D.camera.zoom;
       const doubleTapEvt = new MouseEvent("dblclick", {
-        offsetX: canvas.clientWidth / 2,
-        offsetY: canvas.clientWidth / 2
+        clientX: canvas.clientWidth / 2,
+        clientY: canvas.clientHeight / 2
       } as any);
       view3D.renderer.canvas.dispatchEvent(doubleTapEvt);
       view3D.renderer.canvas.dispatchEvent(doubleTapEvt);
@@ -231,8 +233,8 @@ describe("ZoomControl", () => {
 
       const prevZoom = view3D.camera.zoom;
       const doubleTapEvt = new MouseEvent("dblclick", {
-        offsetX: canvas.clientWidth / 2,
-        offsetY: canvas.clientWidth / 2
+        clientX: canvas.clientWidth / 2,
+        clientY: canvas.clientHeight / 2
       } as any);
       view3D.renderer.canvas.dispatchEvent(doubleTapEvt);
       view3D.renderer.canvas.dispatchEvent(doubleTapEvt);

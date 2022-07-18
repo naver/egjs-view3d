@@ -1,8 +1,8 @@
 import * as THREE from "three";
 
 import ARSwirlControl from "~/control/ar/ARSwirlControl";
-import { createView3D } from "test-utils";
 import ARScene from "~/xr/ARScene";
+import { createView3D, loadDefaultModel } from "../../../test-utils";
 
 describe("ARSwirlControl", () => {
   describe("Initial properties", () => {
@@ -81,7 +81,7 @@ describe("ARSwirlControl", () => {
         cam.updateMatrixWorld();
         cam.updateProjectionMatrix();
 
-        await view3D.load("/cube.glb");
+        await loadDefaultModel(view3D);
 
         const ctx = {
           scene: new ARScene(),
@@ -105,7 +105,7 @@ describe("ARSwirlControl", () => {
         cam.updateMatrixWorld();
         cam.updateProjectionMatrix();
 
-        await view3D.load("/cube.glb");
+        await loadDefaultModel(view3D);
 
         const ctx = {
           scene: new ARScene(),
@@ -140,7 +140,7 @@ describe("ARSwirlControl", () => {
         cam.updateMatrixWorld();
         cam.updateProjectionMatrix();
 
-        await view3D.load("/cube.glb");
+        await loadDefaultModel(view3D);
 
         const ctx = {
           scene: new ARScene(),
@@ -164,7 +164,7 @@ describe("ARSwirlControl", () => {
         cam.updateMatrixWorld();
         cam.updateProjectionMatrix();
 
-        await view3D.load("/cube.glb");
+        await loadDefaultModel(view3D);
 
         const ctx = {
           scene: new ARScene(),

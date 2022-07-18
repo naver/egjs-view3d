@@ -333,7 +333,9 @@ class RotateControl extends Component<ControlEvents> implements CameraControl, O
       this._isFirstTouch = false;
     }
 
-    evt.preventDefault();
+    if (evt.cancelable !== false) {
+      evt.preventDefault();
+    }
     evt.stopPropagation();
 
     const prevPos = this._prevPos;

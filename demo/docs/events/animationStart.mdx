@@ -1,11 +1,11 @@
 ---
-sidebar_position: 15
+sidebar_position: 14
 ---
 
 import View3D from "@site/src/components/View3D";
 import License from "@site/src/components/License";
 
-An event that fires on single animation loop.
+An event that fires on single animation start.
 
 |Property|Type|Description|
 |:---:|:---:|---|
@@ -15,10 +15,21 @@ An event that fires on single animation loop.
 |clip|[THREE.AnimationClip](https://threejs.org/docs/#api/en/animation/AnimationClip)|An AnimationClip instance of the animation|
 |action|[THREE.AnimationAction](https://threejs.org/docs/#api/en/animation/AnimationAction)|An AnimationAction instance of the animation|
 
-<View3D
-  src="/egjs-view3d/model/RobotExpressive.glb"
-  showExampleCode
-  showEventsTriggered={["animationLoop"]} />
+<div className="columns">
+  <div className="column">
+    <View3D
+      src="/egjs-view3d/model/RobotExpressive.glb"
+      showExampleCode
+      showEventsTriggered={["animationStart", "animationLoop", "animationFinished"]} />
+  </div>
+  <div className="column">
+    <View3D
+      src="/egjs-view3d/model/RobotExpressive.glb"
+      animationRepeatMode={"all"}
+      showExampleCode
+      showEventsTriggered={["animationStart", "animationLoop", "animationFinished"]} />
+  </div>
+</div>
 
 <License items={[
   {

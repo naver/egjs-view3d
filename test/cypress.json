@@ -5,5 +5,7 @@
   "screenshotsFolder": "failed/screenshots",
   "videosFolder": "failed/videos",
   "pluginsFile": false,
-  "fixturesFolder": false
+  "fixturesFolder": false,
+  "video": false,
+  "defaultCommandTimeout": 10000
 }

@@ -14,7 +14,7 @@ import {
   EVENTS
 } from "~/index";
 import * as DEFAULT from "~/const/default";
-import { createView3D } from "../test-utils";
+import { createView3D, loadDefaultModel } from "../test-utils";
 
 describe("View3D", () => {
   describe("Default properties", () => {
@@ -143,7 +143,7 @@ describe("View3D", () => {
       it("should set scene's environment on init", async () => {
         const view3D = await createView3D();
 
-        await view3D.load("/cube.glb");
+        await loadDefaultModel(view3D);
 
         expect(view3D.scene.root.environment).not.to.be.null;
       });
@@ -151,7 +151,7 @@ describe("View3D", () => {
       it("should not set scene's background on init", async () => {
         const view3D = await createView3D();
 
-        await view3D.load("/cube.glb");
+        await loadDefaultModel(view3D);
 
         expect(view3D.scene.root.background).to.be.null;
       });
@@ -304,7 +304,7 @@ describe("View3D", () => {
         expect(imgEl).not.to.be.null;
         expect(imgEl.parentElement).not.to.be.null;
 
-        await view3D.load("/cube.glb");
+        await loadDefaultModel(view3D);
 
         expect(imgEl.parentElement).to.be.null;
       });

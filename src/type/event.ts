@@ -5,6 +5,7 @@
 import View3D from "../View3D";
 import Model from "../core/Model";
 import Pose from "../core/Pose";
+import Annotation from "../core/annotation/Annotation";
 import { INPUT_TYPE } from "../const/external";
 import WebARSession from "../xr/WebARSession";
 
@@ -215,6 +216,24 @@ export interface CameraChangeEvent {
 }
 
 /**
+ * An event that fires on animation start
+ * @event View3D#animationStart
+ * @type {object}
+ * @property {string} type A type of the event.
+ * @property {View3D} target An instance of View3D that triggered this event.
+ * @property {number} index An index of the animation.
+ * @property {THREE.AnimationClip} clip An {@link https://threejs.org/docs/#api/en/animation/AnimationClip AnimationClip} instance of the animation.
+ * @property {THREE.AnimationAction} action An {@link https://threejs.org/docs/#api/en/animation/AnimationAction AnimationAction} instance of the animation.
+ */
+export interface AnimationStartEvent {
+  type: string;
+  target: View3D;
+  index: number;
+  clip: THREE.AnimationClip;
+  action: THREE.AnimationAction;
+}
+
+/**
  * An event that fires on single animation loop
  * @event View3D#animationLoop
  * @type {object}
@@ -248,6 +267,34 @@ export interface AnimationFinishedEvent {
   index: number;
   clip: THREE.AnimationClip;
   action: THREE.AnimationAction;
+}
+
+/**
+ * An event that fires on annotation focus
+ * @event View3D#annotationFocus
+ * @type {object}
+ * @property {string} type A type of the event.
+ * @property {View3D} target An instance of View3D that triggered this event.
+ * @property {Annotation} annotation An instance of the annotation that triggered this event.
+ */
+export interface AnnotationFocusEvent {
+  type: string;
+  target: View3D;
+  annotation: Annotation;
+}
+
+/**
+ * An event that fires on annotation unfocus
+ * @event View3D#annotationUnfocus
+ * @type {object}
+ * @property {string} type A type of the event.
+ * @property {View3D} target An instance of View3D that triggered this event.
+ * @property {Annotation} annotation An instance of the annotation that triggered this event.
+ */
+export interface AnnotationUnfocusEvent {
+  type: string;
+  target: View3D;
+  annotation: Annotation;
 }
 
 /**

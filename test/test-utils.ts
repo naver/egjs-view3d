@@ -1,7 +1,9 @@
+import * as THREE from "three";
+
 import View3D, { View3DOptions } from "~/View3D";
 import { EVENTS } from "~/const/external";
 import { merge } from "~/utils";
-import { Animation } from "~/core";
+import { Animation, Model } from "~/core";
 
 export const createSandbox = (id: string = ""): HTMLElement => {
   const tmp = document.createElement("div");
@@ -107,4 +109,25 @@ const createMouseEvent = (name: string, x: number, y: number) => {
   });
 
   return evt;
+};
+
+export const loadDefaultModel = async (view3D: View3D) => {
+  (view3D as any)._src = "/cube.glb";
+
+  const cubeGeometry = new THREE.BoxBufferGeometry();
+  const cubeMaterial = new THREE.MeshBasicMaterial();
+  const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+  const model = new Model({
+    src: "/cube.glb",
+    scenes: [cube]
+  });
+
+  view3D.display(model);
+
+  // Prevent loading model by src
+  (view3D as any)._loadModel = () => [Promise.resolve()];
+
+  if (!view3D.initialized) {
+    await view3D.init();
+  }
 };

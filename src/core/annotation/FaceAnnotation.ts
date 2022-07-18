@@ -7,7 +7,6 @@ import * as THREE from "three";
 import View3D from "../../View3D";
 import Pose from "../Pose";
 import AnimationControl from "../../control/AnimationControl";
-import { DEFAULT_CLASS } from "../../const/external";
 import { getAnimatedFace } from "../../utils";
 
 import Annotation, { AnnotationOptions } from "./Annotation";
@@ -54,11 +53,7 @@ class FaceAnnotation extends Annotation {
   }
 
   public async focus(): Promise<void> {
-    const el = this._element;
-
-    if (el) {
-      el.classList.add(DEFAULT_CLASS.ANNOTATION_SELECTED);
-    }
+    if (this._focusing) return;
 
     const view3D = this._view3D;
     const { camera, control } = view3D;
@@ -79,16 +74,15 @@ class FaceAnnotation extends Annotation {
     window.addEventListener("click", () => {
       this.unfocus();
     }, { once: true, capture: true });
+
+    this._onFocus();
   }
 
   public unfocus(): void {
-    const el = this._element;
+    if (!this._focusing) return;
+
     const { control } = this._view3D;
     const trackingControl = this._trackingControl;
-
-    if (el) {
-      el.classList.remove(DEFAULT_CLASS.ANNOTATION_SELECTED);
-    }
 
     if (trackingControl) {
       control.sync();
@@ -97,6 +91,8 @@ class FaceAnnotation extends Annotation {
       trackingControl.destroy();
       this._trackingControl = null;
     }
+
+    this._onUnfocus();
   }
 
   public render(params: Parameters<Annotation["render"]>[0]) {
