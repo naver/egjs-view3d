@@ -16,7 +16,8 @@ const external = {
   "three/examples/jsm/loaders/KTX2Loader": "KTX2Loader",
   "three/examples/jsm/lights/LightProbeGenerator": "LightProbeGenerator",
   "three/examples/jsm/shaders/HorizontalBlurShader": "HorizontalBlurShader",
-  "three/examples/jsm/shaders/VerticalBlurShader": "VerticalBlurShader"
+  "three/examples/jsm/shaders/VerticalBlurShader": "VerticalBlurShader",
+  "three/examples/jsm/webxr/XREstimatedLight": "XREstimatedLight"
 };
 const tsconfig = "tsconfig.build.json";
 const plugins = [

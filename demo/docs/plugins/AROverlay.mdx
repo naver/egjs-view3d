@@ -18,14 +18,9 @@ view3D.loadPlugins(new AROverlay({
 }));
 ```
 
-<>
-  {(() => {
-    const plugins = [new AROverlay(), new ARButton()];
-    return <View3D
-      src="/egjs-view3d/model/draco/alarm.glb"
-      plugins={plugins} />
-  })()}
-</>
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  showARButton />
 
 ### Options
 |Option|Type|Default|Description|

@@ -11,11 +11,18 @@ import PauseIcon from "../../asset/pause-icon";
 import ControlBar from "./ControlBar";
 import ControlBarItem from "./ControlBarItem";
 
+/**
+ * @param {string} [position="left"] Position inside the control bar
+ * @param {number} [order=9999] Order within the current position, items will be sorted in ascending order
+ */
 export interface PlayButtonOptions {
   position: ControlBarItem["position"];
   order: ControlBarItem["order"];
 }
 
+/**
+ * Show animation play/ pause button, use with ControlBar
+ */
 class PlayButton implements ControlBarItem {
   public position: PlayButtonOptions["position"];
   public order: PlayButtonOptions["order"];
@@ -28,6 +35,7 @@ class PlayButton implements ControlBarItem {
   private _enabled: boolean;
   private _paused: boolean;
 
+  /** */
   public constructor(view3D: View3D, controlBar: ControlBar, {
     position = ControlBar.POSITION.LEFT,
     order = 9999
@@ -41,6 +49,9 @@ class PlayButton implements ControlBarItem {
     this._paused = true;
   }
 
+  /**
+   * Enable control item
+   */
   public enable() {
     if (this._enabled) return;
 
@@ -49,6 +60,9 @@ class PlayButton implements ControlBarItem {
     this._enabled = true;
   }
 
+  /**
+   * Disable control item
+   */
   public disable() {
     if (!this._enabled) return;
 

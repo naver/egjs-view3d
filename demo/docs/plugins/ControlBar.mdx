@@ -3,6 +3,7 @@ sidebar_position: 3
 ---
 
 import View3D, { ControlBar } from "@site/src/components/View3D";
+import CustomControlBar from "@site/src/components/demo/CustomControlBar";
 import License from "@site/src/components/License";
 
 ControlBar adds a bar at the bottom of the canvas that can control animation and other things.
@@ -37,21 +38,7 @@ view3D.loadPlugins(new ControlBar({
 |navigationGizmo|boolean \| [NavigationGizmoOptions](/docs/api/NavigationGizmoOptions)|true|Show navigation gizmo|
 
 ### Customizing
-<>
-  {(() => {
-    const plugin = new ControlBar({
-      autoHide: false,
-      progressBar: { position: "left" },
-      playButton: { order: 0 },
-      animationSelector: false,
-      navigationGizmo: false,
-      cameraResetButton: false
-    });
-    return <View3D
-      src="/egjs-view3d/model/RobotExpressive.glb"
-      plugins={[plugin]} />
-  })()}
-</>
+<CustomControlBar />
 
 ```json
 autoHide: false,
