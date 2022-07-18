@@ -4,13 +4,13 @@ name: @egjs/view3d
 license: MIT
 author: NAVER Corp.
 repository: https://github.com/naver/egjs-view3d
-version: 2.5.0-snapshot
+version: 2.6.0
 */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('three'), require('@egjs/component'), require('three/examples/jsm/loaders/RGBELoader'), require('three/examples/jsm/shaders/HorizontalBlurShader'), require('three/examples/jsm/shaders/VerticalBlurShader'), require('three/examples/jsm/lights/LightProbeGenerator'), require('three/examples/jsm/loaders/GLTFLoader'), require('three/examples/jsm/loaders/DRACOLoader'), require('three/examples/jsm/loaders/KTX2Loader')) :
-  typeof define === 'function' && define.amd ? define(['three', '@egjs/component', 'three/examples/jsm/loaders/RGBELoader', 'three/examples/jsm/shaders/HorizontalBlurShader', 'three/examples/jsm/shaders/VerticalBlurShader', 'three/examples/jsm/lights/LightProbeGenerator', 'three/examples/jsm/loaders/GLTFLoader', 'three/examples/jsm/loaders/DRACOLoader', 'three/examples/jsm/loaders/KTX2Loader'], factory) :
-  (global = global || self, global.View3D = factory(global.THREE, global.Component, global.RGBELoader, global.HorizontalBlurShader, global.VerticalBlurShader, global.LightProbeGenerator, global.GLTFLoader, global.DRACOLoader, global.KTX2Loader));
-}(this, (function (THREE, Component, RGBELoader, HorizontalBlurShader, VerticalBlurShader, LightProbeGenerator, GLTFLoader$1, DRACOLoader, KTX2Loader) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('three'), require('@egjs/component'), require('three/examples/jsm/loaders/RGBELoader'), require('three/examples/jsm/shaders/HorizontalBlurShader'), require('three/examples/jsm/shaders/VerticalBlurShader'), require('three/examples/jsm/lights/LightProbeGenerator'), require('three/examples/jsm/webxr/XREstimatedLight'), require('three/examples/jsm/loaders/GLTFLoader'), require('three/examples/jsm/loaders/DRACOLoader'), require('three/examples/jsm/loaders/KTX2Loader')) :
+  typeof define === 'function' && define.amd ? define(['three', '@egjs/component', 'three/examples/jsm/loaders/RGBELoader', 'three/examples/jsm/shaders/HorizontalBlurShader', 'three/examples/jsm/shaders/VerticalBlurShader', 'three/examples/jsm/lights/LightProbeGenerator', 'three/examples/jsm/webxr/XREstimatedLight', 'three/examples/jsm/loaders/GLTFLoader', 'three/examples/jsm/loaders/DRACOLoader', 'three/examples/jsm/loaders/KTX2Loader'], factory) :
+  (global = global || self, global.View3D = factory(global.THREE, global.Component, global.RGBELoader, global.HorizontalBlurShader, global.VerticalBlurShader, global.LightProbeGenerator, global.XREstimatedLight, global.GLTFLoader, global.DRACOLoader, global.KTX2Loader));
+}(this, (function (THREE, Component, RGBELoader, HorizontalBlurShader, VerticalBlurShader, LightProbeGenerator, XREstimatedLight, GLTFLoader$1, DRACOLoader, KTX2Loader) { 'use strict';
 
   /*
    * Copyright (c) 2020 NAVER Corp.
@@ -414,9 +414,15 @@ version: 2.5.0-snapshot
     CONTEXT_MENU: "contextmenu",
     MOUSE_ENTER: "mouseenter",
     MOUSE_LEAVE: "mouseleave",
+    POINTER_DOWN: "pointerdown",
+    POINTER_MOVE: "pointermove",
+    POINTER_UP: "pointerup",
+    POINTER_ENTER: "pointerenter",
+    POINTER_LEAVE: "pointerleave",
     LOAD: "load",
     ERROR: "error",
     CLICK: "click",
+    DOUBLE_CLICK: "dblclick",
     CONTEXT_LOST: "webglcontextlost",
     CONTEXT_RESTORED: "webglcontextrestored"
   };
@@ -434,6 +440,8 @@ version: 2.5.0-snapshot
     MOUSE_BUTTON[MOUSE_BUTTON["RIGHT"] = 2] = "RIGHT";
   })(MOUSE_BUTTON || (MOUSE_BUTTON = {}));
   const ANONYMOUS = "anonymous";
+  const EL_DIV = "div";
+  const EL_BUTTON = "button";
 
   /*
    * Copyright (c) 2020 NAVER Corp.
@@ -456,6 +464,14 @@ version: 2.5.0-snapshot
    * @property {"beforeRender"} BEFORE_RENDER {@link /docs/events/beforeRender Before render event}
    * @property {"render"} RENDER {@link /docs/events/render Render event}
    * @property {"progress"} PROGRESS {@link /docs/events/progress Progress event}
+   * @property {"inputStart"} INPUT_START {@link /docs/events/inputStart Input start event}
+   * @property {"inputEnd"} INPUT_END {@link /docs/events/inputEnd Input end event}
+   * @property {"cameraChange"} CAMERA_CHANGE {@link /docs/events/cameraChange Camera change event}
+   * @property {"animationStart"} ANIMATION_START {@link /docs/events/animationStart Animation start event}
+   * @property {"animationLoop"} ANIMATION_LOOP {@link /docs/events/animationLoop Animation loop event}
+   * @property {"animationFinished"} ANIMATION_FINISHED {@link /docs/events/animationFinished Animation finished event}
+   * @property {"annotationFocus"} ANNOTATION_FOCUS {@link /docs/events/annotationFocus Annotation focus event}
+   * @property {"annotationUnfocus"} ANNOTATION_UNFOCUS {@link /docs/events/annotationUnfocus Annotation unfocus event}
    * @property {"quickLookTap"} QUICK_LOOK_TAP {@link /docs/events/quickLookTap Quick Look Tap event}
    * @property {"arStart"} AR_START {@link /docs/events/arStart AR start evemt}
    * @property {"arEnd"} AR_END {@link /docs/events/arEnd AR end event}
@@ -481,6 +497,11 @@ version: 2.5.0-snapshot
     INPUT_START: "inputStart",
     INPUT_END: "inputEnd",
     CAMERA_CHANGE: "cameraChange",
+    ANIMATION_START: "animationStart",
+    ANIMATION_LOOP: "animationLoop",
+    ANIMATION_FINISHED: "animationFinished",
+    ANNOTATION_FOCUS: "annotationFocus",
+    ANNOTATION_UNFOCUS: "annotationUnfocus",
     AR_START: "arStart",
     AR_END: "arEnd",
     AR_MODEL_PLACED: "arModelPlaced",
@@ -542,6 +563,7 @@ version: 2.5.0-snapshot
     ANNOTATION_TOOLTIP: "view3d-annotation-tooltip",
     ANNOTATION_DEFAULT: "default",
     ANNOTATION_SELECTED: "selected",
+    ANNOTATION_HIDDEN: "hidden",
     ANNOTATION_FLIP_X: "flip-x",
     ANNOTATION_FLIP_Y: "flip-y",
     CTX_LOST: "ctx-lost"
@@ -646,6 +668,19 @@ version: 2.5.0-snapshot
     ROTATE: 0,
     TRANSLATE: 1,
     ZOOM: 2
+  };
+  /**
+   * Animation repeat modes
+   * @type {object}
+   * @property {"one"} ONE Repeat single animation
+   * @property {"none"} NONE Pause on animation's last frame
+   * @property {"all"} ALL Repeat all animations
+   */
+
+  const ANIMATION_REPEAT_MODE = {
+    ONE: "one",
+    NONE: "none",
+    ALL: "all"
   };
 
   /*
@@ -2565,11 +2600,45 @@ version: 2.5.0-snapshot
      * Create new ModelAnimator instance
      */
     constructor(view3D) {
+      this._onAnimationLoop = evt => {
+        const view3D = this._view3D;
+        const actions = this._actions;
+        const clips = this._clips;
+        const index = actions.findIndex(action => action === evt.action);
+        view3D.trigger(EVENTS$1.ANIMATION_LOOP, {
+          type: EVENTS$1.ANIMATION_LOOP,
+          target: view3D,
+          index,
+          action: evt.action,
+          clip: clips[index]
+        });
+
+        if (view3D.animationRepeatMode === ANIMATION_REPEAT_MODE.ALL) {
+          const nextIndex = index + 1 >= clips.length ? 0 : index + 1;
+          this.play(nextIndex);
+        }
+      };
+
+      this._onAnimationFinished = evt => {
+        const view3D = this._view3D;
+        const actions = this._actions;
+        const clips = this._clips;
+        const index = actions.findIndex(action => action === evt.action);
+        view3D.trigger(EVENTS$1.ANIMATION_FINISHED, {
+          type: EVENTS$1.ANIMATION_FINISHED,
+          target: view3D,
+          index,
+          action: evt.action,
+          clip: clips[index]
+        });
+      };
+
       this._view3D = view3D;
       this._mixer = new THREE.AnimationMixer(view3D.scene.userObjects);
       this._clips = [];
       this._actions = [];
       this._activeAnimationIdx = -1;
+      this._timeScale = 1;
       this._fadePromises = [];
     }
     /**
@@ -2625,6 +2694,18 @@ version: 2.5.0-snapshot
       return (_a = this._clips[this._activeAnimationIdx]) !== null && _a !== void 0 ? _a : null;
     }
     /**
+     * THREE.AnimationAction instance of the animation currently playing, `null` if there're no animation or stopped.
+     * @see {@link https://threejs.org/docs/#api/en/animation/AnimationAction AnimationAction}
+     * @type {THREE.AnimationAction | null}
+     */
+
+
+    get activeAction() {
+      var _a;
+
+      return (_a = this._actions[this._activeAnimationIdx]) !== null && _a !== void 0 ? _a : null;
+    }
+    /**
      * An index of the animation currently playing.
      * @type {number}
      * @readonly
@@ -2655,6 +2736,41 @@ version: 2.5.0-snapshot
       return this.activeAnimation && !this.paused;
     }
     /**
+     * Global time scale for animations
+     * @type {number}
+     */
+
+
+    get timeScale() {
+      return this._timeScale;
+    }
+
+    set timeScale(val) {
+      this._timeScale = val;
+    }
+    /**
+     * Initialize ModelAnimator
+     */
+
+
+    init() {
+      this._mixer.addEventListener("loop", this._onAnimationLoop);
+
+      this._mixer.addEventListener("finished", this._onAnimationFinished);
+    }
+    /**
+     * Destroy ModelAnimator instance
+     */
+
+
+    destroy() {
+      this.reset();
+
+      this._mixer.removeEventListener("loop", this._onAnimationLoop);
+
+      this._mixer.removeEventListener("finished", this._onAnimationFinished);
+    }
+    /**
      * Store the given clips
      * @param clips Three.js {@link https://threejs.org/docs/#api/en/animation/AnimationClip AnimationClip}s of the model
      * @returns {void}
@@ -2674,6 +2790,7 @@ version: 2.5.0-snapshot
         action.setEffectiveWeight(0);
         return action;
       });
+      this.updateRepeatMode();
     }
     /**
      * Play one of the model's animation
@@ -2683,6 +2800,7 @@ version: 2.5.0-snapshot
 
 
     play(index) {
+      const view3D = this._view3D;
       const action = this._actions[index];
       if (!action) return;
       this.stop(); // Stop all previous actions
@@ -2695,6 +2813,14 @@ version: 2.5.0-snapshot
       this._activeAnimationIdx = index;
 
       this._flushFadePromises();
+
+      view3D.trigger(EVENTS$1.ANIMATION_START, {
+        type: EVENTS$1.ANIMATION_START,
+        target: view3D,
+        index,
+        action,
+        clip: this._clips[index]
+      });
     }
     /**
      * Crossfade animation from one to another
@@ -2852,6 +2978,28 @@ version: 2.5.0-snapshot
       this._mixer.update(delta);
     }
     /**
+     * Update animation repeat mode of the animation actions
+     */
+
+
+    updateRepeatMode() {
+      const view3D = this._view3D;
+      const actions = this._actions;
+      const repeatMode = view3D.animationRepeatMode;
+
+      if (repeatMode === ANIMATION_REPEAT_MODE.NONE) {
+        actions.forEach(action => {
+          action.clampWhenFinished = true;
+          action.loop = THREE.LoopOnce;
+        });
+      } else {
+        actions.forEach(action => {
+          action.clampWhenFinished = false;
+          action.loop = THREE.LoopRepeat;
+        });
+      }
+    }
+    /**
      * Reset the instance and remove all cached animation clips attached to it
      * @returns {void}
      */
@@ -2866,7 +3014,7 @@ version: 2.5.0-snapshot
     }
 
     _restoreTimeScale() {
-      this._mixer.timeScale = 1;
+      this._mixer.timeScale = this._timeScale;
     }
 
     _flushFadePromises() {
@@ -3045,7 +3193,9 @@ version: 2.5.0-snapshot
   const EVENTS$2 = {
     SELECT_START: "selectstart",
     SELECT: "select",
-    SELECT_END: "selectend"
+    SELECT_END: "selectend",
+    ESTIMATION_START: "estimationstart",
+    ESTIMATION_END: "estimationend"
   };
   const INPUT_PROFILE = {
     TOUCH: "generic-touchscreen"
@@ -3059,7 +3209,10 @@ version: 2.5.0-snapshot
       domOverlay: {
         root
       }
-    } : {}
+    } : {},
+    LIGHT_ESTIMATION: {
+      optionalFeatures: ["light-estimation"]
+    }
   }; // For type definition
 
   const EMPTY_FEATURES = {};
@@ -4559,6 +4712,14 @@ version: 2.5.0-snapshot
     add(...objects) {
       this._arRoot.add(...objects);
     }
+    /**
+     * Remove objects from scene
+     */
+
+
+    remove(...objects) {
+      this._arRoot.remove(...objects);
+    }
 
     setRootPosition(pos) {
       const root = this._root;
@@ -4710,6 +4871,72 @@ version: 2.5.0-snapshot
 
   }
 
+  /**
+   * Manager for WebXR light-estimation feature
+   */
+
+  class LightEstimation {
+    constructor(view3D, arScene) {
+      this._onEstimationStart = () => {
+        const estimatedLight = this._light;
+        const scene = this._arScene;
+        if (!estimatedLight) return;
+        scene.add(estimatedLight);
+
+        if (estimatedLight.environment) {
+          scene.root.environment = estimatedLight.environment;
+        }
+      };
+
+      this._onEstimationEnd = () => {
+        const estimatedLight = this._light;
+        const scene = this._arScene;
+        if (!estimatedLight) return;
+        scene.remove(estimatedLight);
+        scene.root.environment = this._origEnvironment;
+      };
+
+      this._view3D = view3D;
+      this._arScene = arScene;
+      this._light = null;
+      this._origEnvironment = null;
+    }
+    /**
+     * As light estimation is optional, always return true
+     * @type {true}
+     */
+
+
+    static isAvailable() {
+      return true;
+    }
+    /**
+     * "light-estimation" as optionalFeatures
+     */
+
+
+    getFeatures() {
+      return FEATURES.LIGHT_ESTIMATION;
+    }
+
+    init() {
+      const renderer = this._view3D.renderer.threeRenderer;
+      const estimatedLight = new XREstimatedLight.XREstimatedLight(renderer);
+      this._light = estimatedLight;
+      estimatedLight.addEventListener(EVENTS$2.ESTIMATION_START, this._onEstimationStart);
+      estimatedLight.addEventListener(EVENTS$2.ESTIMATION_END, this._onEstimationEnd);
+    }
+
+    destroy() {
+      const estimatedLight = this._light;
+      if (!estimatedLight) return;
+      estimatedLight.removeEventListener(EVENTS$2.ESTIMATION_START, this._onEstimationStart);
+      estimatedLight.removeEventListener(EVENTS$2.ESTIMATION_END, this._onEstimationEnd);
+      this._light = null;
+    }
+
+  }
+
   /*
    * Copyright (c) 2020 NAVER Corp.
    * egjs projects are licensed under the MIT license
@@ -4724,7 +4951,9 @@ version: 2.5.0-snapshot
      * @param {View3D} view3D Instance of the View3D
      * @param {object} [options={}] Options
      * @param {object} [options.features={}] Additional features(see {@link https://developer.mozilla.org/en-US/docs/Web/API/XRSessionInit XRSessionInit}) of the WebXR session.
+     * @param {boolean} [options.vertical=false] Whether to place 3D model vertically on the wall.
      * @param {HTMLElement|string|null} [options.overlayRoot=null] `dom-overlay`'s root element. You can set either HTMLElement or query selector for that element.
+     * @param {boolean} [options.useLightEstimation=true] Whether to use `light-estimation` feature.
      * @param {boolean|ARSwirlControlOptions} [options.rotate=true] Options for the rotate control inside the AR session. You can disable rotate control by giving `false`.
      * @param {boolean|ARTranslateControlOptions} [options.translate=true] Options for the translate control inside the AR session. You can disable translate control by giving `false`.
      * @param {boolean|ARScaleControlOptions} [options.scale=true] Options for the scale control inside the AR session. You can disable scale control by giving `false`.
@@ -4736,6 +4965,7 @@ version: 2.5.0-snapshot
       features = EMPTY_FEATURES,
       vertical = false,
       overlayRoot = null,
+      useLightEstimation = true,
       rotate = true,
       translate = true,
       scale = true,
@@ -4749,7 +4979,8 @@ version: 2.5.0-snapshot
 
       this.features = features;
       this.vertical = vertical;
-      this.overlayRoot = overlayRoot; // Create internal components
+      this.overlayRoot = overlayRoot;
+      this.useLightEstimation = useLightEstimation; // Create internal components
 
       this._arScene = new ARScene();
       this._control = new WebARControl(view3D, this._arScene, {
@@ -4762,6 +4993,7 @@ version: 2.5.0-snapshot
       });
       this._hitTest = new HitTest();
       this._domOverlay = new DOMOverlay();
+      this._lightEstimation = new LightEstimation(view3D, this._arScene);
     }
     /**
      * Return availability of this session
@@ -4794,6 +5026,10 @@ version: 2.5.0-snapshot
     get domOverlay() {
       return this._domOverlay;
     }
+
+    get lightEstimation() {
+      return this._lightEstimation;
+    }
     /**
      * Enter session
      * @param view3D Instance of the View3D
@@ -4811,12 +5047,21 @@ version: 2.5.0-snapshot
         const control = this._control;
         const hitTest = this._hitTest;
         const domOverlay = this._domOverlay;
+        const useLightEstimation = this.useLightEstimation;
+        const lightEstimation = this._lightEstimation;
         const vertical = this.vertical;
 
         const features = this._getAllXRFeatures(); // Enable xr
 
 
         threeRenderer.xr.enabled = true;
+
+        if (useLightEstimation) {
+          // Estimation requires "sessionstart" event of the renderer
+          // So it should be initialized before requesting session
+          lightEstimation.init();
+        }
+
         const session = yield navigator.xr.requestSession(SESSION.AR, features); // Cache original values
 
         const originalPixelRatio = threeRenderer.getPixelRatio();
@@ -4829,6 +5074,7 @@ version: 2.5.0-snapshot
         const onSessionEnd = () => __awaiter(this, void 0, void 0, function* () {
           control.destroy(session);
           arScene.destroy(view3D);
+          lightEstimation.destroy();
           domOverlay.destroy(); // Restore original values
 
           threeRenderer.setPixelRatio(originalPixelRatio); // Restore render loop
@@ -4920,7 +5166,7 @@ version: 2.5.0-snapshot
 
       const userFeatures = this.features;
       const overlayRoot = (_a = getNullableElement(this.overlayRoot)) !== null && _a !== void 0 ? _a : this._createARRootElement();
-      return merge({}, this._domOverlay.getFeatures(overlayRoot), this._hitTest.getFeatures(), userFeatures);
+      return merge({}, this._domOverlay.getFeatures(overlayRoot), this._hitTest.getFeatures(), this._lightEstimation.getFeatures(), userFeatures);
     }
 
     _initModelPosition(ctx) {
@@ -5001,7 +5247,7 @@ version: 2.5.0-snapshot
 
     _createARRootElement() {
       const view3D = this._view3D;
-      const root = document.createElement("div");
+      const root = document.createElement(EL_DIV);
       root.classList.add(AR_OVERLAY_CLASS);
       view3D.rootEl.appendChild(root);
       view3D.once(EVENTS$1.AR_END, () => {
@@ -5390,6 +5636,8 @@ version: 2.5.0-snapshot
       this._baseDistance = baseDistance;
       this._aspect = aspect;
       this._enabled = false;
+      this._hidden = false;
+      this._focusing = false;
       this._tooltipSize = new THREE.Vector2();
 
       if (element) {
@@ -5463,6 +5711,16 @@ version: 2.5.0-snapshot
     get aspect() {
       return this._aspect;
     }
+    /**
+     * Whether the annotation is hidden and not rendered
+     * @type {boolean}
+     * @readonly
+     */
+
+
+    get hidden() {
+      return this._hidden;
+    }
 
     set focusDuration(val) {
       this._focusDuration = val;
@@ -5521,7 +5779,7 @@ version: 2.5.0-snapshot
     }) {
       const el = this._element;
       const tooltipSize = this._tooltipSize;
-      if (!el) return;
+      if (!el || this._hidden) return;
       el.style.zIndex = `${renderOrder + 1}`;
       el.style.transform = `translate(-50%, -50%) translate(${screenPos.x}px, ${screenPos.y}px)`;
 
@@ -5535,6 +5793,34 @@ version: 2.5.0-snapshot
         el.classList.add(DEFAULT_CLASS.ANNOTATION_FLIP_X);
       } else {
         el.classList.remove(DEFAULT_CLASS.ANNOTATION_FLIP_X);
+      }
+    }
+    /**
+     * Show annotation.
+     * A class "hidden" will be removed from the annotation element.
+     */
+
+
+    show() {
+      const el = this._element;
+      this._hidden = false;
+
+      if (el) {
+        el.classList.remove(DEFAULT_CLASS.ANNOTATION_HIDDEN);
+      }
+    }
+    /**
+     * Hide annotation and prevent it from being rendered.
+     * A class "hidden" will be added to the annotation element.
+     */
+
+
+    hide() {
+      const el = this._element;
+      this._hidden = true;
+
+      if (el) {
+        el.classList.add(DEFAULT_CLASS.ANNOTATION_HIDDEN);
       }
     }
     /**
@@ -5595,6 +5881,38 @@ version: 2.5.0-snapshot
       return focusVector;
     }
 
+    _onFocus() {
+      const view3D = this._view3D;
+      const el = this._element;
+
+      if (el) {
+        el.classList.add(DEFAULT_CLASS.ANNOTATION_SELECTED);
+      }
+
+      this._focusing = true;
+      view3D.trigger(EVENTS$1.ANNOTATION_FOCUS, {
+        type: EVENTS$1.ANNOTATION_FOCUS,
+        target: view3D,
+        annotation: this
+      });
+    }
+
+    _onUnfocus() {
+      const view3D = this._view3D;
+      const el = this._element;
+
+      if (el) {
+        el.classList.remove(DEFAULT_CLASS.ANNOTATION_SELECTED);
+      }
+
+      this._focusing = false;
+      view3D.trigger(EVENTS$1.ANNOTATION_UNFOCUS, {
+        type: EVENTS$1.ANNOTATION_UNFOCUS,
+        target: view3D,
+        annotation: this
+      });
+    }
+
   }
 
   /**
@@ -5619,10 +5937,10 @@ version: 2.5.0-snapshot
 
     focus() {
       return __awaiter(this, void 0, void 0, function* () {
+        if (this._focusing) return;
         const {
           camera
         } = this._view3D;
-        const el = this._element;
         const focus = this._focus;
         let targetPose;
 
@@ -5641,15 +5959,14 @@ version: 2.5.0-snapshot
           targetPose = new Pose(toDegree(yaw), toDegree(pitch), 0, this._position.toArray());
         }
 
-        if (el) {
-          el.classList.add(DEFAULT_CLASS.ANNOTATION_SELECTED);
-          window.addEventListener("click", () => {
-            this.unfocus();
-          }, {
-            once: true,
-            capture: true
-          });
-        }
+        window.addEventListener(EVENTS.CLICK, () => {
+          this.unfocus();
+        }, {
+          once: true,
+          capture: true
+        });
+
+        this._onFocus();
 
         if (!targetPose.equals(camera.currentPose)) {
           return camera.reset(this._focusDuration, EASING$1, targetPose);
@@ -5660,9 +5977,9 @@ version: 2.5.0-snapshot
     }
 
     unfocus() {
-      const el = this._element;
-      if (!el) return;
-      el.classList.remove(DEFAULT_CLASS.ANNOTATION_SELECTED);
+      if (!this._focusing) return;
+
+      this._onUnfocus();
     }
 
     toJSON() {
@@ -5683,7 +6000,7 @@ version: 2.5.0-snapshot
   }
 
   /**
-   *
+   * {@link Annotation} that tracks position of mesh face(triangle)
    */
 
   class FaceAnnotation extends Annotation {
@@ -5725,12 +6042,7 @@ version: 2.5.0-snapshot
 
     focus() {
       return __awaiter(this, void 0, void 0, function* () {
-        const el = this._element;
-
-        if (el) {
-          el.classList.add(DEFAULT_CLASS.ANNOTATION_SELECTED);
-        }
-
+        if (this._focusing) return;
         const view3D = this._view3D;
         const {
           camera,
@@ -5755,19 +6067,17 @@ version: 2.5.0-snapshot
           once: true,
           capture: true
         });
+
+        this._onFocus();
       });
     }
 
     unfocus() {
-      const el = this._element;
+      if (!this._focusing) return;
       const {
         control
       } = this._view3D;
       const trackingControl = this._trackingControl;
-
-      if (el) {
-        el.classList.remove(DEFAULT_CLASS.ANNOTATION_SELECTED);
-      }
 
       if (trackingControl) {
         control.sync();
@@ -5775,6 +6085,8 @@ version: 2.5.0-snapshot
         trackingControl.destroy();
         this._trackingControl = null;
       }
+
+      this._onUnfocus();
     }
 
     render(params) {
@@ -6119,19 +6431,19 @@ version: 2.5.0-snapshot
 
     _createWrapper() {
       const view3D = this._view3D;
-      const wrapper = document.createElement("div");
+      const wrapper = document.createElement(EL_DIV);
       wrapper.classList.add(DEFAULT_CLASS.ANNOTATION_WRAPPER);
       view3D.rootEl.appendChild(wrapper);
       return wrapper;
     }
 
     _createDefaultAnnotationElement(label) {
-      const annotation = document.createElement("div");
+      const annotation = document.createElement(EL_DIV);
       annotation.classList.add(DEFAULT_CLASS.ANNOTATION);
       annotation.classList.add(DEFAULT_CLASS.ANNOTATION_DEFAULT);
 
       if (label) {
-        const tooltip = document.createElement("div");
+        const tooltip = document.createElement(EL_DIV);
         tooltip.classList.add(DEFAULT_CLASS.ANNOTATION_TOOLTIP);
         tooltip.classList.add(DEFAULT_CLASS.ANNOTATION_DEFAULT);
         tooltip.innerHTML = label;
@@ -6168,7 +6480,7 @@ version: 2.5.0-snapshot
       this._screenScale = new THREE.Vector2(0, 0);
       this._prevPos = new THREE.Vector2(0, 0);
       this._isFirstTouch = false;
-      this._isScrolling = false;
+      this._scrolling = false;
       this._enabled = false;
 
       this._onMouseDown = evt => {
@@ -6187,8 +6499,7 @@ version: 2.5.0-snapshot
         window.addEventListener(EVENTS.MOUSE_MOVE, this._onMouseMove, false);
         window.addEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
         this.trigger(CONTROL_EVENTS.HOLD, {
-          inputType: INPUT_TYPE.ROTATE,
-          isTouch: false
+          inputType: INPUT_TYPE.ROTATE
         });
       };
 
@@ -6211,8 +6522,7 @@ version: 2.5.0-snapshot
         window.removeEventListener(EVENTS.MOUSE_MOVE, this._onMouseMove, false);
         window.removeEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
         this.trigger(CONTROL_EVENTS.RELEASE, {
-          inputType: INPUT_TYPE.ROTATE,
-          isTouch: false
+          inputType: INPUT_TYPE.ROTATE
         });
       };
 
@@ -6223,14 +6533,13 @@ version: 2.5.0-snapshot
         this._prevPos.set(touch.clientX, touch.clientY);
 
         this.trigger(CONTROL_EVENTS.HOLD, {
-          inputType: INPUT_TYPE.ROTATE,
-          isTouch: true
+          inputType: INPUT_TYPE.ROTATE
         });
       };
 
       this._onTouchMove = evt => {
         // Only the one finger motion should be considered
-        if (evt.touches.length > 1 || this._isScrolling) return;
+        if (evt.touches.length > 1 || this._scrolling) return;
         const touch = evt.touches[0];
         const scrollable = this._view3D.scrollable;
 
@@ -6240,7 +6549,7 @@ version: 2.5.0-snapshot
 
             if (Math.abs(delta.y) > Math.abs(delta.x)) {
               // Assume Scrolling
-              this._isScrolling = true;
+              this._scrolling = true;
               return;
             }
           }
@@ -6248,7 +6557,7 @@ version: 2.5.0-snapshot
           this._isFirstTouch = false;
         }
 
-        if (!scrollable && evt.cancelable) {
+        if (evt.cancelable !== false) {
           evt.preventDefault();
         }
 
@@ -6273,12 +6582,11 @@ version: 2.5.0-snapshot
           this._prevPos.set(0, 0);
 
           this.trigger(CONTROL_EVENTS.RELEASE, {
-            inputType: INPUT_TYPE.ROTATE,
-            isTouch: true
+            inputType: INPUT_TYPE.ROTATE
           });
         }
 
-        this._isScrolling = false;
+        this._scrolling = false;
       };
 
       this._view3D = view3D;
@@ -6404,7 +6712,7 @@ version: 2.5.0-snapshot
 
     reset() {
       this._isFirstTouch = false;
-      this._isScrolling = false;
+      this._scrolling = false;
     }
     /**
      * Update control by given deltaTime
@@ -6452,10 +6760,10 @@ version: 2.5.0-snapshot
       const targetEl = this._view3D.renderer.canvas;
       targetEl.addEventListener(EVENTS.MOUSE_DOWN, this._onMouseDown);
       targetEl.addEventListener(EVENTS.TOUCH_START, this._onTouchStart, {
-        passive: true
+        passive: false
       });
       targetEl.addEventListener(EVENTS.TOUCH_MOVE, this._onTouchMove, {
-        passive: this._view3D.scrollable
+        passive: false
       });
       targetEl.addEventListener(EVENTS.TOUCH_END, this._onTouchEnd);
       this._enabled = true;
@@ -6474,8 +6782,8 @@ version: 2.5.0-snapshot
       if (!this._enabled) return;
       const targetEl = this._view3D.renderer.canvas;
       targetEl.removeEventListener(EVENTS.MOUSE_DOWN, this._onMouseDown);
-      window.removeEventListener(EVENTS.MOUSE_MOVE, this._onMouseMove);
-      window.removeEventListener(EVENTS.MOUSE_UP, this._onMouseUp);
+      window.removeEventListener(EVENTS.MOUSE_MOVE, this._onMouseMove, false);
+      window.removeEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
       targetEl.removeEventListener(EVENTS.TOUCH_START, this._onTouchStart);
       targetEl.removeEventListener(EVENTS.TOUCH_MOVE, this._onTouchMove);
       targetEl.removeEventListener(EVENTS.TOUCH_END, this._onTouchEnd);
@@ -6544,8 +6852,7 @@ version: 2.5.0-snapshot
         window.addEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
         window.addEventListener(EVENTS.CONTEXT_MENU, this._onContextMenu, false);
         this.trigger(CONTROL_EVENTS.HOLD, {
-          inputType: INPUT_TYPE.TRANSLATE,
-          isTouch: false
+          inputType: INPUT_TYPE.TRANSLATE
         });
       };
 
@@ -6567,8 +6874,7 @@ version: 2.5.0-snapshot
         window.removeEventListener(EVENTS.MOUSE_MOVE, this._onMouseMove, false);
         window.removeEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
         this.trigger(CONTROL_EVENTS.RELEASE, {
-          inputType: INPUT_TYPE.TRANSLATE,
-          isTouch: false
+          inputType: INPUT_TYPE.TRANSLATE
         });
       };
 
@@ -6584,8 +6890,7 @@ version: 2.5.0-snapshot
 
         this._touchInitialized = true;
         this.trigger(CONTROL_EVENTS.HOLD, {
-          inputType: INPUT_TYPE.TRANSLATE,
-          isTouch: true
+          inputType: INPUT_TYPE.TRANSLATE
         });
       };
 
@@ -6623,8 +6928,7 @@ version: 2.5.0-snapshot
           if (this._touchInitialized) {
             this._touchInitialized = false;
             this.trigger(CONTROL_EVENTS.RELEASE, {
-              inputType: INPUT_TYPE.TRANSLATE,
-              isTouch: true
+              inputType: INPUT_TYPE.TRANSLATE
             });
           }
 
@@ -6863,6 +7167,7 @@ version: 2.5.0-snapshot
       maxFov = AUTO,
       minDistance = 0.1,
       maxDistance = 2,
+      doubleTap = true,
       easing = EASING$1
     } = {}) {
       super();
@@ -6884,8 +7189,7 @@ version: 2.5.0-snapshot
 
         if (!this._isWheelScrolling) {
           this.trigger(CONTROL_EVENTS.HOLD, {
-            inputType: INPUT_TYPE.ZOOM,
-            isTouch: false
+            inputType: INPUT_TYPE.ZOOM
           });
         }
 
@@ -6915,8 +7219,7 @@ version: 2.5.0-snapshot
 
         if (this._isFirstTouch) {
           this.trigger(CONTROL_EVENTS.HOLD, {
-            inputType: INPUT_TYPE.ZOOM,
-            isTouch: true
+            inputType: INPUT_TYPE.ZOOM
           });
         }
 
@@ -6927,11 +7230,48 @@ version: 2.5.0-snapshot
       this._onTouchEnd = evt => {
         if (evt.touches.length !== 0) return;
         this.trigger(CONTROL_EVENTS.RELEASE, {
-          inputType: INPUT_TYPE.ZOOM,
-          isTouch: true
+          inputType: INPUT_TYPE.ZOOM
         });
         this._prevTouchDistance = -1;
         this._isFirstTouch = true;
+      };
+
+      this._onDoubleClick = evt => {
+        const view3D = this._view3D;
+        if (!this._doubleTap || !view3D.model) return;
+        const {
+          zoomIn = 0.8,
+          duration = ANIMATION_DURATION,
+          easing = EASING$1,
+          useZoomOut = true
+        } = getObjectOption(this._doubleTap);
+        const zoomRange = this._motion.range;
+        const maxZoom = -zoomRange.min * zoomIn;
+
+        if (view3D.camera.zoom >= maxZoom && useZoomOut) {
+          const resetPose = view3D.camera.currentPose.clone();
+          resetPose.zoom = 0;
+          void view3D.camera.reset(duration, easing, resetPose);
+          return;
+        }
+
+        const raycaster = new THREE.Raycaster();
+        const pointer = new THREE.Vector2();
+        const canvasSize = view3D.renderer.canvasSize;
+        pointer.x = evt.offsetX / canvasSize.x * 2 - 1;
+        pointer.y = -(evt.offsetY / canvasSize.y) * 2 + 1;
+        raycaster.setFromCamera(pointer, view3D.camera.threeCamera);
+        const intersects = raycaster.intersectObject(view3D.model.scene);
+        if (!intersects.length) return; // Nearest
+
+        const intersect = intersects[0];
+        const newPivot = intersect.point;
+        const {
+          yaw,
+          pitch
+        } = view3D.camera;
+        const resetPose = new Pose(yaw, pitch, maxZoom, newPivot.toArray());
+        void view3D.camera.reset(duration, easing, resetPose);
       };
 
       this._view3D = view3D;
@@ -6942,6 +7282,7 @@ version: 2.5.0-snapshot
       this._maxFov = maxFov;
       this._minDistance = minDistance;
       this._maxDistance = maxDistance;
+      this._doubleTap = doubleTap;
       this._easing = easing;
       this._motion = new Motion({
         duration,
@@ -7059,6 +7400,10 @@ version: 2.5.0-snapshot
     get maxDistance() {
       return this._maxDistance;
     }
+
+    get doubleTap() {
+      return this._doubleTap;
+    }
     /**
      * Easing function of the animation
      * @type {function}
@@ -7118,8 +7463,7 @@ version: 2.5.0-snapshot
 
       if (this._isWheelScrolling && prevProgress < 1 && newProgress >= 1) {
         this.trigger(CONTROL_EVENTS.RELEASE, {
-          inputType: INPUT_TYPE.ZOOM,
-          isTouch: false
+          inputType: INPUT_TYPE.ZOOM
         });
         this._isWheelScrolling = false;
       }
@@ -7149,6 +7493,7 @@ version: 2.5.0-snapshot
         passive: false,
         capture: false
       });
+      targetEl.addEventListener(EVENTS.DOUBLE_CLICK, this._onDoubleClick);
       this._enabled = true;
       this.sync();
       this.trigger(CONTROL_EVENTS.ENABLE, {
@@ -7167,6 +7512,7 @@ version: 2.5.0-snapshot
       targetEl.removeEventListener(EVENTS.WHEEL, this._onWheel, false);
       targetEl.removeEventListener(EVENTS.TOUCH_MOVE, this._onTouchMove, false);
       targetEl.removeEventListener(EVENTS.TOUCH_END, this._onTouchEnd, false);
+      targetEl.removeEventListener(EVENTS.DOUBLE_CLICK, this._onDoubleClick);
       this._enabled = false;
       this.trigger(CONTROL_EVENTS.DISABLE, {
         inputType: INPUT_TYPE.ZOOM
@@ -7254,12 +7600,11 @@ version: 2.5.0-snapshot
       };
 
       this._onHold = ({
-        inputType,
-        isTouch
+        inputType
       }) => {
         const view3D = this._view3D;
 
-        if (inputType !== INPUT_TYPE.ZOOM && !isTouch) {
+        if (inputType !== INPUT_TYPE.ZOOM) {
           const grabCursorEnabled = view3D.useGrabCursor && (this._rotateControl.enabled || this._translateControl.enabled);
 
           if (grabCursorEnabled) {
@@ -7275,12 +7620,11 @@ version: 2.5.0-snapshot
       };
 
       this._onRelease = ({
-        inputType,
-        isTouch
+        inputType
       }) => {
         const view3D = this._view3D;
 
-        if (inputType !== INPUT_TYPE.ZOOM && !isTouch) {
+        if (inputType !== INPUT_TYPE.ZOOM) {
           const grabCursorEnabled = view3D.useGrabCursor && (this._rotateControl.enabled || this._translateControl.enabled);
 
           if (grabCursorEnabled) {
@@ -8319,6 +8663,7 @@ version: 2.5.0-snapshot
       scrollable = true,
       wheelScrollable = false,
       useGrabCursor = true,
+      defaultAnimationIndex = 0,
       skybox = null,
       envmap = null,
       background = null,
@@ -8327,6 +8672,7 @@ version: 2.5.0-snapshot
       skyboxBlur = false,
       toneMapping = TONE_MAPPING.LINEAR,
       useDefaultEnv = true,
+      animationRepeatMode = ANIMATION_REPEAT_MODE.ONE,
       annotationURL = null,
       annotationWrapper = `.${DEFAULT_CLASS.ANNOTATION_WRAPPER}`,
       annotationSelector = `.${DEFAULT_CLASS.ANNOTATION}`,
@@ -8366,6 +8712,7 @@ version: 2.5.0-snapshot
       this._scrollable = scrollable;
       this._wheelScrollable = wheelScrollable;
       this._useGrabCursor = useGrabCursor;
+      this._defaultAnimationIndex = defaultAnimationIndex;
       this._skybox = skybox;
       this._envmap = envmap;
       this._background = background;
@@ -8374,6 +8721,7 @@ version: 2.5.0-snapshot
       this._skyboxBlur = skyboxBlur;
       this._toneMapping = toneMapping;
       this._useDefaultEnv = useDefaultEnv;
+      this._animationRepeatMode = animationRepeatMode;
       this._annotationURL = annotationURL;
       this._annotationWrapper = annotationWrapper;
       this._annotationSelector = annotationSelector;
@@ -8821,7 +9169,7 @@ version: 2.5.0-snapshot
       return this._toneMapping;
     }
     /**
-     *
+     * Whether to use generated default environment map.
      * @type {boolean}
      * @default true
      */
@@ -8829,6 +9177,29 @@ version: 2.5.0-snapshot
 
     get useDefaultEnv() {
       return this._useDefaultEnv;
+    }
+    /**
+     * Index of the animation to play after the model is loaded
+     * @type {number}
+     * @default 0
+     */
+
+
+    get defaultAnimationIndex() {
+      return this._defaultAnimationIndex;
+    }
+    /**
+     * Repeat mode of the animator.
+     * "one" will repeat single animation, and "all" will repeat all animations.
+     * "none" will make animation to automatically paused on its last frame.
+     * @see ANIMATION_REPEAT_MODE
+     * @type {string}
+     * @default "one"
+     */
+
+
+    get animationRepeatMode() {
+      return this._animationRepeatMode;
     }
     /**
      * An URL to the JSON file that has annotation informations.
@@ -8994,6 +9365,10 @@ version: 2.5.0-snapshot
       return this._maxDeltaTime;
     }
 
+    set defaultAnimationIndex(val) {
+      this._defaultAnimationIndex = val;
+    }
+
     set initialZoom(val) {
       this._initialZoom = val;
     }
@@ -9051,6 +9426,12 @@ version: 2.5.0-snapshot
       this._control.updateCursor();
     }
 
+    set animationRepeatMode(val) {
+      this._animationRepeatMode = val;
+
+      this._animator.updateRepeatMode();
+    }
+
     set autoResize(val) {
       this._autoResize = val;
 
@@ -9083,7 +9464,7 @@ version: 2.5.0-snapshot
 
       this._autoResizer.disable();
 
-      this._animator.reset();
+      this._animator.destroy();
 
       this._annotationManager.destroy();
 
@@ -9107,10 +9488,12 @@ version: 2.5.0-snapshot
         const scene = this._scene;
         const renderer = this._renderer;
         const control = this._control;
+        const animator = this._animator;
         const annotationManager = this._annotationManager;
         const meshoptPath = this._meshoptPath;
         const tasks = [];
         this.resize();
+        animator.init();
         annotationManager.init();
 
         if (this._autoResize) {
@@ -9227,7 +9610,7 @@ version: 2.5.0-snapshot
       animator.setClips(model.animations);
 
       if (model.animations.length > 0) {
-        animator.play(0);
+        animator.play(this._defaultAnimationIndex);
       }
 
       annotationManager.reset();
@@ -9415,7 +9798,7 @@ version: 2.5.0-snapshot
    */
 
 
-  View3D.VERSION = "2.5.0-snapshot";
+  View3D.VERSION = "2.6.0";
 
   /*
    * "View In Ar" Icon from [Google Material Design Icons](https://github.com/google/material-design-icons)
@@ -9470,8 +9853,8 @@ version: 2.5.0-snapshot
           tooltipClass = "view3d-tooltip"
         } = this._options;
         const arAvailable = yield view3D.ar.isAvailable();
-        const button = document.createElement("button");
-        const tooltip = document.createElement("div");
+        const button = document.createElement(EL_BUTTON);
+        const tooltip = document.createElement(EL_DIV);
         const tooltipText = document.createTextNode(arAvailable ? availableText : unavailableText);
         button.classList.add(buttonClass);
         tooltip.classList.add(tooltipClass);
@@ -9524,49 +9907,50 @@ version: 2.5.0-snapshot
      * Create new instance of AROverlay
      * @param {object} [options={}] Options for the AROverlay
      */
-    constructor(options = {}) {
-      this._options = options;
+    constructor({
+      className = {},
+      showPlaneDetection = true,
+      toastText = "Point your device downwards to find the ground and move it around."
+    } = {}) {
+      this.className = className;
+      this.showPlaneDetection = showPlaneDetection;
+      this.toastText = toastText;
+
+      this._createElements();
     }
 
     init(view3D) {
       return __awaiter(this, void 0, void 0, function* () {
+        const rootEl = this._rootEl;
+        const detectionRoot = this._detectionRootEl;
+        const closeButton = this._closeButtonEl;
+        const className = Object.assign(Object.assign({}, AROverlay.DEFAULT_CLASS), this.className);
         view3D.on(EVENTS$1.AR_START, ({
           session
         }) => {
           const overlayRoot = session.domOverlay.root;
           if (!overlayRoot) return;
-
-          if (this._cachedElements) {
-            Object.values(this._cachedElements).map(el => {
-              if (!overlayRoot.contains(el)) {
-                overlayRoot.appendChild(el);
-              }
-            });
-          } else {
-            const closeButton = document.createElement("div");
-            closeButton.innerHTML = CloseIcon;
-            closeButton.classList.add("view3d-ar-close");
-            overlayRoot.appendChild(closeButton);
-            this._cachedElements = {
-              closeButton
-            };
-          }
-
-          const {
-            closeButton
-          } = this._cachedElements;
+          overlayRoot.appendChild(rootEl);
 
           const closeButtonHandler = () => {
             void session.exit();
           };
 
-          closeButton.addEventListener("click", closeButtonHandler);
+          detectionRoot === null || detectionRoot === void 0 ? void 0 : detectionRoot.classList.add(className.DETECTION_VISIBLE);
+
+          const onPlacedHandler = () => {
+            detectionRoot === null || detectionRoot === void 0 ? void 0 : detectionRoot.classList.remove(className.DETECTION_VISIBLE);
+          };
+
+          view3D.once(EVENTS$1.AR_MODEL_PLACED, onPlacedHandler);
+          closeButton.addEventListener(EVENTS.CLICK, closeButtonHandler);
           view3D.once(EVENTS$1.AR_END, () => {
-            if (closeButton.parentElement) {
-              closeButton.parentElement.removeChild(closeButton);
+            if (rootEl.parentElement) {
+              rootEl.parentElement.removeChild(rootEl);
             }
 
-            closeButton.removeEventListener("click", closeButtonHandler);
+            closeButton.removeEventListener(EVENTS.CLICK, closeButtonHandler);
+            view3D.off(EVENTS$1.AR_MODEL_PLACED, onPlacedHandler);
           });
         });
       });
@@ -9575,7 +9959,80 @@ version: 2.5.0-snapshot
     teardown() {// DO NOTHING
     }
 
+    _createElements() {
+      const className = Object.assign(Object.assign({}, AROverlay.DEFAULT_CLASS), this.className);
+      const root = document.createElement(EL_DIV);
+      const closeButton = document.createElement(EL_DIV);
+      closeButton.classList.add(className.CLOSE_BUTTON);
+      closeButton.innerHTML = CloseIcon;
+      root.classList.add(className.ROOT);
+      root.appendChild(closeButton);
+
+      if (this.showPlaneDetection) {
+        this._detectionRootEl = this._createPlaneDetectionElements();
+        root.appendChild(this._detectionRootEl);
+      }
+
+      this._rootEl = root;
+      this._closeButtonEl = closeButton;
+    }
+
+    _createPlaneDetectionElements() {
+      const className = Object.assign(Object.assign({}, AROverlay.DEFAULT_CLASS), this.className);
+      const detectionRoot = document.createElement(EL_DIV);
+      const detectionIcon = document.createElement(EL_DIV);
+      const detectionLabel = document.createElement(EL_DIV);
+      const detectionPhone = document.createElement(EL_DIV);
+      const detectionCube = document.createElement(EL_DIV);
+      const detectionPlane = document.createElement(EL_DIV);
+      const cubeFaces = range(5).map(() => document.createElement(EL_DIV));
+      detectionRoot.classList.add(className.DETECTION_ROOT);
+      detectionIcon.classList.add(className.DETECTION_ICON);
+      detectionLabel.classList.add(className.DETECTION_TOAST);
+      detectionPhone.classList.add(className.DETECTION_PHONE);
+      detectionCube.classList.add(className.DETECTION_CUBE);
+      detectionPlane.classList.add(className.DETECTION_PLANE);
+      detectionLabel.innerHTML = this.toastText;
+      cubeFaces.forEach(face => {
+        face.classList.add(className.DETECTION_CUBE_FACE);
+        detectionCube.appendChild(face);
+      });
+      detectionIcon.appendChild(detectionPhone);
+      detectionIcon.appendChild(detectionCube);
+      detectionIcon.appendChild(detectionPlane);
+      detectionRoot.appendChild(detectionIcon);
+      detectionRoot.appendChild(detectionLabel);
+      return detectionRoot;
+    }
+
   }
+  /**
+   * Default class names that AROverlay uses
+   * @type {object}
+   * @property {"view3d-ar-root"} ROOT A class name for the root element of AROverlay
+   * @property {"view3d-ar-close"} CLOSE_BUTTON A class name for the close button element
+   * @property {"view3d-ar-detection"} DETECTION_ROOT A class name for the root element of floor detection annotator
+   * @property {"view3d-ar-detection-icon"} DETECTION_ICON A class name for the wrapper element of floor detection icon
+   * @property {"view3d-ar-detection-toast"} DETECTION_TOAST A class name for the toast element of floor detection annotator
+   * @property {"view3d-ar-phone"} DETECTION_PHONE A class name for the root element of floor detection phone shape
+   * @property {"view3d-ar-cube"} DETECTION_CUBE A class name for the root element of floor detection cube
+   * @property {"view3d-ar-cube-face"} DETECTION_CUBE_FACE A class name for the face elements of floor detection cube
+   * @property {"view3d-ar-plane"} DETECTION_PLANE A class name for the face elements of floor detection plane
+   */
+
+
+  AROverlay.DEFAULT_CLASS = {
+    ROOT: "view3d-ar-root",
+    CLOSE_BUTTON: "view3d-ar-close",
+    DETECTION_ROOT: "view3d-ar-detection",
+    DETECTION_ICON: "view3d-ar-detection-icon",
+    DETECTION_TOAST: "view3d-ar-detection-toast",
+    DETECTION_PHONE: "view3d-ar-phone",
+    DETECTION_CUBE: "view3d-ar-cube",
+    DETECTION_CUBE_FACE: "view3d-ar-cube-face",
+    DETECTION_PLANE: "view3d-ar-plane",
+    DETECTION_VISIBLE: "visible"
+  };
 
   /**
    * A plugin that displays loading bar while
@@ -9583,8 +10040,8 @@ version: 2.5.0-snapshot
 
   class LoadingBar {
     /**
-     * Create new instance of Spinner
-     * @param {LoadingBarOptions} [options={}] Options for the Spinner
+     * Create new instance of LoadingBar
+     * @param {LoadingBarOptions} [options={}] Options for the LoadingBar
      */
     constructor(options = {}) {
       this._startLoading = ({
@@ -9593,7 +10050,7 @@ version: 2.5.0-snapshot
       }) => {
         if (level !== 0) return;
         const {
-          type = "default",
+          type = LoadingBar.TYPE.DEFAULT,
           loadingLabel = "Loading 3D Model...",
           parsingLabel = "Parsing 3D Model...",
           labelColor = "#ffffff",
@@ -9604,16 +10061,17 @@ version: 2.5.0-snapshot
           spinnerWidth = "30%",
           overlayBackground = "rgba(0, 0, 0, 0.3)"
         } = this._options;
-        const loadingOverlay = document.createElement("div");
-        const loadingWrapper = document.createElement("div");
-        const loadingLabelEl = document.createElement("div");
-        const loadingBar = document.createElement("div");
-        const loadingFiller = document.createElement("div");
-        loadingOverlay.classList.add("view3d-lb-overlay");
-        loadingWrapper.classList.add("view3d-lb-wrapper");
-        loadingBar.classList.add("view3d-lb-base");
-        loadingLabelEl.classList.add("view3d-lb-label");
-        loadingFiller.classList.add("view3d-lb-filler");
+        const loadingOverlay = document.createElement(EL_DIV);
+        const loadingWrapper = document.createElement(EL_DIV);
+        const loadingLabelEl = document.createElement(EL_DIV);
+        const loadingBar = document.createElement(EL_DIV);
+        const loadingFiller = document.createElement(EL_DIV);
+        const className = Object.assign(Object.assign({}, this._options.className), LoadingBar.DEFAULT_CLASS);
+        loadingOverlay.classList.add(className.OVERLAY);
+        loadingWrapper.classList.add(className.WRAPPER);
+        loadingBar.classList.add(className.BASE);
+        loadingLabelEl.classList.add(className.LABEL);
+        loadingFiller.classList.add(className.FILLER);
         loadingOverlay.style.backgroundColor = overlayBackground;
 
         if (type !== LoadingBar.TYPE.SPINNER) {
@@ -9621,7 +10079,7 @@ version: 2.5.0-snapshot
           loadingBar.style.backgroundColor = barBackground;
           loadingFiller.style.backgroundColor = barForeground;
         } else {
-          loadingBar.classList.add("type-spinner");
+          loadingBar.classList.add(className.TYPE_SPINNER);
           loadingBar.style.width = spinnerWidth;
           loadingBar.style.paddingTop = spinnerWidth;
           loadingFiller.style.borderWidth = barHeight;
@@ -9630,7 +10088,7 @@ version: 2.5.0-snapshot
         }
 
         if (type === LoadingBar.TYPE.TOP) {
-          loadingOverlay.classList.add("type-top");
+          loadingOverlay.classList.add(className.TYPE_TOP);
         } else if (type === LoadingBar.TYPE.DEFAULT) {
           loadingBar.style.width = barWidth;
         }
@@ -9700,14 +10158,1302 @@ version: 2.5.0-snapshot
 
   }
   /**
-   * Available styles of loading bar
+   * Default class names that LoadingBar uses
+   * @type {object}
+   * @property {"view3d-lb-overlay"} OVERLAY A class name for overlay element of LoadingBar plugin
+   * @property {"view3d-lb-wrapper"} WRAPPER A class name for wrapper element of LoadingBar plugin
+   * @property {"view3d-lb-base"} BASE A class name for progress bar base element of LoadingBar plugin
+   * @property {"view3d-lb-label"} LABEL A class name for label element of LoadingBar plugin
+   * @property {"view3d-lb-filler"} FILLER A class name for progress bar filler element  of LoadingBar plugin
+   * @property {"is-spinner"} TYPE_SPINNER A class name for LoadingBar plugin when the type is "spinner"
+   * @property {"is-top"} TYPE_TOP A class name for LoadingBar plugin when the type is "top"
    */
 
+
+  LoadingBar.DEFAULT_CLASS = {
+    OVERLAY: "view3d-lb-overlay",
+    WRAPPER: "view3d-lb-wrapper",
+    BASE: "view3d-lb-base",
+    LABEL: "view3d-lb-label",
+    FILLER: "view3d-lb-filler",
+    TYPE_SPINNER: "is-spinner",
+    TYPE_TOP: "is-top"
+  };
+  /**
+   * Available styles of loading bar
+   */
 
   LoadingBar.TYPE = {
     DEFAULT: "default",
     TOP: "top",
     SPINNER: "spinner"
+  };
+
+  /*
+   * Copyright (c) 2020 NAVER Corp.
+   * egjs projects are licensed under the MIT license
+   */
+  /**
+   * Show animation progress bar, use with ControlBar
+   */
+
+  class AnimationProgressBar {
+    /** */
+    constructor(view3D, controlBar, {
+      position = ControlBar.POSITION.TOP,
+      order = 9999
+    } = {}) {
+      this._onResize = () => {
+        this._rootBbox = this._trackEl.getBoundingClientRect();
+      };
+
+      this._onRender = ({
+        target: view3D
+      }) => {
+        const animator = view3D.animator;
+        const activeAnimationIdx = animator.activeAnimationIndex;
+        const activeAnimationClip = animator.activeAnimation;
+        const activeAnimationAction = animator.actions[activeAnimationIdx];
+        if (!activeAnimationClip || !activeAnimationAction) return;
+        const progress = activeAnimationAction.time / activeAnimationClip.duration;
+
+        this._fill(progress);
+      };
+
+      this._onMouseDown = evt => {
+        if (evt.button !== MOUSE_BUTTON.LEFT) return;
+        const animator = this._view3D.animator;
+        const activeAnimationIdx = animator.activeAnimationIndex;
+        const activeAnimationAction = animator.actions[activeAnimationIdx];
+        evt.preventDefault();
+        window.addEventListener(EVENTS.MOUSE_MOVE, this._onMouseMove, false);
+        window.addEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
+        this._rootBbox = this._trackEl.getBoundingClientRect();
+
+        this._showThumb();
+
+        this._origTimeScale = activeAnimationAction.getEffectiveTimeScale();
+
+        this._setAnimationTimeScale(0);
+
+        this._updateAnimationProgress(evt.pageX);
+      };
+
+      this._onMouseMove = evt => {
+        evt.preventDefault();
+
+        this._updateAnimationProgress(evt.pageX);
+      };
+
+      this._onMouseUp = () => {
+        window.removeEventListener(EVENTS.MOUSE_MOVE, this._onMouseMove, false);
+        window.removeEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
+
+        this._hideThumb();
+
+        this._setAnimationTimeScale(this._origTimeScale);
+      };
+
+      this._onTouchStart = evt => {
+        if (evt.touches.length > 1) return;
+        const touch = evt.touches[0];
+        const animator = this._view3D.animator;
+        const activeAnimationIdx = animator.activeAnimationIndex;
+        const activeAnimationAction = animator.actions[activeAnimationIdx];
+        this._rootBbox = this._trackEl.getBoundingClientRect();
+
+        this._showThumb();
+
+        this._firstTouch = {
+          x: touch.pageX,
+          y: touch.pageY
+        };
+        this._origTimeScale = activeAnimationAction.getEffectiveTimeScale();
+
+        this._setAnimationTimeScale(0);
+
+        this._updateAnimationProgress(touch.pageX);
+      };
+
+      this._onTouchMove = evt => {
+        // Only the one finger motion should be considered
+        if (evt.touches.length > 1 || this._scrolling) return;
+        const touch = evt.touches[0];
+        const scrollable = this._view3D.scrollable;
+        const firstTouch = this._firstTouch;
+
+        if (firstTouch) {
+          if (scrollable) {
+            const delta = new THREE.Vector2(touch.pageX, touch.pageY).sub(new THREE.Vector2(firstTouch.x, firstTouch.y));
+
+            if (Math.abs(delta.y) > Math.abs(delta.x)) {
+              // Assume Scrolling
+              this._scrolling = true;
+
+              this._release();
+
+              return;
+            }
+          }
+
+          this._firstTouch = null;
+        }
+
+        if (evt.cancelable) {
+          evt.preventDefault();
+        }
+
+        evt.stopPropagation();
+
+        this._setAnimationTimeScale(0);
+
+        this._updateAnimationProgress(touch.pageX);
+      };
+
+      this._onTouchEnd = evt => {
+        if (evt.touches.length > 0) return;
+
+        this._release();
+
+        this._scrolling = false;
+      };
+
+      this._updateAnimationProgress = x => {
+        const view3D = this._view3D;
+        const rootBbox = this._rootBbox;
+        const thumb = this._thumbEl;
+        const animator = view3D.animator;
+        const activeAnimationIdx = animator.activeAnimationIndex;
+        const activeAnimationClip = animator.activeAnimation;
+        const activeAnimationAction = animator.actions[activeAnimationIdx];
+        if (!activeAnimationClip || !activeAnimationAction) return;
+        const progress = (x - rootBbox.x) / rootBbox.width;
+        const newTime = clamp(progress, 0, 1) * activeAnimationClip.duration;
+        activeAnimationAction.time = newTime;
+        const newTimeSeconds = Math.floor(newTime);
+        const newTimeFractions = Math.floor(100 * (newTime - newTimeSeconds));
+
+        const padNumber = val => `${"0".repeat(Math.max(2 - val.toString().length, 0))}${val}`;
+
+        thumb.setAttribute("data-time", `${padNumber(newTimeSeconds)}:${padNumber(newTimeFractions)}`);
+        view3D.renderer.renderSingleFrame();
+      };
+
+      this.position = position;
+      this.order = order;
+      this._view3D = view3D;
+      this._controlBar = controlBar;
+
+      this._createElements();
+
+      this._enabled = false;
+      this._firstTouch = null;
+      this._scrolling = false;
+      this._origTimeScale = 1;
+    }
+
+    get element() {
+      return this._rootEl;
+    }
+
+    get enabled() {
+      return this._enabled;
+    }
+    /**
+     * Enable control item
+     */
+
+
+    enable() {
+      const view3D = this._view3D;
+      if (this._enabled) return;
+      this._rootBbox = this._trackEl.getBoundingClientRect();
+      this._enabled = true;
+      view3D.on(EVENTS$1.RESIZE, this._onResize);
+      view3D.on(EVENTS$1.RENDER, this._onRender);
+
+      this._fill(0);
+
+      this.enableInput();
+    }
+    /**
+     * Disable control item
+     */
+
+
+    disable() {
+      const view3D = this._view3D;
+      if (!this._enabled) return;
+      this._enabled = false;
+      view3D.off(EVENTS$1.RESIZE, this._onResize);
+      view3D.off(EVENTS$1.RENDER, this._onRender);
+      this.disableInput();
+    }
+    /**
+     * Enable mouse / touch inputs
+     */
+
+
+    enableInput() {
+      const root = this._rootEl;
+      const view3D = this._view3D;
+      this._firstTouch = null;
+      this._scrolling = false;
+      if (view3D.animator.animationCount <= 0) return;
+      root.addEventListener(EVENTS.MOUSE_DOWN, this._onMouseDown);
+      root.addEventListener(EVENTS.TOUCH_START, this._onTouchStart, {
+        passive: false
+      });
+      root.addEventListener(EVENTS.TOUCH_MOVE, this._onTouchMove, {
+        passive: false
+      });
+      root.addEventListener(EVENTS.TOUCH_END, this._onTouchEnd);
+    }
+    /**
+     * Disable mouse / touch inputs
+     */
+
+
+    disableInput() {
+      const root = this._rootEl;
+      root.removeEventListener(EVENTS.MOUSE_DOWN, this._onMouseDown);
+      window.removeEventListener(EVENTS.MOUSE_MOVE, this._onMouseMove, false);
+      window.removeEventListener(EVENTS.MOUSE_UP, this._onMouseUp, false);
+      root.removeEventListener(EVENTS.TOUCH_START, this._onTouchStart);
+      root.removeEventListener(EVENTS.TOUCH_MOVE, this._onTouchMove);
+      root.removeEventListener(EVENTS.TOUCH_END, this._onTouchEnd);
+    }
+
+    _createElements() {
+      const controlBar = this._controlBar;
+      const className = Object.assign(Object.assign({}, controlBar.className), ControlBar.DEFAULT_CLASS);
+      const root = document.createElement(EL_DIV);
+      root.classList.add(className.PROGRESS_ROOT);
+      root.draggable = false;
+      const track = document.createElement(EL_DIV);
+      track.classList.add(className.PROGRESS_TRACK);
+      const thumb = document.createElement(EL_DIV);
+      thumb.classList.add(className.PROGRESS_THUMB);
+      const filler = document.createElement(EL_DIV);
+      filler.classList.add(className.PROGRESS_FILLER);
+      track.appendChild(filler);
+      track.appendChild(thumb);
+      root.appendChild(track);
+      this._rootEl = root;
+      this._trackEl = track;
+      this._thumbEl = thumb;
+      this._fillerEl = filler;
+    }
+
+    _fill(progress) {
+      this._fillerEl.style.width = `${progress * 100}%`;
+      this._thumbEl.style.transform = `translateX(${progress * this._rootBbox.width}px)`;
+    }
+
+    _release() {
+      this._hideThumb();
+
+      this._setAnimationTimeScale(this._origTimeScale);
+    }
+
+    _showThumb() {
+      const thumb = this._thumbEl;
+      const controlBar = this._controlBar;
+      const className = Object.assign(Object.assign({}, controlBar.className), ControlBar.DEFAULT_CLASS);
+      thumb.classList.add(className.VISIBLE);
+    }
+
+    _hideThumb() {
+      const thumb = this._thumbEl;
+      const controlBar = this._controlBar;
+      const className = Object.assign(Object.assign({}, controlBar.className), ControlBar.DEFAULT_CLASS);
+      thumb.classList.remove(className.VISIBLE);
+    }
+
+    _setAnimationTimeScale(timeScale) {
+      const view3D = this._view3D;
+      const animator = view3D.animator;
+      const activeAnimationIdx = animator.activeAnimationIndex;
+      const activeAnimationClip = animator.activeAnimation;
+      const activeAnimationAction = animator.actions[activeAnimationIdx];
+      if (!activeAnimationClip || !activeAnimationAction) return;
+      activeAnimationAction.setEffectiveTimeScale(timeScale);
+    }
+
+  }
+
+  /*
+   * "Play Arrow" Icon from [Google Material Design Icons](https://github.com/google/material-design-icons)
+   * Licensed under [Apache Lincese Version 2.0](https://github.com/google/material-design-icons/blob/master/LICENSE)
+   */
+  // eslint-disable-next-line quotes
+  var PlayIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" height="48" width="48"><path d="M16 37.85V9.85L38 23.85Z"/></svg>';
+
+  /*
+   * "Pause" Icon from [Google Material Design Icons](https://github.com/google/material-design-icons)
+   * Licensed under [Apache Lincese Version 2.0](https://github.com/google/material-design-icons/blob/master/LICENSE)
+   */
+  // eslint-disable-next-line quotes
+  var PauseIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" height="48" width="48"><path d="M28.25 38V10H36V38ZM12 38V10H19.75V38Z"/></svg>';
+
+  /**
+   * Show animation play/ pause button, use with ControlBar
+   */
+
+  class PlayButton {
+    /** */
+    constructor(view3D, controlBar, {
+      position = ControlBar.POSITION.LEFT,
+      order = 9999
+    } = {}) {
+      this._updateIcon = () => {
+        const view3D = this._view3D;
+
+        if (view3D.animator.paused !== this._paused) {
+          this._paused = view3D.animator.paused;
+          this._element.innerHTML = this._paused ? PlayIcon : PauseIcon;
+        }
+      };
+
+      this._onClick = () => {
+        const animator = this._view3D.animator;
+
+        if (animator.paused) {
+          animator.resume();
+        } else {
+          animator.pause();
+        }
+
+        this._updateIcon();
+      };
+
+      this.position = position;
+      this.order = order;
+      this._view3D = view3D;
+      this._element = this._createButton(controlBar);
+      this._enabled = false;
+      this._paused = true;
+    }
+
+    get element() {
+      return this._element;
+    }
+
+    get enabled() {
+      return this._enabled;
+    }
+    /**
+     * Enable control item
+     */
+
+
+    enable() {
+      if (this._enabled) return;
+
+      this._view3D.on(EVENTS$1.RENDER, this._updateIcon);
+
+      this._element.addEventListener(EVENTS.CLICK, this._onClick);
+
+      this._enabled = true;
+    }
+    /**
+     * Disable control item
+     */
+
+
+    disable() {
+      if (!this._enabled) return;
+
+      this._view3D.off(EVENTS$1.RENDER, this._updateIcon);
+
+      this._element.removeEventListener(EVENTS.CLICK, this._onClick);
+
+      this._enabled = false;
+    }
+
+    _createButton(controlBar) {
+      const root = document.createElement(EL_BUTTON);
+      const className = Object.assign(Object.assign({}, controlBar.className), ControlBar.DEFAULT_CLASS);
+      root.classList.add(className.CONTROLS_ITEM);
+      root.innerHTML = PlayIcon;
+      return root;
+    }
+
+  }
+
+  /**
+   * Show animation selector, use with ControlBar
+   */
+
+  class AnimationSelector {
+    /** */
+    constructor(view3D, controlBar, {
+      position = ControlBar.POSITION.LEFT,
+      order = 9999
+    } = {}) {
+      this._updateAnimations = () => {
+        const view3D = this._view3D;
+        const controlBar = this._controlBar;
+        const animator = view3D.animator;
+        const root = this._rootEl;
+        const name = this._nameEl;
+        const itemList = this._itemListEl;
+        const animations = animator.clips;
+        const className = Object.assign(Object.assign({}, controlBar.className), ControlBar.DEFAULT_CLASS);
+
+        while (itemList.firstChild) {
+          itemList.removeChild(itemList.firstChild);
+        }
+
+        if (animations.length <= 0) {
+          root.classList.add(className.DISABLED);
+          return;
+        }
+
+        root.classList.remove(className.DISABLED);
+        const elements = animations.map(animation => {
+          const el = document.createElement(EL_DIV);
+          el.classList.add(className.ANIMATION_ITEM);
+          el.innerHTML = animation.name;
+          return el;
+        });
+
+        const selectAnimation = (animation, idx) => {
+          elements[idx].classList.add(className.ANIMATION_SELECTED);
+          name.innerHTML = animation.name;
+        };
+
+        animations.forEach((animation, idx) => {
+          const el = elements[idx];
+
+          if (idx === animator.activeAnimationIndex) {
+            selectAnimation(animation, idx);
+          }
+
+          el.addEventListener(EVENTS.CLICK, evt => {
+            const wasPaused = animator.paused;
+            animator.play(idx);
+
+            if (wasPaused) {
+              animator.pause();
+            }
+
+            elements.forEach(element => {
+              element.classList.remove(className.ANIMATION_SELECTED);
+            });
+            selectAnimation(animation, idx);
+
+            this._hideList();
+
+            evt.stopPropagation();
+          });
+          itemList.appendChild(el);
+        });
+      };
+
+      this._toggleList = evt => {
+        const controlBar = this._controlBar;
+        const itemList = this._itemListEl;
+        const className = Object.assign(Object.assign({}, controlBar.className), ControlBar.DEFAULT_CLASS);
+        itemList.classList.toggle(className.VISIBLE);
+
+        if (itemList.classList.contains(className.VISIBLE)) {
+          this._view3D.rootEl.addEventListener(EVENTS.CLICK, this._hideList);
+        }
+
+        evt.stopPropagation();
+      };
+
+      this._hideList = () => {
+        const controlBar = this._controlBar;
+        const itemList = this._itemListEl;
+        const className = Object.assign(Object.assign({}, controlBar.className), ControlBar.DEFAULT_CLASS);
+
+        if (itemList.classList.contains(className.VISIBLE)) {
+          itemList.classList.remove(className.VISIBLE);
+        }
+      };
+
+      this.position = position;
+      this.order = order;
+      this._view3D = view3D;
+      this._controlBar = controlBar;
+
+      this._createElements();
+
+      this._enabled = false;
+    }
+
+    get element() {
+      return this._rootEl;
+    }
+
+    get enabled() {
+      return this._enabled;
+    }
+    /**
+     * Enable control item
+     */
+
+
+    enable() {
+      if (this._enabled) return;
+
+      if (this._view3D.initialized) {
+        this._updateAnimations();
+      }
+
+      this._view3D.on(EVENTS$1.MODEL_CHANGE, this._updateAnimations);
+
+      this._nameEl.addEventListener(EVENTS.CLICK, this._toggleList);
+
+      this._enabled = true;
+    }
+    /**
+     * Disable control item
+     */
+
+
+    disable() {
+      if (!this._enabled) return;
+
+      this._view3D.off(EVENTS$1.MODEL_CHANGE, this._updateAnimations);
+
+      this._view3D.rootEl.removeEventListener(EVENTS.CLICK, this._hideList);
+
+      this._nameEl.removeEventListener(EVENTS.CLICK, this._toggleList);
+
+      this._enabled = false;
+    }
+
+    _createElements() {
+      const controlBar = this._controlBar;
+      const root = document.createElement(EL_DIV);
+      const name = document.createElement(EL_DIV);
+      const itemList = document.createElement(EL_DIV);
+      const className = Object.assign(Object.assign({}, controlBar.className), ControlBar.DEFAULT_CLASS);
+      root.classList.add(className.CONTROLS_ITEM);
+      root.classList.add(className.DISABLED);
+      name.classList.add(className.ANIMATION_NAME);
+      itemList.classList.add(className.ANIMATION_LIST);
+      root.appendChild(name);
+      root.appendChild(itemList);
+      this._rootEl = root;
+      this._nameEl = name;
+      this._itemListEl = itemList;
+    }
+
+  }
+
+  /*
+   * "Fullscreen" Icon from [Google Material Design Icons](https://github.com/google/material-design-icons)
+   * Licensed under [Apache Lincese Version 2.0](https://github.com/google/material-design-icons/blob/master/LICENSE)
+   */
+  // eslint-disable-next-line quotes
+  var FullscreenIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" height="48" width="48"><path d="M10 38v-9.65h3V35h6.65v3Zm0-18.35V10h9.65v3H13v6.65ZM28.35 38v-3H35v-6.65h3V38ZM35 19.65V13h-6.65v-3H38v9.65Z"/></svg>';
+
+  const requestFullscreen = ["requestFullscreen", "webkitRequestFullscreen", "webkitRequestFullScreen", "webkitCancelFullScreen", "mozRequestFullScreen", "msRequestFullscreen"];
+  const fullscreenElement = ["fullscreenElement", "webkitFullscreenElement", "webkitCurrentFullScreenElement", "mozFullScreenElement", "msFullscreenElement"];
+  const exitFullscreen = ["exitFullscreen", "webkitExitFullscreen", "webkitCancelFullScreen", "mozCancelFullScreen", "msExitFullscreen"];
+  /**
+   * Show fullscreen enter / exit button, use with ControlBar
+   */
+
+  class FullscreenButton {
+    /** */
+    constructor(view3D, controlBar, {
+      position = ControlBar.POSITION.RIGHT,
+      order = 9999
+    } = {}) {
+      this._onClick = () => {
+        const root = this._view3D.rootEl;
+
+        if (this._isFullscreen()) {
+          this._exitFullscreen();
+        } else {
+          this._requestFullscreen(root);
+        }
+      };
+
+      this.position = position;
+      this.order = order;
+      this._view3D = view3D;
+      this._element = this._createButton(controlBar);
+      this._enabled = false;
+    }
+
+    get element() {
+      return this._element;
+    }
+
+    get enabled() {
+      return this._enabled;
+    }
+    /**
+     * Enable control item
+     */
+
+
+    enable() {
+      if (this._enabled) return;
+
+      this._element.addEventListener(EVENTS.CLICK, this._onClick);
+
+      this._enabled = true;
+    }
+    /**
+     * Disable control item
+     */
+
+
+    disable() {
+      if (!this._enabled) return;
+
+      this._element.removeEventListener(EVENTS.CLICK, this._onClick);
+
+      this._enabled = false;
+    }
+
+    _isFullscreen() {
+      if (!document) return false;
+
+      for (const key of fullscreenElement) {
+        if (document[key]) return true;
+      }
+
+      return false;
+    }
+
+    _requestFullscreen(el) {
+      for (const key of requestFullscreen) {
+        const request = el[key];
+
+        if (request) {
+          request.call(el);
+        }
+      }
+    }
+
+    _exitFullscreen() {
+      for (const key of exitFullscreen) {
+        const exit = document[key];
+
+        if (exit) {
+          exit.call(document);
+        }
+      }
+    }
+
+    _createButton(controlBar) {
+      const root = document.createElement(EL_BUTTON);
+      const className = Object.assign(Object.assign({}, controlBar.className), ControlBar.DEFAULT_CLASS);
+      root.classList.add(className.CONTROLS_ITEM);
+      root.innerHTML = FullscreenIcon;
+      return root;
+    }
+
+  }
+
+  /*
+   * Copyright (c) 2020 NAVER Corp.
+   * egjs projects are licensed under the MIT license
+   */
+  /**
+   * Show navigation gizmos, use with ControlBar
+   */
+
+  class NavigationGizmo {
+    /** */
+    constructor(view3D, controlBar, {
+      axisWidth = 5,
+      font = "14px sans-serif",
+      xAxisColor = "#ef2746",
+      yAxisColor = "#a7c031",
+      zAxisColor = "#6571a6"
+    } = {}) {
+      /**
+       *
+       */
+      this._onRender = () => {
+        const view3D = this._view3D;
+        const ctx = this._ctx;
+        const canvasSize = this._canvasSize;
+        const camera = view3D.camera.threeCamera;
+        if (!ctx || !view3D.model) return;
+        ctx.clearRect(0, 0, canvasSize.x, canvasSize.y);
+        const quat = camera.quaternion.clone();
+        quat.invert();
+        const xPos = new THREE.Vector3(1, 0, 0).applyQuaternion(quat);
+        const yPos = new THREE.Vector3(0, 1, 0).applyQuaternion(quat);
+        const zPos = new THREE.Vector3(0, 0, 1).applyQuaternion(quat);
+        const center = new THREE.Vector2(0.5, 0.5).multiply(canvasSize);
+        ctx.lineCap = "round";
+        ctx.lineWidth = this.axisWidth;
+        const xColor = new THREE.Color(this.xAxisColor);
+        const yColor = new THREE.Color(this.yAxisColor);
+        const zColor = new THREE.Color(this.zAxisColor); // Sorted by distance, ASC
+
+        const axisPositions = [{
+          idx: 0,
+          axis: "X",
+          color: xColor,
+          pos: xPos,
+          negative: false
+        }, {
+          idx: 1,
+          axis: "Y",
+          color: yColor,
+          pos: yPos,
+          negative: false
+        }, {
+          idx: 2,
+          axis: "Z",
+          color: zColor,
+          pos: zPos,
+          negative: false
+        }, {
+          idx: 3,
+          axis: "X",
+          color: xColor,
+          pos: xPos.clone().negate(),
+          negative: true
+        }, {
+          idx: 4,
+          axis: "Y",
+          color: yColor,
+          pos: yPos.clone().negate(),
+          negative: true
+        }, {
+          idx: 5,
+          axis: "Z",
+          color: zColor,
+          pos: zPos.clone().negate(),
+          negative: true
+        }].sort((a, b) => a.pos.z - b.pos.z);
+        axisPositions.forEach(({
+          axis,
+          pos,
+          color,
+          negative,
+          idx
+        }, renderIdx) => {
+          const screenPos = this._getScreenPos(pos);
+
+          const alpha = pos.z >= 0 ? 1 : 0.6;
+
+          const colorRGBA = this._getColorRGBAString(color, alpha);
+
+          if (!negative) {
+            ctx.strokeStyle = colorRGBA;
+            ctx.beginPath();
+            ctx.moveTo(center.x, center.y);
+            ctx.lineTo(screenPos.x, screenPos.y);
+            ctx.stroke();
+            ctx.globalCompositeOperation = "destination-out";
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            ctx.ellipse(screenPos.x, screenPos.y, 10, 10, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.globalCompositeOperation = "source-over";
+          }
+
+          ctx.fillStyle = colorRGBA;
+          ctx.beginPath();
+          ctx.ellipse(screenPos.x, screenPos.y, 10, 10, 0, 0, 2 * Math.PI);
+          ctx.fill();
+
+          if (!negative) {
+            ctx.font = this.font;
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(axis, screenPos.x, screenPos.y);
+          }
+
+          const axisEl = this._axisEls[idx];
+          axisEl.style.left = `${screenPos.x}px`;
+          axisEl.style.top = `${screenPos.y}px`;
+          axisEl.style.zIndex = renderIdx.toString();
+        });
+      };
+
+      this.axisWidth = axisWidth;
+      this.font = font;
+      this.xAxisColor = xAxisColor;
+      this.yAxisColor = yAxisColor;
+      this.zAxisColor = zAxisColor;
+      this._view3D = view3D;
+
+      this._createElement(controlBar);
+
+      this._ctx = this._canvasEl.getContext("2d");
+      this._enabled = false;
+      this._canvasSize = new THREE.Vector2();
+    }
+
+    get element() {
+      return this._rootEl;
+    }
+
+    get enabled() {
+      return this._enabled;
+    }
+    /**
+     * Enable control item
+     */
+
+
+    enable() {
+      if (this._enabled || !this._ctx) return;
+      const root = this._rootEl;
+      const canvas = this._canvasEl;
+      const view3D = this._view3D;
+      this._enabled = true;
+      view3D.rootEl.appendChild(root);
+      view3D.on(EVENTS$1.RENDER, this._onRender);
+
+      this._canvasSize.set(canvas.clientWidth, canvas.clientHeight);
+
+      canvas.width = this._canvasSize.x;
+      canvas.height = this._canvasSize.y;
+      const poses = [new Pose(-90, 0, 0), new Pose(0, 90, 0), new Pose(0, 0, 0), new Pose(90, 0, 0), new Pose(0, -90, 0), new Pose(180, 0, 0)];
+      poses.forEach(pose => {
+        pose.pivot.copy(view3D.camera.defaultPose.pivot);
+      });
+      this._axisClickListeners = this._axisEls.map((el, idx) => {
+        const targetPose = poses[idx];
+
+        const listener = () => {
+          void view3D.camera.reset(ANIMATION_DURATION, EASING$1, targetPose);
+        };
+
+        el.addEventListener(EVENTS.CLICK, listener);
+        return listener;
+      });
+    }
+    /**
+     * Disable control item
+     */
+
+
+    disable() {
+      if (!this._enabled) return;
+      this._enabled = false;
+      const root = this._view3D.rootEl;
+      const element = this._rootEl;
+
+      if (element && element.parentElement === root) {
+        root.removeChild(element);
+      }
+
+      this._view3D.off(EVENTS$1.RENDER, this._onRender);
+
+      this._axisEls.forEach((el, idx) => {
+        const listener = this._axisClickListeners[idx];
+        el.removeEventListener(EVENTS.CLICK, listener);
+      });
+
+      this._axisClickListeners = [];
+    }
+
+    _createElement(controlBar) {
+      const root = document.createElement(EL_DIV);
+      const canvas = document.createElement("canvas");
+      const axisEls = range(6).map(() => document.createElement(EL_DIV));
+      const className = Object.assign(Object.assign({}, controlBar.className), ControlBar.DEFAULT_CLASS);
+      root.classList.add(className.GIZMO_ROOT);
+      root.appendChild(canvas);
+      axisEls.forEach(el => {
+        el.classList.add(className.GIZMO_AXIS);
+        root.appendChild(el);
+      });
+      this._rootEl = root;
+      this._canvasEl = canvas;
+      this._axisEls = axisEls;
+    }
+
+    _getScreenPos(pos) {
+      const canvasSize = this._canvasSize;
+      const screenPos = new THREE.Vector2(pos.x, -pos.y).multiplyScalar(0.8).addScalar(1).multiplyScalar(0.5).multiply(canvasSize);
+      return screenPos;
+    }
+
+    _getColorRGBAString(color, alpha) {
+      return `rgba(${Math.floor(color.r * 255)},${Math.floor(color.g * 255)},${Math.floor(color.b * 255)},${alpha})`;
+    }
+
+  }
+
+  /*
+   * "Replay" Icon from [Google Material Design Icons](https://github.com/google/material-design-icons)
+   * Licensed under [Apache Lincese Version 2.0](https://github.com/google/material-design-icons/blob/master/LICENSE)
+   */
+  // eslint-disable-next-line quotes
+  var ResetIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" height="48" width="48"><path d="M24 44q-3.75 0-7.025-1.4-3.275-1.4-5.725-3.85Q8.8 36.3 7.4 33.025 6 29.75 6 26h3q0 6.25 4.375 10.625T24 41q6.25 0 10.625-4.375T39 26q0-6.25-4.25-10.625T24.25 11H23.1l3.65 3.65-2.05 2.1-7.35-7.35 7.35-7.35 2.05 2.05-3.9 3.9H24q3.75 0 7.025 1.4 3.275 1.4 5.725 3.85 2.45 2.45 3.85 5.725Q42 22.25 42 26q0 3.75-1.4 7.025-1.4 3.275-3.85 5.725-2.45 2.45-5.725 3.85Q27.75 44 24 44Z"/></svg>';
+
+  /**
+   * Show camera reset button, use with ControlBar
+   */
+
+  class CameraResetButton {
+    /** */
+    constructor(view3D, controlBar, {
+      position = ControlBar.POSITION.RIGHT,
+      order = 9999,
+      duration = 500
+    } = {}) {
+      this._onClick = () => {
+        void this._view3D.camera.reset(this.duration);
+      };
+
+      this.position = position;
+      this.order = order;
+      this.duration = duration;
+      this._view3D = view3D;
+      this._element = this._createButton(controlBar);
+      this._enabled = false;
+    }
+
+    get element() {
+      return this._element;
+    }
+
+    get enabled() {
+      return this._enabled;
+    }
+    /**
+     * Enable control item
+     */
+
+
+    enable() {
+      if (this._enabled) return;
+
+      this._element.addEventListener(EVENTS.CLICK, this._onClick);
+
+      this._enabled = true;
+    }
+    /**
+     * Disable control item
+     */
+
+
+    disable() {
+      if (!this._enabled) return;
+
+      this._element.removeEventListener(EVENTS.CLICK, this._onClick);
+
+      this._enabled = false;
+    }
+
+    _createButton(controlBar) {
+      const root = document.createElement(EL_BUTTON);
+      const className = Object.assign(Object.assign({}, controlBar.className), ControlBar.DEFAULT_CLASS);
+      root.classList.add(className.CONTROLS_ITEM);
+      root.innerHTML = ResetIcon;
+      return root;
+    }
+
+  }
+
+  /**
+   * Add a bar at the bottom of the canvas that can control animation and other things
+   */
+
+  class ControlBar {
+    /** */
+    constructor({
+      autoHide = true,
+      className = {},
+      progressBar = true,
+      playButton = true,
+      animationSelector = true,
+      fullscreenButton = true,
+      navigationGizmo = true,
+      cameraResetButton = true
+    } = {}) {
+      /**
+       * Show control bar
+       */
+      this.show = () => {
+        const root = this._rootEl;
+        const className = Object.assign(Object.assign({}, ControlBar.DEFAULT_CLASS), this.className);
+        root.classList.add(className.VISIBLE);
+      };
+      /**
+       * Hide control bar
+       */
+
+
+      this.hide = () => {
+        const wrapper = this._rootEl;
+        const className = Object.assign(Object.assign({}, ControlBar.DEFAULT_CLASS), this.className);
+        wrapper.classList.remove(className.VISIBLE);
+      };
+
+      this._updateModelParams = () => {
+        this._items.forEach(item => {
+          // Re-enable control items for new View3D instance
+          item.disable();
+          item.enable();
+        });
+      };
+
+      this._hideAfterDelay = () => {
+        const {
+          delay = 0
+        } = getObjectOption(this.autoHide);
+
+        if (this._autoHideTimer) {
+          window.clearTimeout(this._autoHideTimer);
+          this._autoHideTimer = -1;
+        }
+
+        if (delay <= 0) {
+          this.hide();
+        } else {
+          this._autoHideTimer = window.setTimeout(this.hide, delay);
+        }
+      };
+
+      this.autoHide = autoHide;
+      this.className = className;
+      this.progressBar = progressBar;
+      this.playButton = playButton;
+      this.animationSelector = animationSelector;
+      this.fullscreenButton = fullscreenButton;
+      this.navigationGizmo = navigationGizmo;
+      this.cameraResetButton = cameraResetButton;
+      this._items = [];
+
+      this._initElements();
+
+      this._autoHideTimer = -1;
+    }
+
+    get rootEl() {
+      return this._rootEl;
+    }
+
+    get items() {
+      return this._items;
+    }
+
+    init(view3D) {
+      return __awaiter(this, void 0, void 0, function* () {
+        this._attachElements(view3D);
+
+        if (view3D.model) {
+          this._updateModelParams();
+        }
+
+        this._items = this._createDefaultItems(view3D);
+
+        this._addItemElements();
+
+        this._items.forEach(item => {
+          item.enable();
+        });
+
+        view3D.on(EVENTS$1.MODEL_CHANGE, this._updateModelParams);
+        this.show();
+
+        this._setupAutoHide(view3D);
+      });
+    }
+
+    teardown(view3D) {
+      const root = view3D.rootEl;
+      root.removeEventListener(EVENTS.POINTER_ENTER, this.show);
+      root.removeEventListener(EVENTS.POINTER_LEAVE, this._hideAfterDelay);
+
+      this._removeElements(view3D);
+
+      this._items.forEach(item => {
+        item.disable();
+      });
+
+      this._items = [];
+      view3D.off(EVENTS$1.MODEL_CHANGE, this._updateModelParams);
+      window.clearTimeout(this._autoHideTimer);
+    }
+
+    _initElements() {
+      const className = Object.assign(Object.assign({}, ControlBar.DEFAULT_CLASS), this.className);
+      const rootEl = document.createElement(EL_DIV);
+      rootEl.classList.add(className.ROOT);
+      this._rootEl = rootEl;
+      const bgEl = document.createElement(EL_DIV);
+      bgEl.classList.add(className.CONTROLS_BG);
+      rootEl.appendChild(bgEl);
+      const topControlsWrapper = document.createElement(EL_DIV);
+      const sideControlsWrapper = document.createElement(EL_DIV);
+      const leftControlsWrapper = document.createElement(EL_DIV);
+      const rightControlsWrapper = document.createElement(EL_DIV);
+      topControlsWrapper.classList.add(className.CONTROLS_TOP);
+      sideControlsWrapper.classList.add(className.CONTROLS_SIDE);
+      leftControlsWrapper.classList.add(className.CONTROLS_LEFT);
+      rightControlsWrapper.classList.add(className.CONTROLS_RIGHT);
+      rootEl.appendChild(topControlsWrapper);
+      sideControlsWrapper.appendChild(leftControlsWrapper);
+      sideControlsWrapper.appendChild(rightControlsWrapper);
+      rootEl.appendChild(sideControlsWrapper);
+      this._topControlsWrapper = topControlsWrapper;
+      this._leftControlsWrapper = leftControlsWrapper;
+      this._rightControlsWrapper = rightControlsWrapper;
+    }
+
+    _addItemElements() {
+      const topControlsWrapper = this._topControlsWrapper;
+      const leftControlsWrapper = this._leftControlsWrapper;
+      const rightControlsWrapper = this._rightControlsWrapper;
+
+      const positionedItems = this._items.filter(item => item.position && item.order != null);
+
+      const posMap = {
+        [ControlBar.POSITION.TOP]: {
+          parentEl: topControlsWrapper,
+          items: []
+        },
+        [ControlBar.POSITION.LEFT]: {
+          parentEl: leftControlsWrapper,
+          items: []
+        },
+        [ControlBar.POSITION.RIGHT]: {
+          parentEl: rightControlsWrapper,
+          items: []
+        }
+      };
+      positionedItems.forEach(item => {
+        posMap[item.position].items.push(item);
+      });
+      Object.keys(posMap).forEach(posKey => {
+        const position = posMap[posKey];
+        const {
+          parentEl,
+          items
+        } = position;
+        items.sort((a, b) => a.order - b.order);
+        items.forEach(item => {
+          parentEl.appendChild(item.element);
+        });
+      });
+    }
+
+    _attachElements(view3D) {
+      view3D.rootEl.appendChild(this._rootEl);
+    }
+
+    _removeElements(view3D) {
+      const wrapper = this._rootEl;
+
+      if (wrapper.parentElement === view3D.rootEl) {
+        view3D.rootEl.removeChild(wrapper);
+      }
+    }
+
+    _setupAutoHide(view3D) {
+      if (!this.autoHide) return;
+      const {
+        initialDelay = 3000
+      } = getObjectOption(this.autoHide);
+      const root = view3D.rootEl;
+      this._autoHideTimer = window.setTimeout(() => {
+        this.hide();
+      }, initialDelay);
+      root.addEventListener(EVENTS.POINTER_ENTER, this.show);
+      root.addEventListener(EVENTS.POINTER_LEAVE, this._hideAfterDelay);
+    }
+
+    _createDefaultItems(view3D) {
+      const items = [];
+
+      if (this.progressBar) {
+        items.push(new AnimationProgressBar(view3D, this, getObjectOption(this.progressBar)));
+      }
+
+      if (this.playButton) {
+        items.push(new PlayButton(view3D, this, getObjectOption(this.playButton)));
+      }
+
+      if (this.animationSelector) {
+        items.push(new AnimationSelector(view3D, this, getObjectOption(this.animationSelector)));
+      }
+
+      if (this.cameraResetButton) {
+        items.push(new CameraResetButton(view3D, this, getObjectOption(this.cameraResetButton)));
+      }
+
+      if (this.fullscreenButton) {
+        items.push(new FullscreenButton(view3D, this, getObjectOption(this.fullscreenButton)));
+      }
+
+      if (this.navigationGizmo) {
+        items.push(new NavigationGizmo(view3D, this, getObjectOption(this.navigationGizmo)));
+      }
+
+      return items;
+    }
+
+  }
+  /**
+   * Default class names that ControlBar uses
+   * @type {object}
+   * @property {"view3d-control-bar"} ROOT A class name for wrapper element
+   * @property {"visible"} VISIBLE A class name for visible elements
+   * @property {"disabled"} DISABLED A class name for disabled elements
+   * @property {"view3d-controls-background"} CONTROLS_BG A class name for background element
+   * @property {"view3d-side-controls"} CONTROLS_SIDE A class name for controls wrapper element that includes both left & right controls
+   * @property {"view3d-top-controls"} CONTROLS_TOP A class name for controls wrapper element that is placed on the top inside the control bar
+   * @property {"view3d-left-controls"} CONTROLS_LEFT A class name for controls wrapper element that is placed on the left inside the control bar
+   * @property {"view3d-right-controls"} CONTROLS_RIGHT A class name for controls wrapper element that is placed on the right inside the control bar
+   * @property {"view3d-control-item"} CONTROLS_ITEM A class name for control item elements
+   * @property {"view3d-progress-bar"} PROGRESS_ROOT A class name for root element of the progress bar
+   * @property {"view3d-progress-track"} PROGRESS_TRACK A class name for progress track element of the progress bar
+   * @property {"view3d-progress-thumb"} PROGRESS_THUMB A class name for thumb element of the progress bar
+   * @property {"view3d-progress-filler"} PROGRESS_FILLER A class name for progress filler element of the progress bar
+   * @property {"view3d-animation-name"} ANIMATION_NAME A class name for animation name element of the animation selector
+   * @property {"view3d-animation-list"} ANIMATION_LIST A class name for animation list element of the animation selector
+   * @property {"view3d-animation-item"} ANIMATION_ITEM A class name for animation list item element of the animation selector
+   * @property {"selected"} ANIMATION_SELECTED A class name for selected animation list item element of the animation selector
+   * @property {"view3d-gizmo"} GIZMO_ROOT A class name for root element of the navigation gizmo
+   * @property {"view3d-gizmo-axis"} GIZMO_AXIS A class name for axis button element of the navigation gizmo
+   */
+
+
+  ControlBar.DEFAULT_CLASS = {
+    ROOT: "view3d-control-bar",
+    VISIBLE: "visible",
+    DISABLED: "disabled",
+    CONTROLS_BG: "view3d-controls-background",
+    CONTROLS_SIDE: "view3d-side-controls",
+    CONTROLS_TOP: "view3d-top-controls",
+    CONTROLS_LEFT: "view3d-left-controls",
+    CONTROLS_RIGHT: "view3d-right-controls",
+    CONTROLS_ITEM: "view3d-control-item",
+    PROGRESS_ROOT: "view3d-progress-bar",
+    PROGRESS_TRACK: "view3d-progress-track",
+    PROGRESS_THUMB: "view3d-progress-thumb",
+    PROGRESS_FILLER: "view3d-progress-filler",
+    ANIMATION_NAME: "view3d-animation-name",
+    ANIMATION_LIST: "view3d-animation-list",
+    ANIMATION_ITEM: "view3d-animation-item",
+    ANIMATION_SELECTED: "selected",
+    GIZMO_ROOT: "view3d-gizmo",
+    GIZMO_AXIS: "view3d-gizmo-axis"
+  };
+  /**
+   * Position constant
+   * @type {object}
+   * @property {"top"} TOP
+   * @property {"left"} LEFT
+   * @property {"right"} RIGHT
+   */
+
+  ControlBar.POSITION = {
+    TOP: "top",
+    LEFT: "left",
+    RIGHT: "right"
   };
 
   /*
@@ -9810,12 +11556,19 @@ version: 2.5.0-snapshot
     ARButton: ARButton,
     AROverlay: AROverlay,
     LoadingBar: LoadingBar,
+    ControlBar: ControlBar,
+    AnimationProgressBar: AnimationProgressBar,
+    AnimationSelector: AnimationSelector,
+    FullscreenButton: FullscreenButton,
+    PlayButton: PlayButton,
+    NavigationGizmo: NavigationGizmo,
     ARScene: ARScene,
     WebARSession: WebARSession,
     SceneViewerSession: SceneViewerSession,
     QuickLookSession: QuickLookSession,
     DOMOverlay: DOMOverlay,
     HitTest: HitTest,
+    LightEstimation: LightEstimation,
     AUTO: AUTO,
     EVENTS: EVENTS$1,
     EASING: EASING,
@@ -9827,6 +11580,7 @@ version: 2.5.0-snapshot
     QUICK_LOOK_APPLE_PAY_BUTTON_TYPE: QUICK_LOOK_APPLE_PAY_BUTTON_TYPE,
     QUICK_LOOK_CUSTOM_BANNER_SIZE: QUICK_LOOK_CUSTOM_BANNER_SIZE,
     INPUT_TYPE: INPUT_TYPE,
+    ANIMATION_REPEAT_MODE: ANIMATION_REPEAT_MODE,
     ERROR_CODES: ERROR_CODES,
     isAvailable: isAvailable
   };

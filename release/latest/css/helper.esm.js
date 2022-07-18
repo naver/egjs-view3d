@@ -4,7 +4,7 @@ name: @egjs/view3d
 license: MIT
 author: NAVER Corp.
 repository: https://github.com/naver/egjs-view3d
-version: 2.5.0-snapshot
+version: 2.6.0
 */
 /*
  * Copyright (c) 2020 NAVER Corp.
