@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { createView3D } from "../../test-utils";
+import { createView3D, loadDefaultModel } from "../../test-utils";
 
 describe("Camera", () => {
   describe("default properties", () => {
@@ -49,7 +49,11 @@ describe("Camera", () => {
 
   describe("reset", () => {
     it("should set pose to default pose immediately if duration = 0", async () => {
-      const camera = (await createView3D({ src: "/cube.glb" })).camera;
+      const view3D = await createView3D();
+
+      await loadDefaultModel(view3D);
+
+      const camera = view3D.camera;
       camera.newPose.yaw = 90;
       camera.newPose.pitch = 45;
       camera.newPose.zoom = 50;
@@ -64,7 +68,10 @@ describe("Camera", () => {
     });
 
     it("should set pose to default pose after given duration if duration > 0", async () => {
-      const view3D = await createView3D({ src: "/cube.glb" });
+      const view3D = await createView3D();
+
+      await loadDefaultModel(view3D);
+
       const camera = view3D.camera;
       camera.newPose.yaw = 90;
       camera.newPose.pitch = 45;
@@ -94,9 +101,11 @@ describe("Camera", () => {
 
     it("should update renderHeight proportionally if `maintainSize` is true", async () => {
       const view3D = (await createView3D({
-        src: "/cube.glb",
         maintainSize: true
       }));
+
+      await loadDefaultModel(view3D);
+
       const camera = view3D.camera;
       const prevHeight = view3D.renderer.size.height;
       const prevRenderHeight = camera.renderHeight;
