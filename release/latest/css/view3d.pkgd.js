@@ -4,7 +4,7 @@ name: @egjs/view3d
 license: MIT
 author: NAVER Corp.
 repository: https://github.com/naver/egjs-view3d
-version: 2.6.1
+version: 2.6.1-snapshot
 */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -2387,6 +2387,8 @@ version: 2.6.1
   class View3DError extends Error {
     /**
      * Create new instance of View3DError
+     * @param {string} message Error message
+     * @param {number} code Error code, see {@link ERROR_CODES}
      */
     constructor(message, code) {
       super(message);
@@ -2405,15 +2407,14 @@ version: 2.6.1
   /**
    * Error codes of {@link View3DError}
    * @type object
-   * @property {number} WRONG_TYPE 0
-   * @property {number} ELEMENT_NOT_FOUND 1
-   * @property {number} CANVAS_NOT_FOUND 2
-   * @property {number} WEBGL_NOT_SUPPORTED 3
-   * @property {number} PROVIDE_SRC_FIRST 4
-   * @property {number} PROVIDE_WIDTH_OR_HEIGHT 5
-   * @property {number} FORMAT_NOT_SUPPORTED 6
-   * @property {number} FILE_NOT_SUPPORTED 7
-   * @property {number} NOT_INITIALIZED 8
+   * @property {0} WRONG_TYPE The given value's type is not expected
+   * @property {1} ELEMENT_NOT_FOUND The element with given CSS selector does not exist
+   * @property {2} CANVAS_NOT_FOUND The element given is not a \<canvas\> element
+   * @property {3} WEBGL_NOT_SUPPORTED The browser does not support WebGL
+   * @property {4} PROVIDE_SRC_FIRST `init()` is called before setting `src`
+   * @property {5} FILE_NOT_SUPPORTED The given file is not supported
+   * @property {6} NOT_INITIALIZED The action is called before the component is initialized
+   * @property {7} MODEL_FAIL_TO_LOAD The 3D model failed to load
    */
   const ERROR_CODES = {
     WRONG_TYPE: 0,
@@ -2421,11 +2422,9 @@ version: 2.6.1
     CANVAS_NOT_FOUND: 2,
     WEBGL_NOT_SUPPORTED: 3,
     PROVIDE_SRC_FIRST: 4,
-    PROVIDE_WIDTH_OR_HEIGHT: 5,
-    FORMAT_NOT_SUPPORTED: 6,
-    FILE_NOT_SUPPORTED: 7,
-    NOT_INITIALIZED: 8,
-    MODEL_FAIL_TO_LOAD: 9
+    FILE_NOT_SUPPORTED: 5,
+    NOT_INITIALIZED: 6,
+    MODEL_FAIL_TO_LOAD: 7
   };
   const MESSAGES = {
     WRONG_TYPE: (val, types) => `${typeof val} is not a ${types.map(type => `"${type}"`).join(" or ")}.`,
@@ -2433,8 +2432,6 @@ version: 2.6.1
     CANVAS_NOT_FOUND: "The canvas element was not found inside the given root element.",
     WEBGL_NOT_SUPPORTED: "WebGL is not supported on this browser.",
     PROVIDE_SRC_FIRST: "\"src\" should be provided before initialization.",
-    PROVIDE_WIDTH_OR_HEIGHT: "Either width or height should be given.",
-    FORMAT_NOT_SUPPORTED: format => `Given format "${format}" is not supported or invalid.`,
     FILE_NOT_SUPPORTED: src => `Given file "${src}" is not supported.`,
     NOT_INITIALIZED: "View3D is not initialized yet.",
     MODEL_FAIL_TO_LOAD: url => `Failed to load/parse the 3D model with the given url: "${url}". Check "loadError" event for actual error instance.`
@@ -9631,7 +9628,7 @@ version: 2.6.1
       var {
         meshIndex = -1,
         faceIndex = -1,
-        weights = [...new Array(3)].map(() => 1 / 3)
+        weights = range(3).map(() => 1 / 3)
       } = _a,
           commonOptions = __rest(_a, ["meshIndex", "faceIndex", "weights"]);
 
@@ -16289,12 +16286,6 @@ version: 2.6.1
      * @param root A root element or selector of it to initialize View3D
      * @param {View3DOptions} [options={}] An options object for View3D
      * @throws {View3DError}
-     * |code|condition|
-     * |---|---|
-     * |{@link ERROR_CODES WRONG_TYPE}|When the root is not either string or HTMLElement|
-     * |{@link ERROR_CODES ELEMENT_NOT_FOUND}|When the element with given CSS selector does not exist|
-     * |{@link ERROR_CODES ELEMENT_NOT_CANVAS}|When the element given is not a \<canvas\> element|
-     * |{@link ERROR_CODES WEBGL_NOT_SUPPORTED}|When the browser does not support WebGL|
      */
     constructor(root, {
       src = null,
@@ -17450,7 +17441,7 @@ version: 2.6.1
    */
 
 
-  View3D.VERSION = "2.6.1";
+  View3D.VERSION = "2.6.1-snapshot";
 
   /*
    * "View In Ar" Icon from [Google Material Design Icons](https://github.com/google/material-design-icons)
