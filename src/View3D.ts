@@ -667,12 +667,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    * @param root A root element or selector of it to initialize View3D
    * @param {View3DOptions} [options={}] An options object for View3D
    * @throws {View3DError}
-   * |code|condition|
-   * |---|---|
-   * |{@link ERROR_CODES WRONG_TYPE}|When the root is not either string or HTMLElement|
-   * |{@link ERROR_CODES ELEMENT_NOT_FOUND}|When the element with given CSS selector does not exist|
-   * |{@link ERROR_CODES ELEMENT_NOT_CANVAS}|When the element given is not a \<canvas\> element|
-   * |{@link ERROR_CODES WEBGL_NOT_SUPPORTED}|When the browser does not support WebGL|
    */
   public constructor(root: string | HTMLElement, {
     src = null,

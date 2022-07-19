@@ -7,7 +7,7 @@ import * as THREE from "three";
 import View3D from "../../View3D";
 import Pose from "../Pose";
 import AnimationControl from "../../control/AnimationControl";
-import { getAnimatedFace } from "../../utils";
+import { getAnimatedFace, range } from "../../utils";
 
 import Annotation, { AnnotationOptions } from "./Annotation";
 
@@ -41,7 +41,7 @@ class FaceAnnotation extends Annotation {
   public constructor(view3D: View3D, {
     meshIndex = -1,
     faceIndex = -1,
-    weights = [...new Array(3)].map(() => 1 / 3),
+    weights = range(3).map(() => 1 / 3),
     ...commonOptions
   }: Partial<FaceAnnotationOptions> = {}) {
     super(view3D, commonOptions);

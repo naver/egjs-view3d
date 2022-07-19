@@ -11,6 +11,8 @@ class View3DError extends Error {
 
   /**
    * Create new instance of View3DError
+   * @param {string} message Error message
+   * @param {number} code Error code, see {@link ERROR_CODES}
    */
   public constructor(message: string, code: number) {
     super(message);

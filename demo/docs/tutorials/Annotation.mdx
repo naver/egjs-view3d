@@ -91,6 +91,7 @@ In that case, you have to add correct CSS for each elements yourself.
     <div className="view3d-overlay is-align-items-flex-start is-justify-content-flex-end">
       <div className="buttons p-4">
         <button className="button" onClick={() => {
+          console.log(view3D.current.view3D);
           view3D.current.view3D.annotation.list[0].focus();
         }}>Focus 1</button>
         <button className="button" onClick={() => {
