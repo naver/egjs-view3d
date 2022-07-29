@@ -293,6 +293,15 @@ class ControlBar implements View3DPlugin {
 
   private _removeElements(view3D: View3D) {
     const wrapper = this._rootEl;
+    const topControlsWrapper = this._topControlsWrapper;
+    const leftControlsWrapper = this._leftControlsWrapper;
+    const rightControlsWrapper = this._rightControlsWrapper;
+
+    [topControlsWrapper, leftControlsWrapper, rightControlsWrapper].forEach(itemWrapper => {
+      while (itemWrapper.firstChild) {
+        itemWrapper.removeChild(itemWrapper.firstChild);
+      }
+    });
 
     if (wrapper.parentElement === view3D.rootEl) {
       view3D.rootEl.removeChild(wrapper);

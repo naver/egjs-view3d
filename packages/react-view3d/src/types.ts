@@ -13,4 +13,4 @@ export type View3DEventProps = {
 export type View3DProps = {
   tag: keyof JSX.IntrinsicElements;
   canvasClass: string;
-} & React.HTMLAttributes<HTMLDivElement> & View3DEventProps;
+} & Omit<React.HTMLAttributes<HTMLDivElement>, keyof View3DEventProps> & View3DEventProps;
