@@ -22,12 +22,12 @@ export default buildHelper([
     format: "es",
     exports: "named",
     input: "./src/index.ts",
-    output: "./dist/view360.esm.js"
+    output: "./dist/view3d.esm.js"
   },
   {
     ...defaultOptions,
     format: "cjs",
     input: "./src/index.umd.ts",
-    output: "./dist/view360.cjs.js"
+    output: "./dist/view3d.cjs.js"
   }
 ]);

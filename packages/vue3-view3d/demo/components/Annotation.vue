@@ -3,7 +3,6 @@
     ref="view3d"
     src="https://naver.github.io/egjs-view3d/model/draco/payphone.glb"
     class="view3d-3by1"
-    @ready="this.onReady"
   >
     <div class="view3d-annotation-wrapper">
       <div class="view3d-annotation default" data-position="0.13 0.5 -0.05" data-focus="-90 0 30"></div>
@@ -16,14 +15,6 @@
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  methods: {
-    onReady: evt => {
-      evt.target.animator.play(1);
-    },
-    onClick: function() {
-      this.$refs.view3d.animator.play(2);
-    }
-  }
 })
 </script>
 <style>

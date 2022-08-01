@@ -2,14 +2,14 @@
 
 <img width="400" src="https://naver.github.io/egjs-view3d/poster/cube.png">
 
-# @egjs/vue-view3d
+# @egjs/ngx-view3d
 
-<img alt="npm (scoped)" src="https://img.shields.io/npm/v/@egjs/vue-view3d?logo=npm"></img>
+<img alt="npm (scoped)" src="https://img.shields.io/npm/v/@egjs/ngx-view3d?logo=npm"></img>
 <img alt="License" src="https://img.shields.io/github/license/naver/egjs-view3d" />
 <img alt="Typescript" src="https://img.shields.io/static/v1.svg?label=&message=TypeScript&color=294E80&style=flat-square&logo=typescript" />
 <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/naver/egjs-view3d?style=social" />
 
-Vue@2 wrapper of <a href="https://github.com/naver/egjs-view3d">@egjs/view3d</a>
+Angular wrapper of <a href="https://github.com/naver/egjs-view3d">@egjs/view3d</a>
 
 👉 **[Demo](https://naver.github.io/egjs-view3d)** / **[API Document](https://naver.github.io/egjs-view3d/docs/api/View3D)** / **[Tutorial](https://naver.github.io/egjs-view3d/docs/)**
 
@@ -18,48 +18,74 @@ Vue@2 wrapper of <a href="https://github.com/naver/egjs-view3d">@egjs/view3d</a>
 ## 🔹 Installation
 
 ```sh
-npm i @egjs/vue-view3d
+npm i @egjs/ngx-view3d
 # OR
-yarn add @egjs/vue-view3d
+yarn add @egjs/ngx-view3d
 ```
 
 ## 🔹 Quick Start
-### Global registration
-```js
-import View3D from "@egjs/vue3-view3d";
-import App from "./App.vue";
-import "@egjs/vue-view3d/css/view3d-bundle.min.css";
+```diff
++import { NgxView3DModule, ReadyEvent } from '@egjs/ngx-view3d';
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
 
-const app = createApp(App);
-
-// This will register both PanoViewer & SpinViewer
-app.use(View3D);
-
-// This will register only PanoViewer
-app.component("PanoViewer", PanoViewer);
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
++   /* Add in imports */
++   NgxView3DModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { } /* Your app */
 ```
 
-### Local registration
-```js
-// You have to import actual component
-import { View3D } from "@egjs/vue-view3d";
+### Template & Script
+```ts
+import { ReadyEvent } from "@egjs/ngx-view3d";
 
-export default {
-  components: {
-    View3D
+@Component({
+  selector: 'view3d-demo',
+  template: `
+    <ngx-view3d
+      [options]="options"
+      (ready)="onReady($event)"
+    />
+  `
+})
+export class View3DDemo {
+  public options = {
+    src: "URL_TO_YOUR_3D_MODEL",
+    envmap: "URL_TO_YOUR_HDR_IMAGE"
+  }
+
+  public onReady(evt: ReadyEvent) {
+    // DO_SOMETHING
   }
 }
 ```
 
-### Usage
-```vue
-<template>
-  <View3D
-    src="URL_TO_YOUR_3D_MODEL",
-    envmap="URL_TO_YOUR_HDR_IMAGE",
-    @ready="onReady"
-  />
-</template>
+### Styles
+You can either add our CSS file to `styles` section of `angular.json`
+```json
+"options": {
+  // ...
+  "styles": [
+    "node_modules/@egjs/ngx-view3d/css/view3d-bundle.min.css"
+    // ... Other global styles
+  ]
+  // ...
+}
+```
+
+Or import from other global style file
+```css
+/* Inside of styles.css */
+@import "@egjs/ngx-view3d/css/view3d-bundle.min.css";
 ```
 
 See detailed explanation on our [Tutorial](https://naver.github.io/egjs-view3d/docs/)

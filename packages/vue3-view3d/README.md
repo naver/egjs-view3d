@@ -24,7 +24,37 @@ yarn add @egjs/vue3-view3d
 ```
 
 ## 🔹 Quick Start
-// TODO:
+### Global registration
+```js
+import View3D from "@egjs/vue3-view3d";
+import "@egjs/vue-view3d/css/view3d-bundle.min.css";
+
+Vue.use(View3D);
+```
+
+### Local registration
+```js
+// You have to import actual component
+import { View3D } from "@egjs/vue3-view3d";
+
+export default {
+  components: {
+    View3D
+  }
+}
+```
+
+### Usage
+```vue
+<template>
+  <View3D
+    src="URL_TO_YOUR_3D_MODEL",
+    envmap="URL_TO_YOUR_HDR_IMAGE",
+    @ready="onReady"
+  />
+</template>
+```
+
 
 See detailed explanation on our [Tutorial](https://naver.github.io/egjs-view3d/docs/)
 

@@ -32,7 +32,7 @@ import "@egjs/react-view3d/css/view3d-bundle.min.css";
   tag="div"
   src="URL_TO_YOUR_3D_MODEL"
   envmap="URL_TO_YOUR_HDR_IMAGE"
-  onViewChange={e => {
+  onReady={e => {
     // DO_SOMETHING
   }}
 >
