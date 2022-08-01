@@ -1,21 +1,39 @@
-import Rerender from "./pano/Rerender.vue";
-import Video from "./pano/Video.vue";
-import Spin from "./spin/Spin.vue";
+import Basic from "./components/Basic.vue";
+import EventDemo from "./components/Event.vue";
+import Method from "./components/Method.vue";
+import Annotation from "./components/Annotation.vue";
+import PluginDemo from "./components/Plugin.vue";
+import PropChange from "./components/PropChange.vue";
 
 export default [
   {
-    path: "/rerender",
-    name: "Rerender",
-    component: Rerender
+    path: "/basic",
+    name: "Basic",
+    component: Basic
   },
   {
-    path: "/video",
-    name: "Video",
-    component: Video
+    path: "/event",
+    name: "Event",
+    component: EventDemo
   },
   {
-    path: "/spin",
-    name: "Spin",
-    component: Spin
+    path: "/method",
+    name: "Method",
+    component: Method
+  },
+  {
+    path: "/annotation",
+    name: "Annotation",
+    component: Annotation
+  },
+  {
+    path: "/plugin",
+    name: "Plugin",
+    component: PluginDemo
+  },
+  {
+    path: "/prop",
+    name: "PropChange",
+    component: PropChange
   }
 ];

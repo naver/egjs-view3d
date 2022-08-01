@@ -5,6 +5,7 @@ const defaultOptions = {
   sourcemap: true,
   plugins: [VuePlugin()]
 };
+
 export default buildHelper([
   {
     ...defaultOptions,

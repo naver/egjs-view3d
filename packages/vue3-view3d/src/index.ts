@@ -1,20 +1,19 @@
-/* eslint-disable @typescript-eslint/naming-convention */
+/**
+ * Copyright (c) 2020 NAVER Corp.
+ * egjs projects are licensed under the MIT license
+ */
 import { App } from "vue";
 
-import PanoViewer from "./PanoViewer";
-import SpinViewer from "./SpinViewer";
+import View3D from "./View3D";
 
-export * from "@egjs/view360";
+export * from "@egjs/view3d";
 
 export default {
   install: (app: App) => {
-    app.component("PanoViewer", PanoViewer);
-    app.component("SpinViewer", SpinViewer);
+    app.component("View3D", View3D);
   },
-  PanoViewer,
-  SpinViewer
+  View3D
 };
 export {
-  PanoViewer,
-  SpinViewer
+  View3D
 };

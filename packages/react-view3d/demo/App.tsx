@@ -9,12 +9,15 @@ import View3D, { ControlBar, LoadingBar, View3DPlugin } from "../src";
 import "./App.css";
 import "@egjs/view3d/css/view3d-bundle.css"
 
-export default class App extends Component<{}> {
+export default class App extends Component<{}, { skybox: string | null }> {
   public plugins: View3DPlugin[];
 
   public constructor(props) {
     super(props);
     this.plugins = [new LoadingBar(), new ControlBar()];
+    this.state = {
+      skybox: null
+    }
   }
 
   public render() {
@@ -67,6 +70,21 @@ export default class App extends Component<{}> {
               className="view3d-3by1"
               plugins={this.plugins}
             ></View3D>
+          </Route>
+          <Route path="/prop">
+            <View3D
+              key={5}
+              src="https://naver.github.io/egjs-view3d/model/draco/alarm.glb"
+              className="view3d-3by1"
+              skybox={this.state.skybox}
+              />
+            <button onClick={() => {
+              if (!this.state.skybox) {
+                this.setState({ skybox: "https://naver.github.io/egjs-view3d/texture/venice_sunset_1k.hdr" })
+              } else {
+                this.setState({ skybox: null });
+              }
+            }}>Change Skybox</button>
           </Route>
         </Switch>
       </main>

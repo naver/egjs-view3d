@@ -1,8 +1,8 @@
-/*
+/**
  * Copyright (c) 2020 NAVER Corp.
  * egjs projects are licensed under the MIT license
  */
-import Vue, { CreateElement } from "vue";
+import { defineComponent, PropType, h } from "vue";
 import VanillaView3D, {
   DEFAULT_CLASS,
   EVENTS,
@@ -11,6 +11,12 @@ import VanillaView3D, {
 } from "@egjs/view3d";
 
 import { View3DProps } from "./types";
+
+type PropTypes = {
+  [key in keyof View3DProps]: {
+    type: PropType<View3DProps[key]>;
+  }
+};
 
 const view3DOptionNames = Object.getOwnPropertyNames(VanillaView3D.prototype)
   .filter(name => {
@@ -23,11 +29,11 @@ const view3DOptionNames = Object.getOwnPropertyNames(VanillaView3D.prototype)
   });
 
 const view3DOptions = view3DOptionNames.reduce((props, name) => {
-  return {
-    ...props,
-    [name]: null
-  }
-}, {});
+    return {
+      ...props,
+      [name]: null
+    }
+  }, {}) as PropTypes;
 
 const view3DSetterNames = view3DOptionNames.filter(name => {
   const descriptor = Object.getOwnPropertyDescriptor(VanillaView3D.prototype, name);
@@ -35,11 +41,9 @@ const view3DSetterNames = view3DOptionNames.filter(name => {
   return !!descriptor!.set;
 });
 
-export default Vue.extend<{
-  _view3D: VanillaView3D;
-}, {}, {}, View3DProps>({
+const View3D = defineComponent({
   props: {
-    ...view3DOptions as any,
+    ...view3DOptions,
     tag: {
       type: String,
       required: false,
@@ -51,20 +55,25 @@ export default Vue.extend<{
       default: ""
     }
   },
+  data() {
+    return {} as {
+      view3D: VanillaView3D;
+    };
+  },
   created() {
-    withMethods(this, "_view3D");
+    withMethods(this, "view3D");
   },
   mounted() {
     const props = getValidProps(this.$props);
 
-    this._view3D = new VanillaView3D(
+    this.view3D = new VanillaView3D(
       this.$refs.wrapper as HTMLElement,
       props
     )
-    const events = Object.keys(EVENTS).map(key => EVENTS[key]);
+    const events = Object.keys(EVENTS).map(key => (EVENTS as any)[key]);
 
     events.forEach(eventName => {
-      this._view3D.on(eventName, (e: any) => {
+      this.view3D.on(eventName, (e: any) => {
         e.target = this;
 
         // Make events from camelCase to kebab-case
@@ -73,27 +82,26 @@ export default Vue.extend<{
     });
   },
   beforeDestroy() {
-    this._view3D?.destroy();
+    this.view3D?.destroy();
   },
-  render(h: CreateElement) {
+  render() {
     const canvasClass = this.canvasClass ?? "";
     const canvasClassName = `${DEFAULT_CLASS.CANVAS} ${canvasClass}`.trim();
 
     return h(this.tag, {
       ref: "wrapper",
-      staticClass: DEFAULT_CLASS.WRAPPER
+      class: DEFAULT_CLASS.WRAPPER
     }, [
-      h("canvas", { staticClass: canvasClassName }),
-      this.$slots.default
+      h("canvas", { class: canvasClassName }),
+      this.$slots.default?.()
     ]);
   },
   watch: {
     ...view3DSetterNames.reduce((setters, name) => {
       setters[`$props.${name}`] = {
         handler(newVal: any) {
-          console.log(name, newVal);
-          if (!this._view3D) return;
-          this._view3D[name] = newVal;
+          if (!this.view3D) return;
+          this.view3D[name] = newVal;
         },
         deep: true
       }
@@ -101,3 +109,5 @@ export default Vue.extend<{
     }, {} as Record<string, any>)
   }
 });
+
+export default View3D;

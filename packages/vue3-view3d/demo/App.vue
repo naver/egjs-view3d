@@ -1,15 +1,12 @@
 <template>
   <div>
-    <header>
-      <div class="header">
-        <span>PanoViewer:</span>
-        <router-link to="/rerender">Rerender</router-link>
-        <router-link to="/video">Video</router-link>
-      </div>
-      <div>
-        <span>SpinViewer:</span>
-        <router-link to="/spin">Spin</router-link>
-      </div>
+    <header class="header">
+      <router-link to="/basic">Basic</router-link>
+      <router-link to="/event">Event</router-link>
+      <router-link to="/method">Method</router-link>
+      <router-link to="/annotation">Annotation</router-link>
+      <router-link to="/plugin">Plugin</router-link>
+      <router-link to="/prop">PropChange</router-link>
     </header>
     <router-view></router-view>
   </div>

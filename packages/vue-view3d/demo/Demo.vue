@@ -6,6 +6,7 @@
       <router-link to="/method">Method</router-link>
       <router-link to="/annotation">Annotation</router-link>
       <router-link to="/plugin">Plugin</router-link>
+      <router-link to="/prop">PropChange</router-link>
     </header>
     <transition name="component-fade" mode="out-in">
       <router-view></router-view>

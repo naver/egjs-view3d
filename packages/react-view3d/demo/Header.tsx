@@ -10,6 +10,7 @@ export default class Header extends React.Component {
         <Link to="/method">Method</Link>
         <Link to="/annotation">Annotation</Link>
         <Link to="/plugin">Plugin</Link>
+        <Link to="/prop">PropChange</Link>
       </header>
     );
   }

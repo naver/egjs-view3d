@@ -3,6 +3,7 @@ import EventDemo from "./components/Event.vue";
 import Method from "./components/Method.vue";
 import Annotation from "./components/Annotation.vue";
 import PluginDemo from "./components/Plugin.vue";
+import PropChange from "./components/PropChange.vue";
 
 export default {
   routes: [
@@ -30,6 +31,11 @@ export default {
       path: "/plugin",
       name: "Plugin",
       component: PluginDemo
+    },
+    {
+      path: "/prop",
+      name: "PropChange",
+      component: PropChange
     }
   ]
 };

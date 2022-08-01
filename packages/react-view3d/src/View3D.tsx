@@ -14,6 +14,16 @@ import { View3DProps } from "./types";
 
 type View3DPropsAndOptions = Partial<View3DProps & View3DOptions>;
 
+const view3DSetterNames = Object.getOwnPropertyNames(VanillaView3D.prototype)
+  .filter(name => {
+    const descriptor = Object.getOwnPropertyDescriptor(VanillaView3D.prototype, name);
+
+    if (name.startsWith("_")) return false;
+    if (descriptor?.value) return false;
+
+    return !!descriptor!.set;
+  });
+
 class View3D extends React.PureComponent<View3DPropsAndOptions> {
   public static defaultProps: Partial<View3DProps> = {
     tag: "div"
@@ -42,6 +52,19 @@ class View3D extends React.PureComponent<View3DPropsAndOptions> {
 
   public componentWillUnmount() {
     this._vanillaView3D.destroy();
+  }
+
+  public componentDidUpdate(prevProps) {
+    const view3D = this._vanillaView3D;
+
+    view3DSetterNames.forEach(name => {
+      const oldProp = prevProps[name];
+      const newProp = this.props[name];
+
+      if (newProp !== oldProp) {
+        view3D[name] = newProp;
+      }
+    });
   }
 
   public render() {
@@ -74,7 +97,6 @@ class View3D extends React.PureComponent<View3DPropsAndOptions> {
 
   private _bindEvents() {
     const view3D = this._vanillaView3D;
-    const props = this.props;
 
     Object.keys(EVENTS).forEach((eventKey: keyof typeof EVENTS) => {
       const eventName = EVENTS[eventKey];
@@ -83,7 +105,7 @@ class View3D extends React.PureComponent<View3DPropsAndOptions> {
       view3D.on(eventName, e => {
         e.target = this;
 
-        const evtHandler = props[propName];
+        const evtHandler = this.props[propName];
         if (evtHandler) {
           evtHandler(e);
         }
