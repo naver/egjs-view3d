@@ -2,14 +2,14 @@
 
 <img width="400" src="https://naver.github.io/egjs-view3d/poster/cube.png">
 
-# @egjs/react-view3d
+# @egjs/vue-view3d
 
-<img alt="npm (scoped)" src="https://img.shields.io/npm/v/@egjs/react-view3d?logo=npm"></img>
+<img alt="npm (scoped)" src="https://img.shields.io/npm/v/@egjs/vue-view3d?logo=npm"></img>
 <img alt="License" src="https://img.shields.io/github/license/naver/egjs-view3d" />
 <img alt="Typescript" src="https://img.shields.io/static/v1.svg?label=&message=TypeScript&color=294E80&style=flat-square&logo=typescript" />
 <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/naver/egjs-view3d?style=social" />
 
-React wrapper of <a href="https://github.com/naver/egjs-view3d">@egjs/view3d</a>
+Vue@2 wrapper of <a href="https://github.com/naver/egjs-view3d">@egjs/view3d</a>
 
 👉 **[Demo](https://naver.github.io/egjs-view3d)** / **[API Document](https://naver.github.io/egjs-view3d/docs/api/View3D)** / **[Tutorial](https://naver.github.io/egjs-view3d/docs/)**
 
@@ -18,25 +18,13 @@ React wrapper of <a href="https://github.com/naver/egjs-view3d">@egjs/view3d</a>
 ## 🔹 Installation
 
 ```sh
-npm i @egjs/react-view3d
+npm i @egjs/vue-view3d
 # OR
-yarn add @egjs/react-view3d
+yarn add @egjs/vue-view3d
 ```
 
 ## 🔹 Quick Start
-```jsx
-import View3D from "@egjs/react-view3d";
-import "@egjs/react-view3d/css/view3d-bundle.min.css";
-
-<View3D
-  tag="div"
-  src="URL_TO_YOUR_3D_MODEL"
-  envmap="URL_TO_YOUR_HDR_IMAGE"
-  onViewChange={e => {
-    // DO_SOMETHING
-  }}
->
-```
+// TODO:
 
 See detailed explanation on our [Tutorial](https://naver.github.io/egjs-view3d/docs/)
 

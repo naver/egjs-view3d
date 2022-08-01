@@ -3,7 +3,7 @@ import View3D from "../View3D";
 
 const withMethods = (prototype: any, attr: string) => {
   [Component.prototype, View3D.prototype].forEach(proto => {
-    Object.getOwnPropertyNames(proto).filter(name => !prototype[name] && !name.startsWith("_") && name !== "constructor")
+    Object.getOwnPropertyNames(proto).filter(name => !prototype[name] && name.charAt(0) !== "_" && name !== "constructor")
       .forEach((name: string) => {
         const descriptor = Object.getOwnPropertyDescriptor(proto, name)!;
 

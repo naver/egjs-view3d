@@ -32,11 +32,9 @@ class View3D extends React.PureComponent<View3DPropsAndOptions> {
   }
 
   public componentDidMount() {
-    const props = { ...this.props };
-
     this._vanillaView3D = new VanillaView3D(
       this._containerEl,
-      props
+      this.props
     );
 
     this._bindEvents();
