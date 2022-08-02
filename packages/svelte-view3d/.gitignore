@@ -1,0 +1,7 @@
+/node_modules/
+/public/build/
+lib/
+dist/
+declaration/
+css/
+.DS_Store
