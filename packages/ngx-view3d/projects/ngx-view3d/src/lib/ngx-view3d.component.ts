@@ -18,7 +18,6 @@
 } from "@angular/core";
 import { isPlatformBrowser } from "@angular/common";
 import VanillaView3D, {
-  View3DOptions,
   EVENTS,
   DEFAULT_CLASS,
   withMethods,
@@ -42,18 +41,10 @@ import VanillaView3D, {
   ARStartEvent,
   AREndEvent,
   ARModelPlacedEvent,
-  QuickLookTapEvent
+  QuickLookTapEvent,
+  View3DOptions
 } from "@egjs/view3d";
-
-const view3DSetterNames = Object.getOwnPropertyNames(VanillaView3D.prototype)
-  .filter(name => {
-    const descriptor = Object.getOwnPropertyDescriptor(VanillaView3D.prototype, name);
-
-    if (name.startsWith("_")) return false;
-    if (descriptor?.value) return false;
-
-    return !!descriptor!.set;
-  });
+import { optionNames, optionInputs, setterNames } from "./const";
 
 @Component({
   selector: "ngx-view3d, [NgxView3D]",
@@ -64,35 +55,35 @@ const view3DSetterNames = Object.getOwnPropertyNames(VanillaView3D.prototype)
   host: {
     style: "display: block;",
     class: DEFAULT_CLASS.WRAPPER
-  }
+  },
+  inputs: optionInputs
 })
 export class NgxView3DComponent
   implements AfterViewInit, OnDestroy, OnChanges {
   @Input() public canvasClass: string;
-  @Input() public options: View3DOptions;
 
-  @Output() public ready = new EventEmitter<ReadyEvent>();
-  @Output() public loadStart = new EventEmitter<LoadStartEvent>();
-  @Output() public load = new EventEmitter<LoadEvent>();
-  @Output() public loadError = new EventEmitter<LoadErrorEvent>();
-  @Output() public loadFinish = new EventEmitter<LoadFinishEvent>();
-  @Output() public modelChange = new EventEmitter<ModelChangeEvent>();
-  @Output() public resize = new EventEmitter<ResizeEvent>();
-  @Output() public beforeRender = new EventEmitter<BeforeRenderEvent>();
-  @Output() public render = new EventEmitter<RenderEvent>();
-  @Output() public progress = new EventEmitter<ProgressEvent>();
-  @Output() public inputStart = new EventEmitter<InputStartEvent>();
-  @Output() public inputEnd = new EventEmitter<InputEndEvent>();
-  @Output() public cameraChange = new EventEmitter<CameraChangeEvent>();
-  @Output() public animationStart = new EventEmitter<AnimationStartEvent>();
-  @Output() public animationLoop = new EventEmitter<AnimationLoopEvent>();
-  @Output() public animationFinished = new EventEmitter<AnimationFinishedEvent>();
-  @Output() public annotationFocus = new EventEmitter<AnnotationFocusEvent>();
-  @Output() public annotationUnfocus = new EventEmitter<AnnotationUnfocusEvent>();
-  @Output() public arStart = new EventEmitter<ARStartEvent>();
-  @Output() public arEnd = new EventEmitter<AREndEvent>();
-  @Output() public arModelPlaced = new EventEmitter<ARModelPlacedEvent>();
-  @Output() public quickLookTap = new EventEmitter<QuickLookTapEvent>();
+  @Output("ready") public readyEmitter = new EventEmitter<ReadyEvent>();
+  @Output("loadStart") public loadStartEmitter = new EventEmitter<LoadStartEvent>();
+  @Output("load") public loadEmitter = new EventEmitter<LoadEvent>();
+  @Output("loadError") public loadErrorEmitter = new EventEmitter<LoadErrorEvent>();
+  @Output("loadFinish") public loadFinishEmitter = new EventEmitter<LoadFinishEvent>();
+  @Output("modelChange") public modelChangeEmitter = new EventEmitter<ModelChangeEvent>();
+  @Output("resize") public resizeEmitter = new EventEmitter<ResizeEvent>();
+  @Output("beforeRender") public beforeRenderEmitter = new EventEmitter<BeforeRenderEvent>();
+  @Output("render") public renderEmitter = new EventEmitter<RenderEvent>();
+  @Output("progress") public progressEmitter = new EventEmitter<ProgressEvent>();
+  @Output("inputStart") public inputStartEmitter = new EventEmitter<InputStartEvent>();
+  @Output("inputEnd") public inputEndEmitter = new EventEmitter<InputEndEvent>();
+  @Output("cameraChange") public cameraChangeEmitter = new EventEmitter<CameraChangeEvent>();
+  @Output("animationStart") public animationStartEmitter = new EventEmitter<AnimationStartEvent>();
+  @Output("animationLoop") public animationLoopEmitter = new EventEmitter<AnimationLoopEvent>();
+  @Output("animationFinished") public animationFinishedEmitter = new EventEmitter<AnimationFinishedEvent>();
+  @Output("annotationFocus") public annotationFocusEmitter = new EventEmitter<AnnotationFocusEvent>();
+  @Output("annotationUnfocus") public annotationUnfocusEmitter = new EventEmitter<AnnotationUnfocusEvent>();
+  @Output("arStart") public arStartEmitter = new EventEmitter<ARStartEvent>();
+  @Output("arEnd") public arEndEmitter = new EventEmitter<AREndEvent>();
+  @Output("arModelPlaced") public arModelPlacedEmitter = new EventEmitter<ARModelPlacedEvent>();
+  @Output("quickLookTap") public quickLookTapEmitter = new EventEmitter<QuickLookTapEvent>();
 
   @ViewChild("canvas") public canvas: ElementRef<HTMLCanvasElement>;
 
@@ -106,11 +97,6 @@ export class NgxView3DComponent
   ) {
     this._view3D = null;
 
-    Object.keys(EVENTS).forEach(evtKey => {
-      const evtName = EVENTS[evtKey];
-      this[evtName] = new EventEmitter();
-    });
-
     withMethods(this, "_view3D");
   }
 
@@ -118,7 +104,7 @@ export class NgxView3DComponent
     if (!isPlatformBrowser(this._platformId)) return;
 
     const container = this._elRef.nativeElement;
-    const options = this.options;
+    const options = this._getOptions();
 
     this._view3D = new VanillaView3D(container, options);
 
@@ -130,19 +116,26 @@ export class NgxView3DComponent
   }
 
   public ngOnChanges(changes: SimpleChanges) {
-    if (!this._view3D || !changes.options) return;
+    if (!this._view3D) return;
 
-    const prevProps = changes.options.previousValue;
-    const newProps = changes.options.currentValue;
+    setterNames.forEach(name => {
+      const changed = changes[`opt-${name}`];
+      if (!changed) return;
 
-    view3DSetterNames.forEach(name => {
-      const oldProp = prevProps[name];
-      const newProp = newProps[name];
+      const oldProp = changed.previousValue;
+      const newProp = changed.currentValue;
 
       if (newProp !== oldProp) {
         this._view3D[name] = newProp;
       }
     });
+  }
+
+  private _getOptions() {
+    return optionNames.reduce((options, name) => {
+      options[name] = this[`opt-${name}`];
+      return options;
+    }, {}) as View3DOptions;
   }
 
   private _bindEvents() {
@@ -152,7 +145,7 @@ export class NgxView3DComponent
       const evtName = EVENTS[evtKey];
 
       view3D.on(evtName, e => {
-        const emitter = this[evtName];
+        const emitter = this[`${evtName}Emitter`];
 
         e.currentTarget = this;
 

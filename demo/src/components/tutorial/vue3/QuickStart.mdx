@@ -1,0 +1,86 @@
+## Registering
+### Global registration
+```js
+import View3D from "@egjs/vue3-view3d";
+import App from "./App.vue";
+import "@egjs/vue3-view3d/css/view3d-bundle.min.css";
+
+const app = createApp(App);
+
+// This will register the component named "View3D"
+app.use(View3D);
+```
+
+### Local registration
+```js
+// You have to import the actual component, not the "default"
+import { View3D } from "@egjs/vue3-view3d";
+
+export default {
+  components: {
+    View3D
+  }
+}
+```
+
+## Usage
+All options & events are available like the below
+
+```html
+<template>
+  <View3D
+    src="URL_TO_YOUR_3D_MODEL",
+    envmap="URL_TO_YOUR_HDR_IMAGE",
+    @ready="onReady"
+  />
+</template>
+```
+
+:::caution
+
+- All `camelCased` event names became **`kebab-case`**
+- e.g., `modelChange` => **`model-change`**
+
+:::
+
+### Styles
+You can import our CSS file like the below
+```js
+import "@egjs/vue3-view3d/css/view3d-bundle.css";
+```
+
+### Additional props for vue3-view3d
+There're two additional props for View3D
+- `tag` - sets html tag of the `view3d-wrapper` element
+- `canvasClass` - sets additional class for `view3d-canvas` element
+
+### Using methods
+All properties & methods of View3D is accesible by using a reference of it.
+
+```html title=Method.vue
+<template>
+  <div>
+    <View3D
+      ref="view3d"
+      src="https://naver.github.io/egjs-view3d/model/RobotExpressive.glb"
+      class="view3d-3by1"
+      @ready="this.onReady"
+    />
+    <button @click="this.onClick">Change Animation</button>
+  </div>
+</template>
+<script lang="ts">
+import { defineComponent } from "vue";
+
+export default defineComponent({
+  methods: {
+    onReady: evt => {
+      evt.target.animator.play(1);
+    },
+    onClick: function() {
+      this.$refs.view3d.animator.play(2);
+    }
+  }
+})
+</script>
+```

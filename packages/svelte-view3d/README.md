@@ -24,11 +24,11 @@ yarn add @egjs/svelte-view3d
 ```
 
 ## 🔹 Quick Start
-```js
+```jsx
 import View3D from "@egjs/svelte-view3d";
 
 <View3D
-  tag="div"
+  src="URL_TO_YOUR_3D_MODEL"
   image="PATH_TO_YOUR_PANORAMA_IMAGE"
   on:viewChange={e => {
     // Event properties are placed in "detail"

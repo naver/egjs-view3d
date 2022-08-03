@@ -6,6 +6,10 @@
 	"module": "dist/view3d.esm.js",
 	"es2015": "dist/view3d.esm.js",
 	"types": "declaration/index.d.ts",
+  "sideEffects": [
+    "**/*.css",
+    "**/*.sass"
+  ],
 	"scripts": {
 		"dev": "npm run build:css && rollup -w --config ./rollup.config.dev.js",
 		"build": "run-s build:bundle build:declaration build:css printsizes",

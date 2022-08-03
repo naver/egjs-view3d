@@ -1,13 +1,15 @@
 {
+  "npmClient": "yarn",
+  "useWorkspaces": true,
   "packages": [
     "packages/*",
-    "packages/ngx-conveyer/projects/ngx-conveyer"
+    "packages/ngx-view3d/projects/ngx-view3d"
   ],
   "version": "independent",
   "lernaHelperOptions": {
     "deployFileMap": [
       {
-        "basePath": "packages/conveyer/dist",
+        "basePath": "packages/view3d/dist",
         "dists": [
           "demo/release/{{version}}/dist",
           "demo/release/latest/dist"

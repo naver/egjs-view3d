@@ -1,0 +1,118 @@
+---
+title: Quick Start
+id: quick-start
+slug: /quick-start
+sidebar_position: 2
+---
+
+import View3D from "@site/src/components/View3D";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import License from "@site/src/components/License";
+import VanillaQuickStart from "@site/src/components/tutorial/vanilla/QuickStart.mdx";
+import ReactQuickStart from "@site/src/components/tutorial/react/QuickStart.mdx";
+import NgxQuickStart from "@site/src/components/tutorial/angular/QuickStart.mdx";
+import Vue2QuickStart from "@site/src/components/tutorial/vue2/QuickStart.mdx";
+import Vue3QuickStart from "@site/src/components/tutorial/vue3/QuickStart.mdx";
+import SvelteQuickStart from "@site/src/components/tutorial/svelte/QuickStart.mdx";
+
+<Tabs
+  groupId="framework"
+  defaultValue="js"
+  lazy={true}
+  values={[
+    { label: "Javascript", value: "js" },
+    { label: "React", value: "react" },
+    { label: "Angular", value: "ng" },
+    { label: "Vue@2", value: "vue2" },
+    { label: "Vue@3", value: "vue3" },
+    { label: "Svelte", value: "svelte" }
+  ]}>
+  <TabItem value="js">
+    <VanillaQuickStart />
+  </TabItem>
+  <TabItem value="react">
+    <ReactQuickStart />
+  </TabItem>
+  <TabItem value="ng">
+    <NgxQuickStart />
+  </TabItem>
+  <TabItem value="vue2">
+    <Vue2QuickStart />
+  </TabItem>
+  <TabItem value="vue3">
+    <Vue3QuickStart />
+  </TabItem>
+  <TabItem value="svelte">
+    <SvelteQuickStart />
+  </TabItem>
+</Tabs>
+
+### Ratio helper classes
+The class `view3d-square`(or `view3d-1by1`) will set the height of canvas element same to its width.
+You can use one of our other pre-defined classes to set responsive canvas height with fixed ratio.
+
+```
+view3d-square
+view3d-1by1
+view3d-5by4
+view3d-4by3
+view3d-3by2
+view3d-5by3
+view3d-16by9
+view3d-2by1
+view3d-3by1
+view3d-4by5
+view3d-3by4
+view3d-2by3
+view3d-3by5
+view3d-9by16
+view3d-1by2
+view3d-1by3
+```
+
+You can also can set canvas width/height without ratio class but with CSS like this, and View3D will follow.
+```css
+.view3d-wrapper {
+  width: 100%;
+  height: 100vh;
+}
+```
+
+## Displaying a model
+3D model will be displayed on the canvas if you set the option `src`.
+
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  poster="/egjs-view3d/poster/alarm_default.png"
+  clickToLoad
+  showExampleCode />
+
+View3D uses generated envmap as a default light source.
+You can turn this off with the option [useDefaultEnv](/docs/options/environment/useDefaultEnv), or you can use a HDR image as envmap for IBL(image-based lighting), so you can set any HDR image for the option [envmap](/docs/options/environment/envmap) and model will be litten.
+
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  envmap="/egjs-view3d/texture/artist_workshop_1k.hdr"
+  poster="/egjs-view3d/poster/alarm.png"
+  clickToLoad
+  showExampleCode />
+
+To get HDR images, check this [awesome collection of Poly Haven](https://polyhaven.com/hdris)
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Artist Workshop",
+    link: "https://polyhaven.com/a/artist_workshop",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />

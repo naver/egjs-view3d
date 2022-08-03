@@ -1,0 +1,110 @@
+---
+title: Installation
+id: installation
+slug: /
+sidebar_position: 1
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import CodeBlock from "@theme/CodeBlock";
+
+## 📦 Package managers (recommended)
+You can easily install Flicking with package managers like [npm](https://www.npmjs.com/) or [yarn](https://classic.yarnpkg.com/en/)
+
+:::caution
+View3D offers different packages for each framework.
+For example, you have to install `@egjs/react-view3d` if you're using React.
+:::
+
+<Tabs
+  groupId="pm"
+  defaultValue="npm"
+  lazy={true}
+  values={[
+    { label: "npm", value: "npm" },
+    { label: "yarn", value: "yarn" },
+    { label: "React", value: "react" },
+    { label: "Angular", value: "ng" },
+    { label: "Vue@2", value: "vue2" },
+    { label: "Vue@3", value: "vue3" },
+    { label: "Svelte", value: "svelte" }
+  ]}>
+  <TabItem value="npm">
+    <CodeBlock className="language-shell">npm install @egjs/view3d</CodeBlock>
+  </TabItem>
+  <TabItem value="yarn">
+    <CodeBlock className="language-shell">yarn add @egjs/view3d</CodeBlock>
+  </TabItem>
+  <TabItem value="react">
+    <CodeBlock className="language-shell">npm install @egjs/react-view3d</CodeBlock>
+  </TabItem>
+  <TabItem value="ng">
+    <CodeBlock className="language-shell">npm install @egjs/ngx-view3d</CodeBlock>
+  </TabItem>
+  <TabItem value="vue2">
+    <CodeBlock className="language-shell">npm install @egjs/vue-view3d</CodeBlock>
+  </TabItem>
+  <TabItem value="vue3">
+    <CodeBlock className="language-shell">npm install @egjs/vue3-view3d</CodeBlock>
+  </TabItem>
+  <TabItem value="svelte">
+    <CodeBlock className="language-shell">npm install @egjs/svelte-view3d</CodeBlock>
+  </TabItem>
+</Tabs>
+
+## 🔗 CDN Links
+### Minified & Packaged (with dependencies)
+<Tabs
+  groupId="cdn"
+  defaultValue="url"
+  lazy={true}
+  values={[
+    { label: "URL", value: "url" },
+    { label: "HTML <script>", value: "html" }
+  ]}>
+  <TabItem value="url">
+    <CodeBlock className="language-shell">https://unpkg.com/@egjs/view3d@latest/dist/view3d.pkgd.min.js</CodeBlock>
+  </TabItem>
+  <TabItem value="html">
+    <CodeBlock className="language-html">{`<script src="https://unpkg.com/@egjs/view3d@latest/dist/view3d.pkgd.min.js"></script>`}</CodeBlock>
+  </TabItem>
+</Tabs>
+
+### Packaged (with dependencies)
+<Tabs
+  groupId="cdn"
+  defaultValue="url"
+  lazy={true}
+  values={[
+    { label: "URL", value: "url" },
+    { label: "HTML <script>", value: "html" }
+  ]}>
+  <TabItem value="url">
+    <CodeBlock className="language-shell">https://unpkg.com/@egjs/view3d@latest/dist/view3d.pkgd.js</CodeBlock>
+  </TabItem>
+  <TabItem value="html">
+    <CodeBlock className="language-html">{`<script src="https://unpkg.com/@egjs/view3d@latest/dist/view3d.pkgd.js"></script>`}</CodeBlock>
+  </TabItem>
+</Tabs>
+
+### CSS
+<Tabs
+  groupId="cdn"
+  defaultValue="url"
+  lazy={true}
+  values={[
+    { label: "URL", value: "url" },
+    { label: "HTML <link>", value: "html" },
+    { label: "CSS @import", value: "css" }
+  ]}>
+  <TabItem value="url">
+    <CodeBlock className="language-shell">https://unpkg.com/@egjs/view3d@latest/css/view3d-bundle.min.css</CodeBlock>
+  </TabItem>
+  <TabItem value="html">
+    <CodeBlock className="language-html">{`<link rel="stylesheet" href="https://unpkg.com/@egjs/view3d@latest/css/view3d-bundle.min.css">`}</CodeBlock>
+  </TabItem>
+  <TabItem value="css">
+    <CodeBlock className="language-css">{`@import "https://unpkg.com/@egjs/view3d@latest/css/view3d-bundle.min.css";`}</CodeBlock>
+  </TabItem>
+</Tabs>

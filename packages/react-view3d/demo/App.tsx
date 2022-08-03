@@ -11,6 +11,7 @@ import "@egjs/view3d/css/view3d-bundle.css"
 
 export default class App extends Component<{}, { skybox: string | null }> {
   public plugins: View3DPlugin[];
+  public view3DRef: View3D;
 
   public constructor(props) {
     super(props);
@@ -43,12 +44,18 @@ export default class App extends Component<{}, { skybox: string | null }> {
           <Route path="/method">
             <View3D
               key={2}
+              ref={ref => {
+                if (ref) {
+                  this.view3DRef = ref;
+                }
+              }}
               src="https://naver.github.io/egjs-view3d/model/RobotExpressive.glb"
               className="view3d-3by1"
               onReady={e => {
                 console.log(e.target);
                 e.target.animator.play(1);
               }} />
+            <button onClick={() => { this.view3DRef.animator.play(2); }}>CHANGE ANIMATION</button>
           </Route>
           <Route path="/annotation">
             <View3D

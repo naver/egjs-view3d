@@ -1,0 +1,143 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import CodeBlock from "@theme/CodeBlock";
+
+<Tabs
+  groupId="framework"
+  defaultValue="js"
+  lazy={true}
+  values={[
+    { label: "Javascript", value: "js" },
+    { label: "React", value: "react" },
+    { label: "Angular", value: "ng" },
+    { label: "Vue@2", value: "vue2" },
+    { label: "Vue@3", value: "vue3" },
+    { label: "Svelte", value: "svelte" }
+  ]}>
+  <TabItem value="js">
+
+```js
+import View3D, { EVENTS, RenderEvent } from "@egjs/view3d";
+
+// For Typescript users: You can specify event types like this
+const onRender = (evt: RenderEvent) => {
+  // DO_SOMETHING
+};
+
+view3D.on(EVENTS.RENDER, onRender);
+```
+
+  </TabItem>
+  <TabItem value="react">
+Event handlers can be added with `on-` prop.
+Handler names start with `on` and followed by event name, in camelCase.
+
+- `ready` - `onReady`
+- `loadError` - `onLoadError`
+
+```tsx
+import View3D, { ReadyEvent } from "@egjs/react-view3d";
+
+<View3D onReady={(evt: ReadyEvent) => {}} />
+```
+
+  </TabItem>
+  <TabItem value="ng">
+
+```html title=demo.component.html
+<ngx-view3d
+  (ready)="onReady($event)"
+></ngx-view3d>
+```
+
+```ts title=demo.component.ts
+import { Component, ViewChild, ReadyEvent } from "@angular/core";
+
+@Component({
+  selector: "demo",
+  templateUrl: "./demo.component.html"
+})
+export class DemoComponent {
+  public onReady(evt: ReadyEvent) {
+    // DO_SOMETHING
+  }
+}
+```
+
+  </TabItem>
+  <TabItem value="vue2">
+
+:::caution
+
+- All `camelCased` event names became **`kebab-case`**
+- e.g., `modelChange` => **`model-change`**
+
+:::
+
+```html
+<template>
+  <View3D
+    @ready="onReady"
+  />
+</template>
+<script lang="ts">
+import Vue from "vue";
+
+export default Vue.extend({
+  methods: {
+    onReady: evt => {
+      // DO_SOMETHING
+    }
+  }
+})
+</script>
+```
+
+  </TabItem>
+  <TabItem value="vue3">
+
+:::caution
+
+- All `camelCased` event names became **`kebab-case`**
+- e.g., `modelChange` => **`model-change`**
+
+:::
+
+```html
+<template>
+  <View3D
+    @ready="onReady"
+  />
+</template>
+<script lang="ts">
+import { defineComponent } from "vue";
+
+export default defineComponent({
+  methods: {
+    onReady: evt => {
+      // DO_SOMETHING
+    }
+  }
+})
+</script>
+```
+
+  </TabItem>
+  <TabItem value="svelte">
+
+```html
+<script lang="ts">
+  import View3D from "@egjs/svelte-view3d";
+
+  function onReady(evt) {
+    // DO_SOMETHING
+  }
+</script>
+
+<View3D
+  on:ready={onReady}
+/>
+```
+
+  </TabItem>
+</Tabs>

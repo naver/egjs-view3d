@@ -5,7 +5,10 @@
   "main": "dist/view3d.cjs.js",
   "module": "dist/view3d.esm.js",
   "types": "declaration/index.d.ts",
-  "sideEffects": false,
+  "sideEffects": [
+    "**/*.css",
+    "**/*.sass"
+  ],
   "scripts": {
     "start": "vue-cli-service demo",
     "build": "rm -rf dist && rollup -c rollup.config.build.js && npm run declaration",

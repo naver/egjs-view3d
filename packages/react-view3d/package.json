@@ -6,7 +6,10 @@
   "module": "dist/view3d.esm.js",
   "es2015": "dist/view3d.esm.js",
   "types": "declaration/index.d.ts",
-  "sideEffects": false,
+  "sideEffects": [
+    "**/*.css",
+    "**/*.sass"
+  ],
   "scripts": {
     "start": "react-app-rewired start",
     "build": "rollup -c && npm run declaration",

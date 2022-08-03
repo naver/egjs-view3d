@@ -1,0 +1,57 @@
+You can import and use View3D just like other React components.
+
+```jsx
+import View3D from "@egjs/react-view3d";
+import "@egjs/react-view3d/css/view3d-bundle.min.css";
+
+<View3D
+  tag="div"
+  src="URL_TO_YOUR_3D_MODEL"
+  envmap="URL_TO_YOUR_HDR_IMAGE"
+  onReady={e => {
+    // DO_SOMETHING
+  }}
+>
+```
+
+### Events
+Event handlers can be added with `on-` prop.
+Handler names start with `on` and followed by event name, in camelCase.
+
+***examples***
+- `ready` - `onReady`
+- `loadError` - `onLoadError`
+
+### Styles
+```js
+import "@egjs/react-view3d/css/view3d-bundle.min.css";
+// or import "@egjs/react-view3d/css/view3d.min.css"; if you don't use any plugin or annotations
+```
+
+### Additional props for react-view3d
+There're two additional props for View3D
+- `tag` - sets html tag of the `view3d-wrapper` element
+- `canvasClass` - sets additional class for `view3d-canvas` element
+
+### Using methods
+All properties & methods of View3D is accesible by using a reference of it.
+
+```jsx
+import { useRef } from "react";
+
+function MyView3D() {
+  const view3DRef = useRef();
+
+  return <>
+    <View3D
+      ref={view3DRef}
+      tag="div"
+      src="URL_TO_YOUR_3D_MODEL"
+      envmap="URL_TO_YOUR_HDR_IMAGE"
+    >
+    <button onClick={() => {
+      view3DRef.current.camera.reset();
+    }}>CLICK ME</button>
+  </>;
+}
+```

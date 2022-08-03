@@ -1,0 +1,50 @@
+You can import and use View3D just like other Svelte components.
+
+```jsx
+import View3D from "@egjs/svelte-view3d";
+
+<View3D
+  src="URL_TO_YOUR_3D_MODEL"
+  image="PATH_TO_YOUR_PANORAMA_IMAGE"
+  on:viewChange={e => {
+    // Event properties are placed in "detail"
+    console.log(e.detail);
+  }}
+/>
+```
+
+### Styles
+```html title=App.svelte
+<script>
+  import "@egjs/svelte-view3d/css/view3d-bundle.min.css";
+</script>
+```
+
+### Additional props for svelte-view3d
+There's one additional prop for View3D
+- `canvasClass` - sets additional class for `view3d-canvas` element
+
+### Using methods
+```html title=method.component.html
+<script lang="ts">
+  import View3D from "@egjs/svelte-view3d";
+
+  let view3D: View3D;
+
+  function onReady(evt) {
+    evt.detail.target.animator.play(1);
+  }
+
+  function onClick() {
+    view3D.animator.play(2);
+  }
+</script>
+
+<View3D
+  bind:this={view3D}
+  src="https://naver.github.io/egjs-view3d/model/RobotExpressive.glb"
+  class="view3d-3by1"
+  on:ready={onReady}
+/>
+<button on:click={onClick}>Change Animation</button>
+```

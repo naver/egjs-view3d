@@ -1,0 +1,58 @@
+---
+sidebar_position: 7
+---
+
+import FrameworkEvents from "@site/src/components/tutorial/FrameworkEvents.mdx";
+
+## Basics
+
+You can handle the events that View3D triggers with 3 methods: `on`, `once`, `off`
+
+```js
+import View3D, { EVENTS } from "@egjs/view3d";
+
+const view3D = new View3D(...);
+
+// EVENTS.MODEL_CHANGE = "modelChange"
+view3D.on(EVENTS.MODEL_CHANGE, evt => {
+  // This callback is called everytime when "modelChange" event triggered.
+  evt.target === view3D // true
+  evt.type === "modelChange" // true
+});
+```
+
+```ts
+import View3D, { EVENTS, RenderEvent } from "@egjs/view3d";
+
+// For Typescript users: You can specify event types like this
+const onRender = (evt: RenderEvent) => {
+  // DO_SOMETHING
+};
+
+view3D.on(EVENTS.RENDER, onRender);
+
+// This callback is called only once
+view3D.once(EVENTS.LOAD, evt => {
+  // Remove attached event handler
+  view3D.off(EVENTS.RENDER, onRender);
+});
+```
+
+Or, you can use the option [on](/docs/options/miscellaneous/on) to add event handlers on component creation.
+
+```js
+import View3D, { EVENTS, RenderEvent } from "@egjs/view3d";
+
+const view3D = new View3D("#el-id", {
+  on: {
+    [EVENTS.LOAD]: evt => {
+      console.log(evt); // "load" triggered
+    }
+  }
+});
+```
+
+## Frameworks
+<FrameworkEvents />
+
+See all available events in the [Events](/docs/events/ready) page.

@@ -91,7 +91,6 @@ export default Vue.extend<{
     ...view3DSetterNames.reduce((setters, name) => {
       setters[`$props.${name}`] = {
         handler(newVal: any) {
-          console.log(name, newVal);
           if (!this._view3D) return;
           this._view3D[name] = newVal;
         },

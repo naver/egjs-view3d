@@ -26,17 +26,11 @@ yarn add @egjs/vue-view3d
 ## 🔹 Quick Start
 ### Global registration
 ```js
-import View3D from "@egjs/vue3-view3d";
-import App from "./App.vue";
+import Vue from "vue";
+import View3D from "@egjs/vue-view3d";
 import "@egjs/vue-view3d/css/view3d-bundle.min.css";
 
-const app = createApp(App);
-
-// This will register both PanoViewer & SpinViewer
-app.use(View3D);
-
-// This will register only PanoViewer
-app.component("PanoViewer", PanoViewer);
+Vue.use(View3D);
 ```
 
 ### Local registration

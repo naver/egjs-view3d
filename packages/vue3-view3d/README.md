@@ -27,9 +27,12 @@ yarn add @egjs/vue3-view3d
 ### Global registration
 ```js
 import View3D from "@egjs/vue3-view3d";
-import "@egjs/vue-view3d/css/view3d-bundle.min.css";
+import App from "./App.vue";
+import "@egjs/vue3-view3d/css/view3d-bundle.min.css";
 
-Vue.use(View3D);
+const app = createApp(App);
+
+app.use(View3D);
 ```
 
 ### Local registration
@@ -54,7 +57,6 @@ export default {
   />
 </template>
 ```
-
 
 See detailed explanation on our [Tutorial](https://naver.github.io/egjs-view3d/docs/)
 

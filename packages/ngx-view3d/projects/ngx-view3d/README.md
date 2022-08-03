@@ -25,7 +25,7 @@ yarn add @egjs/ngx-view3d
 
 ## 🔹 Quick Start
 ```diff
-+import { NgxView3DModule, ReadyEvent } from '@egjs/ngx-view3d';
++import { NgxView3DModule } from '@egjs/ngx-view3d';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
@@ -52,16 +52,15 @@ import { ReadyEvent } from "@egjs/ngx-view3d";
   selector: 'view3d-demo',
   template: `
     <ngx-view3d
-      [options]="options"
+      [src]="src"
+      [envmap]="envmap"
       (ready)="onReady($event)"
     />
   `
 })
 export class View3DDemo {
-  public options = {
-    src: "URL_TO_YOUR_3D_MODEL",
-    envmap: "URL_TO_YOUR_HDR_IMAGE"
-  }
+  public src = "URL_TO_YOUR_3D_MODEL";
+  public envmap = "URL_TO_YOUR_HDR_IMAGE";
 
   public onReady(evt: ReadyEvent) {
     // DO_SOMETHING
@@ -115,4 +114,3 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ```
-
