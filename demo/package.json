@@ -46,7 +46,6 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-proposal-decorators": "^7.18.9",
     "@types/offscreencanvas": "^2019.6.4",
     "bulma": "^0.9.3",
     "docusaurus-plugin-sass": "^0.2.1",
