@@ -23,17 +23,9 @@
 		"printsizes": "print-sizes ./dist --exclude=\\.map",
 		"lint": "eslint 'src/**/*.ts'",
 		"lint:test": "eslint 'test/unit/**/*.ts'",
-		"docs:build": "rm -rf ./demo/docs/api && jsdoc-to-mdx -c ./jsdoc-to-mdx.json",
-		"demo:build": "run-s build demo:copy-lib docs:build && npm run demo:build-docusaurus",
-		"demo:build-docusaurus": "npm run build --prefix demo",
 		"demo:copy-lib": "run-s demo:copy-lib-version demo:copy-lib-latest",
-		"demo:copy-lib-version": "cpx 'dist/**/*' demo/static/release/$npm_package_version --clean && cpx 'css/**/*' demo/static/release/$npm_package_version/css --clean",
-		"demo:copy-lib-latest": "cpx 'dist/**/*' demo/static/release/latest --clean && cpx 'dist/**/*' demo/static/release/latest/css --clean",
-		"gh-pages:upstream": "gh-pages -d demo/build/ --remote upstream",
-		"gh-pages:origin": "gh-pages -d demo/build/",
-		"demo:deploy": "run-s demo:build gh-pages:upstream",
-		"demo:deploy-origin": "run-s demo:build gh-pages:origin",
-		"release": "release-helper upstream"
+		"demo:copy-lib-version": "cpx 'dist/**/*' ../../demo/static/release/$npm_package_version --clean && cpx 'css/**/*' ../../demo/static/release/$npm_package_version/css --clean",
+		"demo:copy-lib-latest": "cpx 'dist/**/*' ../../demo/static/release/latest --clean && cpx 'css/**/*' ../../demo/static/release/latest/css --clean"
 	},
 	"repository": {
 		"type": "git",

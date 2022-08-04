@@ -6,13 +6,15 @@
 		"update-angular-consts": "npm run build --prefix packages/view3d && node ./config/update-type-consts.js",
 		"packages": "npm run packages:update && npm run packages:build && npm run packages:publish",
 		"packages:update": "lerna-helper version && npm run update-angular-consts",
-		"packages:build": "npm run build --prefix packages/view3d && lerna run build --ignore @egjs/view3d --ignore @egjs/ngx-view3d --ignore docs --stream",
+		"packages:build": "npm run build --prefix packages/view3d && lerna run build --ignore @egjs/view3d --ignore @egjs/ngx-view3d --ignore demo --stream",
 		"packages:publish": "lerna-helper publish --ignore @egjs/ngx-view3d --commit 'chore: update packages versions'",
 		"changelog": "lerna-helper changelog --type all --base @egjs/view3d",
 		"docs:build": "jsdoc-to-mdx -c ./jsdoc-to-mdx.json",
-		"docs:version": "node ./config/docs-version-up",
-		"demo:build": "npm run docs:build && npm run docs:version && npm run build --prefix packages/docs",
-		"demo:deploy": "lerna-helper deploy --base @egjs/view3d --remote upstream",
+		"demo:build": "run-s demo:copy-lib docs:build demo:build-docusaurus",
+    "demo:copy-lib": "npm run build --prefix packages/view3d && npm run demo:copy-lib --prefix packages/view3d",
+    "demo:build-docusaurus": "npm run build --prefix demo",
+		"demo:deploy": "lerna-helper deploy --base @egjs/view3d --src demo/build/ --remote upstream",
+    "demo:deploy-origin": "lerna-helper deploy --base @egjs/view3d --src demo/build/ --remote origin",
 		"release": "lerna-helper release --base @egjs/view3d --remote upstream --branch main"
 	},
 	"repository": {
@@ -32,7 +34,18 @@
 		"husky": "^4.3.8",
 		"jsdoc-to-mdx": "^1.1.2",
 		"lerna": "^4.0.0",
+		"npm-run-all": "^4.1.5",
 		"typescript": "~3.8.0"
+	},
+	"workspaces": {
+		"packages": [
+			"packages/*",
+			"packages/ngx-view3d/projects/ngx-view3d"
+		],
+		"nohoist": [
+			"**/@egjs/build-helper",
+			"**/@egjs/build-helper/**"
+		]
 	},
 	"husky": {
 		"hooks": {
