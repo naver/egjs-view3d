@@ -38,7 +38,7 @@
     "not op_mini all"
   ],
   "dependencies": {
-    "@egjs/view3d": "~2.6.0"
+    "@egjs/view3d": "~2.7.0"
   },
   "peerDependencies": {
     "vue": "^2.0.0"

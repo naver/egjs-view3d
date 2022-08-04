@@ -1,0 +1,80 @@
+.header-github-link:hover,
+.header-npm-link:hover {
+  opacity: 0.6;
+}
+
+.header-github-link::before,
+.header-npm-link::before {
+  content: '';
+  width: 24px;
+  height: 24px;
+  display: flex;
+}
+
+.header-github-link {
+  margin-right: 0.5rem;
+}
+
+.header-github-link::before {
+  background: url("../../static/icon/github.svg") no-repeat;
+}
+
+html[data-theme='dark'] .header-github-link::before {
+  background: url("../../static/icon/github_white.svg") no-repeat;
+}
+
+.header-npm-link::before {
+  background: url("../../static/icon/npm.svg") no-repeat;
+}
+
+.ar-model-swapper {
+  display: flex;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.view3d-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.view3d-overlay > * {
+  pointer-events: all;
+}
+
+.view3d-overlay.hidden {
+  display: none;
+}
+
+.view3d-demo-controls {
+  position: absolute;
+  display: flex;
+  top: 0;
+  right: 0;
+  flex-direction: column;
+}
+
+/* rc-slider override */
+.rc-slider-track {
+  background-color: var(--ifm-color-primary) !important;
+}
+
+.rc-slider-handle {
+  border: solid 2px var(--ifm-color-primary) !important;
+  opacity: 1 !important;
+}
+
+.rc-slider-handle-dragging.rc-slider-handle-dragging.rc-slider-handle-dragging {
+  box-shadow: 0 0 0 5px var(--ifm-color-primary) !important;
+}

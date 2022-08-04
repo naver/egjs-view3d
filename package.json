@@ -6,8 +6,8 @@
 		"update-angular-consts": "npm run build --prefix packages/view3d && node ./config/update-type-consts.js",
 		"packages": "npm run packages:update && npm run packages:build && npm run packages:publish",
 		"packages:update": "lerna-helper version && npm run update-angular-consts",
-		"packages:build": "npm run build --prefix packages/view3d && lerna run build --ignore @egjs/view3d --ignore @egjs/ngx-view3d --ignore demo --stream",
-		"packages:publish": "lerna-helper publish --ignore @egjs/ngx-view3d --commit 'chore: update packages versions'",
+		"packages:build": "npm run build --prefix packages/view3d && lerna run build --ignore @egjs/view3d --ignore @egjs/ngx-view3d --ignore view3d-optimizer --stream",
+		"packages:publish": "lerna-helper publish --ignore @egjs/ngx-view3d --ignore view3d-optimizer --commit 'chore: update packages versions'",
 		"changelog": "lerna-helper changelog --type all --base @egjs/view3d",
 		"docs:build": "jsdoc-to-mdx -c ./jsdoc-to-mdx.json",
 		"demo:build": "run-s demo:copy-lib docs:build demo:build-docusaurus",
@@ -36,16 +36,6 @@
 		"lerna": "^4.0.0",
 		"npm-run-all": "^4.1.5",
 		"typescript": "~3.8.0"
-	},
-	"workspaces": {
-		"packages": [
-			"packages/*",
-			"packages/ngx-view3d/projects/ngx-view3d"
-		],
-		"nohoist": [
-			"**/@egjs/build-helper",
-			"**/@egjs/build-helper/**"
-		]
 	},
 	"husky": {
 		"hooks": {

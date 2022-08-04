@@ -19,7 +19,7 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
-    "@egjs/view3d": "~2.6.0"
+    "@egjs/view3d": "~2.7.0"
   },
   "peerDependencies": {
     "react": ">=16.0.0"
