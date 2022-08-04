@@ -4,7 +4,7 @@ import Range from "../Range";
 import Collapse from "../Collapse";
 import { Context } from "../context";
 import { onEnvmapChange } from "../action";
-import { Skybox } from "../../../../../src/core";
+import { Skybox } from "../../../../../packages/view3d/src/core";
 import UploadIcon from "@site/static/icon/file_upload_black.svg";
 
 const envmaps = [

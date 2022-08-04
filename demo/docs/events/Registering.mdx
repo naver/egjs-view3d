@@ -5,6 +5,10 @@ id: register
 slug: /events
 ---
 
+import FrameworkEvents from "@site/src/components/tutorial/FrameworkEvents.mdx";
+
+## Basics
+
 Event handlers can be added in two ways.
 
 1. Add event handlers before initialization with the option [on](/docs/options/miscellaneous/on)
@@ -48,3 +52,6 @@ view3D.on("render", handler);
 // Detach handler
 view3D.off("render", handler);
 ```
+
+## Frameworks
+<FrameworkEvents />

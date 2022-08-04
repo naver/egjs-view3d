@@ -9,21 +9,44 @@ import View3D from "@site/src/components/View3D";
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import License from "@site/src/components/License";
+import VanillaQuickStart from "@site/src/components/tutorial/vanilla/QuickStart.mdx";
+import ReactQuickStart from "@site/src/components/tutorial/react/QuickStart.mdx";
+import NgxQuickStart from "@site/src/components/tutorial/angular/QuickStart.mdx";
+import Vue2QuickStart from "@site/src/components/tutorial/vue2/QuickStart.mdx";
+import Vue3QuickStart from "@site/src/components/tutorial/vue3/QuickStart.mdx";
+import SvelteQuickStart from "@site/src/components/tutorial/svelte/QuickStart.mdx";
 
-## DOM Structure
-View3D requires appropriate DOM structure for initialization.
-There should be one `canvas` element inside the wrapper element.
-
-```html
-<div id="wrapper-el" class="view3d-wrapper view3d-square">
-  <canvas class="view3d-canvas"></canvas>
-</div>
-```
-```js
-new View3D("#wrapper-el");
-```
-
-All class names are optional, but it's needed when you're using our CSS files.
+<Tabs
+  groupId="framework"
+  defaultValue="js"
+  lazy={true}
+  values={[
+    { label: "Javascript", value: "js" },
+    { label: "React", value: "react" },
+    { label: "Angular", value: "ng" },
+    { label: "Vue@2", value: "vue2" },
+    { label: "Vue@3", value: "vue3" },
+    { label: "Svelte", value: "svelte" }
+  ]}>
+  <TabItem value="js">
+    <VanillaQuickStart />
+  </TabItem>
+  <TabItem value="react">
+    <ReactQuickStart />
+  </TabItem>
+  <TabItem value="ng">
+    <NgxQuickStart />
+  </TabItem>
+  <TabItem value="vue2">
+    <Vue2QuickStart />
+  </TabItem>
+  <TabItem value="vue3">
+    <Vue3QuickStart />
+  </TabItem>
+  <TabItem value="svelte">
+    <SvelteQuickStart />
+  </TabItem>
+</Tabs>
 
 ### Ratio helper classes
 The class `view3d-square`(or `view3d-1by1`) will set the height of canvas element same to its width.
@@ -55,44 +78,6 @@ You can also can set canvas width/height without ratio class but with CSS like t
   height: 100vh;
 }
 ```
-
-## Setup Script & Styles
-<Tabs
-  groupId="quick-start"
-  defaultValue="bundler"
-  lazy={true}
-  values={[
-    { label: "With bundlers", value: "bundler" },
-    { label: "Without bundlers", value: "non-bundler" }
-  ]}>
-  <TabItem value="bundler">
-
-```js
-import View3D from "@egjs/view3d";
-import "@egjs/view3d/css/view3d-bundle.min.css";
-// or import "@egjs/view3d/css/view3d.min.css"; if you don't use any plugins
-
-const view3D = new View3D("#view3d", {
-  // Options
-})
-```
-
-  </TabItem>
-  <TabItem value="non-bundler">
-
-```html
-<script src="https://unpkg.com/@egjs/view3d@latest/dist/view3d.pkgd.min.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/@egjs/view3d@latest/css/view3d-bundle.min.css">
-```
-
-```js
-const view3D = new View3D("#view3d", {
-  // Options
-})
-```
-
-  </TabItem>
-</Tabs>
 
 ## Displaying a model
 3D model will be displayed on the canvas if you set the option `src`.

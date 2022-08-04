@@ -1,0 +1,104 @@
+## Registering
+Start using ngx-view3d by registering `NgxView3DModule` in `imports` section.
+
+```js
+import { NgxView3DModule } from '@egjs/ngx-view3d';
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    NgxView3DModule // <ngx-view3d> is available
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { } /* Your app */
+```
+
+## Usage
+You can provide options using `options` prop
+
+```js
+@Component({
+  selector: 'view3d-demo',
+  template: `
+    <ngx-view3d
+      [src]="src"
+      [envmap]="envmap"
+      (ready)="onReady($event)"
+    />
+  `
+})
+export class View3DDemo {
+  public src = "URL_TO_YOUR_3D_MODEL";
+  public envmap = "URL_TO_YOUR_HDR_IMAGE";
+
+  public onReady(evt) {
+    // DO_SOMETHING
+  }
+}
+```
+
+### Styles
+You can either add our CSS file to `styles` section of `angular.json`
+```json
+"options": {
+  // ...
+  "styles": [
+    "node_modules/@egjs/ngx-view3d/css/view3d-bundle.min.css"
+    // ... Other global styles
+  ]
+  // ...
+}
+```
+
+Or import from other global style file
+```css
+/* Inside of styles.css */
+@import "@egjs/ngx-view3d/css/view3d-bundle.min.css";
+```
+
+### Additional props for ngx-view3d
+There's one additional prop for View3D
+- `canvasClass` - sets additional class for `view3d-canvas` element
+
+### Using methods
+All properties & methods of View3D is accesible using `ViewChild`
+
+```html title=method.component.html
+<div>
+  <ngx-view3d
+    #viewer
+    class="view3d-3by1"
+    [src]="'https://naver.github.io/egjs-view3d/model/RobotExpressive.glb'"
+    (ready)="onReady($event)"
+  ></ngx-view3d>
+  <button (click)="onClick()">Change Animation</button>
+</div>
+```
+
+```ts title=method.component.ts
+import { Component, ViewChild } from "@angular/core";
+
+@Component({
+  selector: "demo-method",
+  templateUrl: "./method.component.html",
+  styleUrls: ["../app.component.css"]
+})
+export class MethodComponent {
+  @ViewChild("viewer") public view3D;
+
+  public onReady(evt) {
+    evt.target.animator.play(1);
+  }
+
+  public onClick() {
+    this.view3D.animator.play(2);
+  }
+}
+```

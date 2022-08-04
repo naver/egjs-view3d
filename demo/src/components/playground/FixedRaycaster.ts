@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-import { getAttributeScale, getSkinnedVertex } from "../../../../src/utils";
+import { getAttributeScale, getSkinnedVertex } from "../../../../packages/view3d/src/utils";
 
 const _inverseMatrix = new THREE.Matrix4();
 const _ray = new THREE.Ray();

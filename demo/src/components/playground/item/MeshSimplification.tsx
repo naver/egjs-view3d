@@ -3,7 +3,7 @@ import { FastQuadric, ThreeAdapter } from "mesh-simplifier";
 
 import Range from "../Range";
 import WarningIcon from "../../../../static/icon/warning.svg";
-import { Model } from "../../../../../src";
+import { Model } from "../../../../../packages/view3d/src";
 
 import { Context } from "../context";
 import Collapse from "../Collapse";

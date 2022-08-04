@@ -1,5 +1,5 @@
 import React from "react";
-import { Model } from "../../../../src";
+import { Model } from "../../../../packages/view3d/src";
 
 import styles from "./model-info.module.css";
 import { Context } from "./context";

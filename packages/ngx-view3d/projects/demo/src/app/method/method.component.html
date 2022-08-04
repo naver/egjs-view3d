@@ -1,0 +1,9 @@
+<div>
+  <ngx-view3d
+    #viewer
+    class="view3d-3by1"
+    [src]="'https://naver.github.io/egjs-view3d/model/RobotExpressive.glb'"
+    (ready)="onReady($event)"
+  ></ngx-view3d>
+  <button (click)="onClick()">Change Animation</button>
+</div>

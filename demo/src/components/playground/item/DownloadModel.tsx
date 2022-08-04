@@ -7,8 +7,8 @@ import { saveAs } from "file-saver";
 
 import Collapse from "../Collapse";
 import { Context } from "../context";
-import { clamp } from "../../../../../src/utils";
-import { ANNOTATION_EXTRA, TEXTURE_LOD_EXTRA } from "../../../../../src/const/internal";
+import { clamp } from "../../../../../packages/view3d/src/utils";
+import { ANNOTATION_EXTRA, TEXTURE_LOD_EXTRA } from "../../../../../packages/view3d/src/const/internal";
 
 import HelpIcon from "@site/static/icon/help.svg";
 import DownloadIcon from "@site/static/icon/file_download_black.svg";

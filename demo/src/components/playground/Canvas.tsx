@@ -8,9 +8,8 @@ import { Context } from "./context";
 import * as actions from "./action";
 import styles from "./canvas.module.css";
 
-import VanillaView3D, { GLTFLoader, LoadingBar, FaceAnnotation, ControlBar } from "../../../../src";
-import ResetIcon from "../../../static/icon/reset.svg";
-import { getAnimatedFace } from "../../../../src/utils";
+import VanillaView3D, { GLTFLoader, LoadingBar, FaceAnnotation, ControlBar } from "../../../../packages/view3d/src";
+import { getAnimatedFace } from "../../../../packages/view3d/src/utils";
 
 class RenderSection extends React.Component<{}, {
   overrideSize: boolean;

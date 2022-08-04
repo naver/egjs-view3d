@@ -5,8 +5,12 @@ import Layout from "@theme/Layout";
 // @ts-ignore
 import Link from "@docusaurus/Link";
 // @ts-ignore
+import Tabs from "@theme/Tabs";
+// @ts-ignore
+import TabItem from "@theme/TabItem";
+// @ts-ignore
 import CodeBlock from "@theme/CodeBlock";
-import VanillaView3D from "../../../src";
+import VanillaView3D from "../../../packages/view3d/src";
 import License from "../components/License";
 
 import styles from "./home.module.css";
@@ -42,7 +46,38 @@ class Home extends React.Component {
             <img alt="Typescript" src="https://img.shields.io/static/v1.svg?label=&message=TypeScript&color=294E80&style=flat-square&logo=typescript" />
             <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/naver/egjs-view3d?style=social" />
           </div>
-          <CodeBlock className={clsx(styles.max400, "language-shell")}>{"npm install @egjs/view3d"}</CodeBlock>
+          <Tabs
+            groupId="framework"
+            defaultValue="js"
+            lazy={true}
+            className={styles.mainTabs}
+            values={[
+              { label: "Javascript", value: "js" },
+              { label: "React", value: "react" },
+              { label: "Angular", value: "ng" },
+              { label: "Vue@2", value: "vue2" },
+              { label: "Vue@3", value: "vue3" },
+              { label: "Svelte", value: "svelte" }
+            ]}>
+            <TabItem value="js">
+              <CodeBlock className={clsx(styles.max400, "language-shell")}>{"npm install @egjs/view3d"}</CodeBlock>
+            </TabItem>
+            <TabItem value="react">
+              <CodeBlock className={clsx(styles.max400, "language-shell")}>{"npm install @egjs/react-view3d"}</CodeBlock>
+            </TabItem>
+            <TabItem value="ng">
+              <CodeBlock className={clsx(styles.max400, "language-shell")}>{"npm install @egjs/ngx-view3d"}</CodeBlock>
+            </TabItem>
+            <TabItem value="vue2">
+              <CodeBlock className={clsx(styles.max400, "language-shell")}>{"npm install @egjs/vue-view3d"}</CodeBlock>
+            </TabItem>
+            <TabItem value="vue3">
+              <CodeBlock className={clsx(styles.max400, "language-shell")}>{"npm install @egjs/vue3-view3d"}</CodeBlock>
+            </TabItem>
+            <TabItem value="svelte">
+              <CodeBlock className={clsx(styles.max400, "language-shell")}>{"npm install @egjs/svelte-view3d"}</CodeBlock>
+            </TabItem>
+          </Tabs>
           <div className="subtitle has-text-centered">Fast & Customizable glTF 3D model viewer, packed with full of features!</div>
           <div className={styles.btnsWrapper}>
             <Link

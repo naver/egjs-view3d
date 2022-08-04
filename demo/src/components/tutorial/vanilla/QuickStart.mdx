@@ -1,0 +1,55 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+## DOM Structure
+View3D requires appropriate DOM structure for initialization.
+There should be one `canvas` element inside the wrapper element.
+
+```html
+<div id="wrapper-el" class="view3d-wrapper view3d-square">
+  <canvas class="view3d-canvas"></canvas>
+</div>
+```
+```js
+new View3D("#wrapper-el");
+```
+
+All class names are optional, but it's needed when you're using our CSS files.
+
+## Setup Script & Styles
+<Tabs
+  groupId="quick-start"
+  defaultValue="bundler"
+  lazy={true}
+  values={[
+    { label: "With bundlers", value: "bundler" },
+    { label: "Without bundlers", value: "non-bundler" }
+  ]}>
+  <TabItem value="bundler">
+
+```js
+import View3D from "@egjs/view3d";
+import "@egjs/view3d/css/view3d-bundle.min.css";
+// or import "@egjs/view3d/css/view3d.min.css"; if you don't use any plugin or annotations
+
+const view3D = new View3D("#view3d", {
+  // Options
+})
+```
+
+  </TabItem>
+  <TabItem value="non-bundler">
+
+```html
+<script src="https://unpkg.com/@egjs/view3d@latest/dist/view3d.pkgd.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@egjs/view3d@latest/css/view3d-bundle.min.css">
+```
+
+```js
+const view3D = new View3D("#view3d", {
+  // Options
+})
+```
+
+  </TabItem>
+</Tabs>

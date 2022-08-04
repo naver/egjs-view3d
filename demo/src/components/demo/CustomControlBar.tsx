@@ -1,7 +1,7 @@
 import React from "react";
 import clsx from "clsx";
 
-import VanillaView3D, { ControlBar } from "../../../../src";
+import VanillaView3D, { ControlBar } from "../../../../packages/view3d/src";
 
 class CustomControlBar extends React.Component {
   private _view3D: VanillaView3D;

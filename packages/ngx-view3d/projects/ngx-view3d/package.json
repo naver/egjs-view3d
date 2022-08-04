@@ -1,0 +1,35 @@
+{
+  "name": "@egjs/ngx-view3d",
+  "version": "2.0.0",
+  "description": "Fast & Customizable glTF 3D model viewer, packed with full of features!",
+  "sideEffects": [
+    "**/*.css",
+    "**/*.sass"
+  ],
+  "peerDependencies": {
+    "@angular/common": ">=10.0.0",
+    "@angular/core": ">=10.0.0"
+  },
+  "dependencies": {
+    "@egjs/view3d": "~2.6.0"
+  },
+  "devDependencies": {
+    "@angular/common": "~10.0.0",
+    "@angular/core": "~10.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/naver/egjs-view3d/tree/master/packages/ngx-view3d"
+  },
+  "author": {
+    "name": "NAVER Corp."
+  },
+  "namespace": {
+    "eg": "eg"
+  },
+  "homepage": "https://naver.github.io/egjs-view3d/",
+  "bugs": {
+    "url": "https://github.com/naver/egjs-view3d/issues"
+  },
+  "license": "MIT"
+}

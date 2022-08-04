@@ -2,7 +2,7 @@ import React from "react";
 import clsx from "clsx";
 import Swal from "sweetalert2";
 import * as THREE from "three";
-import VanillaView3D, { View3DOptions, ARButton, AROverlay, LoadingBar, ControlBar, View3DPlugin, LoadingBarOptions, ControlBarOptions } from "../../../src";
+import VanillaView3D, { View3DOptions, ARButton, AROverlay, LoadingBar, ControlBar, View3DPlugin, LoadingBarOptions, ControlBarOptions } from "../../../packages/view3d/src";
 import DownloadIcon from "../../static/icon/file_download_black.svg";
 
 import OptionExample from "./OptionExample";
@@ -132,6 +132,8 @@ class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivE
         return { ...options, [key]: restProps[key] };
       }, {});
 
+    delete view3DOptions["on"];
+
     return <>
       <div ref={this._rootRef} className={clsx(className, "view3d-wrapper", "view3d-1by1", "mb-2")} style={style}>
         <canvas className="view3d-canvas"></canvas>
@@ -165,6 +167,6 @@ class View3D extends React.Component<DemoOptions & React.HTMLAttributes<HTMLDivE
   }
 }
 
-export * from "../../../src";
+export * from "../../../packages/view3d/src";
 
 export default View3D;

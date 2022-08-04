@@ -1,5 +1,5 @@
 import React from "react";
-import VanillaView3D, { Model } from "../../../../src";
+import VanillaView3D, { Model } from "../../../../packages/view3d/src";
 
 export type PlaygroundAction = {
   type: "set_view3d";

@@ -1,0 +1,88 @@
+<center>
+
+<img width="400" src="https://naver.github.io/egjs-view3d/poster/cube.png">
+
+# @egjs/vue3-view3d
+
+<img alt="npm (scoped)" src="https://img.shields.io/npm/v/@egjs/vue3-view3d?logo=npm"></img>
+<img alt="License" src="https://img.shields.io/github/license/naver/egjs-view3d" />
+<img alt="Typescript" src="https://img.shields.io/static/v1.svg?label=&message=TypeScript&color=294E80&style=flat-square&logo=typescript" />
+<img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/naver/egjs-view3d?style=social" />
+
+Vue@3 wrapper of <a href="https://github.com/naver/egjs-view3d">@egjs/view3d</a>
+
+👉 **[Demo](https://naver.github.io/egjs-view3d)** / **[API Document](https://naver.github.io/egjs-view3d/docs/api/View3D)** / **[Tutorial](https://naver.github.io/egjs-view3d/docs/)**
+
+</center>
+
+## 🔹 Installation
+
+```sh
+npm i @egjs/vue3-view3d
+# OR
+yarn add @egjs/vue3-view3d
+```
+
+## 🔹 Quick Start
+### Global registration
+```js
+import View3D from "@egjs/vue3-view3d";
+import App from "./App.vue";
+import "@egjs/vue3-view3d/css/view3d-bundle.min.css";
+
+const app = createApp(App);
+
+app.use(View3D);
+```
+
+### Local registration
+```js
+// You have to import actual component
+import { View3D } from "@egjs/vue3-view3d";
+
+export default {
+  components: {
+    View3D
+  }
+}
+```
+
+### Usage
+```vue
+<template>
+  <View3D
+    src="URL_TO_YOUR_3D_MODEL",
+    envmap="URL_TO_YOUR_HDR_IMAGE",
+    @ready="onReady"
+  />
+</template>
+```
+
+See detailed explanation on our [Tutorial](https://naver.github.io/egjs-view3d/docs/)
+
+## 🔹 Browser Support
+View3D is available for the last two major versions of all evergreen desktop and mobile browsers.
+
+## 🔹 License
+```
+Copyright (c) 2020-present NAVER Corp.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+```
+

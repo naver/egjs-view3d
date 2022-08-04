@@ -2,7 +2,7 @@ import React from "react";
 import clsx from "clsx";
 import Slider, { SliderProps } from "rc-slider";
 import styles from "./range.module.css";
-import { clamp } from "../../../../src/utils";
+import { clamp } from "../../../../packages/view3d/src/utils";
 
 class Range extends React.Component<SliderProps & {
   name?: string;

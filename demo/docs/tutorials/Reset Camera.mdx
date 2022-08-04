@@ -2,14 +2,11 @@
 sidebar_position: 5
 ---
 
+import ElementExample from "@site/src/components/ElementExample";
+
 You can reset the camera to default [Pose](/docs/api/Pose) by calling [camera.reset](/docs/api/Camera#reset)
 
-```html
-<div class="view3d-wrapper">
-  <canvas class="view3d-canvas"></canvas>
-  <button id="reset">Reset Camera</button>
-</div>
-```
+<ElementExample el={`<button id="reset">Reset Camera</button>`} />
 
 Add a click handler to button that calls `camera.reset`.
 

@@ -1,7 +1,7 @@
 import Swal from "sweetalert2";
 
 import { PlaygroundAction } from "./context";
-import View3D, { GLTFLoader } from "../../../../src";
+import View3D, { GLTFLoader } from "../../../../packages/view3d/src";
 
 export const onFileChange = async (view3D: View3D, dispatch: (action: PlaygroundAction) => null, fileMap: Map<string, any>) => {
   dispatch({
