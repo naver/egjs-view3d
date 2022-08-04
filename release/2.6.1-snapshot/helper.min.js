@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2020-present NAVER Corp.
+Copyright (c) NAVER Corp.
 name: @egjs/view3d
 license: MIT
 author: NAVER Corp.

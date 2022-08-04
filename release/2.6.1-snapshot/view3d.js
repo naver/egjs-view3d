@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2020-present NAVER Corp.
+Copyright (c) NAVER Corp.
 name: @egjs/view3d
 license: MIT
 author: NAVER Corp.
@@ -541,6 +541,8 @@ version: 2.6.1-snapshot
   /**
    * Default class names that View3D uses
    * @type {object}
+   * @property {"view3d-wrapper"} WRAPPER A class name for wrapper element
+   * @property {"view3d-canvas"} CANVAS A class name for canvas element
    * @property {"view3d-poster"} POSTER A class name for poster element
    * @property {"view3d-ar-overlay"} AR_OVERLAY A class name for AR overlay element
    * @property {"view3d-annotation-wrapper"} ANNOTATION_WRAPPER A class name for annotation wrapper element
@@ -553,6 +555,8 @@ version: 2.6.1-snapshot
    */
 
   const DEFAULT_CLASS = {
+    WRAPPER: "view3d-wrapper",
+    CANVAS: "view3d-canvas",
     POSTER: "view3d-poster",
     AR_OVERLAY: "view3d-ar-overlay",
     ANNOTATION_WRAPPER: "view3d-annotation-wrapper",
@@ -2730,7 +2734,9 @@ version: 2.6.1-snapshot
 
 
     get animating() {
-      return this.activeAnimation && !this.paused;
+      var _a;
+
+      return ((_a = this.activeAction) === null || _a === void 0 ? void 0 : _a.isRunning()) && !this.paused;
     }
     /**
      * Global time scale for animations
@@ -11337,6 +11343,14 @@ version: 2.6.1-snapshot
 
     _removeElements(view3D) {
       const wrapper = this._rootEl;
+      const topControlsWrapper = this._topControlsWrapper;
+      const leftControlsWrapper = this._leftControlsWrapper;
+      const rightControlsWrapper = this._rightControlsWrapper;
+      [topControlsWrapper, leftControlsWrapper, rightControlsWrapper].forEach(itemWrapper => {
+        while (itemWrapper.firstChild) {
+          itemWrapper.removeChild(itemWrapper.firstChild);
+        }
+      });
 
       if (wrapper.parentElement === view3D.rootEl) {
         view3D.rootEl.removeChild(wrapper);
@@ -11510,6 +11524,53 @@ version: 2.6.1-snapshot
     }
   };
 
+  const withMethods = (prototype, attr) => {
+    [Component.prototype, View3D.prototype].forEach(proto => {
+      Object.getOwnPropertyNames(proto).filter(name => name.charAt(0) !== "_" && name !== "constructor").forEach(name => {
+        const descriptor = Object.getOwnPropertyDescriptor(proto, name);
+
+        if (descriptor.value) {
+          // Public Function
+          Object.defineProperty(prototype, name, {
+            value: function (...args) {
+              return descriptor.value.call(this[attr], ...args);
+            }
+          });
+        } else {
+          const getterDescriptor = {};
+
+          if (descriptor.get) {
+            getterDescriptor.get = function () {
+              var _a;
+
+              return (_a = descriptor.get) === null || _a === void 0 ? void 0 : _a.call(this[attr]);
+            };
+          }
+
+          if (descriptor.set) {
+            getterDescriptor.set = function (...args) {
+              var _a;
+
+              return (_a = descriptor.set) === null || _a === void 0 ? void 0 : _a.call(this[attr], ...args);
+            };
+          }
+
+          Object.defineProperty(prototype, name, getterDescriptor);
+        }
+      });
+    });
+  };
+
+  const getValidProps = propsObj => {
+    return Object.keys(propsObj).reduce((props, propName) => {
+      if (propsObj[propName] != null) {
+        props[propName] = propsObj[propName];
+      }
+
+      return props;
+    }, {});
+  };
+
   /*
    * Copyright (c) 2020 NAVER Corp.
    * egjs projects are licensed under the MIT license
@@ -11573,7 +11634,9 @@ version: 2.6.1-snapshot
     INPUT_TYPE: INPUT_TYPE,
     ANIMATION_REPEAT_MODE: ANIMATION_REPEAT_MODE,
     ERROR_CODES: ERROR_CODES,
-    isAvailable: isAvailable
+    isAvailable: isAvailable,
+    withMethods: withMethods,
+    getValidProps: getValidProps
   };
 
   /*
