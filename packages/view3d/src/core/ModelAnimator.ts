@@ -84,7 +84,7 @@ class ModelAnimator {
    * @type {boolean}
    * @readonly
    */
-  public get animating() { return this.activeAnimation && !this.paused; }
+  public get animating() { return this.activeAction?.isRunning() && !this.paused; }
 
   /**
    * Global time scale for animations
