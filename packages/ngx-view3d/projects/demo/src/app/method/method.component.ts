@@ -1,4 +1,5 @@
 import { Component, ViewChild } from "@angular/core";
+import { NgxView3DComponent } from "../../../../ngx-view3d/src/lib/ngx-view3d.component";
 
 @Component({
   selector: "demo-method",
@@ -6,7 +7,7 @@ import { Component, ViewChild } from "@angular/core";
   styleUrls: ["../app.component.css"]
 })
 export class MethodComponent {
-  @ViewChild("viewer") public view3D;
+  @ViewChild("viewer") public view3D: NgxView3DComponent;
 
   public onReady(evt) {
     evt.target.animator.play(1);

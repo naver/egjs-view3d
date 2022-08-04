@@ -44,6 +44,7 @@ import VanillaView3D, {
   QuickLookTapEvent,
   View3DOptions
 } from "@egjs/view3d";
+import View3DInterface from "./View3DInterface";
 import { optionNames, optionInputs, setterNames } from "./const";
 
 @Component({
@@ -58,7 +59,7 @@ import { optionNames, optionInputs, setterNames } from "./const";
   },
   inputs: optionInputs
 })
-export class NgxView3DComponent
+export class NgxView3DComponent extends View3DInterface
   implements AfterViewInit, OnDestroy, OnChanges {
   @Input() public canvasClass: string;
 
@@ -89,15 +90,13 @@ export class NgxView3DComponent
 
   public get element() { return this._elRef.nativeElement; }
   private get _canvasElClass() { return `${DEFAULT_CLASS.CANVAS} ${this.canvasClass ?? ""}`.trim(); }
-  private _view3D: VanillaView3D;
 
   public constructor(
     private _elRef: ElementRef<HTMLElement>,
     @Inject(PLATFORM_ID) private _platformId
   ) {
+    super();
     this._view3D = null;
-
-    withMethods(this, "_view3D");
   }
 
   public ngAfterViewInit() {
