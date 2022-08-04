@@ -81,7 +81,7 @@ const View3D = defineComponent({
       });
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.view3D?.destroy();
   },
   render() {
