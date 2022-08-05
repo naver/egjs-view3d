@@ -109,4 +109,5 @@ outjs/
 declaration/
 css/
 TODO.md
+*.lerna-backup
 *.pem

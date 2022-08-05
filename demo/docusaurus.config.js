@@ -35,10 +35,10 @@ const config = {
         },
         theme: {
           customCss: [
-            require.resolve("./src/css/custom.css"),
-            require.resolve("./src/css/global.css"),
+            require.resolve("./src/styles/custom.css"),
+            require.resolve("./src/styles/global.css"),
             require.resolve("../packages/view3d/sass/view3d-bundle.sass"),
-            require.resolve("./src/css/bulma-override.sass"),
+            require.resolve("./src/styles/bulma-override.sass"),
             require.resolve("rc-slider/assets/index.css")
           ]
         },

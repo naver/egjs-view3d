@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "start": "vue-cli-service demo",
-    "build": "rm -rf dist && rollup -c rollup.config.build.js && npm run declaration",
+    "build": "rm -rf dist && rollup -c && npm run declaration",
     "postbuild": "cpx 'node_modules/@egjs/view3d/css/*' css/",
     "declaration": "rm -rf declaration && tsc -p tsconfig.declaration.json",
     "lint": "vue-cli-service lint --no-fix",
@@ -38,7 +38,7 @@
     "not op_mini all"
   ],
   "dependencies": {
-    "@egjs/view3d": "~2.6.0"
+    "@egjs/view3d": "~2.7.0"
   },
   "peerDependencies": {
     "vue": "^2.0.0"
@@ -49,7 +49,7 @@
     "@vue/cli-service": "^3.7.0",
     "rollup-plugin-vue": "^6.0.0",
     "tslib": "^2.3.1",
-    "typescript": "^3.9.3",
+    "typescript": "~4.1",
     "vue": "^2.0.0",
     "vue-cli-plugin-p11n": "^0.3.0",
     "vue-router": "^3.0.6",

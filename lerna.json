@@ -1,14 +1,15 @@
 {
-  "npmClient": "yarn",
-  "useWorkspaces": true,
   "packages": [
-    "packages/*",
+    "packages/view3d",
+    "packages/react-view3d",
+    "packages/vue-view3d",
+    "packages/vue3-view3d",
+    "packages/svelte-view3d",
     "packages/ngx-view3d/projects/ngx-view3d"
   ],
   "version": "independent",
   "lernaHelperOptions": {
     "beforeReleaseScripts": [
-      "npm run packages:build",
       "npm run demo:build",
       "npm run demo:deploy"
     ]

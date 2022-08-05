@@ -11,6 +11,7 @@
     "e2e": "ng e2e"
   },
   "private": true,
+  "lernaHelperPublishPath": "./dist/ngx-view3d",
   "dependencies": {
     "@angular/animations": "~10.0.0",
     "@angular/common": "~10.0.0",
