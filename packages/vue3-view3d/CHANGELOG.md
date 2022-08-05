@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.0](https://github.com/naver/egjs-view3d/compare/@egjs/vue3-view3d@2.0.0...@egjs/vue3-view3d@2.0.0) (2022-08-05)
+
+**Note:** Version bump only for package @egjs/vue3-view3d
+
+
+
+
+
 ## 2.0.0 (2022-08-04)
 
 

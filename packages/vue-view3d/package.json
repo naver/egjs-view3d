@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "start": "vue-cli-service demo",
-    "build": "rm -rf dist && rollup -c rollup.config.build.js && npm run declaration",
+    "build": "rm -rf dist && rollup -c && npm run declaration",
     "postbuild": "cpx 'node_modules/@egjs/view3d/css/*' css/",
     "declaration": "rm -rf declaration && tsc -p tsconfig.declaration.json",
     "lint": "vue-cli-service lint --no-fix",
