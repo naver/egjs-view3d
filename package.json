@@ -14,7 +14,8 @@
     "demo:build-docusaurus": "npm run build --prefix demo",
     "demo:deploy": "lerna-helper deploy --base @egjs/view3d --src demo/build/ --remote upstream",
     "demo:deploy-origin": "lerna-helper deploy --base @egjs/view3d --src demo/build/ --remote origin",
-    "release": "lerna-helper release --base @egjs/view3d --remote upstream --branch main"
+    "release": "lerna-helper release --base @egjs/view3d --remote upstream --branch main",
+    "bootstrap": "lerna bootstrap --hoist three --hoist @types/three"
   },
   "repository": {
     "type": "git",
@@ -26,15 +27,20 @@
     "url": "https://github.com/naver/egjs-view3d/issues"
   },
   "homepage": "https://github.com/naver/egjs-view3d#readme",
+  "dependencies": {
+    "three": "~0.134.0"
+  },
   "devDependencies": {
     "@daybrush/jsdoc": "^0.3.12",
     "@egjs/release-helper": "^0.2.3",
+    "@types/three": "~0.134.0",
+    "cpx": "^1.5.0",
     "egjs-jsdoc-template": "^1.4.4",
     "husky": "^4.3.8",
     "jsdoc-to-mdx": "^1.1.2",
     "lerna": "^4.0.0",
     "npm-run-all": "^4.1.5",
-    "typescript": "~3.8.0"
+    "typescript": "~4.1.0"
   },
   "husky": {
     "hooks": {
