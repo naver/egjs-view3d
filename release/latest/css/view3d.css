@@ -9,6 +9,12 @@
   padding: 0;
 }
 
+.view3d-wrapper:-ms-fullscreen {
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+}
+
 .view3d-wrapper:fullscreen {
   width: 100vw;
   height: 100vh;
@@ -23,6 +29,7 @@
   height: 100%;
   -webkit-user-select: none;
      -moz-user-select: none;
+      -ms-user-select: none;
           user-select: none;
   -webkit-user-drag: none;
 }

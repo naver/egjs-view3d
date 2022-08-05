@@ -9,6 +9,12 @@
   padding: 0;
 }
 
+.view3d-wrapper:-ms-fullscreen {
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+}
+
 .view3d-wrapper:fullscreen {
   width: 100vw;
   height: 100vh;
@@ -23,6 +29,7 @@
   height: 100%;
   -webkit-user-select: none;
      -moz-user-select: none;
+      -ms-user-select: none;
           user-select: none;
   -webkit-user-drag: none;
 }
@@ -123,6 +130,7 @@
   position: absolute;
   -webkit-user-select: none;
      -moz-user-select: none;
+      -ms-user-select: none;
           user-select: none;
   opacity: 0;
   cursor: pointer;
@@ -184,6 +192,7 @@
   cursor: auto;
   -webkit-user-select: text;
      -moz-user-select: text;
+      -ms-user-select: text;
           user-select: text;
 }
 
@@ -578,6 +587,7 @@
   flex-direction: column;
   -webkit-user-select: none;
      -moz-user-select: none;
+      -ms-user-select: none;
           user-select: none;
   -webkit-user-drag: none;
   font-size: 16px;
