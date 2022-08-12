@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.7.1](https://github.com/naver/egjs-view3d/compare/2.7.0...2.7.1) (2022-08-12)
+### :sparkles: Packages
+* `@egjs/ngx-view3d` 2.0.1
+* `@egjs/react-view3d` 2.0.1
+* `@egjs/svelte-view3d` 2.0.1
+* `@egjs/view3d` 2.7.1
+* `@egjs/vue-view3d` 2.0.1
+* `@egjs/vue3-view3d` 2.0.1
+
+
+### :bug: Bug Fix
+
+* `@egjs/view3d`
+    * can't import umd build ([b3a345a](https://github.com/naver/egjs-view3d/commit/b3a345a349b5fa12177849a943becbb3a459d645))
+
+
+### :mega: Other
+
+* All
+    * update packages versions ([0b4eefd](https://github.com/naver/egjs-view3d/commit/0b4eefd87b4e96e99c7ed45ffd9badeb943bd612))
+* Other
+    * fix test script ([d5ee7b9](https://github.com/naver/egjs-view3d/commit/d5ee7b9709d13c8249054a74a0dc29dbf1419bb0))
+
+
+
 
 
 **Note:** Version bump only for package view3d-root
