@@ -19,7 +19,7 @@ const withMethods = (prototype: any, attr: string) => {
           const getterDescriptor: { get?: () => any; set?: (val: any) => void } = {};
           if (descriptor.get) {
             getterDescriptor.get = function() {
-              return descriptor.get?.call(this[attr]);
+              return this[attr] && descriptor.get?.call(this[attr]);
             };
           }
           if (descriptor.set) {

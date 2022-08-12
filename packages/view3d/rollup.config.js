@@ -2,6 +2,7 @@
 const glslify = require("rollup-plugin-glslify");
 const buildHelper = require("./config/build-helper");
 const { babel } = require("@rollup/plugin-babel");
+const resolve = require("@rollup/plugin-node-resolve");
 
 export const name = "View3D";
 export const fileName = "view3d";
@@ -9,15 +10,7 @@ const helperName = "View3D.Helper";
 
 const external = {
   three: "THREE",
-  "@egjs/component": "Component",
-  "three/examples/jsm/loaders/GLTFLoader": "GLTFLoader",
-  "three/examples/jsm/loaders/RGBELoader": "RGBELoader",
-  "three/examples/jsm/loaders/DRACOLoader": "DRACOLoader",
-  "three/examples/jsm/loaders/KTX2Loader": "KTX2Loader",
-  "three/examples/jsm/lights/LightProbeGenerator": "LightProbeGenerator",
-  "three/examples/jsm/shaders/HorizontalBlurShader": "HorizontalBlurShader",
-  "three/examples/jsm/shaders/VerticalBlurShader": "VerticalBlurShader",
-  "three/examples/jsm/webxr/XREstimatedLight": "XREstimatedLight"
+  "@egjs/component": "Component"
 };
 const tsconfig = "tsconfig.build.json";
 const plugins = [
@@ -28,6 +21,9 @@ const plugins = [
     configFile: "./babel.config.js"
   })
 ];
+const resolveThreeExamples = resolve({
+  include: "node_modules/three/examples",
+});
 
 const common = {
   sourcemap: false,
@@ -46,7 +42,8 @@ export default buildHelper([
     output: `./dist/${fileName}.js`,
     format: "umd",
     external,
-    ...common
+    ...common,
+    plugins: [...plugins, resolveThreeExamples]
   },
   {
     name,
@@ -55,7 +52,8 @@ export default buildHelper([
     format: "umd",
     external,
     uglify: true,
-    ...common
+    ...common,
+    plugins: [...plugins, resolveThreeExamples]
   },
   {
     name,
@@ -89,7 +87,6 @@ export default buildHelper([
     input: "./src/helper/index.umd.ts",
     output: "./dist/helper.js",
     format: "umd",
-    external,
     ...helperCommon
   },
   {
@@ -97,7 +94,6 @@ export default buildHelper([
     input: "./src/helper/index.umd.ts",
     output: "./dist/helper.min.js",
     format: "umd",
-    external,
     uglify: true,
     ...helperCommon
   },
@@ -106,7 +102,6 @@ export default buildHelper([
     output: "./dist/helper.esm.js",
     format: "esm",
     exports: "named",
-    external,
     ...helperCommon
   }
 ]);
