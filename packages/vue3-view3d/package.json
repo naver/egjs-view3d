@@ -1,6 +1,6 @@
 {
   "name": "@egjs/vue3-view3d",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Fast & Customizable glTF 3D model viewer, packed with full of features!",
   "main": "dist/view3d.cjs.js",
   "module": "dist/view3d.esm.js",
@@ -33,7 +33,7 @@
     "not op_mini all"
   ],
   "dependencies": {
-    "@egjs/view3d": "~2.7.0"
+    "@egjs/view3d": "~2.7.1"
   },
   "peerDependencies": {
     "vue": "^3.0.0"

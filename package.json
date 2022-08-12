@@ -5,8 +5,8 @@
   "scripts": {
     "packages": "npm run packages:update && npm run packages:build && npm run packages:publish",
     "packages:update": "lerna-helper version",
-    "packages:build": "npm run build --prefix packages/view3d && lerna run build --ignore @egjs/view3d --ignore @egjs/ngx-view3d --stream",
-    "packages:publish": "lerna-helper publish --ignore @egjs/ngx-view3d --commit 'chore: update packages versions'",
+    "packages:build": "npm run build --prefix packages/view3d && lerna run build --ignore @egjs/view3d --stream",
+    "packages:publish": "lerna-helper publish --commit 'chore: update packages versions'",
     "changelog": "lerna-helper changelog --type all --base @egjs/view3d",
     "docs:build": "jsdoc-to-mdx -c ./jsdoc-to-mdx.json",
     "demo:build": "run-s demo:copy-lib docs:build demo:build-docusaurus",
