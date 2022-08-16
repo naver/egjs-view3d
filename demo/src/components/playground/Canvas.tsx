@@ -33,6 +33,9 @@ class RenderSection extends React.Component<{}, {
     const view3D = new VanillaView3D("#playground-view3d", {
       src: "/egjs-view3d/model/cube.glb",
       autoplay: true,
+      zoom: {
+        doubleTap: false
+      },
       plugins: [new LoadingBar({ type: "top" }), new ControlBar()]
     }).on("ready", () => {
       dispatch({
