@@ -46,16 +46,18 @@ class PointAnnotation extends Annotation {
 
     let targetPose: Pose;
 
+    const pivotOffset = this._getPivotOffset();
+    const position = new THREE.Vector3().addVectors(this._position, pivotOffset);
+
     if (focus.length > 0) {
       const focusVector = this._getFocus();
-      const position = this._position;
 
       targetPose = new Pose(focusVector.x, focusVector.y, focusVector.z, position.toArray());
     } else {
       const modelToPos = this._calculateNormalFromModelCenter();
       const { yaw, pitch } = directionToYawPitch(modelToPos);
 
-      targetPose = new Pose(toDegree(yaw), toDegree(pitch), 0, this._position.toArray());
+      targetPose = new Pose(toDegree(yaw), toDegree(pitch), 0, position.toArray());
     }
 
     window.addEventListener(BROWSER.EVENTS.CLICK, () => {
@@ -81,7 +83,8 @@ class PointAnnotation extends Annotation {
     return {
       position: this._position.toArray(),
       focus: this._focus,
-      duration: this._focusDuration
+      duration: this._focusDuration,
+      focusOffset: this._focusOffset
     };
   }
 

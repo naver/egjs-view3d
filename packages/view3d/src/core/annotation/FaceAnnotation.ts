@@ -58,9 +58,9 @@ class FaceAnnotation extends Annotation {
     const view3D = this._view3D;
     const { camera, control } = view3D;
     const focus = this._getFocus();
-    const position = this._getPosition();
+    const pivot = this._getFocusPivot();
 
-    const targetPose = new Pose(focus.x, focus.y, focus.z, position.toArray());
+    const targetPose = new Pose(focus.x, focus.y, focus.z, pivot.toArray());
     const trackingControl = new AnimationControl(view3D, camera.currentPose, targetPose, {
       duration: this._focusDuration,
       disableOnFinish: false
@@ -103,9 +103,9 @@ class FaceAnnotation extends Annotation {
 
     const { camera } = this._view3D;
     const focus = this._getFocus();
-    const position = this._getPosition();
+    const pivot = this._getFocusPivot();
 
-    const targetPose = new Pose(focus.x, focus.y, focus.z, position.toArray());
+    const targetPose = new Pose(focus.x, focus.y, focus.z, pivot.toArray());
 
     trackingControl.changeStartEnd(camera.currentPose, targetPose);
     trackingControl.reset();
@@ -116,7 +116,8 @@ class FaceAnnotation extends Annotation {
       meshIndex: this._meshIndex,
       faceIndex: this._faceIndex,
       focus: this._focus,
-      duration: this._focusDuration
+      duration: this._focusDuration,
+      focusOffset: this._focusOffset
     };
   }
 
@@ -135,6 +136,12 @@ class FaceAnnotation extends Annotation {
       .addScaledVector(animatedVertices[0], weights[0])
       .addScaledVector(animatedVertices[1], weights[1])
       .addScaledVector(animatedVertices[2], weights[2]);
+  }
+
+  private _getFocusPivot(): THREE.Vector3 {
+    const basePosition = this._getPosition();
+    const pivotOffset = this._getPivotOffset();
+    return new THREE.Vector3().addVectors(basePosition, pivotOffset);
   }
 }
 
