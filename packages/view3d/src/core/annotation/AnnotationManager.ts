@@ -161,6 +161,7 @@ class AnnotationManager {
       faceIndex: number;
       position: number[] | null;
       focus: number[];
+      focusOffset: number[];
       duration: number;
       label: string | null;
     }>;
