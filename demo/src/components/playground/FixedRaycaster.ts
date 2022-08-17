@@ -199,9 +199,9 @@ class FixedRaycaster {
       _vB.copy(getSkinnedVertex(b, skinned, positionScale, skinWeightScale));
       _vC.copy(getSkinnedVertex(c, skinned, positionScale, skinWeightScale));
     } else {
-      _vA.fromBufferAttribute(position, a);
-      _vB.fromBufferAttribute(position, b);
-      _vC.fromBufferAttribute(position, c);
+      _vA.fromBufferAttribute(position, a).applyMatrix4(object.matrixWorld);
+      _vB.fromBufferAttribute(position, b).applyMatrix4(object.matrixWorld);
+      _vC.fromBufferAttribute(position, c).applyMatrix4(object.matrixWorld);
     }
 
     const intersection = this._checkIntersection(object, material, raycaster, ray, _vA, _vB, _vC, _intersectionPoint);
@@ -236,7 +236,6 @@ class FixedRaycaster {
     }
 
     return intersection;
-
   }
 
   private _checkIntersection(object: THREE.Mesh, material: THREE.Material, raycaster: THREE.Raycaster, ray: THREE.Ray, pA: THREE.Vector3, pB: THREE.Vector3, pC: THREE.Vector3, point: THREE.Vector3): THREE.Intersection | null {
