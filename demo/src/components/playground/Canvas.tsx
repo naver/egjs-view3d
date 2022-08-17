@@ -214,6 +214,7 @@ class RenderSection extends React.Component<{}, {
       if (!animatedVertices) return;
 
       const weights = this._getBarycentricWeight(intersect.point, animatedVertices);
+      const focusOffset = new THREE.Vector3().subVectors(view3D.camera.pivot, intersect.point);
 
       const newAnnotation = new FaceAnnotation(view3D, {
         element: el,
@@ -221,6 +222,7 @@ class RenderSection extends React.Component<{}, {
         baseDistance: view3D.camera.baseDistance,
         aspect,
         focus: [currentPose.yaw, currentPose.pitch, currentPose.zoom],
+        focusOffset: focusOffset.toArray(),
         meshIndex,
         faceIndex,
         weights
