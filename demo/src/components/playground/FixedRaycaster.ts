@@ -44,7 +44,7 @@ class FixedRaycaster {
     const raycaster = this._raycaster;
 
     if (object.layers.test(raycaster.layers)) {
-      if ((object as THREE.SkinnedMesh).isSkinnedMesh) {
+      if ((object as THREE.Mesh).isMesh) {
         this._raycast(object as THREE.Mesh, raycaster, intersects);
       } else {
         object.raycast(raycaster, intersects);
