@@ -71,27 +71,13 @@ class FaceAnnotation extends Annotation {
     trackingControl.enable();
     control.add(trackingControl);
 
-    window.addEventListener("click", () => {
-      this.unfocus();
-    }, { once: true, capture: true });
-
     this._onFocus();
   }
 
   public unfocus(): void {
     if (!this._focusing) return;
 
-    const { control } = this._view3D;
-    const trackingControl = this._trackingControl;
-
-    if (trackingControl) {
-      control.sync();
-      control.remove(trackingControl);
-
-      trackingControl.destroy();
-      this._trackingControl = null;
-    }
-
+    this._destroyTrackingControl();
     this._onUnfocus();
   }
 
@@ -111,6 +97,18 @@ class FaceAnnotation extends Annotation {
     trackingControl.reset();
   }
 
+  public handleUserInput() {
+    if (!this._focusing) return;
+
+    const view3D = this._view3D;
+
+    if (view3D.annotationAutoUnfocus) {
+      this.unfocus();
+    } else {
+      this._destroyTrackingControl();
+    }
+  }
+
   public toJSON() {
     return {
       meshIndex: this._meshIndex,
@@ -119,6 +117,19 @@ class FaceAnnotation extends Annotation {
       duration: this._focusDuration,
       focusOffset: this._focusOffset
     };
+  }
+
+  private _destroyTrackingControl() {
+    const { control } = this._view3D;
+    const trackingControl = this._trackingControl;
+
+    if (trackingControl) {
+      control.sync();
+      control.remove(trackingControl);
+
+      trackingControl.destroy();
+      this._trackingControl = null;
+    }
   }
 
   private _getPosition(): THREE.Vector3 {

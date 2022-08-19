@@ -112,6 +112,7 @@ export interface View3DOptions {
   annotationWrapper: HTMLElement | string;
   annotationSelector: string;
   annotationBreakpoints: Record<number, number>;
+  annotationAutoUnfocus: boolean;
 
   // AR
   webAR: boolean | Partial<WebARSessionOptions>;
@@ -198,6 +199,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _annotationWrapper: View3DOptions["annotationWrapper"];
   private _annotationSelector: View3DOptions["annotationSelector"];
   private _annotationBreakpoints: View3DOptions["annotationBreakpoints"];
+  private _annotationAutoUnfocus: View3DOptions["annotationAutoUnfocus"];
 
   private _webAR: View3DOptions["webAR"];
   private _sceneViewer: View3DOptions["sceneViewer"];
@@ -512,6 +514,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get annotationBreakpoints() { return this._annotationBreakpoints; }
   /**
+   * Whether to automatically unfocus annotation on user input
+   * @type {boolean}
+   * @default true
+   */
+  public get annotationAutoUnfocus() { return this._annotationAutoUnfocus; }
+  /**
    * Options for the WebXR-based AR session.
    * If `false` is given, it will disable WebXR-based AR session.
    * @type {boolean | WebARSessionOptions}
@@ -701,6 +709,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     annotationWrapper = `.${DEFAULT_CLASS.ANNOTATION_WRAPPER}`,
     annotationSelector = `.${DEFAULT_CLASS.ANNOTATION}`,
     annotationBreakpoints = DEFAULT.ANNOTATION_BREAKPOINT,
+    annotationAutoUnfocus = true,
     webAR = true,
     sceneViewer = true,
     quickLook = true,
@@ -756,6 +765,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._annotationWrapper = annotationWrapper;
     this._annotationSelector = annotationSelector;
     this._annotationBreakpoints = annotationBreakpoints;
+    this._annotationAutoUnfocus = annotationAutoUnfocus;
 
     this._webAR = webAR;
     this._sceneViewer = sceneViewer;

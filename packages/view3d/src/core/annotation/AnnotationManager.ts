@@ -44,7 +44,7 @@ class AnnotationManager {
   }
 
   /**
-   * Initialize and collect annotations from the wrapper
+   * Init AnnotationManager
    */
   public init() {
     const view3D = this._view3D;
@@ -352,11 +352,7 @@ class AnnotationManager {
     const annotations = this._list;
 
     annotations.forEach(annotation => {
-      const el = annotation.element;
-
-      if (!el) return;
-
-      annotation.unfocus();
+      annotation.handleUserInput();
     });
   };
 }

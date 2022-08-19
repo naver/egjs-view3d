@@ -58,6 +58,12 @@ abstract class Annotation {
    */
   public get renderable() { return !!this._element; }
   /**
+   * Whether this annotation is focused
+   * @type {boolean}
+   * @readonly
+   */
+  public get focusing() { return this._focusing; }
+  /**
    * An array of values in order of [yaw, pitch, zoom]
    * @type {number[]}
    * @readonly
@@ -278,6 +284,16 @@ abstract class Annotation {
     this._enabled = false;
   }
 
+  public handleUserInput() {
+    if (!this._focusing) return;
+
+    const view3D = this._view3D;
+
+    if (view3D.annotationAutoUnfocus) {
+      this.unfocus();
+    }
+  }
+
   protected _getFocus(): THREE.Vector3 {
     const view3D = this._view3D;
     const focusVector = new THREE.Vector3().fromArray(this._focus);
@@ -316,6 +332,12 @@ abstract class Annotation {
   protected _onFocus() {
     const view3D = this._view3D;
     const el = this._element;
+
+    view3D.annotation.list.forEach(annotation => {
+      if (annotation._focusing) {
+        annotation.unfocus();
+      }
+    });
 
     if (el) {
       el.classList.add(DEFAULT_CLASS.ANNOTATION_SELECTED);
