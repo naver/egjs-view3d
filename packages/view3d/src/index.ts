@@ -15,6 +15,7 @@ export * from "./helper";
 export * from "./type/event";
 export * from "./type/external";
 export * from "./cfc";
+export * from "./utils";
 
 export type {
   View3DOptions,
