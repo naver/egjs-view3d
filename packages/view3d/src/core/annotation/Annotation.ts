@@ -17,9 +17,9 @@ export interface AnnotationOptions {
   element: HTMLElement | null;
   focus: number[];
   focusDuration: number;
+  focusOffset: number[];
   baseFov: number;
   baseDistance: number | null;
-  aspect: number;
 }
 
 /**
@@ -37,9 +37,9 @@ abstract class Annotation {
   protected _element: HTMLElement | null;
   protected _focus: number[];
   protected _focusDuration: number;
+  protected _focusOffset: number[];
   protected _baseFov: number;
   protected _baseDistance: number | null;
-  protected _aspect: number;
   protected _enabled: boolean;
   protected _hidden: boolean;
   protected _focusing: boolean;
@@ -69,6 +69,12 @@ abstract class Annotation {
    */
   public get focusDuration() { return this._focusDuration; }
   /**
+   * Offset vector from the pivot when focused
+   * @type {number[]}
+   * @readonly
+   */
+  public get focusOffset() { return this._focusOffset; }
+  /**
    * Base fov value that annotation is referencing
    * @type {number}
    */
@@ -79,11 +85,6 @@ abstract class Annotation {
    */
   public get baseDistance() { return this._baseDistance; }
   /**
-   * Base aspect value that annotation is referencing
-   * @type {number}
-   */
-  public get aspect() { return this._aspect; }
-  /**
    * Whether the annotation is hidden and not rendered
    * @type {boolean}
    * @readonly
@@ -93,7 +94,6 @@ abstract class Annotation {
   public set focusDuration(val: number) { this._focusDuration = val; }
   public set baseFov(val: number) { this._baseFov = val; }
   public set baseDistance(val: number | null) { this._baseDistance = val; }
-  public set aspect(val: number) { this._aspect = val; }
 
   /**
    * @param {View3D} view3D Instance of the view3D
@@ -103,17 +103,17 @@ abstract class Annotation {
     element = null,
     focus = [],
     focusDuration = 1000,
+    focusOffset = [],
     baseFov = 45,
-    baseDistance = null,
-    aspect = 1
+    baseDistance = null
   }: Partial<AnnotationOptions> = {}) {
     this._view3D = view3D;
     this._element = element;
     this._focus = focus;
     this._focusDuration = focusDuration;
+    this._focusOffset = focusOffset;
     this._baseFov = baseFov;
     this._baseDistance = baseDistance;
-    this._aspect = aspect;
     this._enabled = false;
     this._hidden = false;
     this._focusing = false;
@@ -283,21 +283,25 @@ abstract class Annotation {
     const focusVector = new THREE.Vector3().fromArray(this._focus);
 
     const currentDistance = view3D.camera.baseDistance;
-    const currentSize = view3D.renderer.size;
-    const currentAspect = Math.max(currentSize.height / currentSize.width, 1);
-
-    const aspect = this._aspect;
     const baseFov = this._baseFov;
     const baseDistance = this._baseDistance ?? currentDistance;
 
-    const aspectRatio = currentAspect / aspect;
-    const targetRenderHeight = aspectRatio * baseDistance * Math.tan(toRadian((baseFov - focusVector.z) / 2));
+    const targetRenderHeight = baseDistance * Math.tan(toRadian((baseFov - focusVector.z) / 2));
     const targetFov = 2 * toDegree(Math.atan(targetRenderHeight / currentDistance));
 
     // zoom value
     focusVector.z = view3D.camera.baseFov - targetFov;
 
     return focusVector;
+  }
+
+  protected _getPivotOffset(): THREE.Vector3 {
+    const offset = this._focusOffset;
+    return new THREE.Vector3(
+      offset[0] ?? 0,
+      offset[1] ?? 0,
+      offset[2] ?? 0
+    );
   }
 
   protected _onClick = () => {

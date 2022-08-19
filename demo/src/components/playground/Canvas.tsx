@@ -104,6 +104,7 @@ class RenderSection extends React.Component<{}, {
                   view3D.autoResize = true;
                   view3D.rootEl.style.cssText = "";
                 }
+                view3D.renderer.renderSingleFrame();
 
                 this.setState({
                   overrideSize: e.currentTarget.checked
@@ -205,7 +206,6 @@ class RenderSection extends React.Component<{}, {
 
       const intersect = intersects[0];
       const size = view3D.renderer.size;
-      const aspect = Math.max(size.height / size.width, 1);
 
       const meshIndex = model.meshes.findIndex(mesh => mesh === intersects[0].object);
       const faceIndex = intersect.faceIndex!;
@@ -214,13 +214,14 @@ class RenderSection extends React.Component<{}, {
       if (!animatedVertices) return;
 
       const weights = this._getBarycentricWeight(intersect.point, animatedVertices);
+      const focusOffset = new THREE.Vector3().subVectors(view3D.camera.pivot, intersect.point);
 
       const newAnnotation = new FaceAnnotation(view3D, {
         element: el,
         baseFov: view3D.camera.baseFov,
         baseDistance: view3D.camera.baseDistance,
-        aspect,
         focus: [currentPose.yaw, currentPose.pitch, currentPose.zoom],
+        focusOffset: focusOffset.toArray(),
         meshIndex,
         faceIndex,
         weights
