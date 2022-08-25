@@ -1,0 +1,39 @@
+---
+sidebar_position: 5
+---
+
+import View3D from "@site/src/components/View3D";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
+
+<OptionDescriptor type="boolean" defaultVal="true" />
+
+Whether to automatically unfocus annotation on user input.
+`annotation.unfocus` must be called manually when `false` is used.
+
+<div className="columns">
+  <div className="column">
+    <View3D
+      src="/egjs-view3d/model/draco/alarm.glb"
+      annotationURL="/egjs-view3d/model/annotation/alarm-annotations.json"
+      annotationAutoUnfocus
+      showExampleCode />
+  </div>
+  <div className="column">
+    <View3D
+      src="/egjs-view3d/model/draco/alarm.glb"
+      annotationURL="/egjs-view3d/model/annotation/alarm-annotations.json"
+      annotationAutoUnfocus={false}
+      showExampleCode />
+  </div>
+</div>
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  }
+]} />
