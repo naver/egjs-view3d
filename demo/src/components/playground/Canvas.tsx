@@ -205,7 +205,6 @@ class RenderSection extends React.Component<{}, {
       view3D.annotation.wrapper.appendChild(el);
 
       const intersect = intersects[0];
-      const size = view3D.renderer.size;
 
       const meshIndex = model.meshes.findIndex(mesh => mesh === intersects[0].object);
       const faceIndex = intersect.faceIndex!;

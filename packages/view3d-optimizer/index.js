@@ -66,10 +66,6 @@ const run = async (cmd, taskDesc) => {
 const main = async () => {
   await exec(`npx gltfpack -i ${options.input} -o ${tmpFile}`);
 
-  if (options.draco) {
-    await run(`npx gltf-pipeline -i ${tmpFile} -o ${tmpFile} -d -s --keepUnusedElements`, "Applying Draco compression");
-  }
-
   if (options.maxTextureSize) {
     const maxSize = parseFloat(options.maxTextureSize);
     if (isNaN(maxSize)) {
