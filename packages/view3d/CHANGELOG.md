@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.8.0](https://github.com/naver/egjs-view3d/compare/@egjs/view3d@2.7.1...@egjs/view3d@2.8.0) (2022-09-01)
+
+
+### :rocket: New Features
+
+* add annotation focus offset ([b847096](https://github.com/naver/egjs-view3d/commit/b84709646d1065b31a2e8f013606e4db1777254d))
+* add annotationAutoUnfocus ([cfdc58a](https://github.com/naver/egjs-view3d/commit/cfdc58a3a9ce5d34c11c7e1c29a0401e2638c37d))
+
+
+### :bug: Bug Fix
+
+* remove draco duplication ([d94afea](https://github.com/naver/egjs-view3d/commit/d94afea2b7449321267604bd4b15abf886b08631))
+
+
+### :mega: Other
+
+* update packages versions ([c832878](https://github.com/naver/egjs-view3d/commit/c8328786f05cf357a07893c489cd4ecf020f6031))
+
+
+
 ## [2.7.1](https://github.com/naver/egjs-view3d/compare/@egjs/view3d@2.7.0...@egjs/view3d@2.7.1) (2022-08-12)
 
 
