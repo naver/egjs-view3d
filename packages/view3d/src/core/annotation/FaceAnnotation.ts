@@ -77,7 +77,7 @@ class FaceAnnotation extends Annotation {
   public unfocus(): void {
     if (!this._focusing) return;
 
-    this._destroyTrackingControl();
+    this.destroyTrackingControl();
     this._onUnfocus();
   }
 
@@ -105,7 +105,7 @@ class FaceAnnotation extends Annotation {
     if (view3D.annotationAutoUnfocus) {
       this.unfocus();
     } else {
-      this._destroyTrackingControl();
+      this.destroyTrackingControl();
     }
   }
 
@@ -119,17 +119,17 @@ class FaceAnnotation extends Annotation {
     };
   }
 
-  private _destroyTrackingControl() {
+  public destroyTrackingControl() {
     const { control } = this._view3D;
     const trackingControl = this._trackingControl;
 
-    if (trackingControl) {
-      control.sync();
-      control.remove(trackingControl);
+    if (!trackingControl) return;
 
-      trackingControl.destroy();
-      this._trackingControl = null;
-    }
+    control.sync();
+    control.remove(trackingControl);
+
+    trackingControl.destroy();
+    this._trackingControl = null;
   }
 
   private _getPosition(): THREE.Vector3 {
