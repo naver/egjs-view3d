@@ -357,3 +357,65 @@ export const getAnimatedFace = (model: Model | null, meshIndex: number, faceInde
 
   return vertices;
 };
+
+export const subclip = (sourceClip: THREE.AnimationClip, name: string, startTime: number, endTime: number) => {
+  const clip = sourceClip.clone();
+	clip.name = name;
+
+	const tracks: THREE.KeyframeTrack[] = [];
+  clip.tracks.forEach(track => {
+    const valueSize = track.getValueSize();
+
+    const times: number[] = [];
+    const values: number[] = [];
+
+    for (let timeIdx = 0; timeIdx < track.times.length; ++timeIdx) {
+      const time = track.times[timeIdx];
+      const nextTime = track.times[timeIdx + 1];
+      const prevTime = track.times[timeIdx - 1];
+
+      const isPrevFrame = nextTime && time < startTime && nextTime > startTime;
+      const isMiddleFrame = time >= startTime && time < endTime;
+      const isNextFrame = prevTime && time >= endTime && prevTime < endTime;
+
+      if (!isPrevFrame && !isMiddleFrame && !isNextFrame) continue;
+
+      times.push(time);
+
+      for (let k = 0; k < valueSize; ++k) {
+        values.push(track.values[timeIdx * valueSize + k]);
+      }
+    }
+
+    if (times.length === 0) return;
+
+    track.times = convertArray(times, track.times.constructor);
+    track.values = convertArray(values, track.values.constructor);
+
+    tracks.push(track);
+  });
+
+	clip.tracks = tracks;
+
+	for (let i = 0; i < clip.tracks.length; ++i) {
+		clip.tracks[i].shift(-startTime);
+	}
+  clip.duration = endTime - startTime;
+
+	return clip;
+};
+
+// From three.js AnimationUtils
+// https://github.com/mrdoob/three.js/blob/68daccedef9c9c325cc5f4c929fcaf05229aa1b3/src/animation/AnimationUtils.js#L20
+// The MIT License
+// Copyright © 2010-2022 three.js authors
+const convertArray = (array, type, forceClone = false) => {
+  if (!array || // let 'undefined' and 'null' pass
+    !forceClone && array.constructor === type ) return array;
+
+  if (typeof type.BYTES_PER_ELEMENT === 'number') {
+    return new type( array ); // create typed array
+  }
+
+  return Array.prototype.slice.call(array); // create Array
+};
