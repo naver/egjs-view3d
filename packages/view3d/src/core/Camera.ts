@@ -290,7 +290,9 @@ class Camera {
       this._maxTanHalfHFov = fov;
     }
 
-    defaultPose.pivot = modelCenter.clone();
+    defaultPose.pivot = view3D.pivot === AUTO
+      ? modelCenter.clone()
+      : new THREE.Vector3().fromArray(view3D.pivot);
     this._baseDistance = effectiveCamDist;
 
     camera.near = (effectiveCamDist - maxDistToCenter) * 0.1;

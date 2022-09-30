@@ -81,6 +81,7 @@ export interface View3DOptions {
   center: typeof AUTO | number[];
   yaw: number;
   pitch: number;
+  pivot: typeof AUTO | number[];
   initialZoom: number | {
     axis: "x" | "y" | "z";
     ratio: number;
@@ -174,6 +175,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _center: View3DOptions["center"];
   private _yaw: View3DOptions["yaw"];
   private _pitch: View3DOptions["pitch"];
+  private _pivot: View3DOptions["pivot"];
   private _initialZoom: View3DOptions["initialZoom"];
   private _rotate: View3DOptions["rotate"];
   private _translate: View3DOptions["translate"];
@@ -342,15 +344,17 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get fov() { return this._fov; }
   /**
-   * Center of the camera rotation.
-   * If `"auto"` is given, it will use the center of the model's bounding box as the pivot.
-   * Else, you can use any world position as the pivot.
+   * Center of the camera distance calculation.
+   * If `"auto"` is given, it will use the center of the model's bounding box.
+   * Else, you can use any world position.
+   * Model's bounding box and center position will be shown on screen in every rotation angle.
    * @type {"auto" | number[]}
    * @default "auto"
    */
   public get center() { return this._center; }
   /**
    * Initial Y-axis rotation of the camera, in degrees.
+   * Use {@link Camera#yaw view3D.camera.yaw} instead if you want current yaw value.
    * @type {number}
    * @default 0
    */
@@ -358,10 +362,20 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   /**
    * Initial X-axis rotation of the camera, in degrees.
    * Should be a value from -90 to 90.
+   * Use {@link Camera#pitch view3D.camera.pitch} instead if you want current pitch value.
    * @type {number}
    * @default 0
    */
   public get pitch() { return this._pitch; }
+  /**
+   * Initial focal point of the camera. Also will be referenced while {@link Camera#fit camera.fit} is called.
+   * If `"auto"` is given, it will use {@link View3D#center center} as pivot.
+   * Else, you can use any world position.
+   * Use {@link Camera#pivot view3D.camera.pivot} instead if you want current pitch value.
+   * @type {"auto" | number[]}
+   * @default "auto"
+   */
+  public get pivot() { return this._pivot; }
   /**
    * Initial zoom value.
    * If `number` is given, positive value will make camera zoomed in and negative value will make camera zoomed out.
@@ -687,6 +701,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     center = AUTO,
     yaw = 0,
     pitch = 0,
+    pivot = AUTO,
     initialZoom = 0,
     rotate = true,
     translate = true,
@@ -740,6 +755,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._center = center;
     this._yaw = yaw;
     this._pitch = pitch;
+    this._pivot = pivot;
     this._initialZoom = initialZoom;
     this._rotate = rotate;
     this._translate = translate;
