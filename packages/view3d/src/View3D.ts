@@ -348,7 +348,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    * If `"auto"` is given, it will use the center of the model's bounding box.
    * Else, you can use a number array as any world position.
    * Or, you can use a string array as a relative position to bounding box min/max. ex) ["0%", "100%", "50%"]
-   * Model's bounding box and center position will be shown on screen in every rotation angle.
+   * The difference to {@link View3D#pivot pivot} is model's bounding box and center position will be shown on screen at every rotation angle.
    * @type {"auto" | Array<number | string>}
    * @default "auto"
    */
