@@ -6,7 +6,7 @@ import View3D from "@site/src/components/View3D";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
 import License from "@site/src/components/License";
 
-<OptionDescriptor type={`"auto" | number[]`} defaultVal={`"auto"`} />
+<OptionDescriptor type={`"auto" | Array<number | string>`} defaultVal={`"auto"`} />
 
 Initial focal point of the camera. Also will be referenced while [camera.fit](/docs/api/Camera#fit) is called.
 If `"auto"` is given, it will use [center](/docs/options/control/center) as pivot.
@@ -24,6 +24,12 @@ Use [view3D.camera.pivot](/docs/api/Camera#pivot) instead if you want current pi
 <View3D
   src="/egjs-view3d/model/draco/alarm.glb"
   pivot={[0.03, 0, 0]}
+  showExampleCode />
+
+### pivot: ["0%", "50%", "100%"]
+<View3D
+  src="/egjs-view3d/model/draco/alarm.glb"
+  pivot={["0%", "50%", "100%"]}
   showExampleCode />
 
 <License items={[
