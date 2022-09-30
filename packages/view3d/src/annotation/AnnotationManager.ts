@@ -4,11 +4,11 @@
  */
 import * as THREE from "three";
 
-import View3D from "../../View3D";
-import { DEFAULT_CLASS } from "../../const/external";
-import { CONTROL_EVENTS } from "../../const/internal";
-import * as BROWSER from "../../const/browser";
-import { getNullableElement, toDegree } from "../../utils";
+import View3D from "../View3D";
+import { DEFAULT_CLASS } from "../const/external";
+import { CONTROL_EVENTS } from "../const/internal";
+import * as BROWSER from "../const/browser";
+import { getNullableElement, toDegree } from "../utils";
 
 import Annotation from "./Annotation";
 import PointAnnotation from "./PointAnnotation";

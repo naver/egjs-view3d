@@ -40,4 +40,4 @@ export type {
   ShadowOptions
 };
 
-export * from "./annotation";
+export * from "../annotation";

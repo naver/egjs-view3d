@@ -5,9 +5,10 @@
 
 import * as THREE from "three";
 
-import { getAttributeScale, getSkinnedVertex } from "../utils";
+import { getAttributeScale, getSkinnedVertex, parseAsBboxRatio } from "../utils";
 
-import { Annotation } from "./annotation";
+import { Annotation } from "../annotation";
+import { AUTO } from "../const/external";
 
 /**
  * Data class for loaded 3d model
@@ -16,6 +17,7 @@ class Model {
   private _src: string;
   private _scene: THREE.Group;
   private _bbox: THREE.Box3;
+  private _center: THREE.Vector3;
   private _animations: THREE.AnimationClip[];
   private _annotations: Annotation[];
   private _fixSkinnedBbox: boolean;
@@ -53,6 +55,13 @@ class Model {
    * @see https://threejs.org/docs/#api/en/math/Box3
    */
   public get bbox() { return this._bbox; }
+  /**
+   * Center of the model
+   * @type THREE#Vector3
+   * @readonly
+   * @see https://threejs.org/docs/#api/en/math/Vector3
+   */
+  public get center() { return this._center; }
 
   /**
    * Whether the model's meshes gets rendered into shadow map
@@ -86,6 +95,7 @@ class Model {
   public constructor({
     src,
     scenes,
+    center = AUTO,
     animations = [],
     annotations = [],
     fixSkinnedBbox = false,
@@ -94,6 +104,7 @@ class Model {
   }: {
     src: string;
     scenes: THREE.Object3D[];
+    center?: typeof AUTO | Array<number | string>;
     animations?: THREE.AnimationClip[];
     annotations?: Annotation[];
     fixSkinnedBbox?: boolean;
@@ -118,6 +129,9 @@ class Model {
 
     this._fixSkinnedBbox = fixSkinnedBbox;
     this._bbox = bbox;
+    this._center = center === AUTO
+      ? bbox.getCenter(new THREE.Vector3())
+      : parseAsBboxRatio(center, bbox)
     this.castShadow = castShadow;
     this.receiveShadow = receiveShadow;
   }

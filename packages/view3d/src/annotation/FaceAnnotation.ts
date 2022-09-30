@@ -4,10 +4,10 @@
  */
 import * as THREE from "three";
 
-import View3D from "../../View3D";
-import Pose from "../Pose";
-import AnimationControl from "../../control/AnimationControl";
-import { getAnimatedFace, range } from "../../utils";
+import View3D from "../View3D";
+import Pose from "../core/Pose";
+import AnimationControl from "../control/AnimationControl";
+import { getAnimatedFace, range } from "../utils";
 
 import Annotation, { AnnotationOptions } from "./Annotation";
 

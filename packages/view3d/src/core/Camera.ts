@@ -7,7 +7,7 @@ import * as THREE from "three";
 
 import View3D from "../View3D";
 import AnimationControl from "../control/AnimationControl";
-import { toRadian, clamp, circulate, toDegree, getRotatedPosition, isNumber, isString } from "../utils";
+import { toRadian, clamp, circulate, toDegree, getRotatedPosition, isNumber, isString, parseAsBboxRatio } from "../utils";
 import * as DEFAULT from "../const/default";
 import { AUTO, EVENTS, ZOOM_TYPE } from "../const/external";
 
@@ -252,7 +252,7 @@ class Camera {
   /**
    * Fit camera frame to the given model
    */
-  public fit(model: Model, center: View3D["center"]): void {
+  public fit(model: Model): void {
     const view3D = this._view3D;
     const camera = this._threeCamera;
     const defaultPose = this._defaultPose;
@@ -263,11 +263,8 @@ class Camera {
     const fov = view3D.fov;
     const hfov = fov === AUTO ? DEFAULT.FOV : fov;
 
-    const modelCenter = Array.isArray(center)
-      ? new THREE.Vector3().fromArray(this._parseBboxRatioOption(center, bbox))
-      : bbox.getCenter(new THREE.Vector3());
-
-    const maxDistToCenterSquared = center === AUTO
+    const modelCenter = model.center;
+    const maxDistToCenterSquared = view3D.ignoreCenterOnFit || view3D.center === AUTO
       ? new THREE.Vector3().subVectors(bbox.max, bbox.min).lengthSq() / 4
       : model.reduceVertices((dist, vertice) => {
         return Math.max(dist, vertice.distanceToSquared(modelCenter));
@@ -293,7 +290,7 @@ class Camera {
 
     defaultPose.pivot = pivot === AUTO
       ? modelCenter.clone()
-      : new THREE.Vector3().fromArray(this._parseBboxRatioOption(pivot, bbox));
+      : parseAsBboxRatio(pivot, bbox);
     this._baseDistance = effectiveCamDist;
 
     camera.near = (effectiveCamDist - maxDistToCenter) * 0.1;
