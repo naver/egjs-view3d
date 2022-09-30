@@ -8,9 +8,10 @@ import License from "@site/src/components/License";
 
 <OptionDescriptor type={`"auto" | Array<number | string>`} defaultVal={`"auto"`} />
 
-Center of the camera distance calculation.
+Specifies the center of the model.
 If `"auto"` is given, it will use the center of the model's bounding box.
 Else, you can use any world position.
+Or, you can use a string array as a relative position to bounding box min/max. `ex) ["0%", "100%", "50%"]`
 The difference to [pivot](/docs/options/control/pivot) is model's bounding box and center position will be shown on screen at every rotation angle.
 
 ## Example

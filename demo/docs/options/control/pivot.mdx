@@ -8,8 +8,8 @@ import License from "@site/src/components/License";
 
 <OptionDescriptor type={`"auto" | Array<number | string>`} defaultVal={`"auto"`} />
 
-Initial focal point of the camera. Also will be referenced while [camera.fit](/docs/api/Camera#fit) is called.
-If `"auto"` is given, it will use [center](/docs/options/control/center) as pivot.
+Initial origin point of rotation of the camera.
+If `"auto"` is given, it will use [model's center](/docs/options/control/center) as pivot.
 Else, you can use any world position.
 Use [view3D.camera.pivot](/docs/api/Camera#pivot) instead if you want current pivot value.
 

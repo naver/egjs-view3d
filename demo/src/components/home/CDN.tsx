@@ -8,7 +8,7 @@ import CodeBlock from "@theme/CodeBlock";
 export default () => <section className="py-4">
   <div className="title mb-6">CDN Links</div>
   <div className="columns">
-    <div className="column">
+    <div className="column is-6">
       <div className="subtitle">JS</div>
       <Tabs
         groupId="cdn"
@@ -26,7 +26,7 @@ export default () => <section className="py-4">
         </TabItem>
       </Tabs>
     </div>
-    <div className="column">
+    <div className="column is-6">
       <div className="subtitle">CSS</div>
       <Tabs
         groupId="cdn"

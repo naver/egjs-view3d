@@ -20,7 +20,7 @@ export default () => {
       <div className="column has-text-weight-bold has-text-centered">maintainSize: true</div>
     </div>
     <div className="columns">
-      <div className="column">
+      <div className="column is-6">
         <View3D
           ref={ref}
           src="/egjs-view3d/model/draco/alarm.glb"
@@ -28,7 +28,7 @@ export default () => {
           maintainSize={false}
           showExampleCode />
       </div>
-      <div className="column">
+      <div className="column is-6">
         <View3D
           ref={ref2}
           src="/egjs-view3d/model/draco/alarm.glb"
