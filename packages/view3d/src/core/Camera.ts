@@ -7,7 +7,7 @@ import * as THREE from "three";
 
 import View3D from "../View3D";
 import AnimationControl from "../control/AnimationControl";
-import { toRadian, clamp, circulate, toDegree, getRotatedPosition, isNumber } from "../utils";
+import { toRadian, clamp, circulate, toDegree, getRotatedPosition, isNumber, isString } from "../utils";
 import * as DEFAULT from "../const/default";
 import { AUTO, EVENTS, ZOOM_TYPE } from "../const/external";
 
@@ -252,18 +252,19 @@ class Camera {
   /**
    * Fit camera frame to the given model
    */
-  public fit(model: Model, center: "auto" | number[]): void {
+  public fit(model: Model, center: View3D["center"]): void {
     const view3D = this._view3D;
     const camera = this._threeCamera;
-    const control = view3D.control;
     const defaultPose = this._defaultPose;
+    const control = view3D.control;
+    const pivot = view3D.pivot;
     const bbox = model.bbox;
 
     const fov = view3D.fov;
     const hfov = fov === AUTO ? DEFAULT.FOV : fov;
 
     const modelCenter = Array.isArray(center)
-      ? new THREE.Vector3().fromArray(center)
+      ? new THREE.Vector3().fromArray(this._parseBboxRatioOption(center, bbox))
       : bbox.getCenter(new THREE.Vector3());
 
     const maxDistToCenterSquared = center === AUTO
@@ -290,9 +291,9 @@ class Camera {
       this._maxTanHalfHFov = fov;
     }
 
-    defaultPose.pivot = view3D.pivot === AUTO
+    defaultPose.pivot = pivot === AUTO
       ? modelCenter.clone()
-      : new THREE.Vector3().fromArray(view3D.pivot);
+      : new THREE.Vector3().fromArray(this._parseBboxRatioOption(pivot, bbox));
     this._baseDistance = effectiveCamDist;
 
     camera.near = (effectiveCamDist - maxDistToCenter) * 0.1;
@@ -374,6 +375,19 @@ class Camera {
     const tanHalfVFov = tanHalfHFov * Math.max(1, (this._maxTanHalfHFov / tanHalfHFov) / camera.aspect);
 
     this._baseFov = toDegree(2 * Math.atan(tanHalfVFov));
+  }
+
+  private _parseBboxRatioOption(arr: Array<number | string>, bbox: THREE.Box3) {
+    const min = bbox.min.toArray();
+    const size = new THREE.Vector3().subVectors(bbox.max, bbox.min).toArray();
+
+    return arr.map((val, idx) => {
+      if (!isString(val)) return val;
+
+      const ratio = parseFloat(val) * 0.01;
+
+      return min[idx] + ratio * size[idx];
+    });
   }
 }
 

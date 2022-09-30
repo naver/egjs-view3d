@@ -78,10 +78,10 @@ export interface View3DOptions {
 
   // Control
   fov: typeof AUTO | number;
-  center: typeof AUTO | number[];
+  center: typeof AUTO | Array<number | string>;
   yaw: number;
   pitch: number;
-  pivot: typeof AUTO | number[];
+  pivot: typeof AUTO | Array<number | string>;
   initialZoom: number | {
     axis: "x" | "y" | "z";
     ratio: number;
@@ -346,9 +346,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   /**
    * Center of the camera distance calculation.
    * If `"auto"` is given, it will use the center of the model's bounding box.
-   * Else, you can use any world position.
+   * Else, you can use a number array as any world position.
+   * Or, you can use a string array as a relative position to bounding box min/max. ex) ["0%", "100%", "50%"]
    * Model's bounding box and center position will be shown on screen in every rotation angle.
-   * @type {"auto" | number[]}
+   * @type {"auto" | Array<number | string>}
    * @default "auto"
    */
   public get center() { return this._center; }
@@ -370,9 +371,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   /**
    * Initial focal point of the camera. Also will be referenced while {@link Camera#fit camera.fit} is called.
    * If `"auto"` is given, it will use {@link View3D#center center} as pivot.
-   * Else, you can use any world position.
+   * Else, you can use a number array as any world position.
+   * Or, you can use a string array as a relative position to bounding box min/max. ex) ["0%", "100%", "50%"]
    * Use {@link Camera#pivot view3D.camera.pivot} instead if you want current pivot value.
-   * @type {"auto" | number[]}
+   * @type {"auto" | Array<number | string>}
    * @default "auto"
    */
   public get pivot() { return this._pivot; }
