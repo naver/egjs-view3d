@@ -11,7 +11,7 @@ import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader";
 import View3D from "../View3D";
 import Model from "../core/Model";
 import Annotation from "../annotation/Annotation";
-import { ANNOTATION_EXTRA, CUSTOM_TEXTURE_LOD_EXTENSION, STANDARD_MAPS, TEXTURE_LOD_EXTRA } from "../const/internal";
+import { ANNOTATION_EXTRA, CUSTOM_TEXTURE_LOD_EXTENSION, STANDARD_MAPS, TEXTURE_LOD_EXTRA, VARIANT_EXTENSION } from "../const/internal";
 import { createLoadingContext } from "../utils";
 
 import Loader from "./Loader";
@@ -84,8 +84,8 @@ class GLTFLoader extends Loader {
 
     return new Promise((resolve, reject) => {
       try {
-        loader.load(url, gltf => {
-          const model = this._parseToModel(gltf, url);
+        loader.load(url, async gltf => {
+          const model = await this._parseToModel(gltf, url);
           resolve(model);
         }, evt => this._onLoadingProgress(evt, url, loadingContext), err => {
           loadingContext.initialized = true;
@@ -161,8 +161,8 @@ class GLTFLoader extends Loader {
       const loadingContext = createLoadingContext(view3D, gltfURL);
 
       loader.manager = manager;
-      loader.load(gltfURL, gltf => {
-        const model = this._parseToModel(gltf, gltfFile.name);
+      loader.load(gltfURL, async gltf => {
+        const model = await this._parseToModel(gltf, gltfFile.name);
         revokeURLs();
         resolve(model);
       }, evt => this._onLoadingProgress(evt, gltfURL, loadingContext), err => {
@@ -173,7 +173,7 @@ class GLTFLoader extends Loader {
     });
   }
 
-  private _parseToModel(gltf: GLTF, src: string): Model {
+  private async _parseToModel(gltf: GLTF, src: string): Promise<Model> {
     const view3D = this._view3D;
     const fixSkinnedBbox = view3D.fixSkinnedBbox;
 
@@ -267,14 +267,25 @@ class GLTFLoader extends Loader {
       annotations.push(...view3D.annotation.parse(data));
     }
 
+    const userData = gltf.userData ?? {};
+    const extensions = userData.gltfExtensions ?? {};
+    const variants = extensions[VARIANT_EXTENSION] ? extensions[VARIANT_EXTENSION].variants : [];
+
     const model = new Model({
       src,
       scenes: gltf.scenes,
       center: view3D.center,
       annotations,
+      parser: gltf.parser,
       animations: gltf.animations,
+      annotations,
+      variants,
       fixSkinnedBbox
     });
+
+    if (view3D.variant) {
+      await model.selectVariant(view3D.variant);
+    }
 
     return model;
   }
