@@ -1,12 +1,17 @@
+---
+sidebar_position: 2
+---
+
 import View3D from "@site/src/components/View3D";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
 import License from "@site/src/components/License";
 
 <OptionDescriptor type={`"auto" | number[]`} defaultVal={`"auto"`} />
 
-Center of the camera rotation.
-If `"auto"` is given, it will use the center of the model's bounding box as the pivot.
-Else, you can use any world position as the pivot.
+Center of the camera distance calculation.
+If `"auto"` is given, it will use the center of the model's bounding box.
+Else, you can use any world position.
+Model's bounding box and center position will be shown on screen in every rotation angle.
 
 ## Example
 ### center: "auto" (default)

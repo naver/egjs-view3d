@@ -1,27 +1,29 @@
 ---
-sidebar_position: 11
+sidebar_position: 5
 ---
 
 import View3D from "@site/src/components/View3D";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
 import License from "@site/src/components/License";
 
-<OptionDescriptor type="boolean" defaultVal="true" />
+<OptionDescriptor type={`"auto" | number[]`} defaultVal={`"auto"`} />
 
-Enable browser scrolling with touch on the canvas area.
-This will block the rotate(pitch) control if the user is currently scrolling.
+Initial focal point of the camera. Also will be referenced while [camera.fit](/docs/api/Camera#fit) is called.
+If `"auto"` is given, it will use [center](/docs/options/control/center) as pivot.
+Else, you can use any world position.
+Use [view3D.camera.pivot](/docs/api/Camera#pivot) instead if you want current pivot value.
 
 ## Example
-### scrollable: true (default)
+### pivot: "auto" (default)
 <View3D
   src="/egjs-view3d/model/draco/alarm.glb"
-  scrollable={true}
+  pivot="auto"
   showExampleCode />
 
-### scrollable: false
+### pivot: [0.03, 0, 0]
 <View3D
   src="/egjs-view3d/model/draco/alarm.glb"
-  scrollable={false}
+  pivot={[0.03, 0, 0]}
   showExampleCode />
 
 <License items={[

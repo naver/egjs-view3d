@@ -371,7 +371,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    * Initial focal point of the camera. Also will be referenced while {@link Camera#fit camera.fit} is called.
    * If `"auto"` is given, it will use {@link View3D#center center} as pivot.
    * Else, you can use any world position.
-   * Use {@link Camera#pivot view3D.camera.pivot} instead if you want current pitch value.
+   * Use {@link Camera#pivot view3D.camera.pivot} instead if you want current pivot value.
    * @type {"auto" | number[]}
    * @default "auto"
    */
