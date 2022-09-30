@@ -1,0 +1,61 @@
+---
+sidebar_position: 3
+---
+
+import View3D from "@site/src/components/View3D";
+import Variant from "@site/src/components/demo/Variant";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
+
+<OptionDescriptor type="string | number | null" defaultVal="null" />
+
+Set material variant of the model, which only can be used when using [glTF materials variants extension](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_variants/README.md)
+Either can be index of the variant(number), or the name of the variant(string)
+
+## Example
+<div className="columns">
+  <div className="column is-6">
+    <View3D
+      src="/egjs-view3d/model/MaterialsVariantsShoe.glb"
+      variant={null}
+      showExampleCode />
+  </div>
+  <div className="column is-6">
+    <View3D
+      src="/egjs-view3d/model/MaterialsVariantsShoe.glb"
+      variant={1}
+      showExampleCode />
+  </div>
+</div>
+<div className="columns">
+  <div className="column is-6">
+    <View3D
+      src="/egjs-view3d/model/MaterialsVariantsShoe.glb"
+      variant="street"
+      showExampleCode />
+  </div>
+  <div className="column is-6"></div>
+</div>
+
+## Changing Variant
+You can easily change variant by changing the option value.
+
+<Variant />
+
+```js
+// You can use index of the variant
+view3D.variant = 1;
+
+// Or the name of the variant
+view3D.variant = "beach";
+```
+
+<License items={[
+  {
+    name: "MaterialsVariantsShoe",
+    link: "https://github.com/pushmatrix/glTF-Sample-Models/tree/master/2.0/MaterialsVariantsShoe",
+    author: "Shopify",
+    authorLink: "https://github.com/Shopify",
+    license: "Creative Commons Attribution"
+  }
+]} />
