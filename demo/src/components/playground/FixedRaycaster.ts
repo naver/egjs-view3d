@@ -68,24 +68,8 @@ class FixedRaycaster {
 
     if ( material === undefined ) return;
 
-    // Checking boundingSphere distance to ray
-
-    if (geometry.boundingSphere === null) geometry.computeBoundingSphere();
-
-    _sphere.copy(geometry.boundingSphere!);
-    _sphere.applyMatrix4(matrixWorld);
-
-    if (raycaster.ray.intersectsSphere( _sphere ) === false) return;
-
-    //
     _inverseMatrix.copy(matrixWorld).invert();
-
     _ray.copy(raycaster.ray).applyMatrix4(_inverseMatrix);
-
-    // Check boundingBox before continuing
-    if (geometry.boundingBox !== null) {
-      if (_ray.intersectsBox(geometry.boundingBox) === false) return;
-    }
 
     let intersection;
 
