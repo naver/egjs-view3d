@@ -208,7 +208,7 @@ class AnnotationManager {
     const halfScreenSize = screenSize.clone().multiplyScalar(0.5);
     const threeCamera = camera.threeCamera;
     const camPos = threeCamera.position;
-    const modelCenter = model.bbox.getCenter(new THREE.Vector3());
+    const modelCenter = model.center;
     const breakpoints = view3D.annotationBreakpoints;
 
     // Sort by distance most far to camera (descending)
