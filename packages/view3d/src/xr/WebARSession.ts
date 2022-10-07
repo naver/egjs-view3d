@@ -210,6 +210,7 @@ class WebARSession implements ARSession {
     session.addEventListener("end", onSessionEnd, { once: true });
 
     // Set XR session render loop
+    const screenSize = new THREE.Vector2(window.outerWidth, window.outerHeight);
     const arClock = new THREE.Clock();
     arClock.start();
 
@@ -229,6 +230,7 @@ class WebARSession implements ARSession {
         width: glLayer?.framebufferWidth ?? 1,
         height: glLayer?.framebufferHeight ?? 1
       };
+
       const ctx: XRRenderContext = {
         view3D,
         scene: arScene,
@@ -252,10 +254,11 @@ class WebARSession implements ARSession {
       if (!this._modelPlaced) {
         this._initModelPosition(ctx);
       } else {
-        control.update(ctx);
         view3D.animator.update(delta);
+        control.update(ctx);
         scene.shadowPlane.render();
         threeRenderer.render(arScene.root, xrCam);
+        view3D.annotation.render(xrCam, screenSize);
       }
 
       view3D.trigger(EVENTS.RENDER, {

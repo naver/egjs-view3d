@@ -197,16 +197,15 @@ class AnnotationManager {
   /**
    * Render annotations
    */
-  public render() {
+  public render(camera?: THREE.PerspectiveCamera, size?: THREE.Vector2) {
     const view3D = this._view3D;
     const model = view3D.model;
 
     if (!model) return;
 
-    const camera = view3D.camera;
-    const screenSize = view3D.renderer.canvasSize;
+    const screenSize = size ?? view3D.renderer.canvasSize;
     const halfScreenSize = screenSize.clone().multiplyScalar(0.5);
-    const threeCamera = camera.threeCamera;
+    const threeCamera = camera ?? view3D.camera.threeCamera;
     const camPos = threeCamera.position;
     const modelCenter = model.center;
     const breakpoints = view3D.annotationBreakpoints;
