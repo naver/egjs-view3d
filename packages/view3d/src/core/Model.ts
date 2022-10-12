@@ -4,8 +4,10 @@
  */
 
 import * as THREE from "three";
+import { GLTFParser } from "three/examples/jsm/loaders/GLTFLoader";
 
-import { getAttributeScale, getSkinnedVertex, parseAsBboxRatio } from "../utils";
+import { getAttributeScale, getSkinnedVertex, parseAsBboxRatio, isString } from "../utils";
+import { VARIANT_EXTENSION } from "../const/internal";
 
 import { Annotation } from "../annotation";
 import { AUTO } from "../const/external";
@@ -16,10 +18,12 @@ import { AUTO } from "../const/external";
 class Model {
   private _src: string;
   private _scene: THREE.Group;
+  private _parser: GLTFParser | null;
   private _bbox: THREE.Box3;
   private _center: THREE.Vector3;
   private _animations: THREE.AnimationClip[];
   private _annotations: Annotation[];
+  private _variants: Array<{ name: string }>;
   private _fixSkinnedBbox: boolean;
 
   /**
@@ -96,8 +100,10 @@ class Model {
     src,
     scenes,
     center = AUTO,
+    parser = null,
     animations = [],
     annotations = [],
+    variants = [],
     fixSkinnedBbox = false,
     castShadow = true,
     receiveShadow = false
@@ -105,8 +111,10 @@ class Model {
     src: string;
     scenes: THREE.Object3D[];
     center?: typeof AUTO | Array<number | string>;
+    parser?: GLTFParser | null,
     animations?: THREE.AnimationClip[];
     annotations?: Annotation[];
+    variants?: Array<{ name: string }>;
     fixSkinnedBbox?: boolean;
     castShadow?: boolean;
     receiveShadow?: boolean;
@@ -116,9 +124,11 @@ class Model {
     const scene = new THREE.Group();
     scene.add(...scenes);
 
+    this._scene = scene;
+    this._parser = parser;
     this._animations = animations;
     this._annotations = annotations;
-    this._scene = scene;
+    this._variants = variants;
     const bbox = this._getInitialBbox(fixSkinnedBbox);
 
     // Move to position where bbox.min.y = 0
@@ -134,6 +144,52 @@ class Model {
       : parseAsBboxRatio(center, bbox)
     this.castShadow = castShadow;
     this.receiveShadow = receiveShadow;
+  }
+
+  public async selectVariant(variant: number | string | null) {
+    const variants = this._variants;
+    const parser = this._parser;
+
+    if (variants.length <= 0 || !parser) return;
+
+    let variantIndex = 0;
+    if (variant != null) {
+      if (isString(variant)) {
+        variantIndex = variants.findIndex(({ name }) => name === variant);
+      } else {
+        variantIndex = variant
+      }
+    }
+
+    const scene = this._scene;
+    const matLoadPromises: Promise<any>[] = [];
+
+    scene.traverse(async (obj: THREE.Mesh) => {
+      if (!obj.isMesh || !obj.userData.gltfExtensions) return;
+
+      const meshVariantDef = obj.userData.gltfExtensions[VARIANT_EXTENSION];
+
+      if (!meshVariantDef) return;
+
+      if (!obj.userData.originalMaterial) {
+        obj.userData.originalMaterial = obj.material;
+      }
+
+      const mapping = meshVariantDef.mappings
+        .find(mapping => mapping.variants.includes(variantIndex));
+
+      if (mapping) {
+        const loadMat = parser.getDependency("material", mapping.material);
+        matLoadPromises.push(loadMat);
+
+        obj.material = await loadMat;
+        parser.assignFinalMaterial(obj);
+      } else {
+        obj.material = obj.userData.originalMaterial;
+      }
+    });
+
+    return Promise.all(matLoadPromises);
   }
 
   /**

@@ -44,6 +44,8 @@ export enum GESTURE {
   PINCH = 16,
 }
 
+export const VARIANT_EXTENSION = "KHR_materials_variants";
+
 export const CUSTOM_TEXTURE_LOD_EXTENSION = "EXT_View3D_texture_LOD";
 export const TEXTURE_LOD_EXTRA = "view3d-lod";
 export const ANNOTATION_EXTRA = "view3d-annotation";

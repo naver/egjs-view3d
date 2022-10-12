@@ -71,6 +71,7 @@ export interface View3DOptions {
   // Model
   src: string | string[] | null;
   iosSrc: string | null;
+  variant: number | string | null;
   dracoPath: string;
   ktxPath: string;
   meshoptPath: string | null;
@@ -167,6 +168,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   // Options
   private _src: View3DOptions["src"];
   private _iosSrc: View3DOptions["iosSrc"];
+  private _variant: View3DOptions["variant"];
   private _dracoPath: View3DOptions["dracoPath"];
   private _ktxPath: View3DOptions["ktxPath"];
   private _meshoptPath: View3DOptions["meshoptPath"];
@@ -313,6 +315,14 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    * @default null
    */
   public get iosSrc() { return this._iosSrc; }
+  /**
+   * Active material variant of the model.
+   * Either can be index of the variant(number), or the name of the variant(string)
+   * Changing this value will change the material of the model
+   * @default null
+   * @see https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_variants/README.md
+   */
+  public get variant() { return this._variant; }
   /**
    * URL to {@link https://github.com/google/draco Draco} decoder location.
    * @type {string}
@@ -624,6 +634,15 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get maxDeltaTime() { return this._maxDeltaTime; }
 
+  public set variant(val: View3DOptions["variant"]) {
+    if (this._model) {
+      this._model.selectVariant(val)
+        .then(() => {
+          this.renderer.renderSingleFrame();
+        });
+    }
+    this._variant = val;
+  }
   public set defaultAnimationIndex(val: View3DOptions["defaultAnimationIndex"]) { this._defaultAnimationIndex = val; }
   public set initialZoom(val: View3DOptions["initialZoom"]) { this._initialZoom = val; }
 
@@ -704,6 +723,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   public constructor(root: string | HTMLElement, {
     src = null,
     iosSrc = null,
+    variant = null,
     dracoPath = DEFAULT.DRACO_DECODER_URL,
     ktxPath = DEFAULT.KTX_TRANSCODER_URL,
     meshoptPath = null,
@@ -758,6 +778,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     // Bind options
     this._src = src;
     this._iosSrc = iosSrc;
+    this._variant = variant;
     this._dracoPath = dracoPath;
     this._ktxPath = ktxPath;
     this._meshoptPath = meshoptPath;
