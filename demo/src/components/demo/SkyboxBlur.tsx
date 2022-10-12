@@ -67,7 +67,7 @@ export default () => {
         </table>
       </div>
       <div className="columns">
-        <div className="column">
+        <div className="column is-6">
           <View3D
             ref={view3D1}
             src="/egjs-view3d/model/draco/alarm.glb"
@@ -75,7 +75,7 @@ export default () => {
             skyboxBlur={true}
             showExampleCode />
         </div>
-        <div className="column">
+        <div className="column is-6">
           <View3D
             ref={view3D2}
             src="/egjs-view3d/model/draco/alarm.glb"

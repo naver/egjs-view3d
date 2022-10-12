@@ -4,11 +4,11 @@
  */
 import * as THREE from "three";
 
-import View3D from "../../View3D";
-import { DEFAULT_CLASS } from "../../const/external";
-import { CONTROL_EVENTS } from "../../const/internal";
-import * as BROWSER from "../../const/browser";
-import { getNullableElement, toDegree } from "../../utils";
+import View3D from "../View3D";
+import { DEFAULT_CLASS } from "../const/external";
+import { CONTROL_EVENTS } from "../const/internal";
+import * as BROWSER from "../const/browser";
+import { getNullableElement, toDegree } from "../utils";
 
 import Annotation from "./Annotation";
 import PointAnnotation from "./PointAnnotation";
@@ -208,7 +208,7 @@ class AnnotationManager {
     const halfScreenSize = screenSize.clone().multiplyScalar(0.5);
     const threeCamera = camera.threeCamera;
     const camPos = threeCamera.position;
-    const modelCenter = model.bbox.getCenter(new THREE.Vector3());
+    const modelCenter = model.center;
     const breakpoints = view3D.annotationBreakpoints;
 
     // Sort by distance most far to camera (descending)

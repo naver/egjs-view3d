@@ -4,10 +4,10 @@
  */
 import * as THREE from "three";
 
-import View3D from "../../View3D";
-import * as BROWSER from "../../const/browser";
-import { DEFAULT_CLASS, EVENTS } from "../../const/external";
-import { toDegree, toRadian } from "../../utils";
+import View3D from "../View3D";
+import * as BROWSER from "../const/browser";
+import { DEFAULT_CLASS, EVENTS } from "../const/external";
+import { toDegree, toRadian } from "../utils";
 
 /**
  * Common options for {@link Annotation}s

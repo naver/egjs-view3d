@@ -5,7 +5,7 @@
 import View3D from "../View3D";
 import Model from "../core/Model";
 import Pose from "../core/Pose";
-import Annotation from "../core/annotation/Annotation";
+import Annotation from "../annotation/Annotation";
 import { INPUT_TYPE } from "../const/external";
 import WebARSession from "../xr/WebARSession";
 

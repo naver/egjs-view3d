@@ -10,7 +10,7 @@ import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader";
 
 import View3D from "../View3D";
 import Model from "../core/Model";
-import Annotation from "../core/annotation/Annotation";
+import Annotation from "../annotation/Annotation";
 import { ANNOTATION_EXTRA, CUSTOM_TEXTURE_LOD_EXTENSION, STANDARD_MAPS, TEXTURE_LOD_EXTRA } from "../const/internal";
 import { createLoadingContext } from "../utils";
 
@@ -270,6 +270,7 @@ class GLTFLoader extends Loader {
     const model = new Model({
       src,
       scenes: gltf.scenes,
+      center: view3D.center,
       annotations,
       animations: gltf.animations,
       fixSkinnedBbox

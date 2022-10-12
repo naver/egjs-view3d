@@ -1,39 +1,35 @@
 ---
-sidebar_position: 3
+sidebar_position: 5
 ---
 
 import View3D from "@site/src/components/View3D";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
 import License from "@site/src/components/License";
 
-<OptionDescriptor type="number" defaultVal="0" />
+<OptionDescriptor type={`"auto" | Array<number | string>`} defaultVal={`"auto"`} />
 
-Initial Y-axis rotation of the camera, in degrees.
-Use [view3D.camera.yaw](/docs/api/Camera#yaw) instead if you want current yaw value.
+Initial origin point of rotation of the camera.
+If `"auto"` is given, it will use [model's center](/docs/options/control/center) as pivot.
+Else, you can use any world position.
+Use [view3D.camera.pivot](/docs/api/Camera#pivot) instead if you want current pivot value.
 
 ## Example
-### yaw: 0 (default)
+### pivot: "auto" (default)
 <View3D
   src="/egjs-view3d/model/draco/alarm.glb"
-  yaw={0}
+  pivot="auto"
   showExampleCode />
 
-### yaw: 90
+### pivot: [0.03, 0, 0]
 <View3D
   src="/egjs-view3d/model/draco/alarm.glb"
-  yaw={90}
+  pivot={[0.03, 0, 0]}
   showExampleCode />
 
-### yaw: 180
+### pivot: ["0%", "50%", "100%"]
 <View3D
   src="/egjs-view3d/model/draco/alarm.glb"
-  yaw={180}
-  showExampleCode />
-
-### yaw: -90
-<View3D
-  src="/egjs-view3d/model/draco/alarm.glb"
-  yaw={-90}
+  pivot={["0%", "50%", "100%"]}
   showExampleCode />
 
 <License items={[

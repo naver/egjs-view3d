@@ -419,3 +419,16 @@ const convertArray = (array, type, forceClone = false) => {
 
   return Array.prototype.slice.call(array); // create Array
 };
+
+export const parseAsBboxRatio = (arr: Array<number | string>, bbox: THREE.Box3) => {
+  const min = bbox.min.toArray();
+  const size = new THREE.Vector3().subVectors(bbox.max, bbox.min).toArray();
+
+  return new THREE.Vector3().fromArray(arr.map((val, idx) => {
+    if (!isString(val)) return val;
+
+    const ratio = parseFloat(val) * 0.01;
+
+    return min[idx] + ratio * size[idx];
+  }));
+};

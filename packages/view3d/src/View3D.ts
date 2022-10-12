@@ -13,7 +13,7 @@ import Model from "./core/Model";
 import ModelAnimator from "./core/ModelAnimator";
 import Skybox from "./core/Skybox";
 import ARManager from "./core/ARManager";
-import AnnotationManager from "./core/annotation/AnnotationManager";
+import AnnotationManager from "./annotation/AnnotationManager";
 import { ShadowOptions } from "./core/ShadowPlane";
 import View3DError from "./core/View3DError";
 import OrbitControl from "./control/OrbitControl";
@@ -78,9 +78,10 @@ export interface View3DOptions {
 
   // Control
   fov: typeof AUTO | number;
-  center: typeof AUTO | number[];
+  center: typeof AUTO | Array<number | string>;
   yaw: number;
   pitch: number;
+  pivot: typeof AUTO | Array<number | string>;
   initialZoom: number | {
     axis: "x" | "y" | "z";
     ratio: number;
@@ -92,6 +93,7 @@ export interface View3DOptions {
   scrollable: boolean;
   wheelScrollable: boolean;
   useGrabCursor: boolean;
+  ignoreCenterOnFit: boolean;
 
   // Environment
   skybox: string | null;
@@ -174,6 +176,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _center: View3DOptions["center"];
   private _yaw: View3DOptions["yaw"];
   private _pitch: View3DOptions["pitch"];
+  private _pivot: View3DOptions["pivot"];
   private _initialZoom: View3DOptions["initialZoom"];
   private _rotate: View3DOptions["rotate"];
   private _translate: View3DOptions["translate"];
@@ -182,6 +185,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _scrollable: View3DOptions["scrollable"];
   private _wheelScrollable: View3DOptions["scrollable"];
   private _useGrabCursor: View3DOptions["useGrabCursor"];
+  private _ignoreCenterOnFit: View3DOptions["ignoreCenterOnFit"];
 
   private _skybox: View3DOptions["skybox"];
   private _envmap: View3DOptions["envmap"];
@@ -342,15 +346,18 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get fov() { return this._fov; }
   /**
-   * Center of the camera rotation.
-   * If `"auto"` is given, it will use the center of the model's bounding box as the pivot.
-   * Else, you can use any world position as the pivot.
-   * @type {"auto" | number[]}
+   * Specifies the center of the model.
+   * If `"auto"` is given, it will use the center of the model's bounding box.
+   * Else, you can use a number array as any world position.
+   * Or, you can use a string array as a relative position to bounding box min/max. ex) ["0%", "100%", "50%"]
+   * The difference to {@link View3D#pivot pivot} is model's bounding box and center position will be shown on screen at every rotation angle.
+   * @type {"auto" | Array<number | string>}
    * @default "auto"
    */
   public get center() { return this._center; }
   /**
    * Initial Y-axis rotation of the camera, in degrees.
+   * Use {@link Camera#yaw view3D.camera.yaw} instead if you want current yaw value.
    * @type {number}
    * @default 0
    */
@@ -358,10 +365,21 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   /**
    * Initial X-axis rotation of the camera, in degrees.
    * Should be a value from -90 to 90.
+   * Use {@link Camera#pitch view3D.camera.pitch} instead if you want current pitch value.
    * @type {number}
    * @default 0
    */
   public get pitch() { return this._pitch; }
+  /**
+   * Initial origin point of rotation of the camera.
+   * If `"auto"` is given, it will use {@link View3D#center model's center} as pivot.
+   * Else, you can use a number array as any world position.
+   * Or, you can use a string array as a relative position to bounding box min/max. ex) ["0%", "100%", "50%"]
+   * Use {@link Camera#pivot view3D.camera.pivot} instead if you want current pivot value.
+   * @type {"auto" | Array<number | string>}
+   * @default "auto"
+   */
+  public get pivot() { return this._pivot; }
   /**
    * Initial zoom value.
    * If `number` is given, positive value will make camera zoomed in and negative value will make camera zoomed out.
@@ -420,6 +438,13 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    * @default true
    */
   public get useGrabCursor() { return this._useGrabCursor; }
+  /**
+   * When {@link Camera#pivot camera.fit} is called, View3D will adjust camera with the model so that the model is not clipped from any camera rotation by assuming {@link View3D#center center} as origin of the rotation by default.
+   * This will ignore that behavior by forcing model's bbox center as center of the rotation while fitting the camera to the model.
+   * @type {boolean}
+   * @default false
+   */
+  public get ignoreCenterOnFit() { return this._ignoreCenterOnFit; }
   /**
    * Source to the HDR texture image (RGBE), which will used as the scene environment map & background.
    * `envmap` will be ignored if this value is not `null`.
@@ -687,6 +712,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     center = AUTO,
     yaw = 0,
     pitch = 0,
+    pivot = AUTO,
     initialZoom = 0,
     rotate = true,
     translate = true,
@@ -695,7 +721,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     scrollable = true,
     wheelScrollable = false,
     useGrabCursor = true,
-    defaultAnimationIndex = 0,
+    ignoreCenterOnFit = false,
     skybox = null,
     envmap = null,
     background = null,
@@ -704,6 +730,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     skyboxBlur = false,
     toneMapping = TONE_MAPPING.LINEAR,
     useDefaultEnv = true,
+    defaultAnimationIndex = 0,
     animationRepeatMode = ANIMATION_REPEAT_MODE.ONE,
     annotationURL = null,
     annotationWrapper = `.${DEFAULT_CLASS.ANNOTATION_WRAPPER}`,
@@ -740,6 +767,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._center = center;
     this._yaw = yaw;
     this._pitch = pitch;
+    this._pivot = pivot;
     this._initialZoom = initialZoom;
     this._rotate = rotate;
     this._translate = translate;
@@ -748,7 +776,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._scrollable = scrollable;
     this._wheelScrollable = wheelScrollable;
     this._useGrabCursor = useGrabCursor;
-    this._defaultAnimationIndex = defaultAnimationIndex;
+    this._ignoreCenterOnFit = ignoreCenterOnFit;
 
     this._skybox = skybox;
     this._envmap = envmap;
@@ -759,6 +787,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._toneMapping = toneMapping;
     this._useDefaultEnv = useDefaultEnv;
 
+    this._defaultAnimationIndex = defaultAnimationIndex;
     this._animationRepeatMode = animationRepeatMode;
 
     this._annotationURL = annotationURL;
@@ -945,7 +974,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     scene.shadowPlane.updateDimensions(model);
 
     if (resetCamera) {
-      camera.fit(model, this._center);
+      camera.fit(model);
       void camera.reset(0);
     }
 

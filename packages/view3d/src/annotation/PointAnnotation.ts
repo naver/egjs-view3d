@@ -4,11 +4,11 @@
  */
 import * as THREE from "three";
 
-import View3D from "../../View3D";
-import Pose from "../Pose";
-import * as DEFAULT from "../../const/default";
-import * as BROWSER from "../../const/browser";
-import { directionToYawPitch, toDegree } from "../../utils";
+import View3D from "../View3D";
+import Pose from "../core/Pose";
+import * as DEFAULT from "../const/default";
+import * as BROWSER from "../const/browser";
+import { directionToYawPitch, toDegree } from "../utils";
 
 import Annotation, { AnnotationOptions } from "./Annotation";
 

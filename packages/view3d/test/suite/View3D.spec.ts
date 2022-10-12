@@ -167,6 +167,30 @@ describe("View3D", () => {
       it("should have 'auto' as a default value", async () => {
         expect((await createView3D()).center).to.equal("auto");
       });
+
+      it("should set camera pivot to same value if an array of number is given", async () => {
+        const view3D = await createView3D({
+          src: "/cube.glb",
+          center: [999, 998, 997]
+        });
+        expect(view3D.camera.pivot.x).to.equal(999);
+        expect(view3D.camera.pivot.y).to.equal(998);
+        expect(view3D.camera.pivot.z).to.equal(997);
+      });
+
+      it("should set camera pivot to same value if an array of string is given", async () => {
+        const view3D = await createView3D({
+          src: "/cube.glb",
+          center: ["50%", "40%", "30%"]
+        });
+        const bbox = view3D.model.bbox;
+        const bboxSize = new THREE.Vector3().subVectors(bbox.max, bbox.min);
+
+        expect(bboxSize.toArray().every(val => val !== 0)).to.be.true;
+        expect(view3D.camera.pivot.x).to.equal(bbox.min.x + bboxSize.x * 0.5);
+        expect(view3D.camera.pivot.y).to.equal(bbox.min.y + bboxSize.y * 0.4);
+        expect(view3D.camera.pivot.z).to.equal(bbox.min.z + bboxSize.z * 0.3);
+      });
     });
 
     describe("yaw", () => {
@@ -178,6 +202,36 @@ describe("View3D", () => {
     describe("pitch", () => {
       it("should have 0 as a default value", async () => {
         expect((await createView3D()).pitch).to.equal(0);
+      });
+    });
+
+    describe("pivot", () => {
+      it("should have 'auto' as a default value", async () => {
+        expect((await createView3D()).pivot).to.equal("auto");
+      });
+
+      it("should set camera pivot to same value if an array of number is given", async () => {
+        const view3D = await createView3D({
+          src: "/cube.glb",
+          pivot: [999, 998, 997]
+        });
+        expect(view3D.camera.pivot.x).to.equal(999);
+        expect(view3D.camera.pivot.y).to.equal(998);
+        expect(view3D.camera.pivot.z).to.equal(997);
+      });
+
+      it("should set camera pivot to same value if an array of string is given", async () => {
+        const view3D = await createView3D({
+          src: "/cube.glb",
+          pivot: ["50%", "40%", "30%"]
+        });
+        const bbox = view3D.model.bbox;
+        const bboxSize = new THREE.Vector3().subVectors(bbox.max, bbox.min);
+
+        expect(bboxSize.toArray().every(val => val !== 0)).to.be.true;
+        expect(view3D.camera.pivot.x).to.equal(bbox.min.x + bboxSize.x * 0.5);
+        expect(view3D.camera.pivot.y).to.equal(bbox.min.y + bboxSize.y * 0.4);
+        expect(view3D.camera.pivot.z).to.equal(bbox.min.z + bboxSize.z * 0.3);
       });
     });
 

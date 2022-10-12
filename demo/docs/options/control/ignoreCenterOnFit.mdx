@@ -1,15 +1,15 @@
 ---
-sidebar_position: 8
+sidebar_position: 14
 ---
 
 import View3D from "@site/src/components/View3D";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
 import License from "@site/src/components/License";
 
-<OptionDescriptor type="boolean" defaultVal="true" />
+<OptionDescriptor type={"boolean"} defaultVal={"false"} />
 
-Use a generated envmap as a light source.
-Using `false` will make model unlitten.
+When [camera.fit](/docs/api/Camera#fit) is called, View3D will adjust camera with the model so that the model is not clipped from any camera rotation by assuming {@link View3D#center center} as origin of the rotation by default.
+This will ignore that behavior by forcing model's bbox center as center of the rotation while fitting the camera to the model.
 
 ## Example
 
@@ -17,16 +17,16 @@ Using `false` will make model unlitten.
   <div className="column is-6">
     <View3D
       src="/egjs-view3d/model/draco/alarm.glb"
-      useDefaultEnv={true}
-      showExampleCode
-    />
+      center={[0.03, 0, 0]}
+      ignoreCenterOnFit={false}
+      showExampleCode />
   </div>
   <div className="column is-6">
     <View3D
       src="/egjs-view3d/model/draco/alarm.glb"
-      useDefaultEnv={false}
-      showExampleCode
-    />
+      center={[0.03, 0, 0]}
+      ignoreCenterOnFit={true}
+      showExampleCode />
   </div>
 </div>
 

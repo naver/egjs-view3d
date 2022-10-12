@@ -12,6 +12,9 @@ jobs:
           cache-dependency-path: "**/package-lock.json"
       - name: install-root
         run: npm install
+      - name: install-view3d
+        run: npm install
+        working-directory: ./packages/view3d
       - name: install-unit
         working-directory: ./packages/view3d/test
         run: npm install
