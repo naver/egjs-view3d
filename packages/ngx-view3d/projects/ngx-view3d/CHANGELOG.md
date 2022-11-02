@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.0](https://github.com/naver/egjs-view3d/compare/@egjs/ngx-view3d@2.1.0...@egjs/ngx-view3d@2.2.0) (2022-11-02)
+
+
+### :mega: Other
+
+* update packages versions ([1f7f683](https://github.com/naver/egjs-view3d/commit/1f7f68345783fd03f812778ed2d4a8c7cf34d487))
+
+
+
 ## [2.1.0](https://github.com/naver/egjs-view3d/compare/@egjs/ngx-view3d@2.0.1...@egjs/ngx-view3d@2.1.0) (2022-09-01)
 
 

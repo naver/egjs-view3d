@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.9.0](https://github.com/naver/egjs-view3d/compare/@egjs/view3d@2.8.0...@egjs/view3d@2.9.0) (2022-11-02)
+
+
+### :rocket: New Features
+
+* add interpolant version of subclip util ([8aed683](https://github.com/naver/egjs-view3d/commit/8aed68384fb581908f2934d5c2bdc703e875a8e0))
+* add pivot & ignoreCenterOnFit ([39e6906](https://github.com/naver/egjs-view3d/commit/39e6906e24ab92fc911a3d054bbf11f44695f51f))
+* add variant ([990ea8b](https://github.com/naver/egjs-view3d/commit/990ea8b23b96dfff3389c8de25ec98d43922b093))
+
+
+### :bug: Bug Fix
+
+* annotation not rendering on WebXR ([6710aad](https://github.com/naver/egjs-view3d/commit/6710aadcf8aea79986c48a1648b40ec84250d295))
+
+
+### :mega: Other
+
+* update packages versions ([1f7f683](https://github.com/naver/egjs-view3d/commit/1f7f68345783fd03f812778ed2d4a8c7cf34d487))
+
+
+
 ## [2.8.0](https://github.com/naver/egjs-view3d/compare/@egjs/view3d@2.7.1...@egjs/view3d@2.8.0) (2022-09-01)
 
 
