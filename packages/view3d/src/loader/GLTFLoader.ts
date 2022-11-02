@@ -278,7 +278,6 @@ class GLTFLoader extends Loader {
       annotations,
       parser: gltf.parser,
       animations: gltf.animations,
-      annotations,
       variants,
       fixSkinnedBbox
     });

@@ -1,6 +1,6 @@
 {
   "name": "@egjs/ngx-view3d",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Fast & Customizable glTF 3D model viewer, packed with full of features!",
   "sideEffects": [
     "**/*.css",
@@ -11,7 +11,7 @@
     "@angular/core": ">=10.0.0"
   },
   "dependencies": {
-    "@egjs/view3d": "~2.8.0"
+    "@egjs/view3d": "~2.9.0"
   },
   "devDependencies": {
     "@angular/common": "~10.0.0",
