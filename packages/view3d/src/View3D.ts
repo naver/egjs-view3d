@@ -946,7 +946,9 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._annotationManager.resize();
 
     // Prevent flickering on resize
-    renderer.renderSingleFrame(true);
+    if (this._initialized) {
+      renderer.renderSingleFrame(true);
+    }
 
     this.trigger(EVENTS.RESIZE, { ...newSize, type: EVENTS.RESIZE, target: this });
   }
@@ -1020,7 +1022,9 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
       }
     }
 
-    renderer.renderSingleFrame();
+    if (this._initialized) {
+      renderer.renderSingleFrame();
+    }
 
     this.trigger(EVENTS.MODEL_CHANGE, {
       type: EVENTS.MODEL_CHANGE,
