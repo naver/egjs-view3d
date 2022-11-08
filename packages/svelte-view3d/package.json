@@ -1,6 +1,6 @@
 {
   "name": "@egjs/svelte-view3d",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Fast & Customizable glTF 3D model viewer, packed with full of features!",
   "main": "dist/view3d.cjs.js",
   "module": "dist/view3d.esm.js",
@@ -34,7 +34,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@egjs/view3d": "~2.9.0"
+    "@egjs/view3d": "~2.9.1"
   },
   "devDependencies": {
     "@egjs/build-helper": "^0.1.2",

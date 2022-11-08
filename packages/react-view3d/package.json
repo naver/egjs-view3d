@@ -1,6 +1,6 @@
 {
   "name": "@egjs/react-view3d",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Fast & Customizable glTF 3D model viewer, packed with full of features!",
   "main": "dist/view3d.cjs.js",
   "module": "dist/view3d.esm.js",
@@ -19,7 +19,7 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
-    "@egjs/view3d": "~2.9.0"
+    "@egjs/view3d": "~2.9.1"
   },
   "peerDependencies": {
     "react": ">=16.0.0"
