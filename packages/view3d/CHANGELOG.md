@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.9.1](https://github.com/naver/egjs-view3d/compare/@egjs/view3d@2.9.0...@egjs/view3d@2.9.1) (2022-11-08)
+
+
+### :bug: Bug Fix
+
+* prevent rendering before init ([530e5da](https://github.com/naver/egjs-view3d/commit/530e5dacc62000a21b190554ef21c447f98f5896))
+
+
+### :mega: Other
+
+* update packages versions ([82666f1](https://github.com/naver/egjs-view3d/commit/82666f130836869428006135de36efacdf2898c7))
+
+
+
 ## [2.9.0](https://github.com/naver/egjs-view3d/compare/@egjs/view3d@2.8.0...@egjs/view3d@2.9.0) (2022-11-02)
 
 
