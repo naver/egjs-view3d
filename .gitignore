@@ -100,16 +100,6 @@ typings/
 .history
 
 
-## Custom ###
-.DS_Store
-demo/release/
-dist/
-outjs/
-declaration/
-css/
-TODO.md
-*.lerna-backup
-*.pem
 
 ### OSX ###
 # General
@@ -253,3 +243,14 @@ fabric.properties
 .idea/**/azureSettings.xml
 
 # End of https://www.gitignore.io/api/node,visualstudiocode,webstorm,osx
+
+## Custom ###
+.DS_Store
+demo/release/
+dist/
+outjs/
+declaration/
+css/
+TODO.md
+*.lerna-backup
+*.pem
