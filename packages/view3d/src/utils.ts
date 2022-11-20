@@ -413,7 +413,7 @@ const convertArray = (array, type, forceClone = false) => {
   if (!array || // let 'undefined' and 'null' pass
     !forceClone && array.constructor === type ) return array;
 
-  if (typeof type.BYTES_PER_ELEMENT === 'number') {
+  if (typeof type.BYTES_PER_ELEMENT === "number") {
     return new type( array ); // create typed array
   }
 
