@@ -199,7 +199,8 @@ class Renderer {
       control,
       autoPlayer,
       animator,
-      annotation
+      annotation,
+      postProcessing
     } = view3D;
 
     if (threeRenderer.getContext().isContextLost()) return;
@@ -221,7 +222,12 @@ class Renderer {
     camera.updatePosition();
 
     scene.shadowPlane.render();
-    threeRenderer.render(scene.root, camera.threeCamera);
+
+    if (postProcessing.isPostProcessing) {
+      this._view3D.postProcessing.composer.render();
+    }else {
+      threeRenderer.render(scene.root, camera.threeCamera);
+    }
 
     // Render annotations
     annotation.render();
