@@ -685,6 +685,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     }
     this._variant = val;
   }
+
   public set defaultAnimationIndex(val: View3DOptions["defaultAnimationIndex"]) { this._defaultAnimationIndex = val; }
   public set initialZoom(val: View3DOptions["initialZoom"]) { this._initialZoom = val; }
 
@@ -755,6 +756,14 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
   public set maintainSize(val: View3DOptions["maintainSize"]) { this._maintainSize = val; }
   public set maxDeltaTime(val: View3DOptions["maxDeltaTime"]) { this._maxDeltaTime = val; }
+
+  public set bloom(val: View3DOptions["bloom"]) {
+    if (typeof val === "boolean") this._bloom = val;
+    else {
+      this.postProcessing.setBloomOptions(val);
+    }
+
+  }
 
   /**
    * Creates new View3D instance.

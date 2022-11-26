@@ -131,7 +131,7 @@ class Renderer {
   public resize(): void {
     const renderer = this._renderer;
     const canvas = this._canvas;
-
+    const composer = this._view3D.postProcessing.composer;
     if (renderer.xr.isPresenting) return;
 
     const width = canvas.clientWidth;
@@ -140,6 +140,7 @@ class Renderer {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height, false);
     this._canvasSize.set(width, height);
+    composer.setSize(width, height);
   }
 
   public setAnimationLoop(callback: (delta: number, frame?: THREE.XRFrame) => void): void {
