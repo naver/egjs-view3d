@@ -157,11 +157,7 @@ class PostProcessing {
   private _addBloom({threshold = 0, strength = 0.3, radius = 0.5}: Partial<BloomOptions>) {
     const {width, height} = this._view3D.renderer.canvasSize;
 
-    const bloomPass = new UnrealBloomPass(new Vector2(width, height), 1.5, 0.4, 0.85);
-
-    bloomPass.threshold = threshold;
-    bloomPass.strength = strength;
-    bloomPass.radius = radius;
+    const bloomPass = new UnrealBloomPass(new Vector2(width, height), strength, radius, threshold);
 
     this.composer.addPass(bloomPass);
     return bloomPass;
