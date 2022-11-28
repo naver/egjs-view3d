@@ -60,6 +60,7 @@ class PostProcessing {
     return this._composer;
   }
 
+  public get bloomComponent(){ return this._bloomComponent; }
   /**
    * whether using post-processing.
    * @type {boolean}
