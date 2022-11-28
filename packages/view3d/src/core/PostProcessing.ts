@@ -84,7 +84,7 @@ class PostProcessing {
     view3D.once("beforeRender", () => {
       this._scene.add(new THREE.AmbientLight(0xffffff, 1));
       const {width, height} = this._view3D.renderer.canvasSize;
-      this.composer.setSize(width, height);
+      this.composer.setSize(width * window.devicePixelRatio, height * window.devicePixelRatio);
       const renderPass = new RenderPass(scene, camera);
 
       this.composer.addPass(renderPass);
