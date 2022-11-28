@@ -13,13 +13,13 @@ export default () => {
                 <table>
                     <tbody>
                     <tr>
-                        <td className="mr-2">threshold:</td>
+                        <td className="mr-2">threshold: {options.threshold}</td>
                         <td>
                             <Slider
                                 step={0.01}
                                 min={0}
                                 max={1}
-                                defaultValue={options.strength}
+                                defaultValue={options.threshold}
                                 onChange={val => {
                                     const newThreshold = val as number;
                                     const newVal = {...options, threshold: newThreshold};
@@ -47,7 +47,7 @@ export default () => {
                         </td>
                     </tr>
                     <tr>
-                        <td className="mr-2">radius:</td>
+                        <td className="mr-2">radius: {options.radius}</td>
                         <td>
                             <Slider
                                 step={0.01}
