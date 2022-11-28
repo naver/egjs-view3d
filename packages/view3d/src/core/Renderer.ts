@@ -140,7 +140,7 @@ class Renderer {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height, false);
     this._canvasSize.set(width, height);
-    composer.setSize(width, height);
+    composer.setSize(width * window.devicePixelRatio, height * window.devicePixelRatio);
   }
 
   public setAnimationLoop(callback: (delta: number, frame?: THREE.XRFrame) => void): void {
