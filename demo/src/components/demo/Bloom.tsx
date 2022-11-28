@@ -53,10 +53,10 @@ export default () => {
                                 step={0.01}
                                 min={0}
                                 max={3}
-                                defaultValue={options.strength}
+                                defaultValue={options.radius}
                                 onChange={val => {
-                                    const newStrength = val as number;
-                                    const newVal = {...options, radius: newStrength};
+                                    const newRadius = val as number;
+                                    const newVal = {...options, radius: newRadius};
                                     setOptions(newVal);
                                     view3D.current!.view3D.bloom = newVal;
                                 }}
