@@ -761,6 +761,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     if (typeof val === "boolean") this._bloom = val;
     else {
       this.postProcessing.setBloomOptions(val);
+      this._renderer.renderSingleFrame();
     }
 
   }
