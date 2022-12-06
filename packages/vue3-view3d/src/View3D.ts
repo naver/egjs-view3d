@@ -32,7 +32,7 @@ const view3DOptions = view3DOptionNames.reduce((props, name) => {
     return {
       ...props,
       [name]: null
-    }
+    };
   }, {}) as PropTypes;
 
 const view3DSetterNames = view3DOptionNames.filter(name => {
@@ -69,7 +69,7 @@ const View3D = defineComponent({
     this.view3D = new VanillaView3D(
       this.$refs.wrapper as HTMLElement,
       props
-    )
+    );
     const events = Object.keys(EVENTS).map(key => (EVENTS as any)[key]);
 
     events.forEach(eventName => {
@@ -104,7 +104,7 @@ const View3D = defineComponent({
           this.view3D[name] = newVal;
         },
         deep: true
-      }
+      };
       return setters;
     }, {} as Record<string, any>)
   }

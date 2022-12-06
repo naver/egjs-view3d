@@ -1,7 +1,9 @@
 /// <reference types="svelte" />
+
 import { SvelteComponentTyped } from "svelte";
 import VanillaView3D, { View3DOptions, View3DEvents } from "@egjs/view3d";
 
+// @ts-ignore
 interface View3DProps extends Partial<View3DOptions>, svelte.JSX.HTMLAttributes<HTMLElementTagNameMap["div"]> {
   canvasClass?: string;
 }
