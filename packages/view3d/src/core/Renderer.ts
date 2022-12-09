@@ -131,7 +131,7 @@ class Renderer {
   public resize(): void {
     const renderer = this._renderer;
     const canvas = this._canvas;
-    const composer = this._view3D.postProcessing.composer;
+
     if (renderer.xr.isPresenting) return;
 
     const width = canvas.clientWidth;
@@ -140,7 +140,6 @@ class Renderer {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height, false);
     this._canvasSize.set(width, height);
-    composer.setSize(width * window.devicePixelRatio, height * window.devicePixelRatio);
   }
 
   public setAnimationLoop(callback: (delta: number, frame?: THREE.XRFrame) => void): void {
@@ -201,7 +200,7 @@ class Renderer {
       autoPlayer,
       animator,
       annotation,
-      postProcessing
+      renderComposer
     } = view3D;
 
     if (threeRenderer.getContext().isContextLost()) return;
@@ -224,11 +223,7 @@ class Renderer {
 
     scene.shadowPlane.render();
 
-    if (postProcessing.isPostProcessing) {
-      this._view3D.postProcessing.composer.render();
-    }else {
-      threeRenderer.render(scene.root, camera.threeCamera);
-    }
+    renderComposer.render();
 
     // Render annotations
     annotation.render();
