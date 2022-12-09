@@ -26,7 +26,7 @@ const view3DOptions = view3DOptionNames.reduce((props, name) => {
   return {
     ...props,
     [name]: null
-  }
+  };
 }, {});
 
 const view3DSetterNames = view3DOptionNames.filter(name => {
@@ -60,7 +60,7 @@ export default Vue.extend<{
     this._view3D = new VanillaView3D(
       this.$refs.wrapper as HTMLElement,
       props
-    )
+    );
     const events = Object.keys(EVENTS).map(key => EVENTS[key]);
 
     events.forEach(eventName => {
@@ -95,7 +95,7 @@ export default Vue.extend<{
           this._view3D[name] = newVal;
         },
         deep: true
-      }
+      };
       return setters;
     }, {} as Record<string, any>)
   }
