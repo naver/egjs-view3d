@@ -16,6 +16,7 @@ import ARManager from "./core/ARManager";
 import AnnotationManager from "./annotation/AnnotationManager";
 import { ShadowOptions } from "./core/ShadowPlane";
 import View3DError from "./core/View3DError";
+import RenderComposer from "./core/RenderComposer";
 import OrbitControl from "./control/OrbitControl";
 import { RotateControlOptions } from "./control/RotateControl";
 import { TranslateControlOptions } from "./control/TranslateControl";
@@ -33,7 +34,6 @@ import { getElement, getObjectOption, isCSSSelector, isElement } from "./utils";
 import { LiteralUnion, OptionGetters, ValueOf } from "./type/utils";
 import { LoadingItem } from "./type/external";
 import { GLTFLoader } from "./loader";
-import PostProcessing, { BloomOptions, DoFOptions, SsaoOptions, SsrOptions } from "./core/PostProcessing";
 
 /**
  * @interface
@@ -124,12 +124,6 @@ export interface View3DOptions {
   quickLook: boolean | Partial<QuickLookSessionOptions>;
   arPriority: Array<ValueOf<typeof AR_SESSION_TYPE>>;
 
-  // Post-processing
-  ssr: boolean | Partial<SsrOptions>;
-  ssao: boolean | Partial<SsaoOptions>;
-  bloom: boolean | Partial<BloomOptions>;
-  dof: boolean | Partial<DoFOptions>;
-
   // Others
   poster: string | HTMLElement | null;
   canvasSelector: string;
@@ -165,7 +159,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _autoResizer: AutoResizer;
   private _arManager: ARManager;
   private _annotationManager: AnnotationManager;
-  private _postProcessing: PostProcessing;
+  private _renderComposer: RenderComposer;
 
   // Internal States
   private _rootEl: HTMLElement;
@@ -214,11 +208,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _annotationSelector: View3DOptions["annotationSelector"];
   private _annotationBreakpoints: View3DOptions["annotationBreakpoints"];
   private _annotationAutoUnfocus: View3DOptions["annotationAutoUnfocus"];
-
-  private _ssao: View3DOptions["ssao"];
-  private _bloom: View3DOptions["bloom"];
-  private _dof: View3DOptions["dof"];
-  private _ssr: View3DOptions["ssr"];
 
   private _webAR: View3DOptions["webAR"];
   private _sceneViewer: View3DOptions["sceneViewer"];
@@ -288,10 +277,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get annotation() { return this._annotationManager; }
   /**
-   * {@link PostProcessing} instance of the View3D
-   * @type {PostProcessing}
+   * {@link RenderComposer} instance of the View3D
+   * @type {RenderComposer}
    */
-  public get postProcessing() { return this._postProcessing; }
+  public get renderComposer() {
+    return this._renderComposer;
+  }
 
   // Internal State Getter
   /**
@@ -651,30 +642,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    * @default 1/30
    */
   public get maxDeltaTime() { return this._maxDeltaTime; }
-  /**
-   * SSR option status for postprocessing
-   * @type {boolean | SsrOptions}
-   * @default false
-   */
-  public get ssr() { return this._ssr; }
-  /**
-   * SSAO option status for postprocessing
-   * @type {boolean | SsaoOptions}
-   * @default false
-   */
-  public get ssao() { return this._ssao; }
-  /**
-   * Bloom option status for postprocessing
-   * @type {boolean | BloomOptions}
-   * @default false
-   */
-  public get bloom() { return this._bloom; }
-  /**
-   * DoF option status for postprocessing
-   * @type {boolean | DoFOptions}
-   * @default false
-   */
-  public get dof() { return this._dof; }
 
   public set variant(val: View3DOptions["variant"]) {
     if (this._model) {
@@ -757,15 +724,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   public set maintainSize(val: View3DOptions["maintainSize"]) { this._maintainSize = val; }
   public set maxDeltaTime(val: View3DOptions["maxDeltaTime"]) { this._maxDeltaTime = val; }
 
-  public set bloom(val: View3DOptions["bloom"]) {
-    if (typeof val === "boolean") this._bloom = val;
-    else {
-      this.postProcessing.setBloomOptions(val);
-      this._renderer.renderSingleFrame();
-    }
-
-  }
-
   /**
    * Creates new View3D instance.
    * @param root A root element or selector of it to initialize View3D
@@ -821,11 +779,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     maintainSize = false,
     on = {},
     plugins = [],
-    maxDeltaTime = 1 / 30,
-    ssao = false,
-    bloom = false,
-    dof = false,
-    ssr = false
+    maxDeltaTime = 1 / 30
   }: Partial<View3DOptions> = {}) {
     super();
 
@@ -890,10 +844,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._loadingContext = [];
     this._plugins = plugins;
     this._maxDeltaTime = maxDeltaTime;
-    this._ssao = ssao;
-    this._bloom = bloom;
-    this._dof = dof;
-    this._ssr = ssr;
 
     // Create internal components
     this._renderer = new Renderer(this);
@@ -905,7 +855,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._autoResizer = new AutoResizer(this);
     this._arManager = new ARManager(this);
     this._annotationManager = new AnnotationManager(this);
-    this._postProcessing = new PostProcessing(this);
+    this._renderComposer = new RenderComposer(this);
 
     this._addEventHandlers(on);
     this._addPosterImage();
