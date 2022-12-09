@@ -1,0 +1,30 @@
+---
+sidebar_position: 6
+---
+
+import ComparePostProcessing from "@site/src/components/demo/ComparePostProcessing";
+
+Postprocessing applies various effects to rendered scene.
+```js
+import View3D from "@egjs/view3d";
+
+
+const view3D = new View3D(...);
+
+view3D.loadPlugins(new PostProcessing({
+ bloom : true
+}));
+```
+
+### Options
+|Option|Type|Default|Description|
+|:---:|---|:---:|---|
+|ssr|boolean \| [SSROptions](/docs/api/SSROptions)|false|Apply Screen Space Reflections(SSR) to scene|
+|ssao|boolean \| [SSAOOptions](/docs/api/SSAOOptions)|false|Apply Screen Space Ambient Occlusion(SSAO) to scene|
+|dof|boolean \| [DoFOptions](/docs/api/DoFOptions)|false|Apply Depth of Field(DoF) to scene|
+|unrealBloom|boolean \| [UnrealBloomOptions](/docs/api/UnrealBloomOptions)|false|Apply Bloom effect to scene|
+
+### Compare
+<CustomPostProcessing />
+
+

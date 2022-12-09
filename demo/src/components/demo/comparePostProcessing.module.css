@@ -1,0 +1,19 @@
+.surface {
+    display: flex;
+    position: absolute;
+    width: 100%;
+    top: 0;
+    justify-content: space-between;
+}
+
+.verticalLine {
+    position: absolute;
+    height: 97%;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    margin: 0px auto;
+    width: 0px;
+    border: none;
+    border-right: 1px solid black;
+}
