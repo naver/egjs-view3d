@@ -17,10 +17,10 @@ class ComparePostProcessing extends React.Component {
   public componentDidMount() {
 
     const postProcessing = new PostProcessing({
-      ssr: true,
-      ssao: false,
-      dof: false,
-      unrealBloom: true
+      SSR: true,
+      SSAO: false,
+      DoF: false,
+      Bloom: true
     });
 
     const plugins = [postProcessing];
