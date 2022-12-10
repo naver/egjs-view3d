@@ -3,14 +3,12 @@
  * egjs projects are licensed under the MIT license
  */
 import PostProcessing, { PostProcessingOptions } from "./PostProcessing";
-import UnrealBloomEffect, { UnrealBloomOptions } from "./UnrealBloomEffect";
+
 
 export {
-  PostProcessing,
-  UnrealBloomEffect
+  PostProcessing
 };
 
 export type {
-  PostProcessingOptions,
-  UnrealBloomOptions
+  PostProcessingOptions
 };

@@ -1,7 +1,10 @@
+/*
+ * Copyright (c) 2020 NAVER Corp.
+ * egjs projects are licensed under the MIT license
+ */
+
 import { SSAOPass } from "three/examples/jsm/postprocessing/SSAOPass";
-
 import View3D from "../../View3D";
-
 import PostProcessing from "./PostProcessing";
 import Effects from "./Effects";
 
@@ -12,8 +15,8 @@ export interface SSAOOptions {
   minDistance: number;
 }
 
-class SSAOEffect implements Effects {
-  public ssao: SSAOPass;
+class SSAOEffect extends SSAOPass implements Effects {
+
   private _view3D: View3D;
 
   public constructor(view3D: View3D, postProcessing: PostProcessing, {
@@ -22,34 +25,33 @@ class SSAOEffect implements Effects {
     minDistance = 0,
     kernelSize = 1
   }: Partial<SSAOOptions> = {}) {
-    this._view3D = view3D;
     const scene = view3D.scene.root;
     const camera = view3D.camera.threeCamera;
-    const ssao = this.ssao = new SSAOPass(scene, camera);
-    ssao.kernelRadius = kernelRadius;
-    ssao.kernelSize = kernelSize;
-    ssao.maxDistance = maxDistance;
-    ssao.minDistance = minDistance;
-    // ssao.output = parseInt(SSAOPass.OUTPUT.SSAO);
-  }
 
-  public setOptions(val: Partial<SSAOOptions>) {
-    const ssao = this.ssao;
-
-    console.log(ssao);
-    for (const key in val) {
-      ssao[key] = val[key];
-    }
-
-    this._view3D.renderer.renderSingleFrame();
+    super(scene, camera);
+    this._view3D = view3D;
+    this.kernelRadius = kernelRadius;
+    this.kernelSize = kernelSize;
+    this.maxDistance = maxDistance;
+    this.minDistance = minDistance;
   }
 
   public off(): void {
-    this.ssao.enabled = false;
+    this.enabled = false;
   }
 
   public on(): void {
-    this.ssao.enabled = true;
+    this.enabled = true;
+  }
+
+  public setOptions(val: Partial<SSAOOptions>) {
+    const { renderer } = this._view3D;
+
+    for (const key in val) {
+      this[key] = val[key];
+    }
+
+    renderer.renderSingleFrame();
   }
 
 }
