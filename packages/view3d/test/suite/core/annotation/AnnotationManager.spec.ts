@@ -1,5 +1,5 @@
 import { PointAnnotation } from "~/core";
-import AnnotationManager from "~/core/annotation/AnnotationManager";
+import AnnotationManager from "~/annotation/AnnotationManager";
 import { range } from "~/utils";
 import { createView3D } from "../../../test-utils";
 
