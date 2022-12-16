@@ -34,6 +34,7 @@ import { getElement, getObjectOption, isCSSSelector, isElement } from "./utils";
 import { LiteralUnion, OptionGetters, ValueOf } from "./type/utils";
 import { LoadingItem } from "./type/external";
 import { GLTFLoader } from "./loader";
+import { EffectManager, Effects } from "./effect";
 
 /**
  * @interface
@@ -160,6 +161,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _arManager: ARManager;
   private _annotationManager: AnnotationManager;
   private _renderComposer: RenderComposer;
+  private _effectManager: EffectManager | null;
 
   // Internal States
   private _rootEl: HTMLElement;
@@ -283,6 +285,11 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   public get renderComposer() {
     return this._renderComposer;
   }
+  /**
+   * {@link EffectManager} instance of the View3D
+   * @type {EffectManager}
+   */
+  public get effectManager() { return this._effectManager; }
 
   // Internal State Getter
   /**
@@ -643,12 +650,14 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get maxDeltaTime() { return this._maxDeltaTime; }
 
+  public get effects() { return this.effectManager?.effects; }
+
   public set variant(val: View3DOptions["variant"]) {
     if (this._model) {
       this._model.selectVariant(val)
-        .then(() => {
-          this.renderer.renderSingleFrame();
-        });
+      .then(() => {
+        this.renderer.renderSingleFrame();
+      });
     }
     this._variant = val;
   }
@@ -856,6 +865,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._arManager = new ARManager(this);
     this._annotationManager = new AnnotationManager(this);
     this._renderComposer = new RenderComposer(this);
+    this._effectManager = null;
 
     this._addEventHandlers(on);
     this._addPosterImage();
@@ -1082,6 +1092,22 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     anchorEl.href = imgURL;
     anchorEl.download = fileName;
     anchorEl.click();
+  }
+
+  public addEffects(params: Effects | Effects[]) {
+    if (!this._effectManager) {
+      this._effectManager = new EffectManager(this);
+    }
+
+    const effectManager = this._effectManager;
+
+    if (Array.isArray(params)) {
+      params.forEach((effect) => {
+        effectManager.add(effect);
+      });
+    } else {
+      effectManager.add(params);
+    }
   }
 
   private _loadModel(src: string | string[]): Array<Promise<void>> {
