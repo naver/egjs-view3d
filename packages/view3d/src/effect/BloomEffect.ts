@@ -5,9 +5,9 @@
 
 import * as THREE from "three";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
-import View3D from "../../View3D";
-import PostProcessing from "./PostProcessing";
-import Effects from "./Effects";
+import View3D from "../View3D";
+import { Effects } from "./EffectManager";
+
 
 export interface BloomOptions {
   strength: number;
@@ -16,16 +16,22 @@ export interface BloomOptions {
 }
 
 class BloomEffect extends UnrealBloomPass implements Effects {
+  order: number;
   private _view3D: View3D;
 
-  public constructor(view3D: View3D, postProcessing: PostProcessing, {
+  public constructor(view3D: View3D, {
     threshold = 0.3,
     strength = 0.5,
     radius = 0.5
   }: Partial<BloomOptions> = {}) {
-    const { width, height } = view3D.renderer.canvasSize;
-    super(new THREE.Vector2(width, height), strength, radius, threshold);
+
+    super(new THREE.Vector2(300, 150), strength, radius, threshold);
+    view3D.on("resize", () => {
+      const { width, height } = view3D.renderer.canvasSize;
+      this.resolution = new THREE.Vector2(width, height);
+    });
   }
+
 
   public off(): void {
     this.enabled = false;

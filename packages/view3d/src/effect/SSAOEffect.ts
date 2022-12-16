@@ -4,9 +4,9 @@
  */
 
 import { SSAOPass } from "three/examples/jsm/postprocessing/SSAOPass";
-import View3D from "../../View3D";
-import PostProcessing from "./PostProcessing";
-import Effects from "./Effects";
+import View3D from "../View3D";
+import { Effects } from "./EffectManager";
+
 
 export interface SSAOOptions {
   kernelRadius: number;
@@ -19,7 +19,7 @@ class SSAOEffect extends SSAOPass implements Effects {
 
   private _view3D: View3D;
 
-  public constructor(view3D: View3D, postProcessing: PostProcessing, {
+  public constructor(view3D: View3D, {
     kernelRadius = 1,
     maxDistance = 5,
     minDistance = 0,

@@ -4,9 +4,9 @@
  */
 
 import { SSRPass } from "three/examples/jsm/postprocessing/SSRPass";
-import View3D from "../../View3D";
-import PostProcessing from "./PostProcessing";
-import Effects from "./Effects";
+import View3D from "../View3D";
+import { Effects } from "./EffectManager";
+
 
 export interface SSROptions {
   maxDistance: number;
@@ -15,9 +15,10 @@ export interface SSROptions {
 }
 
 class SSREffect extends SSRPass implements Effects {
+  public readonly order: number;
   private _view3D: View3D;
 
-  public constructor(view3D: View3D, postProcessing: PostProcessing, {
+  public constructor(view3D: View3D, {
     opacity = 0.5,
     blur = true,
     maxDistance = 0.1

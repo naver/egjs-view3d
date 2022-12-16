@@ -8,7 +8,6 @@ import AROverlay, { AROverlayOptions } from "./AROverlay";
 import LoadingBar, { LoadingBarOptions } from "./LoadingBar";
 
 export * from "./ControlBar";
-export * from "./PostProcessing";
 
 export {
   ARButton,

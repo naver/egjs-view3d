@@ -4,9 +4,9 @@
  */
 
 import { BokehPass } from "three/examples/jsm/postprocessing/BokehPass";
-import View3D from "../../View3D";
-import PostProcessing from "./PostProcessing";
-import Effects from "./Effects";
+import View3D from "../View3D";
+import { Effects } from "./EffectManager";
+
 
 export interface DoFOptions {
   near: number;
@@ -17,30 +17,25 @@ export interface DoFOptions {
 }
 
 class DoFEffect extends BokehPass implements Effects {
+  public readonly order: number;
   private _view3D: View3D;
 
-  public constructor(view3D: View3D, postProcessing: PostProcessing, {
+  public constructor(view3D: View3D, {
     focus = 5,
     aperture = 0.01,
     maxblur = 0.01,
-    near,
-    far
-  }: Partial<DoFOptions>) {
+    near = 0.1,
+    far = 85
+  }: Partial<DoFOptions> = {}) {
     const camera = view3D.camera.threeCamera;
     const scene = view3D.scene.root;
-    const { width, height } = view3D.renderer.canvasSize;
 
-    super(scene, camera, { maxblur, aperture, focus, width, height });
+    super(scene, camera, { maxblur, aperture, focus, width: 300, height: 150 });
+
     this._view3D = view3D;
 
-    if (near) {
-      camera.near = near;
-    }
-
-    if (far) {
-      camera.far = far;
-    }
-
+    camera.near = near;
+    camera.far = far;
   }
 
   public off(): void { this.enabled = false; }
@@ -65,6 +60,7 @@ class DoFEffect extends BokehPass implements Effects {
 
     renderer.renderSingleFrame();
   }
+
 }
 
 export default DoFEffect;
