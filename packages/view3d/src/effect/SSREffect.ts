@@ -5,7 +5,7 @@
 
 import { SSRPass } from "three/examples/jsm/postprocessing/SSRPass";
 import View3D from "../View3D";
-import { Effects } from "./EffectManager";
+import { Effects } from "./Effects";
 
 
 export interface SSROptions {
@@ -22,7 +22,7 @@ class SSREffect extends SSRPass implements Effects {
     opacity = 0.5,
     blur = true,
     maxDistance = 0.1
-  }: Partial<SSROptions>) {
+  }: Partial<SSROptions> = {}) {
 
     const camera = view3D.camera.threeCamera;
     const renderer = view3D.renderer.threeRenderer;

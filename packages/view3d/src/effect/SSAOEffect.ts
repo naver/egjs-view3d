@@ -5,7 +5,7 @@
 
 import { SSAOPass } from "three/examples/jsm/postprocessing/SSAOPass";
 import View3D from "../View3D";
-import { Effects } from "./EffectManager";
+import { Effects } from "./Effects";
 
 
 export interface SSAOOptions {

@@ -5,8 +5,7 @@
 
 import { BokehPass } from "three/examples/jsm/postprocessing/BokehPass";
 import View3D from "../View3D";
-import { Effects } from "./EffectManager";
-
+import { Effects } from "./Effects";
 
 export interface DoFOptions {
   near: number;
@@ -30,12 +29,17 @@ class DoFEffect extends BokehPass implements Effects {
     const camera = view3D.camera.threeCamera;
     const scene = view3D.scene.root;
 
-    super(scene, camera, { maxblur, aperture, focus, width: 300, height: 150 });
+    super(scene, camera, { maxblur, aperture, focus });
 
     this._view3D = view3D;
 
     camera.near = near;
     camera.far = far;
+
+    view3D.on("resize", () => {
+      const { width, height } = view3D.renderer.canvasSize;
+      this.setSize(width, height);
+    });
   }
 
   public off(): void { this.enabled = false; }

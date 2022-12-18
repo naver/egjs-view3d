@@ -6,8 +6,7 @@
 import * as THREE from "three";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
 import View3D from "../View3D";
-import { Effects } from "./EffectManager";
-
+import { Effects } from "./Effects";
 
 export interface BloomOptions {
   strength: number;
@@ -26,6 +25,7 @@ class BloomEffect extends UnrealBloomPass implements Effects {
   }: Partial<BloomOptions> = {}) {
 
     super(new THREE.Vector2(300, 150), strength, radius, threshold);
+
     view3D.on("resize", () => {
       const { width, height } = view3D.renderer.canvasSize;
       this.resolution = new THREE.Vector2(width, height);

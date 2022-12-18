@@ -1,12 +1,7 @@
 import View3D from "../View3D";
-import { EffectComposer, Pass } from "three/examples/jsm/postprocessing/EffectComposer";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
-
-export interface Effects extends Pass {
-  on(): void;
-  off(): void;
-  setOptions(val: unknown): void;
-}
+import { Effects } from "./Effects";
 
 type EffectsName = "SSAOEffect" | "SSREffect" | "DoFEffect" | "BloomEffect";
 
@@ -48,7 +43,7 @@ class EffectManager {
     });
   }
 
-  public add(effect: Pass) {
+  public add(effect: Effects) {
     const passes = this._composer.passes;
     const orderEffects = this._orderEffects;
     const activatedEffects = this._activatedEffects;
@@ -71,7 +66,7 @@ class EffectManager {
     this._insertPass(effect);
   }
 
-  private _insertPass(effect: Pass, index?: number) {
+  private _insertPass(effect: Effects, index?: number) {
     const activatedEffects = this._activatedEffects;
     const effectName = effect.constructor.name;
 
