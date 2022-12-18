@@ -34,7 +34,7 @@ import { getElement, getObjectOption, isCSSSelector, isElement } from "./utils";
 import { LiteralUnion, OptionGetters, ValueOf } from "./type/utils";
 import { LoadingItem } from "./type/external";
 import { GLTFLoader } from "./loader";
-import { EffectManager, Effects } from "./effect";
+import { EffectManager, Effects, EffectsName } from "./effect";
 
 
 /**
@@ -1095,15 +1095,35 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     anchorEl.click();
   }
 
-  public addEffects(params: Effects | Effects[]) {
+  /**
+   * Add new effects to view3D
+   * @param {Effects | Effects[]} effects to add
+   */
+  public addEffects(effects: Effects | Effects[]) {
     const effectManager = this._effectManager;
 
-    if (Array.isArray(params)) {
-      params.forEach((effect) => {
+    if (Array.isArray(effects)) {
+      effects.forEach((effect) => {
         effectManager.add(effect);
       });
     } else {
-      effectManager.add(params);
+      effectManager.add(effects);
+    }
+  }
+
+  /**
+   * Remove effects to View3D
+   * @param {EffectsName | EffectsName[] | Effects | Effects[]} effects to remove
+   */
+  public removeEffects(effects: EffectsName | EffectsName[] | Effects | Effects[]) {
+    const effectManager = this._effectManager;
+
+    if (Array.isArray(effects)) {
+      effects.forEach((effect) => {
+        effectManager.remove(effect);
+      });
+    } else {
+      effectManager.remove(effects);
     }
   }
 

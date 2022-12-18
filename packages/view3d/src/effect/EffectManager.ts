@@ -3,7 +3,7 @@ import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { Effects } from "./Effects";
 
-type EffectsName = "SSAOEffect" | "SSREffect" | "DoFEffect" | "BloomEffect";
+export type EffectsName = "SSAOEffect" | "SSREffect" | "DoFEffect" | "BloomEffect";
 
 class EffectManager {
   private _view3D: View3D;
@@ -15,6 +15,7 @@ class EffectManager {
     DoFEffect: 3,
     BloomEffect: 4
   };
+
   private _activatedEffects: Record<EffectsName, boolean> = {
     BloomEffect: false,
     SSREffect: false,
@@ -64,6 +65,19 @@ class EffectManager {
     }
 
     this._insertPass(effect);
+  }
+
+  public remove(effect: EffectsName | Effects) {
+    const composer = this._composer;
+    if (typeof effect === "string") {
+      composer.passes.forEach((pass) => {
+        if (pass.constructor.name === effect) {
+          composer.removePass(pass);
+        }
+      });
+    } else {
+      composer.removePass(effect);
+    }
   }
 
   private _insertPass(effect: Effects, index?: number) {
