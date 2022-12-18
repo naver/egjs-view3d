@@ -67,17 +67,10 @@ class EffectManager {
     this._insertPass(effect);
   }
 
-  public remove(effect: EffectsName | Effects) {
+  public remove(effect: Effects) {
     const composer = this._composer;
-    if (typeof effect === "string") {
-      composer.passes.forEach((pass) => {
-        if (pass.constructor.name === effect) {
-          composer.removePass(pass);
-        }
-      });
-    } else {
-      composer.removePass(effect);
-    }
+
+    composer.removePass(effect);
   }
 
   private _insertPass(effect: Effects, index?: number) {

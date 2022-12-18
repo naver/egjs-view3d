@@ -1097,34 +1097,26 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
   /**
    * Add new effects to view3D
-   * @param {Effects | Effects[]} effects to add
+   * @param {Effects[]} effects to add
    */
-  public addEffects(effects: Effects | Effects[]) {
+  public addEffects(...effects: Effects[]) {
     const effectManager = this._effectManager;
 
-    if (Array.isArray(effects)) {
-      effects.forEach((effect) => {
-        effectManager.add(effect);
-      });
-    } else {
-      effectManager.add(effects);
-    }
+    effects.forEach((effect) => {
+      effectManager.add(effect);
+    });
   }
 
   /**
    * Remove effects to View3D
-   * @param {EffectsName | EffectsName[] | Effects | Effects[]} effects to remove
+   * @param {Effects[]} effects to remove
    */
-  public removeEffects(effects: EffectsName | EffectsName[] | Effects | Effects[]) {
+  public removeEffects(...effects: Effects[]) {
     const effectManager = this._effectManager;
 
-    if (Array.isArray(effects)) {
-      effects.forEach((effect) => {
-        effectManager.remove(effect);
-      });
-    } else {
-      effectManager.remove(effects);
-    }
+    effects.forEach((effect) => {
+      effectManager.remove(effect);
+    });
   }
 
   private _loadModel(src: string | string[]): Array<Promise<void>> {
