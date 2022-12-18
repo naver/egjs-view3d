@@ -13,7 +13,7 @@ class RenderComposer {
   }
 
   public render() {
-    const isPostProcessing = this._view3D.effectManager?.hasEffect;
+    const isPostProcessing = this._view3D.effectManager.hasEffect;
 
     if (isPostProcessing) {
       this._renderPostProcessing();
@@ -23,7 +23,7 @@ class RenderComposer {
   }
 
   private _renderPostProcessing() {
-    const effectManager = this._view3D.effectManager!;
+    const effectManager = this._view3D.effectManager;
     effectManager.composer.render();
   }
 

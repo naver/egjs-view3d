@@ -36,6 +36,7 @@ import { LoadingItem } from "./type/external";
 import { GLTFLoader } from "./loader";
 import { EffectManager, Effects } from "./effect";
 
+
 /**
  * @interface
  * @see [Events](/docs/events/ready) page for detailed information
@@ -161,7 +162,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _arManager: ARManager;
   private _annotationManager: AnnotationManager;
   private _renderComposer: RenderComposer;
-  private _effectManager: EffectManager | null;
+  private _effectManager: EffectManager;
 
   // Internal States
   private _rootEl: HTMLElement;
@@ -865,7 +866,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._arManager = new ARManager(this);
     this._annotationManager = new AnnotationManager(this);
     this._renderComposer = new RenderComposer(this);
-    this._effectManager = null;
+    this._effectManager = new EffectManager(this);
 
     this._addEventHandlers(on);
     this._addPosterImage();
@@ -1095,10 +1096,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   }
 
   public addEffects(params: Effects | Effects[]) {
-    if (!this._effectManager) {
-      this._effectManager = new EffectManager(this);
-    }
-
     const effectManager = this._effectManager;
 
     if (Array.isArray(params)) {
