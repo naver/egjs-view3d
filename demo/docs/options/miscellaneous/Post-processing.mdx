@@ -1,0 +1,92 @@
+---
+sidebar_position: 9
+---
+import PostProcessing from "@site/src/components/demo/PostProcessing";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
+
+<OptionDescriptor type="null | EffectComposerType " defaultVal="null"/>
+
+Post-processing applies various effects to rendered scene.
+
+[EffectComposer](https://threejs.org/docs/#examples/en/postprocessing/EffectComposer) can be assigned to effectComposer of view3D.
+Also, as you can use [Postprocessing](https://github.com/pmndrs/postprocessing) library, too
+
+```js
+import View3D from "@egjs/view3d";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
+
+const view3D = new View3D(...);
+const effectComposer = new EffectComposer(...);
+effectComposer.addPass(...);
+
+...
+
+view3D.effectComposer = effectComposer;
+```
+
+
+### Before / After
+<div className="columns">
+  <div className="column is-6">
+    <PostProcessing src={"/egjs-view3d/model/draco/alarm.glb"} type="alarm" setPostProcessing={false} initZoom={4}/>
+  </div>
+  <div className="column is-6">
+    <PostProcessing src={"/egjs-view3d/model/draco/alarm.glb"} type="alarm" initZoom={4}/>
+  </div>
+</div>
+
+<div className="columns">
+  <div className="column is-6">
+    <PostProcessing src={"/egjs-view3d/model/lamborghini.glb"} setPostProcessing={false}/>
+  </div>
+  <div className="column is-6">
+    <PostProcessing src={"/egjs-view3d/model/lamborghini.glb"} type={"car"}/>
+  </div>
+</div>
+
+
+### Example
+<PostProcessing src={"/egjs-view3d/model/draco/alarm.glb"} type="alarm" initZoom={4}/>
+
+```js
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
+
+const view3D = new View3D(...);
+
+const camera = view3D.camera.threeCamera;
+const renderer = view3D.renderer.threeRenderer;
+const scene = view3D.scene.root;
+
+const effectComposer = new EffectComposer(renderer);
+
+view3D.on("ready", () => {
+
+  const ssr = new SSRPass({renderer, scene, camera, selects: view3D.model.meshes, groundReflector: null});
+  const gammaCorrectionPass = new ShaderPass(GammaCorrectionShader);
+
+  effectComposer.addPass(new RenderPass(scene, camera));
+  effectComposer.addPass(ssr);
+  effectComposer.addPass(gammaCorrectionPass);
+
+  view3D.effectComposer = effectComposer;
+
+});
+```
+
+<License items={[
+  {
+    name: "Alarm Clock 01",
+    link: "https://polyhaven.com/a/alarm_clock_01",
+    author: "Poly Haven",
+    authorLink: "https://polyhaven.com/",
+    license: "CC0"
+  },
+  {
+    name: "Lamborghini Terzo Millennio",
+    link: "https://sketchfab.com/3d-models/free-lamborghini-terzo-millennio-7ad3dffa9d344c3c978eafcc220cb709",
+    author: "SDC PERFORMANCE™️",
+    authorLink: "https://sketchfab.com/3Duae",
+    license: "Creative Commons Attribution"
+  }
+]}/>
