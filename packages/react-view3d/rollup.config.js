@@ -20,7 +20,7 @@ export default buildHelper([
   },
   {
     ...defaultOptions,
-    name: "ReactFlicking",
+    name: "ReactView3D",
     input: "./src/index.umd.ts",
     format: "umd",
     output: "./dist/view3d.umd.js",
