@@ -1,3 +1,6 @@
+import { EffectComposer as EffectComposerLib } from "postprocessing";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
+
 /*
  * Copyright (c) 2015 NAVER Corp.
  * egjs projects are licensed under the MIT license
@@ -20,3 +23,9 @@ export interface LoadingItem {
   lengthComputable: boolean;
   initialized: boolean;
 }
+
+/**
+ * EffectComposer type for post-processing.
+ * It's include post-processing of built-in three.js and [post-processing]{@link https://www.npmjs.com/package/postprocessing} of library
+ */
+export type EffectComposerType = EffectComposer | EffectComposerLib;

@@ -31,7 +31,7 @@ import * as EVENT_TYPES from "./type/event";
 import { View3DPlugin } from "./plugin";
 import { getElement, getObjectOption, isCSSSelector, isElement } from "./utils";
 import { LiteralUnion, OptionGetters, ValueOf } from "./type/utils";
-import { LoadingItem } from "./type/external";
+import { EffectComposerType, LoadingItem } from "./type/external";
 import { GLTFLoader } from "./loader";
 
 /**
@@ -133,6 +133,7 @@ export interface View3DOptions {
   on: Partial<View3DEvents>;
   plugins: View3DPlugin[];
   maxDeltaTime: number;
+  effectComposer: EffectComposerType | null;
 }
 
 /**
@@ -219,6 +220,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _useResizeObserver: View3DOptions["useResizeObserver"];
   private _maintainSize: View3DOptions["maintainSize"];
   private _maxDeltaTime: View3DOptions["maxDeltaTime"];
+  private _effectComposer: View3DOptions["effectComposer"];
 
   // Internal Components Getter
   /**
@@ -633,6 +635,12 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    * @default 1/30
    */
   public get maxDeltaTime() { return this._maxDeltaTime; }
+  /**
+   * Options for the Post-processing. If `EffectComposer` is given, it's `render` method be called by {@link Renderer} instance.
+   * @type {null | EffectComposerType}
+   * @default null
+   */
+  public get effectComposer() { return this._effectComposer; }
 
   public set variant(val: View3DOptions["variant"]) {
     if (this._model) {
@@ -713,6 +721,8 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
   public set maintainSize(val: View3DOptions["maintainSize"]) { this._maintainSize = val; }
   public set maxDeltaTime(val: View3DOptions["maxDeltaTime"]) { this._maxDeltaTime = val; }
+
+  public set effectComposer(val: View3DOptions["effectComposer"]) { this._effectComposer = val; }
 
   /**
    * Creates new View3D instance.
@@ -834,6 +844,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._loadingContext = [];
     this._plugins = plugins;
     this._maxDeltaTime = maxDeltaTime;
+    this._effectComposer = null;
 
     // Create internal components
     this._renderer = new Renderer(this);
