@@ -1,5 +1,5 @@
 ---
-sidebar_position: 9
+sidebar_position: 10
 ---
 import PostProcessing from "@site/src/components/demo/PostProcessing";
 import OptionDescriptor from "@site/src/components/OptionDescriptor";
@@ -9,14 +9,27 @@ import License from "@site/src/components/License";
 
 Post-processing applies various effects to rendered scene.
 
-[EffectComposer](https://threejs.org/docs/#examples/en/postprocessing/EffectComposer) can be assigned to effectComposer of view3D.
-Also, as you can use [Postprocessing](https://github.com/pmndrs/postprocessing) library, too
+[EffectComposer](https://threejs.org/docs/#examples/en/postprocessing/EffectComposer) has to be assigned to effectComposer of view3D.
+Also, as you can use [Postprocessing](https://github.com/pmndrs/postprocessing) library, too.
 
+First need to install by three or postprocessing.
+```shell
+npm install three
+````
+or
+```shell
+npm install postprocessing
+````
 ```js
 import View3D from "@egjs/view3d";
+
+// It's EffectComposer of built-in three.js
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
+// Or you can use EffectComposer of postprocessing library
+import { EffectComposer } from "postprocessing";
 
 const view3D = new View3D(...);
+
 const effectComposer = new EffectComposer(...);
 effectComposer.addPass(...);
 
@@ -24,7 +37,9 @@ effectComposer.addPass(...);
 
 view3D.effectComposer = effectComposer;
 ```
-
+:::info
+Post-processing of three.js and Post-processing of library cannot be mixed. Only one of the two can be used.
+:::
 
 ### Before / After
 <div className="columns">
