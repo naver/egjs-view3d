@@ -254,3 +254,4 @@ css/
 TODO.md
 *.lerna-backup
 *.pem
+.idea
