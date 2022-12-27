@@ -438,6 +438,12 @@ describe("View3D", () => {
         expect((await createView3D()).maxDeltaTime).to.equal(1 / 30);
       });
     });
+
+    describe("effectComposer", () => {
+      it("should have null as a default value", async () => {
+        expect((await createView3D()).effectComposer).to.equal(null);
+      });
+    });
   });
 
   describe("init", () => {

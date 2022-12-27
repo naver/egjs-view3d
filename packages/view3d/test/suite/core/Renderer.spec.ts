@@ -1,6 +1,7 @@
 import * as THREE from "three";
 
 import { createView3D, wait } from "../../test-utils";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 
 describe("Renderer", () => {
   describe("default values", () => {
@@ -66,5 +67,22 @@ describe("Renderer", () => {
       expect(renderSpy.calledOnce).to.be.true;
       expect(beforeRenderSpy.calledBefore(renderSpy)).to.be.true;
     });
+
+    it("should call render method of EffectComposer, if EffectComposer is given to effectComposer of View3D property.", async () => {
+      const view3D = await createView3D();
+      const renderer = view3D.renderer.threeRenderer;
+      const effectComposer = new EffectComposer(renderer);
+
+      view3D.effectComposer = effectComposer;
+
+      let count = 0;
+      effectComposer.render = () => {
+        ++count;
+      }
+
+      view3D.renderer.renderSingleFrame(true);
+
+      expect(count).to.equal(1);
+    })
   });
 });
