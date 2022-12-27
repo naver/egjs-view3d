@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ES2015",
+    "moduleResolution": "node",
     "lib": ["ES2015", "dom"],
     "types": ["cypress"],
     "baseUrl": ".",
