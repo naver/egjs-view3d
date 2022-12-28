@@ -18,7 +18,6 @@ import { GammaCorrectionShader } from "three/examples/jsm/shaders/GammaCorrectio
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
 
 type Params = {
-
   src: string;
   type: "car" | "alarm" | "default"
   setPostProcessing?: boolean
@@ -31,9 +30,11 @@ const PostProcessing = ({ src, setPostProcessing = true, type = "default", initZ
 
   useEffect(() => {
     const view3D = ref.current.view3D;
+
     view3D.on("ready", () => {
       view3D.scene.fixedObjects.children[0].position.y = view3D.model.scene.position.y;
     });
+
   }, []);
 
   useEffect(() => {
@@ -58,7 +59,6 @@ const PostProcessing = ({ src, setPostProcessing = true, type = "default", initZ
     effectComposer.addPass(effectPass);
 
     view3D.effectComposer = effectComposer;
-
 
   }, [setPostProcessing, type]);
 
