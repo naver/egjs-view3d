@@ -78,6 +78,16 @@ describe("View3D", () => {
       it("should have 'null' as a default value", async () => {
         expect((await createView3D()).iosSrc).to.be.null;
       });
+
+      it("can be change at anytime", async () => {
+        const view3D = await createView3D();
+
+        expect(view3D.iosSrc).to.be.null;
+
+        view3D.iosSrc = "/ios.usdz";
+
+        expect(view3D.iosSrc).to.equal("/ios.usdz");
+      });
     });
 
     describe("dracoPath", () => {

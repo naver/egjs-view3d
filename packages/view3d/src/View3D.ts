@@ -634,6 +634,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get maxDeltaTime() { return this._maxDeltaTime; }
 
+  public set iosSrc(val: View3DOptions["iosSrc"]) { this._iosSrc = val; }
   public set variant(val: View3DOptions["variant"]) {
     if (this._model) {
       this._model.selectVariant(val)
