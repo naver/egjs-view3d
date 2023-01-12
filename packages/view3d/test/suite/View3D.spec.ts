@@ -489,5 +489,27 @@ describe("View3D", () => {
 
       expect(view3D.model).not.to.be.null;
     });
+
+    it("should set iosSrc to `null` when loading a new model", async () => {
+      const view3D = await createView3D({
+        iosSrc: "some_ios_src.usdz"
+      });
+
+      await view3D.load("/cube.glb");
+
+      expect(view3D.iosSrc).to.be.null;
+    });
+
+    it("should set iosSrc to given option value when loading a new model", async () => {
+      const view3D = await createView3D({
+        iosSrc: "some_ios_src.usdz"
+      });
+
+      await view3D.load("/cube.glb", {
+        iosSrc: "/cube.usdz"
+      });
+
+      expect(view3D.iosSrc).to.equal("/cube.usdz");
+    });
   });
 });
