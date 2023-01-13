@@ -200,7 +200,7 @@ class Renderer {
       autoPlayer,
       animator,
       annotation,
-      effectComposer
+      effect
     } = view3D;
 
     if (threeRenderer.getContext().isContextLost()) return;
@@ -223,8 +223,8 @@ class Renderer {
 
     scene.shadowPlane.render();
 
-    if (effectComposer) {
-      effectComposer.render();
+    if (effect.isEffect) {
+      effect.effectComposer.render();
     } else {
       threeRenderer.render(scene.root, camera.threeCamera);
     }

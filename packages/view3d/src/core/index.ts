@@ -41,3 +41,4 @@ export type {
 };
 
 export * from "../annotation";
+export * from "../effect";

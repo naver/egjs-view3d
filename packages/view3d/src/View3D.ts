@@ -31,8 +31,10 @@ import * as EVENT_TYPES from "./type/event";
 import { View3DPlugin } from "./plugin";
 import { getElement, getObjectOption, isCSSSelector, isElement } from "./utils";
 import { LiteralUnion, OptionGetters, ValueOf } from "./type/utils";
-import { EffectComposerType, LoadingItem } from "./type/external";
+import { LoadingItem } from "./type/external";
 import { GLTFLoader } from "./loader";
+import EffectManager, { Composer } from "./effect/EffectManager";
+import View3DEffect from "./effect/View3DEffect";
 
 /**
  * @interface
@@ -133,7 +135,6 @@ export interface View3DOptions {
   on: Partial<View3DEvents>;
   plugins: View3DPlugin[];
   maxDeltaTime: number;
-  effectComposer: EffectComposerType | null;
 }
 
 /**
@@ -159,6 +160,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _autoResizer: AutoResizer;
   private _arManager: ARManager;
   private _annotationManager: AnnotationManager;
+  private _effectManager: EffectManager;
 
   // Internal States
   private _rootEl: HTMLElement;
@@ -220,7 +222,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   private _useResizeObserver: View3DOptions["useResizeObserver"];
   private _maintainSize: View3DOptions["maintainSize"];
   private _maxDeltaTime: View3DOptions["maxDeltaTime"];
-  private _effectComposer: View3DOptions["effectComposer"];
+
 
   // Internal Components Getter
   /**
@@ -276,6 +278,11 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    * @type {AnnotationManager}
    */
   public get annotation() { return this._annotationManager; }
+  /**
+   * {@link EffectManager} instance of the View3D
+   * @type {EffectManager}
+   */
+  public get effect() { return this._effectManager; }
 
   // Internal State Getter
   /**
@@ -635,12 +642,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    * @default 1/30
    */
   public get maxDeltaTime() { return this._maxDeltaTime; }
-  /**
-   * Options for the Post-processing. If `EffectComposer` is given, it's `render` method be called by {@link Renderer} instance.
-   * @type {null | EffectComposerType}
-   * @default null
-   */
-  public get effectComposer() { return this._effectComposer; }
 
   public set variant(val: View3DOptions["variant"]) {
     if (this._model) {
@@ -722,7 +723,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   public set maintainSize(val: View3DOptions["maintainSize"]) { this._maintainSize = val; }
   public set maxDeltaTime(val: View3DOptions["maxDeltaTime"]) { this._maxDeltaTime = val; }
 
-  public set effectComposer(val: View3DOptions["effectComposer"]) { this._effectComposer = val; }
 
   /**
    * Creates new View3D instance.
@@ -844,7 +844,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._loadingContext = [];
     this._plugins = plugins;
     this._maxDeltaTime = maxDeltaTime;
-    this._effectComposer = null;
 
     // Create internal components
     this._renderer = new Renderer(this);
@@ -856,6 +855,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._autoResizer = new AutoResizer(this);
     this._arManager = new ARManager(this);
     this._annotationManager = new AnnotationManager(this);
+    this._effectManager = new EffectManager(this);
 
     this._addEventHandlers(on);
     this._addPosterImage();
@@ -955,6 +955,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._camera.resize(newSize, prevSize);
     this._control.resize(newSize);
     this._annotationManager.resize();
+    this._effectManager.resize(newSize);
 
     // Prevent flickering on resize
     if (this._initialized) {
@@ -1084,6 +1085,25 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     anchorEl.click();
   }
 
+  public setCustomEffect(callback: (p: { renderer: THREE.WebGLRenderer; camera: THREE.PerspectiveCamera; scene: THREE.Scene, model: Model | null }) => Composer) {
+    const scene = this.scene.root;
+    const renderer = this.renderer.threeRenderer;
+    const camera = this.camera.threeCamera;
+    const model = this.model;
+
+    const effectComposer = callback({ scene, renderer, camera, model });
+    this._effectManager.effectComposer = effectComposer;
+  }
+
+  public async loadEffects(...effects: View3DEffect[]) {
+    await this._initEffects(effects);
+
+    effects.forEach((effect) => {
+      const pass = effect.getPass();
+      this._effectManager.addPass(pass);
+    });
+  }
+
   private _loadModel(src: string | string[]): Array<Promise<void>> {
     const loader = new GLTFLoader(this);
 
@@ -1189,6 +1209,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
   private async _initPlugins(plugins: View3DPlugin[]) {
     await Promise.all(plugins.map(plugin => plugin.init(this)));
+  }
+
+  private async _initEffects(effects: View3DEffect[]) {
+    await Promise.all(effects.map(effect => effect.init(this)));
   }
 
   private async _resetLoadingContextOnFinish(tasks: Array<Promise<any>>) {
