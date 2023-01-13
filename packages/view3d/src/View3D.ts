@@ -1085,13 +1085,14 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     anchorEl.click();
   }
 
-  public setCustomEffect(callback: (p: { renderer: THREE.WebGLRenderer; camera: THREE.PerspectiveCamera; scene: THREE.Scene, model: Model | null }) => Composer) {
+  public setCustomEffect(callback: (p: { renderer: THREE.WebGLRenderer; camera: THREE.PerspectiveCamera; scene: THREE.Scene, model: Model | null; canvasSize: THREE.Vector2 }) => Composer) {
     const scene = this.scene.root;
     const renderer = this.renderer.threeRenderer;
     const camera = this.camera.threeCamera;
     const model = this.model;
+    const canvasSize = this.renderer.canvasSize;
 
-    const effectComposer = callback({ scene, renderer, camera, model });
+    const effectComposer = callback({ scene, renderer, camera, model, canvasSize });
     this._effectManager.effectComposer = effectComposer;
   }
 
