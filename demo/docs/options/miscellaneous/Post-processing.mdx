@@ -9,17 +9,26 @@ import License from "@site/src/components/License";
 
 Post-processing applies various effects to rendered scene.
 
-[EffectComposer](https://threejs.org/docs/#examples/en/postprocessing/EffectComposer) has to be assigned to effectComposer of view3D.
-Also, as you can use [Postprocessing](https://github.com/pmndrs/postprocessing) library, too.
+View3D offers post-processing on THREE.JS, including SSR, DoF, Bloom, and SAO.
 
-First need to install by three or postprocessing.
-```shell
-npm install three
-````
-or
-```shell
-npm install postprocessing
-````
+```js
+import View3D, {SSR, DoF, Bloom} from "@egjs/view3d";
+
+const view3D = new View3D(...);
+
+view3D.loadEffects(
+    new SSR(),
+    new DoF(),
+    new Bloom({ radius: 0.5, threshold: 0.3, strength: 1 }),
+);
+
+```
+:::caution
+SAO and SSR can not be used together.
+:::
+
+Also, you can use customize THREE.JS post-processing or [Postprocessing](https://github.com/pmndrs/postprocessing) of library.
+
 ```js
 import View3D from "@egjs/view3d";
 
@@ -30,16 +39,17 @@ import { EffectComposer } from "postprocessing";
 
 const view3D = new View3D(...);
 
-const effectComposer = new EffectComposer(...);
-effectComposer.addPass(...);
+view3D.setCustomEffect((param) => {
+      const { camera, renderer, canvasSize, scene, model } = param;
+      const effectComposer = new EffectComposer(renderer);
 
-...
+      ...
 
-view3D.effectComposer = effectComposer;
+      // You have to return EffectComposer
+      return effectComposer;
+});
 ```
-:::info
-Post-processing of three.js and Post-processing of library cannot be mixed. Only one of the two can be used.
-:::
+
 
 ### Before / After
 <div className="columns">
@@ -63,31 +73,6 @@ Post-processing of three.js and Post-processing of library cannot be mixed. Only
 
 ### Example
 <PostProcessing src={"/egjs-view3d/model/draco/alarm.glb"} type="alarm" initZoom={3}/>
-
-```js
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
-
-const view3D = new View3D(...);
-
-const camera = view3D.camera.threeCamera;
-const renderer = view3D.renderer.threeRenderer;
-const scene = view3D.scene.root;
-
-const effectComposer = new EffectComposer(renderer);
-
-view3D.on("ready", () => {
-
-  const ssr = new SSRPass({renderer, scene, camera, selects: view3D.model.meshes, groundReflector: null});
-  const gammaCorrectionPass = new ShaderPass(GammaCorrectionShader);
-
-  effectComposer.addPass(new RenderPass(scene, camera));
-  effectComposer.addPass(ssr);
-  effectComposer.addPass(gammaCorrectionPass);
-
-  view3D.effectComposer = effectComposer;
-
-});
-```
 
 <License items={[
   {

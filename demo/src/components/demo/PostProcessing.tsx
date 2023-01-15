@@ -1,9 +1,6 @@
 import clsx from "clsx";
 import React, { useEffect, useRef } from "react";
-import View3D from "../View3D";
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
-import { SSRPass } from "three/examples/jsm/postprocessing/SSRPass";
+import View3D, { SSR, SAO, Bloom, DoF } from "../View3D";
 import {
   BloomEffect,
   BrightnessContrastEffect,
@@ -12,10 +9,9 @@ import {
   RenderPass as RenderPassLib,
   SMAAEffect,
   ToneMappingEffect,
-  ToneMappingMode
+  ToneMappingMode,
 } from "postprocessing";
-import { GammaCorrectionShader } from "three/examples/jsm/shaders/GammaCorrectionShader";
-import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
+
 
 type Params = {
   src: string;
@@ -38,52 +34,38 @@ const PostProcessing = ({ src, setPostProcessing = true, type = "default", initZ
   }, []);
 
   useEffect(() => {
-    if (!setPostProcessing || type !== "car") return;
-
-    const view3D = ref.current.view3D;
-    const camera = view3D.camera.threeCamera;
-    const renderer = view3D.renderer.threeRenderer;
-    const scene = view3D.scene.root;
-
-    const effectComposer = new EffectComposerLib(renderer);
-
-    const effectPass = new EffectPass(
-      camera,
-      new BloomEffect({ luminanceThreshold: 0.3, intensity: 1.5, }),
-      new SMAAEffect(),
-      new BrightnessContrastEffect({ contrast: 0.01, brightness: 0.03 }),
-      new ToneMappingEffect({ mode: ToneMappingMode.REINHARD2_ADAPTIVE, middleGrey: 0.02, whitePoint: 1 }),
-    );
-
-    effectComposer.addPass(new RenderPassLib(scene, camera));
-    effectComposer.addPass(effectPass);
-
-    view3D.effectComposer = effectComposer;
-
-  }, [setPostProcessing, type]);
-
-  useEffect(() => {
     if (!setPostProcessing || type !== "alarm") return;
 
     const view3D = ref.current.view3D;
 
-    const camera = view3D.camera.threeCamera;
-    const renderer = view3D.renderer.threeRenderer;
-    const scene = view3D.scene.root;
+    view3D.loadEffects(
+      new SSR(),
+      new DoF(),
+      new Bloom({ radius: 0.5, threshold: 0.3, strength: 1 }),
+    );
 
-    const effectComposer = new EffectComposer(renderer);
+  }, [setPostProcessing, type]);
 
-    view3D.on("ready", () => {
+  useEffect(() => {
+    if (!setPostProcessing || type !== "car") return;
 
-      const ssr = new SSRPass({ renderer, scene, camera, selects: view3D.model.meshes, groundReflector: null });
-      const gammaCorrectionPass = new ShaderPass(GammaCorrectionShader);
+    const view3D = ref.current.view3D;
 
-      effectComposer.addPass(new RenderPass(scene, camera));
-      effectComposer.addPass(ssr);
-      effectComposer.addPass(gammaCorrectionPass);
+    view3D.setCustomEffect((param) => {
+      const { camera, renderer, canvasSize, scene, model } = param;
+      const effectComposer = new EffectComposerLib(renderer);
 
-      view3D.effectComposer = effectComposer;
+      effectComposer.addPass(new RenderPassLib(scene, camera));
+      effectComposer.addPass(new EffectPass(
+          camera,
+          new BloomEffect({ luminanceThreshold: 0.3, intensity: 1.5, }),
+          new SMAAEffect(),
+          new BrightnessContrastEffect({ contrast: 0.01, brightness: 0.03 }),
+          new ToneMappingEffect({ mode: ToneMappingMode.REINHARD2_ADAPTIVE, middleGrey: 0.02, whitePoint: 1 }),
+        )
+      );
 
+      return effectComposer;
     });
 
   }, [setPostProcessing, type]);
