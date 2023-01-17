@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.10.0](https://github.com/naver/egjs-view3d/compare/@egjs/view3d@2.9.1...@egjs/view3d@2.10.0) (2023-01-17)
+
+
+### :rocket: New Features
+
+* load iosSrc ([bcb4b8f](https://github.com/naver/egjs-view3d/commit/bcb4b8f37a857be6268609d0720dac5691effedc))
+
+
+### :mega: Other
+
+* fix eslint configs ([a99e3c7](https://github.com/naver/egjs-view3d/commit/a99e3c7217866f7c492c03f62416247154550bec))
+* update packages versions ([db73009](https://github.com/naver/egjs-view3d/commit/db7300922cedba3001fd9668dcca954f68d17f0d))
+
+
+
 ## [2.9.1](https://github.com/naver/egjs-view3d/compare/@egjs/view3d@2.9.0...@egjs/view3d@2.9.1) (2022-11-08)
 
 
