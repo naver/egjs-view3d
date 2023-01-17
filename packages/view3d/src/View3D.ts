@@ -634,6 +634,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
    */
   public get maxDeltaTime() { return this._maxDeltaTime; }
 
+  public set iosSrc(val: View3DOptions["iosSrc"]) { this._iosSrc = val; }
   public set variant(val: View3DOptions["variant"]) {
     if (this._model) {
       this._model.selectVariant(val)
@@ -956,8 +957,14 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   /**
    * Load a new 3D model and replace it with the current one
    * @param {string | string[]} src Source URL to fetch 3D model from
+   * @param {object} [options={}] Options
+   * @param {string | null} [options.iosSrc] Source URL to fetch 3D model in iOS AR Quick Look. `usdz` models are supported.
    */
-  public async load(src: string | string[]) {
+  public async load(src: string | string[], {
+    iosSrc = null
+  }: Partial<{
+    iosSrc: string | null;
+  }> = {}) {
     if (this._initialized) {
       const loadModel = this._loadModel(src);
       void this._resetLoadingContextOnFinish(loadModel);
@@ -966,8 +973,10 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
       // Change the src later as an error can occur while loading the model
       this._src = src;
+      this._iosSrc = iosSrc;
     } else {
       this._src = src;
+      this._iosSrc = iosSrc;
 
       await this.init();
     }

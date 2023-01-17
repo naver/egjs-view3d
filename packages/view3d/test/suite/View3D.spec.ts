@@ -78,6 +78,16 @@ describe("View3D", () => {
       it("should have 'null' as a default value", async () => {
         expect((await createView3D()).iosSrc).to.be.null;
       });
+
+      it("can be change at anytime", async () => {
+        const view3D = await createView3D();
+
+        expect(view3D.iosSrc).to.be.null;
+
+        view3D.iosSrc = "/ios.usdz";
+
+        expect(view3D.iosSrc).to.equal("/ios.usdz");
+      });
     });
 
     describe("dracoPath", () => {
@@ -488,6 +498,28 @@ describe("View3D", () => {
       await view3D.load("/cube.glb");
 
       expect(view3D.model).not.to.be.null;
+    });
+
+    it("should set iosSrc to `null` when loading a new model", async () => {
+      const view3D = await createView3D({
+        iosSrc: "some_ios_src.usdz"
+      });
+
+      await view3D.load("/cube.glb");
+
+      expect(view3D.iosSrc).to.be.null;
+    });
+
+    it("should set iosSrc to given option value when loading a new model", async () => {
+      const view3D = await createView3D({
+        iosSrc: "some_ios_src.usdz"
+      });
+
+      await view3D.load("/cube.glb", {
+        iosSrc: "/cube.usdz"
+      });
+
+      expect(view3D.iosSrc).to.equal("/cube.usdz");
     });
   });
 });
