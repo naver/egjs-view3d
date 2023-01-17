@@ -79,7 +79,7 @@ describe("View3D", () => {
         expect((await createView3D()).iosSrc).to.be.null;
       });
 
-      it("can be change at anytime", async () => {
+      it("can be changed at anytime", async () => {
         const view3D = await createView3D();
 
         expect(view3D.iosSrc).to.be.null;
