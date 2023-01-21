@@ -224,7 +224,7 @@ class Renderer {
     scene.shadowPlane.render();
 
     if (effect.isEffect) {
-      effect.effectComposer.render();
+      effect.render();
     } else {
       threeRenderer.render(scene.root, camera.threeCamera);
     }
