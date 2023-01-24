@@ -39,6 +39,8 @@ class SAO extends View3DEffect {
 
     const saoPass = this._saoPass = new SAOPass(scene, camera);
     saoPass.params = { ...saoPass.params, ...options };
+
+    return saoPass;
   }
 
   public getPass() { return this._saoPass; }

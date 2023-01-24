@@ -23,9 +23,3 @@ export interface LoadingItem {
   lengthComputable: boolean;
   initialized: boolean;
 }
-
-/**
- * EffectComposer type for post-processing.
- * It's include post-processing of built-in three.js and [post-processing]{@link https://www.npmjs.com/package/postprocessing} of library
- */
-export type EffectComposerType = EffectComposer | EffectComposerLib;

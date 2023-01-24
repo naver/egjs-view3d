@@ -1001,6 +1001,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     const animator = this._animator;
     const annotationManager = this._annotationManager;
     const inXR = renderer.threeRenderer.xr.isPresenting;
+    const effectManager = this._effectManager;
 
     scene.reset();
     scene.add(model.scene);
@@ -1023,6 +1024,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     annotationManager.collect();
     annotationManager.add(...model.annotations);
 
+
     this._model = model;
 
     if (inXR) {
@@ -1031,6 +1033,11 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
       if (activeSession) {
         activeSession.control.syncTargetModel(model);
       }
+    }
+
+    if(effectManager.isEffect){
+      effectManager.reset();
+      effectManager.update();
     }
 
     if (this._initialized) {
@@ -1093,25 +1100,33 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     const renderer = this.renderer.threeRenderer;
     const camera = this.camera.threeCamera;
     const canvasSize = this.renderer.canvasSize;
+    const effectManager = this._effectManager;
 
-    this.on("load", ({ model }) => {
+    effectManager.isEffect = true;
+    effectManager.customEffectCallback = callback;
+
+    this.once(EVENTS.LOAD, ({ model }) => {
       const effectComposer = callback({ scene, renderer, camera, model, canvasSize });
-      this._effectManager.effectComposer = effectComposer;
+      effectManager.effectComposer = effectComposer;
     });
   }
 
   /**
    * Add new effects to View3D
-   * @param {(View3DEffect | PassType)[]} effects effects to add
-   * @returns {Promise<void>} A promise that resolves when all effects are initialized
+   * @param {(View3DEffect | EffectCallback | PassType)[]} effects effects to add
    */
-  public async loadEffects(...effects: (View3DEffect | EffectCallback | PassType)[]) {
+  public loadEffects(...effects: (View3DEffect | EffectCallback | PassType)[]) {
     const effectManager = this._effectManager;
 
-    const initializedEffects = await this._initEffects(effects);
+    effectManager.isEffect = true;
+    effectManager.effects = effects;
 
-    initializedEffects.forEach((effect) => {
-      effectManager.addPass(effect);
+    this.once(EVENTS.LOAD, () => {
+      const initializedEffects = effectManager.initEffects(effects);
+
+      initializedEffects.forEach((effect) => {
+        effectManager.addPass(effect);
+      });
     });
   }
 
@@ -1143,6 +1158,8 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
       const model = await loader.load(src);
       const higherLevelLoaded = loaded.slice(level + 1).some(val => !!val);
       const modelLoadedBefore = loaded.some(val => !!val);
+
+      this._model = model;
 
       this.trigger(EVENTS.LOAD, {
         type: EVENTS.LOAD,
@@ -1220,33 +1237,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
   private async _initPlugins(plugins: View3DPlugin[]) {
     await Promise.all(plugins.map(plugin => plugin.init(this)));
-  }
-
-  private async _initEffects(effects: (View3DEffect | EffectCallback | PassType)[]): Promise<PassType[]> {
-    const scene = this.scene.root;
-    const renderer = this.renderer.threeRenderer;
-    const camera = this.camera.threeCamera;
-    const canvasSize = this.renderer.canvasSize;
-
-    return new Promise((resolve) => {
-      this.on("load", async ({ model }) => {
-        const result = await Promise.all(effects.map((effect) => {
-
-          if (effect instanceof Function) {
-            effect = effect({ scene, camera, model, canvasSize, renderer });
-          }
-
-          if (effect instanceof View3DEffect) {
-            effect.init(this);
-            return effect.getPass()!;
-          }
-
-          return effect;
-        }));
-
-        resolve(result);
-      });
-    });
   }
 
   private async _resetLoadingContextOnFinish(tasks: Array<Promise<any>>) {

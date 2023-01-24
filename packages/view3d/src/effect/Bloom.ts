@@ -49,7 +49,7 @@ class Bloom extends View3DEffect {
     const { radius, threshold, strength } = this._options;
     const resolution = new THREE.Vector2(width * window.devicePixelRatio, height * window.devicePixelRatio);
 
-    this._bloomPass = new UnrealBloomPass(resolution, strength, radius, threshold);
+    return this._bloomPass = new UnrealBloomPass(resolution, strength, radius, threshold);
   }
 
   public getPass() { return this._bloomPass; }

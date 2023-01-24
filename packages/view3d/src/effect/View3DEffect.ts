@@ -15,7 +15,7 @@ export abstract class View3DEffect {
 
   public abstract getPass(): PassType | null;
 
-  public abstract init(view3D: View3D): void;
+  public abstract init(view3D: View3D): PassType;
 }
 
 /**
@@ -32,6 +32,7 @@ export interface Composer {
   passes: PassType[];
 
   reset(): void;
+  removePass(pass: PassType): void;
 }
 
 /**

@@ -40,7 +40,7 @@ class SSR extends View3DEffect {
     const camera = view3D.camera.threeCamera;
     const { selects } = this._options;
 
-    this._ssrPass = new SSRPass({ groundReflector: null, selects, renderer, scene, camera});
+    return this._ssrPass = new SSRPass({ groundReflector: null, selects, renderer, scene, camera});
   }
 
   public getPass() { return this._ssrPass; }

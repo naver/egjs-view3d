@@ -44,7 +44,7 @@ class DoF extends View3DEffect {
 
     camera.near = near;
     camera.far = far;
-    this._dofPass = new BokehPass(scene, camera, { maxblur, aperture, focus });
+    return this._dofPass = new BokehPass(scene, camera, { maxblur, aperture, focus });
   }
 
   public getPass() { return this._dofPass; }
