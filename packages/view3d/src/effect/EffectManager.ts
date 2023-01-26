@@ -127,6 +127,8 @@ class EffectManager {
     const effectComposer = this._effectComposer;
     const passes = this._effectComposer.passes;
 
+    this._isEffect = false;
+
     while (passes.length > 1) {
       effectComposer.removePass(passes[passes.length - 1]);
     }
