@@ -439,11 +439,6 @@ describe("View3D", () => {
       });
     });
 
-    describe("effectComposer", () => {
-      it("should have null as a default value", async () => {
-        expect((await createView3D()).effectComposer).to.equal(null);
-      });
-    });
   });
 
   describe("init", () => {
