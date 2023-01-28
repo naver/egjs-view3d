@@ -234,8 +234,6 @@ class EffectManager {
       if (pass.dispose) {
         pass.dispose();
       }
-
-      pass.enabled = false;
     });
 
     while (passes.length > 1) {

@@ -11,8 +11,6 @@ import { BokehPass } from "three/examples/jsm/postprocessing/BokehPass";
  * @interface
  */
 export interface DoFOptions {
-  near: number;
-  far: number;
   focus: number;
   aperture: number;
   maxblur: number;
@@ -27,22 +25,22 @@ class DoF extends View3DEffect {
 
   private _options: DoFOptions;
 
-  constructor({ focus = 5, aperture = 0.01, maxblur = 0.01, near = 0.1, far = 85 }: Partial<DoFOptions> = {}) {
+  constructor({ focus = 5, aperture = 0.05, maxblur = 0.01 }: Partial<DoFOptions> = {}) {
     super();
 
     this._dofPass = null;
     this._options = {
-      far, aperture, focus, maxblur, near
+      aperture,
+      focus,
+      maxblur
     };
   }
 
   public init(view3D: View3D) {
     const scene = view3D.scene.root;
     const camera = view3D.camera.threeCamera;
-    const { far, aperture, focus, maxblur, near } = this._options;
+    const { aperture, focus, maxblur } = this._options;
 
-    camera.near = near;
-    camera.far = far;
     return this._dofPass = new BokehPass(scene, camera, { maxblur, aperture, focus });
   }
 
