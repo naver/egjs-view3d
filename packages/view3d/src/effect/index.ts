@@ -3,7 +3,7 @@
  * egjs projects are licensed under the MIT license
  */
 import EffectManager from "./EffectManager";
-import View3DEffect, { Composer, PassType, SetCustomEffectParam, EffectCallback } from "./View3DEffect";
+import View3DEffect, { Composer, PassType, AssetKit, EffectCallback } from "./View3DEffect";
 import Bloom, { BloomOptions } from "./Bloom";
 import SSR, { SSROptions } from "./SSR";
 import DoF, { DoFOptions } from "./DoF";
@@ -22,7 +22,7 @@ export {
 
 export type {
   Composer,
-  SetCustomEffectParam,
+  AssetKit,
   EffectCallback,
   PassType,
   BloomOptions,

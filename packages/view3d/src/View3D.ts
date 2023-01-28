@@ -33,7 +33,7 @@ import { getElement, getObjectOption, isCSSSelector, isElement } from "./utils";
 import { LiteralUnion, OptionGetters, ValueOf } from "./type/utils";
 import { LoadingItem } from "./type/external";
 import { GLTFLoader } from "./loader";
-import { EffectManager, View3DEffect, SetCustomEffectParam, EffectCallback, PassType } from "./effect";
+import { EffectManager, View3DEffect, AssetKit, EffectCallback, PassType, Composer } from "./effect";
 
 /**
  * @interface
@@ -879,6 +879,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     this._autoResizer.disable();
     this._animator.destroy();
     this._annotationManager.destroy();
+    this._effectManager.reset();
     this._plugins.forEach(plugin => plugin.teardown(this));
     this._plugins = [];
   }
@@ -1024,7 +1025,6 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
     annotationManager.collect();
     annotationManager.add(...model.annotations);
 
-
     this._model = model;
 
     if (inXR) {
@@ -1035,8 +1035,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
       }
     }
 
-    if(effectManager.isEffect){
-      effectManager.reset();
+    if (effectManager.isEffect) {
       effectManager.update();
     }
 
@@ -1092,21 +1091,21 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   }
 
   /**
-   * For Custom effect or using postprocessing library.
-   * @param {SetCustomEffectParam} callback It's a callback and contains the data as arguments needed to implement custom effects or post-processing. return type is {@link Composer}
+   * Set custom EffectComposer to View3D
+   * @param {(param: AssetKit) => Composer} callback It's a callback and contains the data as arguments needed to implement custom effects or post-processing. return type is {@link Composer}
    */
-  public setCustomEffect(callback: SetCustomEffectParam) {
+  public setCustomEffect(callback: (param: AssetKit) => Composer) {
     const scene = this.scene.root;
     const renderer = this.renderer.threeRenderer;
     const camera = this.camera.threeCamera;
     const canvasSize = this.renderer.canvasSize;
     const effectManager = this._effectManager;
 
-    effectManager.isEffect = true;
+    effectManager.isCustomMode = true;
     effectManager.customEffectCallback = callback;
 
-    this.once(EVENTS.LOAD, ({ model }) => {
-      const effectComposer = callback({ scene, renderer, camera, model, canvasSize });
+    this.once(EVENTS.LOAD, ({model}) => {
+      const effectComposer = callback({scene, renderer, camera, model, canvasSize});
       effectManager.effectComposer = effectComposer;
     });
   }
@@ -1118,7 +1117,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
   public loadEffects(...effects: (View3DEffect | EffectCallback | PassType)[]) {
     const effectManager = this._effectManager;
 
-    effectManager.isEffect = true;
+    effectManager.isLoadEffect = true;
     effectManager.effects = effects;
 
     this.once(EVENTS.LOAD, () => {

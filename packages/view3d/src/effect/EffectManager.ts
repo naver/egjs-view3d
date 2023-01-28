@@ -3,28 +3,27 @@
  * egjs projects are licensed under the MIT license
  */
 import View3D from "../View3D";
-import { Composer, EffectCallback, PassType, SetCustomEffectParam } from "./View3DEffect";
+import { AssetKit, Composer, EffectCallback, PassType } from "./View3DEffect";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { View3DEffect } from "./index";
 
-
 /**
  * Manager class for effects
+ * It is the manager for post-processing or various effects
  */
 class EffectManager {
+  private _view3D: View3D;
+
   private _effectComposer: Composer;
 
   private _effects: (View3DEffect | EffectCallback | PassType)[] = [];
 
-  private _isEffect = false;
+  private _customEffectCallback: ((param: AssetKit) => Composer) | null;
 
-  private _view3D: View3D;
+  private _isLoadEffect: boolean;
 
-  private _customEffectCallback: SetCustomEffectParam | null;
-
-  public set customEffectCallback(val: SetCustomEffectParam) { this._customEffectCallback = val; }
-
+  private _isCustomMode: boolean;
 
   /**
    * EffectComposer object on three.js or library
@@ -34,18 +33,58 @@ class EffectManager {
   }
 
   /**
-   * Returns whether the current effect is in use or not.
-   * The render pass is included by default, so if there are more than one pass, effect is determined to be in use.
+   * Return whether the current effect is in use or not
    */
   public get isEffect() {
-    return this._isEffect;
+    return this._isLoadEffect || this._isCustomMode;
   }
 
-  public get effects() { return this._effects; }
+  /**
+   * Return whether the custom mode is in use or not
+   * If {@link setCustomEffect} is used, this will be set to true
+   */
+  public get isCustomMode() {
+    return this._isCustomMode;
+  }
+
+  /**
+   * Return whether the load effect is in use or not.
+   * If {@link loadEffects} is used, this will be set to true
+   */
+  public get isLoadEffect() {
+    return this._isLoadEffect;
+  }
+
+  /**
+   * Returns the array of pass used from {@link loadEffects}.
+   */
+  public get effects() {
+    return this._effects;
+  }
+
   public set effects(val: (View3DEffect | EffectCallback | PassType)[]) {
     this._effects = val;
   }
-  public set isEffect(val: boolean) { this._isEffect = val; }
+
+  public set isCustomMode(val: boolean) {
+    this._isCustomMode = val;
+
+    if (this._isLoadEffect) {
+      console.error("Cannot use both on 'loadEffects' and 'SetCustomEffect'");
+    }
+  }
+
+  public set isLoadEffect(val: boolean) {
+    this._isLoadEffect = val;
+
+    if (this._isCustomMode) {
+      console.error("Cannot use both on 'loadEffects' and 'SetCustomEffect'");
+    }
+  }
+
+  public set customEffectCallback(val: (param: AssetKit) => Composer) {
+    this._customEffectCallback = val;
+  }
 
   public set effectComposer(composer: Composer) {
     this._effectComposer = composer;
@@ -53,15 +92,16 @@ class EffectManager {
 
   constructor(view3D: View3D) {
     this._view3D = view3D;
-    const renderer = view3D.renderer.threeRenderer;
-    const scene = view3D.scene.root;
-    const camera = view3D.camera.threeCamera;
+    this._isCustomMode = false;
+    this._isLoadEffect = false;
 
-    const effectComposer = this._effectComposer = new EffectComposer(renderer);
-
-    effectComposer.addPass(new RenderPass(scene, camera));
+    this._initEffectComposer();
   }
 
+  /**
+   * Initialize {@link effects}
+   * @param effects
+   */
   public initEffects(effects: (View3DEffect | EffectCallback | PassType)[]): PassType[] {
     const view3D = this._view3D;
     const assets = this._getAssets();
@@ -109,31 +149,63 @@ class EffectManager {
     this._effectComposer.render(deltaTime);
   }
 
+  /**
+   * Update on applied effects.
+   * It is removed all applied effects and try again to set them
+   */
   public update() {
-    if (this._customEffectCallback) {
-      this._initCustomEffect();
-      return;
-    }
-
+    const canvasSize = this._view3D.renderer.canvasSize;
     const effects = this._effects;
     const updatedEffect = this.initEffects(effects);
 
-    updatedEffect.forEach((effect) => {
-      this.addPass(effect);
-    });
-  }
-
-  public reset() {
-    const effectComposer = this._effectComposer;
-    const passes = this._effectComposer.passes;
-
-    this._isEffect = false;
-
-    while (passes.length > 1) {
-      effectComposer.removePass(passes[passes.length - 1]);
+    if (this._isLoadEffect && this._isCustomMode) {
+      console.error("Cannot use both on 'loadEffects' and 'SetCustomEffect'");
     }
 
+    this._removeAllPasses();
+
+    if (this._isLoadEffect) {
+      updatedEffect.forEach((effect) => {
+        this.addPass(effect);
+      });
+    }
+
+    if (this._isCustomMode) {
+      this._initCustomEffect();
+    }
+
+    this.resize(canvasSize);
+  }
+
+  /**
+   * Reset effect to initial state
+   */
+  public reset() {
+    const effectComposer = this._effectComposer;
+
+    this._removeAllPasses();
+
     effectComposer.reset();
+    if (effectComposer.dispose) {
+      effectComposer.dispose();
+    }
+
+    this._initEffectComposer();
+
+    this._effects = [];
+    this._isLoadEffect = false;
+    this._isCustomMode = false;
+    this._customEffectCallback = null;
+  }
+
+  private _initEffectComposer() {
+    const view3D = this._view3D;
+    const renderer = view3D.renderer.threeRenderer;
+    const scene = view3D.scene.root;
+    const camera = view3D.camera.threeCamera;
+
+    this._effectComposer = new EffectComposer(renderer);
+    this._effectComposer.addPass(new RenderPass(scene, camera));
   }
 
   private _getAssets() {
@@ -144,7 +216,7 @@ class EffectManager {
     const canvasSize = view3D.renderer.canvasSize;
     const model = view3D.model;
 
-    return { scene, renderer, camera, canvasSize, model };
+    return {scene, renderer, camera, canvasSize, model};
   }
 
   private _initCustomEffect() {
@@ -153,6 +225,23 @@ class EffectManager {
     if (!this._customEffectCallback) return;
 
     this._effectComposer = this._customEffectCallback(assets);
+  }
+
+  private _removeAllPasses() {
+    const passes = this._effectComposer.passes;
+
+    passes.forEach((pass) => {
+      if (pass.dispose) {
+        pass.dispose();
+      }
+
+      pass.enabled = false;
+    });
+
+    while (passes.length > 1) {
+      this._effectComposer.removePass(passes[passes.length - 1]);
+    }
+
   }
 
 }

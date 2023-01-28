@@ -9,7 +9,6 @@ import { BokehPass } from "three/examples/jsm/postprocessing/BokehPass";
 /**
  * Options for the {@link DoF}
  * @interface
- *
  */
 export interface DoFOptions {
   near: number;
@@ -51,5 +50,3 @@ class DoF extends View3DEffect {
 }
 
 export default DoF;
-
-

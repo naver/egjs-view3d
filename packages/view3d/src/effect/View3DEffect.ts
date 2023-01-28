@@ -8,7 +8,7 @@ import Model from "../core/Model";
 
 /**
  * Effect for View3D.
- * Abstract class are used to verify the type with "instanceof" at runtime.
+ * This can be used to verify the type using the "instanceof" operator at runtime.
  * @interface
  */
 export abstract class View3DEffect {
@@ -19,8 +19,8 @@ export abstract class View3DEffect {
 }
 
 /**
- * Interface for the effectComposer.
- * Both effectComposer of THREE.js and effectComposer of post-processing [library]{@link https://github.com/pmndrs/postprocessing} are corresponding interfaces.
+ * This interface is for the effectComposer.
+ * The interface is created to support both EffectComposer of THREE.js and EffectComposer of [postprocessing post-processing]{@link https://github.com/pmndrs/postprocessing}
  */
 export interface Composer {
   render(deltaTime?: number): void;
@@ -32,16 +32,22 @@ export interface Composer {
   passes: PassType[];
 
   reset(): void;
+
   removePass(pass: PassType): void;
+
+  dispose?: () => unknown;
 }
 
 /**
- * Extract common type of Pass in postProcessing library and THREE.js
+ * This is created to support various pass type
  */
 export interface PassType {
   needsSwap: boolean;
+
   enabled: boolean;
+
   setSize(width: number, height: number): void;
+
   render(
     renderer: THREE.WebGLRenderer,
     writeBuffer: THREE.WebGLRenderTarget,
@@ -49,9 +55,14 @@ export interface PassType {
     deltaTime?: number,
     maskActive?: boolean
   ): void;
+
+  dispose?: () => unknown;
 }
 
-type EffectCallbackParam = {
+/**
+ * This interface is used to create various custom effects
+ */
+export type AssetKit = {
   renderer: THREE.WebGLRenderer;
   camera: THREE.PerspectiveCamera;
   scene: THREE.Scene;
@@ -59,8 +70,6 @@ type EffectCallbackParam = {
   canvasSize: THREE.Vector2
 };
 
-export type EffectCallback = (param: EffectCallbackParam) => PassType | View3DEffect;
-
-export type SetCustomEffectParam = (param: EffectCallbackParam) => Composer;
+export type EffectCallback = (param: AssetKit) => PassType | View3DEffect;
 
 export default View3DEffect;
