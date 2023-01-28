@@ -8,6 +8,7 @@ import Bloom, { BloomOptions } from "./Bloom";
 import SSR, { SSROptions } from "./SSR";
 import DoF, { DoFOptions } from "./DoF";
 import SAO, { SAOOptions } from "./SAO";
+import Gamma from "./Gamma";
 
 export {
   View3DEffect,
@@ -15,7 +16,8 @@ export {
   SAO,
   Bloom,
   SSR,
-  DoF
+  DoF,
+  Gamma
 };
 
 export type {
