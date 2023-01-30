@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.10.0](https://github.com/naver/egjs-view3d/compare/2.9.1...2.10.0) (2023-01-17)
+### :sparkles: Packages
+* `@egjs/ngx-view3d` 2.3.0
+* `@egjs/react-view3d` 2.3.0
+* `@egjs/svelte-view3d` 2.3.0
+* `@egjs/view3d` 2.10.0
+* `@egjs/vue-view3d` 2.3.0
+* `@egjs/vue3-view3d` 2.3.0
+
+
+### :rocket: New Features
+
+* `@egjs/view3d`
+    * load iosSrc ([bcb4b8f](https://github.com/naver/egjs-view3d/commit/bcb4b8f37a857be6268609d0720dac5691effedc))
+
+
+### :bug: Bug Fix
+
+* `@egjs/react-view3d`
+    * wrong export name ([612aa7c](https://github.com/naver/egjs-view3d/commit/612aa7c7423cfe854595bb5c4b11aa49b00bc4b4))
+
+
+### :mega: Other
+
+* All
+    * update packages versions ([db73009](https://github.com/naver/egjs-view3d/commit/db7300922cedba3001fd9668dcca954f68d17f0d))
+* `@egjs/vue3-view3d`, `@egjs/vue-view3d`, `@egjs/view3d`, `@egjs/svelte-view3d`
+    * fix eslint configs ([a99e3c7](https://github.com/naver/egjs-view3d/commit/a99e3c7217866f7c492c03f62416247154550bec))
+* Other
+    * add .gitignore for webstorm ([ee068ae](https://github.com/naver/egjs-view3d/commit/ee068aea3487f9ca6e64d5e63474298fc982e606))
+
+
+
 ## [2.9.1](https://github.com/naver/egjs-view3d/compare/2.9.0...2.9.1) (2022-11-08)
 ### :sparkles: Packages
 * `@egjs/ngx-view3d` 2.2.1

@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.3.0](https://github.com/naver/egjs-view3d/compare/@egjs/react-view3d@2.2.1...@egjs/react-view3d@2.3.0) (2023-01-17)
+
+
+### :bug: Bug Fix
+
+* wrong export name ([612aa7c](https://github.com/naver/egjs-view3d/commit/612aa7c7423cfe854595bb5c4b11aa49b00bc4b4))
+
+
+### :mega: Other
+
+* update packages versions ([db73009](https://github.com/naver/egjs-view3d/commit/db7300922cedba3001fd9668dcca954f68d17f0d))
+
+
+
 ## [2.2.1](https://github.com/naver/egjs-view3d/compare/@egjs/react-view3d@2.2.0...@egjs/react-view3d@2.2.1) (2022-11-08)
 
 

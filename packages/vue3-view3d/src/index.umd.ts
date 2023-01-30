@@ -9,7 +9,6 @@ import View3D from "./View3D";
 export default {
   install: (app: App) => {
     app.component("View3D", View3D);
-
   },
   View3D
 };
