@@ -1101,7 +1101,7 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
   /**
    * Set custom EffectComposer to View3D
-   * @param {(param: AssetKit) => Composer} callback It's a callback and contains the data as arguments needed to implement custom effects or post-processing. return type is {@link Composer}
+   * @param callback It's a callback and contains the data as arguments needed to implement custom effects or post-processing. return type is {@link Composer}
    */
   public setCustomEffect(callback: (param: AssetKit) => Composer) {
     const scene = this.scene.root;
@@ -1121,14 +1121,13 @@ class View3D extends Component<View3DEvents> implements OptionGetters<Omit<View3
 
   /**
    * Add new effects to View3D
-   * @param {(View3DEffect | EffectCallback | PassType)[]} effects effects to add
+   * @param effects effects to add
    */
   public loadEffects(...effects: (View3DEffect | EffectCallback | PassType)[]) {
     const effectManager = this._effectManager;
 
     effectManager.isLoadEffect = true;
     effectManager.effects = effects;
-
     this.once(EVENTS.LOAD, () => {
       const initializedEffects = effectManager.initEffects(effects);
 

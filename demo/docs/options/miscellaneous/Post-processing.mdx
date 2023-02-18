@@ -54,39 +54,29 @@ view3D.setCustomEffect((param) => {
 ### Before / After
 <div className="columns">
   <div className="column is-6">
-    <PostProcessing src={"/egjs-view3d/model/draco/alarm.glb"} type="alarm" setPostProcessing={false} initZoom={4}/>
+    <PostProcessing src={"/egjs-view3d/model/draco/alarm.glb"} initZoom={4} yaw={330} pitch={15}/>
   </div>
   <div className="column is-6">
-    <PostProcessing src={"/egjs-view3d/model/draco/alarm.glb"} type="alarm" initZoom={4}/>
-  </div>
-</div>
-
-<div className="columns">
-  <div className="column is-6">
-    <PostProcessing src={"/egjs-view3d/model/lamborghini.glb"} setPostProcessing={false}/>
-  </div>
-  <div className="column is-6">
-    <PostProcessing src={"/egjs-view3d/model/lamborghini.glb"} type={"car"}/>
+    <PostProcessing src={"/egjs-view3d/model/draco/alarm.glb"} effectType="basic" initZoom={4} yaw={330} pitch={15}/>
   </div>
 </div>
 
 
-### Example
-<PostProcessing src={"/egjs-view3d/model/draco/alarm.glb"} type="alarm" initZoom={3}/>
+
 
 <License items={[
-  {
-    name: "Alarm Clock 01",
-    link: "https://polyhaven.com/a/alarm_clock_01",
-    author: "Poly Haven",
-    authorLink: "https://polyhaven.com/",
-    license: "CC0"
-  },
-  {
-    name: "Lamborghini Terzo Millennio",
-    link: "https://sketchfab.com/3d-models/free-lamborghini-terzo-millennio-7ad3dffa9d344c3c978eafcc220cb709",
-    author: "SDC PERFORMANCE™️",
-    authorLink: "https://sketchfab.com/3Duae",
-    license: "Creative Commons Attribution"
-  }
+      {
+        name: "Alarm Clock 01",
+        link: "https://polyhaven.com/a/alarm_clock_01",
+        author: "Poly Haven",
+        authorLink: "https://polyhaven.com/",
+        license: "CC0"
+      },
+      {
+        name: "Lamborghini Terzo Millennio",
+        link: "https://sketchfab.com/3d-models/free-lamborghini-terzo-millennio-7ad3dffa9d344c3c978eafcc220cb709",
+        author: "SDC PERFORMANCE™️",
+        authorLink: "https://sketchfab.com/3Duae",
+        license: "Creative Commons Attribution"
+      }
 ]}/>

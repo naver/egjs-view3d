@@ -1,6 +1,6 @@
 import clsx from "clsx";
-import React, { useEffect, useRef } from "react";
-import View3D, { SSR, SAO, Bloom, DoF } from "../View3D";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
+import View3D, { SSR, SAO, Bloom, View3DOptions, Gamma } from "../View3D";
 import {
   BloomEffect,
   BrightnessContrastEffect,
@@ -11,43 +11,77 @@ import {
   ToneMappingEffect,
   ToneMappingMode,
 } from "postprocessing";
+import * as THREE from "three";
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
+import { GammaCorrectionShader } from "three/examples/jsm/shaders/GammaCorrectionShader";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
+import { SSRPass } from "three/examples/jsm/postprocessing/SSRPass";
+import { SSAOPass } from "three/examples/jsm/postprocessing/SSAOPass";
+import { FXAAShader } from "three/examples/jsm/shaders/FXAAShader";
 
+type EffectType = "false" | "basic" | "three" | "postProcessing-library" | "hybrid";
 
-type Params = {
-  src: string;
-  type: "car" | "alarm" | "default"
-  setPostProcessing?: boolean
-  positionY?: number;
-  initZoom?: number
+interface Params extends Partial<View3DOptions> {
+  effectType: EffectType
 }
 
-const PostProcessing = ({ src, setPostProcessing = true, type = "default", initZoom = 8 }: Params) => {
+const PostProcessing = ({
+  effectType,
+  ...options
+}: Params) => {
+
   const ref = useRef<View3D>(null);
 
-  useEffect(() => {
+
+  useLayoutEffect(() => {
     const view3D = ref.current.view3D;
 
     view3D.on("ready", () => {
-      view3D.scene.fixedObjects.children[0].position.y = view3D.model.scene.position.y;
+      view3D.scene.fixedObjects.children[ 0 ].position.y = view3D.model.scene.position.y;
     });
 
   }, []);
 
   useEffect(() => {
-    if (!setPostProcessing || type !== "alarm") return;
+    if (effectType !== "basic") return;
 
     const view3D = ref.current.view3D;
 
     view3D.loadEffects(
-      new SSR(),
-      new DoF(),
-      new Bloom({ radius: 0.5, threshold: 0.3, strength: 1 }),
+      new Bloom({ strength: 1, radius: 1, threshold: 0.3 }),
+      // ({ canvasSize }) => new UnrealBloomPass(canvasSize, 1, 1.5, 0.3),
     );
 
-  }, [setPostProcessing, type]);
+    view3D.on("loadError", (e) => {
+      console.log(e);
+    })
+
+
+  }, [ effectType ]);
 
   useEffect(() => {
-    if (!setPostProcessing || type !== "car") return;
+    if (effectType !== "three") return;
+
+    const view3D = ref.current.view3D;
+
+
+    (async () => {
+      view3D.loadEffects(
+        ({ model, camera, renderer, canvasSize, scene }) => {
+          console.log(model.meshes[ 0 ]);
+          return new SSRPass({ renderer, scene, camera, selects: [ model.meshes[ 0 ] ], groundReflector: null });
+        },
+
+        // new ShaderPass(FXAAShader),
+        new Bloom({ strength: 1 }),
+      );
+
+
+    })();
+  }, [ effectType ])
+
+  useEffect(() => {
+    if (effectType !== "postProcessing-library") return;
 
     const view3D = ref.current.view3D;
 
@@ -65,21 +99,26 @@ const PostProcessing = ({ src, setPostProcessing = true, type = "default", initZ
         )
       );
 
+
+      console.log(effectComposer, "111");
       return effectComposer;
     });
 
-  }, [setPostProcessing, type]);
+
+    // setTimeout(() => {
+    //   view3D.load("/egjs-view3d/model/draco/alarm.glb");
+    // },3000)
+
+  }, [ effectType ]);
 
   return (
     <>
       <div className={clsx("view3d-wrapper", "mb-2")}>
         <View3D
-          ref={ref}
-          src={src}
-          yaw={330}
-          pitch={8.14}
-          initialZoom={initZoom}
-          meshoptPath={"/egjs-view3d/lib/meshopt_decoder.js"}
+          { ...options }
+          ref={ ref }
+          meshoptPath={ "/egjs-view3d/lib/meshopt_decoder.js" }
+          translate={ "no" }
         />
       </div>
     </>
