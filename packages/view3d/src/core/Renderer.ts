@@ -134,8 +134,8 @@ class Renderer {
 
     if (renderer.xr.isPresenting) return;
 
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
+    const width = canvas.clientWidth || 1;
+    const height = canvas.clientHeight || 1;
 
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height, false);
@@ -205,7 +205,6 @@ class Renderer {
     if (threeRenderer.getContext().isContextLost()) return;
 
     const deltaMiliSec = delta * 1000;
-
     this._renderQueued = false;
 
     animator.update(delta);
