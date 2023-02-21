@@ -1,0 +1,82 @@
+---
+sidebar_position: 10
+---
+import PostProcessing from "@site/src/components/demo/PostProcessing";
+import OptionDescriptor from "@site/src/components/OptionDescriptor";
+import License from "@site/src/components/License";
+
+<OptionDescriptor type="null | EffectComposerType " defaultVal="null"/>
+
+Post-processing applies various effects to rendered scene.
+
+View3D offers post-processing on THREE.JS, including SSR, DoF, Bloom, and SAO.
+
+```js
+import View3D, {SSR, DoF, Bloom} from "@egjs/view3d";
+
+const view3D = new View3D(...);
+
+view3D.loadEffects(
+    new SSR(),
+    new DoF(),
+    new Bloom({ radius: 0.5, threshold: 0.3, strength: 1 }),
+);
+
+```
+:::caution
+SAO and SSR can not be used together.
+:::
+
+Also, you can use customize THREE.JS post-processing or [Postprocessing](https://github.com/pmndrs/postprocessing) of library.
+
+```js
+import View3D from "@egjs/view3d";
+
+// It's EffectComposer of built-in three.js
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
+// Or you can use EffectComposer of postprocessing library
+import { EffectComposer } from "postprocessing";
+
+const view3D = new View3D(...);
+
+view3D.setCustomEffect((param) => {
+      const { camera, renderer, canvasSize, scene, model } = param;
+      const effectComposer = new EffectComposer(renderer);
+
+      ...
+
+      // You have to return EffectComposer
+      return effectComposer;
+});
+```
+
+
+### Before / After
+<div className="columns">
+  <div className="column is-6">
+    <PostProcessing src={"/egjs-view3d/model/draco/alarm.glb"} initZoom={4} yaw={330} pitch={15}/>
+  </div>
+  <div className="column is-6">
+    <PostProcessing src={"/egjs-view3d/model/draco/alarm.glb"} effectType="basic" initZoom={4} yaw={330} pitch={15}/>
+  </div>
+</div>
+
+
+
+
+<License items={[
+      {
+        name: "Alarm Clock 01",
+        link: "https://polyhaven.com/a/alarm_clock_01",
+        author: "Poly Haven",
+        authorLink: "https://polyhaven.com/",
+        license: "CC0"
+      },
+      {
+        name: "Lamborghini Terzo Millennio",
+        link: "https://sketchfab.com/3d-models/free-lamborghini-terzo-millennio-7ad3dffa9d344c3c978eafcc220cb709",
+        author: "SDC PERFORMANCE™️",
+        authorLink: "https://sketchfab.com/3Duae",
+        license: "Creative Commons Attribution"
+      }
+]}/>

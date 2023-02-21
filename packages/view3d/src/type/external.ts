@@ -1,3 +1,6 @@
+import { EffectComposer as EffectComposerLib } from "postprocessing";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
+
 /*
  * Copyright (c) 2015 NAVER Corp.
  * egjs projects are licensed under the MIT license

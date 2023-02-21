@@ -199,7 +199,8 @@ class Renderer {
       control,
       autoPlayer,
       animator,
-      annotation
+      annotation,
+      effect
     } = view3D;
 
     if (threeRenderer.getContext().isContextLost()) return;
@@ -220,7 +221,12 @@ class Renderer {
     camera.updatePosition();
 
     scene.shadowPlane.render();
-    threeRenderer.render(scene.root, camera.threeCamera);
+
+    if (effect.isEffect) {
+      effect.render();
+    } else {
+      threeRenderer.render(scene.root, camera.threeCamera);
+    }
 
     // Render annotations
     annotation.render();

@@ -448,6 +448,7 @@ describe("View3D", () => {
         expect((await createView3D()).maxDeltaTime).to.equal(1 / 30);
       });
     });
+
   });
 
   describe("init", () => {

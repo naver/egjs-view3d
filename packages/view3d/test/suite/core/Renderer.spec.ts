@@ -1,6 +1,7 @@
 import * as THREE from "three";
 
 import { createView3D, wait } from "../../test-utils";
+import { SSR } from "~/effect";
 
 describe("Renderer", () => {
   describe("default values", () => {
@@ -65,6 +66,24 @@ describe("Renderer", () => {
       expect(beforeRenderSpy.calledOnce).to.be.true;
       expect(renderSpy.calledOnce).to.be.true;
       expect(beforeRenderSpy.calledBefore(renderSpy)).to.be.true;
+    });
+
+    it("should call render method of EffectComposer, If the effect is used.", async () => {
+      const view3D = await createView3D();
+      const effectComposer = view3D.effect.effectComposer;
+
+      await view3D.loadEffects(
+        new SSR()
+      );
+
+      let count = 0;
+      effectComposer.render = () => {
+        ++count;
+      };
+
+      view3D.renderer.renderSingleFrame(true);
+
+      expect(count).to.equal(1);
     });
   });
 });
