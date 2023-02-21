@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.10.1](https://github.com/naver/egjs-view3d/compare/2.10.0...2.10.1) (2023-02-21)
+### :sparkles: Packages
+* `@egjs/ngx-view3d` 2.3.1
+* `@egjs/react-view3d` 2.3.1
+* `@egjs/svelte-view3d` 2.3.1
+* `@egjs/view3d` 2.10.1
+* `@egjs/vue-view3d` 2.3.1
+* `@egjs/vue3-view3d` 2.3.1
+
+
+### :bug: Bug Fix
+
+* `@egjs/view3d`
+    * View3D not rendering after setting display none ([858de3e](https://github.com/naver/egjs-view3d/commit/858de3eac5edded2e6f5cc3c91b773808d44a75d))
+
+
+### :mega: Other
+
+* All
+    * update packages versions ([6d3c8eb](https://github.com/naver/egjs-view3d/commit/6d3c8ebd0ae1d3c012f68c5d758d8aaa48cceba8))
+
+
+
 ## [2.10.0](https://github.com/naver/egjs-view3d/compare/2.9.1...2.10.0) (2023-01-17)
 ### :sparkles: Packages
 * `@egjs/ngx-view3d` 2.3.0

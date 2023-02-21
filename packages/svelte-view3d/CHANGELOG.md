@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.3.1](https://github.com/naver/egjs-view3d/compare/@egjs/svelte-view3d@2.3.0...@egjs/svelte-view3d@2.3.1) (2023-02-21)
+
+
+### :mega: Other
+
+* update packages versions ([6d3c8eb](https://github.com/naver/egjs-view3d/commit/6d3c8ebd0ae1d3c012f68c5d758d8aaa48cceba8))
+
+
+
 ## [2.3.0](https://github.com/naver/egjs-view3d/compare/@egjs/svelte-view3d@2.2.1...@egjs/svelte-view3d@2.3.0) (2023-01-17)
 
 
