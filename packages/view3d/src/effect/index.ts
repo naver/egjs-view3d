@@ -6,13 +6,11 @@ import EffectManager from "./EffectManager";
 import View3DEffect, { Composer, PassType, AssetKit, EffectCallback } from "./View3DEffect";
 import Bloom, { BloomOptions } from "./Bloom";
 import SSR, { SSROptions } from "./SSR";
-import SAO, { SAOOptions } from "./SAO";
 import Gamma from "./Gamma";
 
 export {
   View3DEffect,
   EffectManager,
-  SAO,
   Bloom,
   SSR,
   Gamma
@@ -25,7 +23,6 @@ export type {
   PassType,
   BloomOptions,
   SSROptions,
-  SAOOptions
 };
 
 
