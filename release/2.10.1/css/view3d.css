@@ -1,0 +1,108 @@
+.view3d-wrapper {
+  position: relative;
+  touch-action: pan-y;
+}
+
+.view3d-wrapper:-webkit-full-screen {
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+}
+
+.view3d-wrapper:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+}
+
+.view3d-canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  -webkit-user-drag: none;
+}
+
+.view3d-canvas.ctx-lost {
+  text-indent: 0.001px;
+}
+
+.view3d-square,
+.view3d-1by1 {
+  padding-top: 100%;
+}
+
+.view3d-5by4 {
+  padding-top: 80%;
+}
+
+.view3d-4by3 {
+  padding-top: 75%;
+}
+
+.view3d-3by2 {
+  padding-top: 66.6666%;
+}
+
+.view3d-5by3 {
+  padding-top: 60%;
+}
+
+.view3d-16by9 {
+  padding-top: 56.25%;
+}
+
+.view3d-2by1 {
+  padding-top: 50%;
+}
+
+.view3d-3by1 {
+  padding-top: 33.3333%;
+}
+
+.view3d-4by5 {
+  padding-top: 125%;
+}
+
+.view3d-3by4 {
+  padding-top: 133.3333%;
+}
+
+.view3d-2by3 {
+  padding-top: 150%;
+}
+
+.view3d-3by5 {
+  padding-top: 166.6666%;
+}
+
+.view3d-9by16 {
+  padding-top: 177.7777%;
+}
+
+.view3d-1by2 {
+  padding-top: 200%;
+}
+
+.view3d-1by3 {
+  padding-top: 300%;
+}
+
+.view3d-poster {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  filter: blur(1em);
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
+.noblur .view3d-poster {
+  filter: none;
+}

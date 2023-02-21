@@ -1,0 +1,232 @@
+.view3d-ar-overlay {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.view3d-ar-button {
+  display: flex;
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  fill: rgba(0, 0, 0, 0.7);
+  border-radius: 9999px;
+  padding: 12px;
+  border: 1px #dbdbdb solid;
+  background-color: white;
+}
+
+.view3d-ar-button::before {
+  display: block;
+  width: 32px;
+  height: 32px;
+}
+
+.view3d-ar-button:disabled {
+  cursor: not-allowed;
+  pointer-events: all;
+  opacity: 0.5;
+  box-shadow: none;
+}
+
+.view3d-ar-button .view3d-tooltip {
+  visibility: hidden;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 12px;
+  border-radius: 6px;
+  position: absolute;
+  bottom: 100%;
+  right: 0%;
+  z-index: 1;
+  white-space: nowrap;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.view3d-ar-button .view3d-tooltip::after {
+  content: " ";
+  position: absolute;
+  top: 100%;
+  right: 23px;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: black transparent transparent transparent;
+}
+
+.view3d-ar-button:hover .view3d-tooltip {
+  visibility: visible;
+}
+
+.view3d-ar-root {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.view3d-ar-close {
+  display: flex;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  pointer-events: all;
+  cursor: pointer;
+}
+
+.view3d-ar-detection {
+  position: relative;
+  pointer-events: none;
+  display: none;
+}
+
+.view3d-ar-detection.visible {
+  display: flex;
+}
+
+.view3d-ar-detection-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.view3d-ar-phone {
+  width: 100px;
+  height: 180px;
+  border: 8px solid white;
+  border-radius: 10px;
+  animation: view3d-detection-find 6s ease-in-out infinite;
+  position: absolute;
+}
+
+.view3d-ar-phone::before, .view3d-ar-phone::after {
+  position: absolute;
+  left: 0;
+  border-bottom: 8px solid white;
+  content: "";
+  width: 100%;
+}
+
+.view3d-ar-phone::before {
+  top: 10px;
+}
+
+.view3d-ar-phone::after {
+  bottom: 20px;
+}
+
+.view3d-ar-cube {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  transform-style: preserve-3d;
+  transform: rotateX(-30deg) rotateY(45deg);
+  animation: view3d-cube-spin 10s linear infinite;
+}
+
+.view3d-ar-cube-face {
+  width: 30px;
+  height: 30px;
+  background-color: white;
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  transform-style: preserve-3d;
+  -webkit-backface-visibility: hidden;
+          backface-visibility: hidden;
+}
+
+.view3d-ar-cube-face:nth-child(1) {
+  transform: translateY(-16px) rotateX(90deg);
+}
+
+.view3d-ar-cube-face:nth-child(2) {
+  transform: translateZ(16px);
+}
+
+.view3d-ar-cube-face:nth-child(3) {
+  transform: translateX(16px) rotateY(90deg);
+}
+
+.view3d-ar-cube-face:nth-child(4) {
+  transform: translateX(-16px) rotateY(-90deg);
+}
+
+.view3d-ar-cube-face:nth-child(5) {
+  transform: translateZ(-16px) rotateY(180deg);
+}
+
+.view3d-ar-plane {
+  position: absolute;
+  width: 200px;
+  height: 300px;
+  border: 10px solid white;
+  transform-style: preserve-3d;
+  transform: translateY(10px) rotateX(75deg) translateY(-40px);
+}
+
+.view3d-ar-detection-toast {
+  position: fixed;
+  color: #ffffff;
+  width: calc(100vw - 20px);
+  left: 10px;
+  bottom: 10px;
+  padding: 16px;
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.7);
+  text-align: center;
+}
+
+@keyframes view3d-cube-spin {
+  0% {
+    transform: rotateX(-30deg) rotateY(45deg);
+  }
+  50% {
+    transform: rotateX(-30deg) rotateY(225deg);
+  }
+  100% {
+    transform: rotateX(-30deg) rotateY(405deg);
+  }
+}
+
+@keyframes view3d-detection-find {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  12.5% {
+    transform: translate3d(30px, 0, 0);
+  }
+  25% {
+    transform: translate3d(0, 0, 0);
+  }
+  37.5% {
+    transform: translate3d(-30px, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, 0, 0);
+  }
+  62.5% {
+    transform: translate3d(0, 30px, 0);
+  }
+  75% {
+    transform: translate3d(0, 0, 0);
+  }
+  87.5% {
+    transform: translate3d(0, -30px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
