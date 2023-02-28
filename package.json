@@ -1,13 +1,12 @@
 {
   "name": "view3d-root",
-  "description": "Fast & Customizable glTF 3D model viewer, packed with full of features!",
   "private": true,
   "scripts": {
     "lint": "eslint 'packages/**/!(demo)/src/*.ts'",
     "packages": "npm run packages:update && npm run packages:build && npm run packages:publish",
     "packages:update": "lerna-helper version",
-    "packages:build": "npm run build --prefix packages/view3d && lerna run build --ignore @egjs/view3d --stream",
-    "packages:publish": "lerna-helper publish --commit 'chore: update packages versions'",
+    "packages:build": "npm run build --prefix packages/view3d && lerna run build --ignore @egjs/view3d --ignore @egjs/ngx-view3d --stream",
+    "packages:publish": "lerna-helper publish --ignore @egjs/ngx-view3d --commit 'chore: update packages versions'",
     "changelog": "lerna-helper changelog --type all --base @egjs/view3d",
     "docs:build": "jsdoc-to-mdx -c ./jsdoc-to-mdx.json",
     "demo:build": "run-s demo:copy-lib docs:build demo:build-docusaurus",
@@ -15,8 +14,7 @@
     "demo:build-docusaurus": "npm run build --prefix demo",
     "demo:deploy": "lerna-helper deploy --base @egjs/view3d --src demo/build/ --remote upstream",
     "demo:deploy-origin": "lerna-helper deploy --base @egjs/view3d --src demo/build/ --remote origin",
-    "release": "lerna-helper release --base @egjs/view3d --remote upstream --branch main",
-    "bootstrap": "lerna bootstrap --hoist three --hoist @types/three"
+    "release": "lerna-helper release --base @egjs/view3d --remote upstream --branch main"
   },
   "repository": {
     "type": "git",
@@ -32,8 +30,14 @@
     "three": "~0.134.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.17.5",
+    "@babel/preset-env": "^7.16.11",
     "@daybrush/jsdoc": "^0.3.12",
-    "@egjs/release-helper": "^0.2.3",
+    "@egjs/release-helper": "^0.2.9",
+    "@rollup/plugin-babel": "^5.3.0",
+    "@rollup/plugin-commonjs": "^11.1.0",
+    "@rollup/plugin-node-resolve": "^7.1.3",
+    "@rollup/plugin-replace": "^4.0.0",
     "@types/three": "~0.134.0",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/eslint-plugin-tslint": "^4.18.0",
@@ -48,11 +52,24 @@
     "jsdoc-to-mdx": "^1.1.2",
     "lerna": "^4.0.0",
     "npm-run-all": "^4.1.5",
-    "typescript": "~4.1.0"
+    "rollup": "^2.79.1",
+    "rollup-plugin-glslify": "^1.2.1",
+    "rollup-plugin-prototype-minify": "^1.1.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.34.1",
+    "rollup-plugin-visualizer": "^4.0.4",
+    "tslint": "^6.1.3",
+    "typescript": "^4.7.4"
   },
   "husky": {
     "hooks": {
       "commit-msg": "node ./config/validate-commit-msg.js"
     }
-  }
+  },
+  "workspaces": [
+    "demo",
+    "packages/*",
+    "packages/view3d/test",
+    "packages/ngx-view3d/projects/ngx-view3d"
+  ]
 }

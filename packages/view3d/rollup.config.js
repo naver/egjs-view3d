@@ -1,6 +1,6 @@
 /* eslint-disable import/order */
 const glslify = require("rollup-plugin-glslify");
-const buildHelper = require("./config/build-helper");
+const buildHelper = require("../../config/build-helper");
 const { babel } = require("@rollup/plugin-babel");
 const resolve = require("@rollup/plugin-node-resolve");
 

@@ -7,7 +7,7 @@ import {
 import Header from "./Header";
 import View3D, { ControlBar, LoadingBar, View3DPlugin } from "../src";
 import "./App.css";
-import "@egjs/view3d/css/view3d-bundle.css"
+import "@egjs/view3d/css/view3d-bundle.css";
 
 export default class App extends Component<{}, { skybox: string | null }> {
   public plugins: View3DPlugin[];
@@ -18,7 +18,7 @@ export default class App extends Component<{}, { skybox: string | null }> {
     this.plugins = [new LoadingBar(), new ControlBar()];
     this.state = {
       skybox: null
-    }
+    };
   }
 
   public render() {
@@ -87,7 +87,7 @@ export default class App extends Component<{}, { skybox: string | null }> {
               />
             <button onClick={() => {
               if (!this.state.skybox) {
-                this.setState({ skybox: "https://naver.github.io/egjs-view3d/texture/venice_sunset_1k.hdr" })
+                this.setState({ skybox: "https://naver.github.io/egjs-view3d/texture/venice_sunset_1k.hdr" });
               } else {
                 this.setState({ skybox: null });
               }

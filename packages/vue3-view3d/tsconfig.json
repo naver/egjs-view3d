@@ -2,31 +2,23 @@
   "compilerOptions": {
     "target": "es5",
     "module": "esnext",
-    "strict": false,
     "jsx": "preserve",
-    "importHelpers": true,
     "moduleResolution": "node",
-    "experimentalDecorators": true,
-    "skipLibCheck": true,
+    "useDefineForClassFields": true,
+    "strict": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "sourceMap": true,
-    "declaration": false,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "preserveSymlinks": false,
+    "lib": ["ESNext", "DOM"],
     "baseUrl": ".",
-    "types": [
-      "webpack-env"
-    ],
     "paths": {
       "@/*": [
         "src/*"
       ]
-    },
-    "lib": [
-      "esnext",
-      "dom",
-      "dom.iterable",
-      "scripthost"
-    ]
+    }
   },
   "include": [
     "src/**/*.ts",
@@ -37,5 +29,6 @@
   ],
   "exclude": [
     "node_modules"
-  ]
+  ],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

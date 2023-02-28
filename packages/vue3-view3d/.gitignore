@@ -22,3 +22,9 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+css/
+sass/
+declaration/
+dist/
+node_modules/

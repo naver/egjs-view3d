@@ -15,12 +15,14 @@
   PLATFORM_ID,
   SimpleChanges,
   ViewChild,
+  NgZone,
 } from "@angular/core";
-import { isPlatformBrowser } from "@angular/common";
+import { isPlatformServer } from "@angular/common";
+import { fromEvent, Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 import VanillaView3D, {
   EVENTS,
   DEFAULT_CLASS,
-  withMethods,
   ReadyEvent,
   LoadStartEvent,
   LoadEvent,
@@ -45,7 +47,7 @@ import VanillaView3D, {
   View3DOptions
 } from "@egjs/view3d";
 import View3DInterface from "./View3DInterface";
-import { optionNames, optionInputs, setterNames } from "./const";
+import { optionNames, setterNames } from "./const";
 
 @Component({
   selector: "ngx-view3d, [NgxView3D]",
@@ -55,13 +57,63 @@ import { optionNames, optionInputs, setterNames } from "./const";
   `,
   host: {
     style: "display: block;",
-    class: DEFAULT_CLASS.WRAPPER
+    class: "view3d-wrapper"
   },
-  inputs: optionInputs
+  inputs: [
+    "opt-src: src",
+    "opt-iosSrc: iosSrc",
+    "opt-variant: variant",
+    "opt-dracoPath: dracoPath",
+    "opt-ktxPath: ktxPath",
+    "opt-meshoptPath: meshoptPath",
+    "opt-fixSkinnedBbox: fixSkinnedBbox",
+    "opt-fov: fov",
+    "opt-center: center",
+    "opt-yaw: yaw",
+    "opt-pitch: pitch",
+    "opt-pivot: pivot",
+    "opt-initialZoom: initialZoom",
+    "opt-rotate: rotate",
+    "opt-translate: translate",
+    "opt-zoom: zoom",
+    "opt-autoplay: autoplay",
+    "opt-scrollable: scrollable",
+    "opt-wheelScrollable: wheelScrollable",
+    "opt-useGrabCursor: useGrabCursor",
+    "opt-ignoreCenterOnFit: ignoreCenterOnFit",
+    "opt-skybox: skybox",
+    "opt-envmap: envmap",
+    "opt-background: background",
+    "opt-exposure: exposure",
+    "opt-shadow: shadow",
+    "opt-skyboxBlur: skyboxBlur",
+    "opt-toneMapping: toneMapping",
+    "opt-useDefaultEnv: useDefaultEnv",
+    "opt-defaultAnimationIndex: defaultAnimationIndex",
+    "opt-animationRepeatMode: animationRepeatMode",
+    "opt-annotationURL: annotationURL",
+    "opt-annotationWrapper: annotationWrapper",
+    "opt-annotationSelector: annotationSelector",
+    "opt-annotationBreakpoints: annotationBreakpoints",
+    "opt-annotationAutoUnfocus: annotationAutoUnfocus",
+    "opt-webAR: webAR",
+    "opt-sceneViewer: sceneViewer",
+    "opt-quickLook: quickLook",
+    "opt-arPriority: arPriority",
+    "opt-poster: poster",
+    "opt-canvasSelector: canvasSelector",
+    "opt-autoInit: autoInit",
+    "opt-autoResize: autoResize",
+    "opt-useResizeObserver: useResizeObserver",
+    "opt-maintainSize: maintainSize",
+    "opt-on: on",
+    "opt-plugins: plugins",
+    "opt-maxDeltaTime: maxDeltaTime"
+  ]
 })
 export class NgxView3DComponent extends View3DInterface
   implements AfterViewInit, OnDestroy, OnChanges {
-  @Input() public canvasClass: string;
+  @Input() public canvasClass!: string;
 
   @Output("ready") public readyEmitter = new EventEmitter<ReadyEvent>();
   @Output("loadStart") public loadStartEmitter = new EventEmitter<LoadStartEvent>();
@@ -86,36 +138,42 @@ export class NgxView3DComponent extends View3DInterface
   @Output("arModelPlaced") public arModelPlacedEmitter = new EventEmitter<ARModelPlacedEvent>();
   @Output("quickLookTap") public quickLookTapEmitter = new EventEmitter<QuickLookTapEvent>();
 
-  @ViewChild("canvas") public canvas: ElementRef<HTMLCanvasElement>;
+  @ViewChild("canvas") public canvas!: ElementRef<HTMLCanvasElement>;
 
   public get element() { return this._elRef.nativeElement; }
-  private get _canvasElClass() { return `${DEFAULT_CLASS.CANVAS} ${this.canvasClass ?? ""}`.trim(); }
+  public get _canvasElClass() { return `${DEFAULT_CLASS.CANVAS} ${this.canvasClass ?? ""}`.trim(); }
+  private _destroy$ = new Subject<void>();
 
   public constructor(
     private _elRef: ElementRef<HTMLElement>,
-    @Inject(PLATFORM_ID) private _platformId
+    @Inject(PLATFORM_ID) private _platformId: any,
+    private _ngZone: NgZone
   ) {
     super();
     this._view3D = null;
   }
 
   public ngAfterViewInit() {
-    if (!isPlatformBrowser(this._platformId)) return;
+    if (isPlatformServer(this._platformId)) return;
 
     const container = this._elRef.nativeElement;
     const options = this._getOptions();
 
-    this._view3D = new VanillaView3D(container, options);
+    this._view3D = this._ngZone.runOutsideAngular(
+      () => new VanillaView3D(container, options)
+    );
 
     this._bindEvents();
   }
 
   public ngOnDestroy() {
+    this._destroy$.next();
     this._view3D?.destroy();
   }
 
   public ngOnChanges(changes: SimpleChanges) {
-    if (!this._view3D) return;
+    const view3D = this._view3D;
+    if (!view3D) return;
 
     setterNames.forEach(name => {
       const changed = changes[`opt-${name}`];
@@ -125,33 +183,33 @@ export class NgxView3DComponent extends View3DInterface
       const newProp = changed.currentValue;
 
       if (newProp !== oldProp) {
-        this._view3D[name] = newProp;
+        (view3D as any)[name] = newProp;
       }
     });
   }
 
   private _getOptions() {
     return optionNames.reduce((options, name) => {
-      options[name] = this[`opt-${name}`];
+      (options as any)[name] = (this as any)[`opt-${name}`];
       return options;
     }, {}) as View3DOptions;
   }
 
   private _bindEvents() {
-    const view3D = this._view3D;
+    const view3D = this._view3D!;
 
     Object.keys(EVENTS).forEach(evtKey => {
-      const evtName = EVENTS[evtKey];
+      const evtName = (EVENTS as any)[evtKey];
 
-      view3D.on(evtName, e => {
-        const emitter = this[`${evtName}Emitter`];
-
-        e.currentTarget = this;
-
-        if (emitter) {
-          emitter.emit(e);
-        }
-      });
+      fromEvent(view3D, evtName)
+        .pipe(takeUntil(this._destroy$))
+        .subscribe((event: any) => {
+          const emitter = (this as any)[`${evtName}Emitter`];
+          if (emitter && emitter.observers.length > 0) {
+            event.currentTarget = this;
+            this._ngZone.run(() => emitter.emit(event));
+          }
+        });
     });
   }
 }
