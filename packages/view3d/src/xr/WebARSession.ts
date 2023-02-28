@@ -4,7 +4,6 @@
  */
 
 import * as THREE from "three";
-import type { XRSystem } from "webxr";
 
 import View3D from "../View3D";
 import Animation from "../core/Animation";
@@ -21,10 +20,6 @@ import ARScene from "./ARScene";
 import DOMOverlay from "./features/DOMOverlay";
 import HitTest from "./features/HitTest";
 import LightEstimation from "./features/LightEstimation";
-
-declare global {
-  interface Navigator { xr: XRSystem }
-}
 
 /**
  * Options for WebARSession
@@ -52,20 +47,6 @@ export interface WebARSessionOptions extends WebARControlOptions {
  * WebXR based abstract AR session class
  */
 class WebARSession implements ARSession {
-  /**
-   * Return availability of this session
-   * @returns {Promise<boolean>} A Promise that resolves availability of this session(boolean).
-   */
-  public static isAvailable() {
-    if (
-      !XR.WEBXR_SUPPORTED()
-      || !HitTest.isAvailable()
-      || !DOMOverlay.isAvailable()
-    ) return Promise.resolve(false);
-
-    return navigator.xr.isSessionSupported(XR.SESSION.AR);
-  }
-
   public static readonly type = AR_SESSION_TYPE.WEBXR;
 
   // Options
@@ -151,6 +132,20 @@ class WebARSession implements ARSession {
   }
 
   /**
+   * Return availability of this session
+   * @returns {Promise<boolean>} A Promise that resolves availability of this session(boolean).
+   */
+  public static isAvailable() {
+    if (
+      !XR.WEBXR_SUPPORTED()
+      || !HitTest.isAvailable()
+      || !DOMOverlay.isAvailable()
+    ) return Promise.resolve(false);
+
+    return navigator.xr!.isSessionSupported(XR.SESSION.AR);
+  }
+
+  /**
    * Enter session
    * @param view3D Instance of the View3D
    * @returns {Promise}
@@ -178,7 +173,7 @@ class WebARSession implements ARSession {
       lightEstimation.init();
     }
 
-    const session = await navigator.xr.requestSession(XR.SESSION.AR, features) as unknown as THREE.XRSession;
+    const session = await navigator.xr!.requestSession(XR.SESSION.AR, features) as unknown as THREE.XRSession;
 
     // Cache original values
     const originalPixelRatio = threeRenderer.getPixelRatio();

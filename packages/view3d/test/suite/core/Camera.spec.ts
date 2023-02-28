@@ -107,6 +107,7 @@ describe("Camera", () => {
       await loadDefaultModel(view3D);
 
       const camera = view3D.camera;
+      camera.updatePosition();
       const prevHeight = view3D.renderer.size.height;
       const prevRenderHeight = camera.renderHeight;
 

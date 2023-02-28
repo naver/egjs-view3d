@@ -6,16 +6,8 @@
     "**/*.css",
     "**/*.sass"
   ],
-  "peerDependencies": {
-    "@angular/common": ">=10.0.0",
-    "@angular/core": ">=10.0.0"
-  },
   "dependencies": {
     "@egjs/view3d": "~2.10.1"
-  },
-  "devDependencies": {
-    "@angular/common": "~10.0.0",
-    "@angular/core": "~10.0.0"
   },
   "repository": {
     "type": "git",
@@ -31,5 +23,14 @@
   "bugs": {
     "url": "https://github.com/naver/egjs-view3d/issues"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "keywords": [
+    "3D",
+    "3D-model",
+    "model-viewer",
+    "three",
+    "webgl",
+    "canvas",
+    "typescript"
+  ]
 }

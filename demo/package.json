@@ -54,5 +54,8 @@
     "react-tooltip": "^4.2.21",
     "remark-breaks": "^2.0.2",
     "sass": "^1.43.4"
+  },
+  "installConfig": {
+    "hoistingLimits": "workspaces"
   }
 }

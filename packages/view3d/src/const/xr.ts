@@ -16,7 +16,7 @@ export const QUICK_LOOK_SUPPORTED = () => {
   const anchorEl = document.createElement("a");
   return anchorEl.relList && anchorEl.relList.supports && anchorEl.relList.supports("ar");
 };
-export const WEBXR_SUPPORTED = (): boolean => navigator.xr && !!navigator.xr.isSessionSupported;
+export const WEBXR_SUPPORTED = (): boolean => !!navigator.xr && !!navigator.xr.isSessionSupported;
 export const HIT_TEST_SUPPORTED = (): boolean => window.XRSession && window.XRSession.prototype.requestHitTestSource;
 export const DOM_OVERLAY_SUPPORTED = (): boolean => window.XRDOMOverlayState != null;
 

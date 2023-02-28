@@ -1,4 +1,4 @@
-const buildHelper = require("@egjs/build-helper");
+const buildHelper = require("../../config/build-helper");
 
 const defaultOptions = {
   tsconfig: "tsconfig.build.json",
@@ -27,6 +27,7 @@ export default buildHelper([
     external: {
       "react": "React",
       "react-dom": "ReactDOM",
+      "three": "THREE",
       "@egjs/view3d": "View3D",
       "@egjs/component": "Component"
     }

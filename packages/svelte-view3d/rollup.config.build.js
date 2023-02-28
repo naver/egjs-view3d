@@ -1,14 +1,15 @@
-
-import buildHelper from "@egjs/build-helper";
+/* eslint-env node */
 import svelte from "rollup-plugin-svelte";
 import sveltePreprocess, { replace } from "svelte-preprocess";
 import nodeResolve from "@rollup/plugin-node-resolve";
 
 import replaces from "./replace";
+const buildHelper = require("../../config/build-helper");
 
 const defaultOptions = {
 	external: {
 		svelte: "svelte",
+    three: "THREE",
     "@egjs/view3d": "View3D",
     "@egjs/component": "Component"
 	},

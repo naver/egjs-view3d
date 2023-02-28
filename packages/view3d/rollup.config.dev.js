@@ -1,9 +1,7 @@
 /* eslint-disable import/order */
 const glslify = require("rollup-plugin-glslify");
-const buildHelper = require("./config/build-helper");
+const buildHelper = require("../../config/build-helper");
 const { babel } = require("@rollup/plugin-babel");
-const serve = require("rollup-plugin-serve");
-const livereload = require("rollup-plugin-livereload");
 
 export const name = "View3D";
 export const fileName = "view3d";

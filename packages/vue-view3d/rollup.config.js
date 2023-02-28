@@ -1,9 +1,18 @@
-const buildHelper = require("@egjs/build-helper");
+/* eslint-env node */
+const buildHelper = require("../../config/build-helper");
 const VuePlugin = require("rollup-plugin-vue");
+
+const external = {
+  "vue": "Vue",
+  "three": "THREE",
+  "@egjs/view3d": "View3D",
+  "@egjs/component": "Component",
+};
 
 const defaultOptions = {
   sourcemap: true,
-  plugins: [VuePlugin()]
+  plugins: [VuePlugin()],
+  external
 };
 
 export default buildHelper([

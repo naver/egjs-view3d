@@ -242,15 +242,20 @@ fabric.properties
 # https://plugins.jetbrains.com/plugin/8053-azure-toolkit-for-intellij
 .idea/**/azureSettings.xml
 
+### yarn ###
+# https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored
+
+.yarn/*
+!.yarn/releases
+!.yarn/patches
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+
 # End of https://www.gitignore.io/api/node,visualstudiocode,webstorm,osx
 
 ## Custom ###
 .DS_Store
-demo/release/
-dist/
-outjs/
-declaration/
-css/
 TODO.md
 *.lerna-backup
 *.pem

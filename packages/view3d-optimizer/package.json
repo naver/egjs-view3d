@@ -3,9 +3,7 @@
   "version": "1.0.1",
   "description": "glTF/glb optimizer for View3D",
   "main": "index.js",
-  "bin": {
-    "view3d-optimizer": "./index.js"
-  },
+  "bin": "./index.js",
   "author": "NAVER Corp.",
   "license": "MIT",
   "keywords": [

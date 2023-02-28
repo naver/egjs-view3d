@@ -1,5 +1,5 @@
-const buildHelper = require("@egjs/build-helper");
-const commonjs = require("rollup-plugin-commonjs");
+/* eslint-env node */
+const buildHelper = require("../../config/build-helper");
 const vue = require("rollup-plugin-vue");
 
 const external = {
@@ -11,12 +11,12 @@ const external = {
 const defaultOptions = {
   sourcemap: true,
   plugins: [
-    commonjs(),
     vue()
   ],
   external
 };
-export default buildHelper([
+
+module.exports = buildHelper([
   {
     ...defaultOptions,
     format: "es",
